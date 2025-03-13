@@ -132,7 +132,6 @@ class InterchangeControlHeaderTest {
      */
     @Test
     void testDefaultValues() throws ValidationException {
-        // Create a minimal header with only required fields
         InterchangeControlHeader header = createMinimalHeader();
 
         // Check that defaults are applied

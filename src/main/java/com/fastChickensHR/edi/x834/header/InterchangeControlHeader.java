@@ -194,8 +194,13 @@ public abstract class InterchangeControlHeader extends Segment {
             this.isa10 = context.getFormattedDocumentTime();
         }
 
-        public Builder setIsa01(String isa01) {
-            this.isa01 = isa01;
+        public Builder setIsa06(String isa06) {
+            this.isa06 = TextUtils.padRight(isa06, 15);
+            return this;
+        }
+
+        public Builder setIsa08(String isa08) {
+            this.isa08 = TextUtils.padRight(isa08, 15);
             return this;
         }
 
