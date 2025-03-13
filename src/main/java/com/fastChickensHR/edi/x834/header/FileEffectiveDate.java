@@ -4,6 +4,8 @@ import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 public abstract class FileEffectiveDate extends Segment {
@@ -43,6 +45,8 @@ public abstract class FileEffectiveDate extends Segment {
         return getDtp03();
     }
 
+    @Setter
+    @Accessors(chain = true)
     public static class Builder {
         private String dtp01 = DEFAULT_DATE_TIME_QUALIFIER;
         private String dtp02;
@@ -51,21 +55,6 @@ public abstract class FileEffectiveDate extends Segment {
         public Builder(x834Context context) {
             this.dtp02 = context.getDateFormat().getFormat();
             this.dtp03 = context.getFormattedDocumentDate();
-        }
-
-        public Builder setDtp01(String value) {
-            this.dtp01 = value;
-            return this;
-        }
-
-        public Builder setDtp02(String value) {
-            this.dtp02 = value;
-            return this;
-        }
-
-        public Builder setDtp03(String value) {
-            this.dtp03 = value;
-            return this;
         }
 
         public Builder setDateTimeQualifier(String value) {

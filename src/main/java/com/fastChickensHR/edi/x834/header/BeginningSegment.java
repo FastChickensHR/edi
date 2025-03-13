@@ -4,6 +4,8 @@ import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * Represents the Beginning Segment (BGN) for a transaction set in an EDI 834 document.
@@ -49,17 +51,7 @@ public abstract class BeginningSegment extends Segment {
 
     @Override
     public String[] getElementValues() {
-        return new String[]{
-                bgn01,
-                bgn02,
-                bgn03,
-                bgn04,
-                bgn05,
-                bgn06,
-                bgn07,
-                bgn08,
-                bgn09
-        };
+        return new String[]{bgn01, bgn02, bgn03, bgn04, bgn05, bgn06, bgn07, bgn08, bgn09};
     }
 
     private void validateRequiredFields() throws ValidationException {
@@ -111,9 +103,8 @@ public abstract class BeginningSegment extends Segment {
         return getBgn09();
     }
 
-    /**
-     * Builder for BeginningSegment
-     */
+    @Setter
+    @Accessors(chain = true)
     public static class Builder {
         private final x834Context context;
         private String bgn01 = DEFAULT_TRANSACTION_SET_PURPOSE_CODE;
@@ -132,81 +123,36 @@ public abstract class BeginningSegment extends Segment {
             this.bgn03 = context.getFormattedDocumentDate();
         }
 
-        public Builder setBgn01(String bgn01) {
-            this.bgn01 = bgn01;
-            return this;
-        }
-
         public Builder setTransactionSetPurposeCode(String code) {
             return setBgn01(code);
-        }
-
-        public Builder setBgn02(String bgn02) {
-            this.bgn02 = bgn02;
-            return this;
         }
 
         public Builder setReferenceIdentification(String reference) {
             return setBgn02(reference);
         }
 
-        public Builder setBgn03(String bgn03) {
-            this.bgn03 = bgn03;
-            return this;
-        }
-
         public Builder setDate(String date) {
             return setBgn03(date);
-        }
-
-        public Builder setBgn04(String bgn04) {
-            this.bgn04 = bgn04;
-            return this;
         }
 
         public Builder setTime(String time) {
             return setBgn04(time);
         }
 
-        public Builder setBgn05(String bgn05) {
-            this.bgn05 = bgn05;
-            return this;
-        }
-
         public Builder setTimeZoneCode(String timeZoneCode) {
             return setBgn05(timeZoneCode);
-        }
-
-        public Builder setBgn06(String bgn06) {
-            this.bgn06 = bgn06;
-            return this;
         }
 
         public Builder setOriginalReferenceNumber(String originalReferenceNumber) {
             return setBgn06(originalReferenceNumber);
         }
 
-        public Builder setBgn07(String bgn07) {
-            this.bgn07 = bgn07;
-            return this;
-        }
-
         public Builder setTransactionTypeCode(String transactionTypeCode) {
             return setBgn07(transactionTypeCode);
         }
 
-        public Builder setBgn08(String bgn08) {
-            this.bgn08 = bgn08;
-            return this;
-        }
-
         public Builder setActionCode(String actionCode) {
             return setBgn08(actionCode);
-        }
-
-        public Builder setBgn09(String bgn09) {
-            this.bgn09 = bgn09;
-            return this;
         }
 
         public Builder setSecurityLevelCode(String securityLevelCode) {

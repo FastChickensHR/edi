@@ -5,6 +5,8 @@ import com.fastChickensHR.edi.x834.common.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -108,6 +110,8 @@ public abstract class FunctionalGroupHeader extends Segment {
         return getGs08();
     }
 
+    @Setter
+    @Accessors(chain = true)
     public static class Builder {
         private final x834Context context;
         private String gs01 = DEFAULT_FUNCTIONAL_ID_CODE;
@@ -125,27 +129,12 @@ public abstract class FunctionalGroupHeader extends Segment {
             this.gs05 = context.getFormattedDocumentTime();
         }
 
-        public Builder setGs01(String gs01) {
-            this.gs01 = gs01;
-            return this;
-        }
-
         public Builder setFunctionalIdentifierCode(String code) {
             return setGs01(code);
         }
 
-        public Builder setGs02(String gs02) {
-            this.gs02 = gs02;
-            return this;
-        }
-
         public Builder setApplicationSenderCode(String code) {
             return setGs02(code);
-        }
-
-        public Builder setGs03(String gs03) {
-            this.gs03 = gs03;
-            return this;
         }
 
         public Builder setApplicationReceiverCode(String code) {
@@ -170,27 +159,12 @@ public abstract class FunctionalGroupHeader extends Segment {
             return setGs05(value);
         }
 
-        public Builder setGs06(String gs06) {
-            this.gs06 = gs06;
-            return this;
-        }
-
         public Builder setGroupControlNumber(String number) {
             return setGs06(number);
         }
 
-        public Builder setGs07(String gs07) {
-            this.gs07 = gs07;
-            return this;
-        }
-
         public Builder setResponsibleAgencyCode(String code) {
             return setGs07(code);
-        }
-
-        public Builder setGs08(String gs08) {
-            this.gs08 = gs08;
-            return this;
         }
 
         public Builder setVersionReleaseIndustryCode(String code) {
