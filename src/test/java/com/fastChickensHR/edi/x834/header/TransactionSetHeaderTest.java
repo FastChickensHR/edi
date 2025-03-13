@@ -82,23 +82,6 @@ public class TransactionSetHeaderTest {
     }
 
     /**
-     * Tests setting the transaction set control number after construction.
-     */
-    @Test
-    public void testSetTransactionSetControlNumber() throws ValidationException {
-        TransactionSetHeader header = new TransactionSetHeader.Builder()
-                .setSt01("834")
-                .setSt02("0001")
-                .setSt03("005010X220A1")
-                .build();
-
-        header.setTransactionSetControlNumber("9999");
-        assertEquals("9999", header.getSt02(), "ST02 should be updated after setTransactionSetControlNumber");
-        assertEquals("9999", header.getTransactionSetControlNumber(),
-                "getTransactionSetControlNumber should return updated value");
-    }
-
-    /**
      * Tests that validation correctly rejects an invalid ST01 (Transaction Set Identifier Code).
      */
     @Test

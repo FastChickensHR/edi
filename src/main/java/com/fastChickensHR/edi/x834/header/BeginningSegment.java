@@ -129,8 +129,7 @@ public abstract class BeginningSegment extends Segment {
         public Builder(x834Context context) {
             this.context = context;
             this.bgn02 = context.getTransactionSetControlNumber();
-            // Setting current date in CCYYMMDD format
-            this.bgn03 = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+            this.bgn03 = context.getFormattedDocumentDate();
         }
 
         public Builder setBgn01(String bgn01) {
