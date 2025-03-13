@@ -2,6 +2,8 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Abstract class representing the beginning segment of the header loop in an EDI document.
@@ -9,6 +11,7 @@ import com.fastChickensHR.edi.x834.common.exception.ValidationException;
  * the transaction set identifier code (ST01), transaction set control number (ST02),
  * and implementation convention reference (ST03).
  */
+@Getter
 public abstract class TransactionSetHeader extends Segment {
     // Constants for segment and field identifiers
     public static final String SEGMENT_ID = "ST";
@@ -17,14 +20,24 @@ public abstract class TransactionSetHeader extends Segment {
     public static final String DEFAULT_CONVENTION_REFERENCE = "005010X220A1";
 
     private final String st01; // Transaction Set Identifier Code
+    @Setter
     private String st02; // Transaction Set Control Number
     private final String st03; // Implementation Convention Reference
 
-    protected TransactionSetHeader(Builder builder) {
-        super();
+    protected TransactionSetHeader(Builder builder) throws ValidationException {
         this.st01 = builder.st01;
         this.st02 = builder.st02;
         this.st03 = builder.st03;
+
+        validateRequiredFields();
+    }
+    private void validateRequiredFields() throws ValidationException {
+        if (st01 == null || st01.trim().isEmpty()) {
+            throw new ValidationException("ST01 (Transaction Set Identifier Code) cannot be blank");
+        }
+        if (st02 == null || st02.trim().isEmpty()) {
+            throw new ValidationException("ST02 (Transaction Control Number) cannot be blank");
+        }
     }
 
     @Override
@@ -37,140 +50,67 @@ public abstract class TransactionSetHeader extends Segment {
         return new String[]{st01, st02, st03};
     }
 
-    /**
-     * @return The Transaction Set Identifier Code (ST01) value
-     */
-    public String getSt01() {
-        return st01;
-    }
-
-    /**
-     * @return The Transaction Set Identifier Code (ST01) value
-     */
     public String getTransactionSetIdentifierCode() {
         return st01;
     }
 
-    /**
-     * @return The Transaction Set Control Number (ST02) value
-     */
-    public String getSt02() {
-        return st02;
-    }
-
-    /**
-     * @return The Transaction Set Control Number (ST02) value
-     */
     public String getTransactionSetControlNumber() {
         return st02;
     }
 
-    /**
-     * Sets the Transaction Set Control Number.
-     *
-     * @param value The control number to set (must match SE02)
-     */
-    public void setSt02(String value) {
-        this.st02 = value;
-    }
-
-    /**
-     * Sets the Transaction Set Control Number.
-     *
-     * @param value The control number to set (must match SE02)
-     */
     public void setTransactionSetControlNumber(String value) {
         this.st02 = value;
     }
 
-    /**
-     * @return The Implementation Convention Reference (ST03) value
-     */
-    public String getSt03() {
-        return st03;
-    }
-
-    /**
-     * @return The Implementation Convention Reference (ST03) value
-     */
     public String getImplementationConventionReference() {
         return st03;
     }
 
+    @Getter
+    @Setter
     public static class Builder {
-        // Using default values from constants
         private String st01 = DEFAULT_TRANSACTION_SET_ID;
         private String st02 = DEFAULT_CONTROL_NUMBER;
         private String st03 = DEFAULT_CONVENTION_REFERENCE;
 
-        /**
-         * Sets the ST01 field value (Transaction Set Identifier Code)
-         */
         public Builder setSt01(String st01) {
             this.st01 = st01;
             return this;
         }
 
-        /**
-         * Sets the ST02 field value (Transaction Set Control Number)
-         */
         public Builder setSt02(String st02) {
             this.st02 = st02;
             return this;
         }
 
-        /**
-         * Sets the ST03 field value (Implementation Convention Reference)
-         */
         public Builder setSt03(String st03) {
             this.st03 = st03;
             return this;
         }
 
-        /**
-         * Sets the Transaction Set Identifier Code (ST01)
-         */
         public Builder setTransactionSetIdentifierCode(String code) {
-            this.st01 = code;
-            return this;
+            return setSt01(code);
         }
 
-        /**
-         * Sets the Transaction Set Control Number (ST02)
-         */
         public Builder setTransactionSetControlNumber(String number) {
-            this.st02 = number;
-            return this;
+            return setSt02(number);
+        }
+
+        public Builder setImplementationConventionReference(String reference) {
+            return setSt03(reference);
         }
 
         /**
-         * Sets the Implementation Convention Reference (ST03)
+         * Builds a new TransactionSetHeader instance
          */
-        public Builder setImplementationConventionReference(String reference) {
-            this.st03 = reference;
-            return this;
-        }
-
         public TransactionSetHeader build() throws ValidationException {
-            validateRequiredFields();
-            return new ConcreteTransactionSetHeaderSegment(this);
-        }
-
-        private void validateRequiredFields() throws ValidationException {
-            if (st01 == null || st01.trim().isEmpty()) {
-                throw new ValidationException("ST01 (Transaction Set Identifier Code) is required");
-            }
-            if (st02 == null || st02.trim().isEmpty()) {
-                throw new ValidationException("ST02 (Transaction Set Control Number) is required");
-            }
+            return new TransactionSetHeaderImpl(this);
         }
     }
 
-    /**
-     * Concrete implementation of the HeaderLoopBeginningSegment
-     */
-    private static class ConcreteTransactionSetHeaderSegment extends TransactionSetHeader {
-        public ConcreteTransactionSetHeaderSegment(Builder builder) {
+    // Concrete implementation class that can be instantiated
+    private static class TransactionSetHeaderImpl extends TransactionSetHeader {
+        private TransactionSetHeaderImpl(Builder builder) throws ValidationException {
             super(builder);
         }
     }
