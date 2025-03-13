@@ -12,6 +12,7 @@ import lombok.Setter;
  * and implementation convention reference (ST03).
  */
 @Getter
+@Setter
 public abstract class TransactionSetHeader extends Segment {
     // Constants for segment and field identifiers
     public static final String SEGMENT_ID = "ST";
@@ -20,7 +21,6 @@ public abstract class TransactionSetHeader extends Segment {
     public static final String DEFAULT_CONVENTION_REFERENCE = "005010X220A1";
 
     private final String st01; // Transaction Set Identifier Code
-    @Setter
     private String st02; // Transaction Set Control Number
     private final String st03; // Implementation Convention Reference
 
@@ -31,6 +31,7 @@ public abstract class TransactionSetHeader extends Segment {
 
         validateRequiredFields();
     }
+
     private void validateRequiredFields() throws ValidationException {
         if (st01 == null || st01.trim().isEmpty()) {
             throw new ValidationException("ST01 (Transaction Set Identifier Code) cannot be blank");
@@ -56,10 +57,6 @@ public abstract class TransactionSetHeader extends Segment {
 
     public String getTransactionSetControlNumber() {
         return st02;
-    }
-
-    public void setTransactionSetControlNumber(String value) {
-        this.st02 = value;
     }
 
     public String getImplementationConventionReference() {
