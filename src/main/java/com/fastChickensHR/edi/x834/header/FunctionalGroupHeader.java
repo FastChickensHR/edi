@@ -10,8 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Abstract class representing the Functional Group Header segment in an EDI document.
- * Now using the x834Context for document-level information.
+ * Represents the header segment (GS segment) of a functional group in an EDI (Electronic Data Interchange) message.
+ * This segment contains metadata about the functional group,
+ * such as identifiers, sender and receiver codes, and version details.
  */
 @Getter
 public abstract class FunctionalGroupHeader extends Segment {
