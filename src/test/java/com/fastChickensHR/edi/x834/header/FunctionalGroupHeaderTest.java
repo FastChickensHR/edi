@@ -1,26 +1,36 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.common.x834Context;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionalGroupHeaderTest {
-
+    x834Context context = new x834Context();
     /**
      * Tests for getSegmentIdentifier method in FunctionalGroupHeader class.
      * This method is expected to always return the constant value "GS".
      */
     @Test
     void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder()
+        FunctionalGroupHeader segment = new FunctionalGroupHeader.Builder(context)
+                .setGs01("BE")
                 .setGs02("SenderCode")
                 .setGs03("ReceiverCode")
-                .setGs04("20231115")
-                .setGs05("1230")
+                .setGs04((LocalDate.of(2023, 11, 15)))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("1")
                 .build();
+        segment.setContext(context);
 
-        assertEquals("GS", header.getSegmentIdentifier(), "Expected segment identifier should be 'GS'");
+        assertEquals("GS", segment.getSegmentIdentifier(), "Expected segment identifier should be 'GS'");
+        assertEquals("GS*BE*SenderCode*ReceiverCode*20231115*1230*1*X*005010X220A1~", segment.render().trim(), "The segment is not formatted correctly.");
     }
 
     /**
@@ -28,12 +38,12 @@ class FunctionalGroupHeaderTest {
      */
     @Test
     void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder()
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context)
                 .setGs01("ZZ")
                 .setGs02("SenderCode")
                 .setGs03("ReceiverCode")
-                .setGs04("20231010")
-                .setGs05("1015")
+                .setGs04(LocalDate.of(2023, 10, 10))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(10, 15, 0))
                 .setGs06("123456")
                 .setGs07("X")
                 .setGs08("005010X220A1")
@@ -42,7 +52,7 @@ class FunctionalGroupHeaderTest {
         assertEquals("ZZ", header.getFunctionalIdentifierCode(), "Functional Identifier Code should match GS01");
         assertEquals("SenderCode", header.getApplicationSenderCode(), "Application Sender Code should match GS02");
         assertEquals("ReceiverCode", header.getApplicationReceiverCode(), "Application Receiver Code should match GS03");
-        assertEquals("20231010", header.getDate(), "Date should match GS04");
+        assertEquals("20231010", header.getTransactionSetCreationDate(), "Date should match GS04");
         assertEquals("1015", header.getTime(), "Time should match GS05");
         assertEquals("123456", header.getGroupControlNumber(), "Group Control Number should match GS06");
         assertEquals("X", header.getResponsibleAgencyCode(), "Responsible Agency Code should match GS07");
@@ -54,12 +64,12 @@ class FunctionalGroupHeaderTest {
      */
     @Test
     void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        FunctionalGroupHeader.Builder builder = new FunctionalGroupHeader.Builder()
+        FunctionalGroupHeader.Builder builder = new FunctionalGroupHeader.Builder(context)
                 .setFunctionalIdentifierCode("BE")
                 .setApplicationSenderCode("AppSender")
                 .setApplicationReceiverCode("AppReceiver")
-                .setDate("20231116")
-                .setTime("1245")
+                .setTransactionSetCreationDate(LocalDate.of(2023, 11, 16))
+                .setTransactionSetCreationTime(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
                 .setGroupControlNumber("789012")
                 .setResponsibleAgencyCode("X")
                 .setVersionReleaseIndustryCode("005010X220A2");
@@ -70,9 +80,211 @@ class FunctionalGroupHeaderTest {
         assertEquals("AppSender", header.getGs02(), "GS02 should match Application Sender Code");
         assertEquals("AppReceiver", header.getGs03(), "GS03 should match Application Receiver Code");
         assertEquals("20231116", header.getGs04(), "GS04 should match Date");
-        assertEquals("1245", header.getGs05(), "GS05 should match Time");
+        assertEquals("1230", header.getGs05(), "GS05 should match Time");
         assertEquals("789012", header.getGs06(), "GS06 should match Group Control Number");
         assertEquals("X", header.getGs07(), "GS07 should match Responsible Agency Code");
         assertEquals("005010X220A2", header.getGs08(), "GS08 should match Version/Release/Industry Identifier Code");
+    }
+
+    /**
+     * Tests the EdiSegment formatting.
+     */
+    @Test
+    void testToEdiSegmentFormatting() throws ValidationException {
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("123456")
+                .setGs07("X")
+                .setGs08("005010X220A1")
+                .build();
+        header.setContext(context);
+
+        String expected = "GS*HC*SenderCode*ReceiverCode*20231115*1230*123456*X*005010X220A1~";
+        assertEquals(expected, header.render().trim(),
+                "The EDI segment should be formatted correctly with default context");
+    }
+
+    /**
+     * Tests the getElementValues method.
+     */
+    @Test
+    void testGetElementValues() throws ValidationException {
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("123456")
+                .setGs07("X")
+                .setGs08("005010X220A1")
+                .build();
+
+        String[] expectedValues = {"HC", "SenderCode", "ReceiverCode", "20231115", "1230", "123456", "X", "005010X220A1"};
+        assertArrayEquals(expectedValues, header.getElementValues(),
+                "Element values array should contain all field values in correct order");
+    }
+
+    /* Validation Tests for GS02 - Application Sender Code */
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "   "})
+    void testInvalidGs02_ShouldThrowValidationException(String invalidValue) {
+        FunctionalGroupHeader.Builder builder = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02(invalidValue)
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0));
+
+        ValidationException exception = assertThrows(ValidationException.class, builder::build,
+                "Building with invalid GS02 should throw ValidationException");
+        assertTrue(exception.getMessage().contains("GS02"),
+                "Exception message should mention the field name GS02");
+    }
+
+    /* Validation Tests for GS03 - Application Receiver Code */
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "   "})
+    void testInvalidGs03_ShouldThrowValidationException(String invalidValue) {
+        FunctionalGroupHeader.Builder builder = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03(invalidValue)
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0));
+
+        ValidationException exception = assertThrows(ValidationException.class, builder::build,
+                "Building with invalid GS03 should throw ValidationException");
+        assertTrue(exception.getMessage().contains("GS03"),
+                "Exception message should mention the field name GS03");
+    }
+
+    /* Validation Tests for GS06 - Group Control Number */
+
+    @ParameterizedTest
+    @ValueSource(strings = {" ", "   "})
+    void testInvalidGs06_ShouldThrowValidationException(String invalidValue) {
+        FunctionalGroupHeader.Builder builder = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04((LocalDate.of(2023, 11, 15)))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(14, 30, 0))
+                .setGs06(invalidValue);
+
+        ValidationException exception = assertThrows(ValidationException.class, builder::build,
+                "Building with invalid GS06 should throw ValidationException");
+        assertTrue(exception.getMessage().contains("GS06"),
+                "Exception message should mention the field name GS06");
+    }
+
+    /* Validation Tests for GS08 - Version/Release/Industry Identifier Code */
+
+    @ParameterizedTest
+    @ValueSource(strings = {" ", "   "})
+    void testInvalidGs08_ShouldThrowValidationException(String invalidValue) {
+        FunctionalGroupHeader.Builder builder = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("123456")
+                .setGs07("X")
+                .setGs08(invalidValue);
+
+        ValidationException exception = assertThrows(ValidationException.class, builder::build,
+                "Building with invalid GS08 should throw ValidationException");
+        assertTrue(exception.getMessage().contains("GS08"),
+                "Exception message should mention the field name GS08");
+    }
+
+    /**
+     * Tests updating a field after construction.
+     */
+    @Test
+    void testUpdateFieldAfterConstruction() throws ValidationException {
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04((LocalDate.of(2023, 11, 15)))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("123456")
+                .setGroupControlNumber("999999")
+                .build();
+
+        assertEquals("999999", header.getGs06(),
+                "GS06 should be updated after setGroupControlNumber");
+        assertEquals("999999", header.getGroupControlNumber(),
+                "getGroupControlNumber should return the updated value");
+    }
+
+    /**
+     * Tests valid date formats.
+     */
+    @Test
+    void testValidDateFormats() throws ValidationException {
+        // Test minimum valid date
+        FunctionalGroupHeader header1 = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(1, 1, 1))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("123456")
+                .build();
+
+        assertEquals("00010101", header1.getTransactionSetCreationDate(), "Should accept minimum date");
+
+        // Test maximum valid date
+        FunctionalGroupHeader header2 = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(9999, 12, 31))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(12, 30, 0))
+                .setGs06("123456")
+                .build();
+
+        assertEquals("99991231", header2.getTransactionSetCreationDate(), "Should accept maximum date");
+    }
+
+    /**
+     * Tests valid time formats.
+     */
+    @Test
+    void testValidTimeFormats() throws ValidationException {
+        // Test minimum valid time
+        FunctionalGroupHeader header1 = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(0, 0, 0))
+                .setGs06("123456")
+                .build();
+
+        assertEquals("0000", header1.getTime(), "Should accept minimum time");
+
+        // Test maximum valid time
+        FunctionalGroupHeader header2 = new FunctionalGroupHeader.Builder(context)
+                .setGs01("HC")
+                .setGs02("SenderCode")
+                .setGs03("ReceiverCode")
+                .setGs04(LocalDate.of(2023, 11, 15))
+                .setGs05(LocalDate.of(2023, 11, 15).atTime(23, 59, 0))
+                .setGs06("123456")
+                .build();
+
+        assertEquals("2359", header2.getTime(), "Should accept maximum time");
     }
 }

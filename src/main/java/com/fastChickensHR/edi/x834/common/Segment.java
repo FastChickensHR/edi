@@ -1,52 +1,62 @@
 package com.fastChickensHR.edi.x834.common;
 
-import com.fastChickensHR.edi.x834.x834Document;
-import com.fastChickensHR.edi.x834.constants.ElementSeparator;
-import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
-
 /**
- * Abstract base class for all EDI segments
+ * Base class for all EDI segments.
+ * Now context-aware to reduce direct dependency on X834Document.
  */
 public abstract class Segment {
+    protected x834Context context;
 
     /**
-     * Gets the segment identifier code (e.g., "ST", "SE", "BGN", etc.)
-     * @return The segment identifier
+     * Sets the document context for this segment
+     *
+     * @param context The x834Context containing document-level information
+     */
+    public void setContext(x834Context context) {
+        this.context = context;
+    }
+
+    /**
+     * @return The x834Context for this segment
+     */
+    protected x834Context getContext() {
+        return context;
+    }
+
+    /**
+     * @return The segment identifier (e.g., "ST", "GS")
      */
     public abstract String getSegmentIdentifier();
 
     /**
-     * Gets the ordered list of element values for this segment
-     * @return Array of element values in the correct order
+     * @return Array of element values for this segment
      */
     public abstract String[] getElementValues();
 
     /**
-     * Creates the EDI segment string representation
-     * @param elementSeparator The separator to use between elements
-     * @param segmentTerminator The terminator to use at the end of the segment
-     * @return Properly formatted EDI segment string
+     * Renders the segment as a properly formatted EDI segment string
+     *
+     * @return The formatted segment string
      */
-    public String toEdiSegment(ElementSeparator elementSeparator, SegmentTerminator segmentTerminator) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getSegmentIdentifier());
-
-        for (String element : getElementValues()) {
-            sb.append(elementSeparator.getValue());
-            sb.append(element);
+    public String render() {
+        if (context == null) {
+            throw new IllegalStateException("Context must be set before rendering segment");
         }
 
-        sb.append(segmentTerminator.getValue());
-        return sb.toString();
-    }
+        StringBuilder builder = new StringBuilder();
+        builder.append(getSegmentIdentifier());
 
-    /**
-     * Convenience method to format a segment using an EightThirtyFourDocument
-     *
-     * @param document The EDI document containing separators and terminators
-     * @return Properly formatted EDI segment string
-     */
-    public String toEdiSegment(x834Document document) {
-        return toEdiSegment(document.getElementSeparator(), document.getSegmentTerminator());
+        String[] elements = getElementValues();
+        for (String element : elements) {
+            builder.append(context.getElementSeparator());
+            if (element != null) {
+                builder.append(element);
+            }
+        }
+
+        builder.append(context.getSegmentTerminator());
+        builder.append(context.getLineTerminator());
+
+        return builder.toString();
     }
 }
