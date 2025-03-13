@@ -109,6 +109,7 @@ public abstract class FunctionalGroupHeader extends Segment {
     }
 
     public static class Builder {
+        private final x834Context context;
         private String gs01 = DEFAULT_FUNCTIONAL_ID_CODE;
         private String gs02;
         private String gs03;
@@ -117,11 +118,11 @@ public abstract class FunctionalGroupHeader extends Segment {
         private String gs06;
         private String gs07 = DEFAULT_RESPONSIBLE_AGENCY_CODE;
         private String gs08 = DEFAULT_VERSION_CODE;
-        private final x834Context context;
 
-        // Passing context through Builder's constructor
         public Builder(x834Context context) {
             this.context = context;
+            this.gs04 = context.getFormattedDocumentDate();
+            this.gs05 = context.getFormattedDocumentTime();
         }
 
         public Builder setGs01(String gs01) {
