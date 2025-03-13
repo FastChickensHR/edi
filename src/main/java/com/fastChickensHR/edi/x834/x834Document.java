@@ -31,11 +31,9 @@ public class x834Document {
         }
 
         // Add other segments and set context for them
-        if (builder.additionalSegments != null) {
-            for (Segment segment : builder.additionalSegments) {
-                segment.setContext(context);
-                segments.add(segment);
-            }
+        for (Segment segment : builder.additionalSegments) {
+            segment.setContext(context);
+            segments.add(segment);
         }
     }
 
