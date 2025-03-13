@@ -4,6 +4,7 @@ import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * Abstract class representing the beginning segment of the header loop in an EDI document.
@@ -12,7 +13,6 @@ import lombok.Setter;
  * and implementation convention reference (ST03).
  */
 @Getter
-@Setter
 public abstract class TransactionSetHeader extends Segment {
     // Constants for segment and field identifiers
     public static final String SEGMENT_ID = "ST";
@@ -21,7 +21,7 @@ public abstract class TransactionSetHeader extends Segment {
     public static final String DEFAULT_CONVENTION_REFERENCE = "005010X220A1";
 
     private final String st01; // Transaction Set Identifier Code
-    private String st02; // Transaction Set Control Number
+    private final String st02; // Transaction Set Control Number
     private final String st03; // Implementation Convention Reference
 
     protected TransactionSetHeader(Builder builder) throws ValidationException {
@@ -63,27 +63,12 @@ public abstract class TransactionSetHeader extends Segment {
         return st03;
     }
 
-    @Getter
     @Setter
+    @Accessors(chain = true)
     public static class Builder {
         private String st01 = DEFAULT_TRANSACTION_SET_ID;
         private String st02 = DEFAULT_CONTROL_NUMBER;
         private String st03 = DEFAULT_CONVENTION_REFERENCE;
-
-        public Builder setSt01(String st01) {
-            this.st01 = st01;
-            return this;
-        }
-
-        public Builder setSt02(String st02) {
-            this.st02 = st02;
-            return this;
-        }
-
-        public Builder setSt03(String st03) {
-            this.st03 = st03;
-            return this;
-        }
 
         public Builder setTransactionSetIdentifierCode(String code) {
             return setSt01(code);

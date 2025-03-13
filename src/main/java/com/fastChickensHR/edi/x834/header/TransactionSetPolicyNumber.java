@@ -3,6 +3,8 @@ package com.fastChickensHR.edi.x834.header;
 import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 public abstract class TransactionSetPolicyNumber extends Segment {
@@ -36,21 +38,13 @@ public abstract class TransactionSetPolicyNumber extends Segment {
         return getRef02();
     }
 
+    @Setter
+    @Accessors(chain = true)
     public static class Builder {
         private String ref01 = DEFAULT_REFERENCE_IDENTIFICATION_QUALIFIER;
         private String ref02;
 
         public Builder() {
-        }
-
-        public Builder setRef01(String value) {
-            this.ref01 = value;
-            return this;
-        }
-
-        public Builder setRef02(String value) {
-            this.ref02 = value;
-            return this;
         }
 
         public Builder setReferenceIdentificationQualifier(String value) {

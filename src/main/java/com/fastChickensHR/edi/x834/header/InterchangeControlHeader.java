@@ -1,10 +1,12 @@
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.common.TextUtils;
+import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * Abstract class representing the Interchange Control Header segment in an EDI document.
@@ -69,7 +71,7 @@ public abstract class InterchangeControlHeader extends Segment {
             throw new ValidationException("ISA06 (Interchange Sender ID) cannot be blank");
         }
         if (isa06.length() != 15) {
-           throw new ValidationException("ISA06 (Interchange Sender ID must be 15 characters in length");
+            throw new ValidationException("ISA06 (Interchange Sender ID must be 15 characters in length");
         }
         if (isa08 == null || isa08.trim().isEmpty()) {
             throw new ValidationException("ISA08 (Interchange Receiver ID) cannot be blank");
@@ -166,9 +168,9 @@ public abstract class InterchangeControlHeader extends Segment {
         return isa16;
     }
 
-    @Getter
+    @Setter
+    @Accessors(chain = true)
     public static class Builder {
-        private final x834Context context;
         private String isa01 = DEFAULT_AUTHORIZATION_INFO_QUALIFIER;
         private String isa02 = DEFAULT_AUTHORIZATION_INFO;
         private String isa03 = DEFAULT_SECURITY_INFO_QUALIFIER;
@@ -188,7 +190,6 @@ public abstract class InterchangeControlHeader extends Segment {
 
 
         public Builder(x834Context context) {
-            this.context = context;
             this.isa09 = context.getFormattedDocumentDate();
             this.isa10 = context.getFormattedDocumentTime();
         }
@@ -202,135 +203,60 @@ public abstract class InterchangeControlHeader extends Segment {
             return setIsa01(qualifier);
         }
 
-        public Builder setIsa02(String isa02) {
-            this.isa02 = isa02;
-            return this;
-        }
-
         public Builder setAuthorizationInformation(String info) {
             return setIsa02(info);
-        }
-
-        public Builder setIsa03(String isa03) {
-            this.isa03 = isa03;
-            return this;
         }
 
         public Builder setSecurityInformationQualifier(String qualifier) {
             return setIsa03(qualifier);
         }
 
-        public Builder setIsa04(String isa04) {
-            this.isa04 = isa04;
-            return this;
-        }
-
         public Builder setSecurityInformation(String info) {
             return setIsa04(info);
-        }
-
-        public Builder setIsa05(String isa05) {
-            this.isa05 = isa05;
-            return this;
         }
 
         public Builder setInterchangeSenderQualifier(String qualifier) {
             return setIsa05(qualifier);
         }
 
-        public Builder setIsa06(String isa06) {
-            this.isa06 = TextUtils.padRight(isa06, 15);
-            return this;
-        }
-
         public Builder setInterchangeSenderID(String id) {
             return setIsa06(id);
-        }
-
-        public Builder setIsa07(String isa07) {
-            this.isa07 = isa07;
-            return this;
         }
 
         public Builder setInterchangeReceiverQualifier(String qualifier) {
             return setIsa07(qualifier);
         }
 
-        public Builder setIsa08(String isa08) {
-            this.isa08 = TextUtils.padRight(isa08, 15);
-            return this;
-        }
-
         public Builder setInterchangeReceiverID(String id) {
             return setIsa08(id);
-        }
-
-        public Builder setIsa09(String isa09) {
-            this.isa09 = isa09;
-            return this;
         }
 
         public Builder setInterchangeDate(String date) {
             return setIsa09(date);
         }
 
-        public Builder setIsa10(String isa10) {
-            this.isa10 = isa10;
-            return this;
-        }
-
         public Builder setInterchangeTime(String time) {
             return setIsa10(time);
-        }
-
-        public Builder setIsa11(String isa11) {
-            this.isa11 = isa11;
-            return this;
         }
 
         public Builder setInterchangeControlStandardsIdentifier(String identifier) {
             return setIsa11(identifier);
         }
 
-        public Builder setIsa12(String isa12) {
-            this.isa12 = isa12;
-            return this;
-        }
-
         public Builder setInterchangeControlVersionNumber(String version) {
             return setIsa12(version);
-        }
-
-        public Builder setIsa13(String isa13) {
-            this.isa13 = isa13;
-            return this;
         }
 
         public Builder setInterchangeControlNumber(String number) {
             return setIsa13(number);
         }
 
-        public Builder setIsa14(String isa14) {
-            this.isa14 = isa14;
-            return this;
-        }
-
         public Builder setAcknowledgmentRequested(String ack) {
             return setIsa14(ack);
         }
 
-        public Builder setIsa15(String isa15) {
-            this.isa15 = isa15;
-            return this;
-        }
-
         public Builder setUsageIndicator(String indicator) {
             return setIsa15(indicator);
-        }
-
-        public Builder setIsa16(String isa16) {
-            this.isa16 = isa16;
-            return this;
         }
 
         public Builder setComponentElementSeparator(String separator) {
