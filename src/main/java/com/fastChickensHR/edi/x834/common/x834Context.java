@@ -7,6 +7,8 @@ import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.LineTerminator;
 import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
 import com.fastChickensHR.edi.x834.constants.SubElementSeparator;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +18,8 @@ import java.time.LocalTime;
  * Context object that contains document-level information needed by segments.
  * This reduces direct coupling between segments and the X834Document.
  */
+@Getter
+@Setter
 public class x834Context {
     // Document formatting
     private ElementSeparator elementSeparator;
@@ -29,9 +33,11 @@ public class x834Context {
     private String senderCode;
     private String receiverCode;
     private LocalDate documentDate;
-    private LocalTime documentTime;
+    private LocalDateTime documentTime;
     private DateFormat dateFormat;
     private TimeFormat timeFormat;
+    private String formattedDocumentDate;
+    private String formattedDocumentTime;
 
     // Constants
     private static final String EDI_VERSION = "00501";
@@ -43,9 +49,11 @@ public class x834Context {
      */
     public x834Context() {
         this.documentDate = LocalDate.now();
-        this.documentTime = LocalTime.now();
+        this.documentTime = LocalDateTime.now();
         this.dateFormat = DateFormat.DATE;
         this.timeFormat = TimeFormat.TIME;
+        this.formattedDocumentDate = formatDate(documentDate);
+        this.formattedDocumentTime = formatTime(documentTime);
         this.elementSeparator = ElementSeparator.ASTERISK;
         this.segmentTerminator = SegmentTerminator.TILDE;
         this.subElementSeparator = SubElementSeparator.GREATER_THAN;
@@ -58,96 +66,16 @@ public class x834Context {
         return elementSeparator.getValue();
     }
 
-    public void setElementSeparator(ElementSeparator elementSeparator) {
-        this.elementSeparator = elementSeparator;
-    }
-
     public char getSubElementSeparator() {
         return subElementSeparator.getValue();
-    }
-
-    public void setSubElementSeparator(SubElementSeparator subElementSeparator) {
-        this.subElementSeparator = subElementSeparator;
     }
 
     public char getSegmentTerminator() {
         return segmentTerminator.getValue();
     }
 
-    public void setSegmentTerminator(SegmentTerminator segmentTerminator) {
-        this.segmentTerminator = segmentTerminator;
-    }
-
     public String getLineTerminator() {
         return lineTerminator.getValue();
-    }
-
-    public void setLineTerminator(LineTerminator lineTerminator) {
-        this.lineTerminator = lineTerminator;
-    }
-
-    public String getTransactionSetControlNumber() {
-        return transactionSetControlNumber;
-    }
-
-    public void setTransactionSetControlNumber(String transactionSetControlNumber) {
-        this.transactionSetControlNumber = transactionSetControlNumber;
-    }
-
-    public String getGroupControlNumber() {
-        return groupControlNumber;
-    }
-
-    public void setGroupControlNumber(String groupControlNumber) {
-        this.groupControlNumber = groupControlNumber;
-    }
-
-    public String getSenderCode() {
-        return senderCode;
-    }
-
-    public void setSenderCode(String senderCode) {
-        this.senderCode = senderCode;
-    }
-
-    public String getReceiverCode() {
-        return receiverCode;
-    }
-
-    public void setReceiverCode(String receiverCode) {
-        this.receiverCode = receiverCode;
-    }
-
-    public LocalDate getDocumentDate() {
-        return documentDate;
-    }
-
-    public void setDocumentDate(LocalDate documentDate) {
-        this.documentDate = documentDate;
-    }
-
-    public LocalTime getDocumentTime() {
-        return documentTime;
-    }
-
-    public void setDocumentTime(LocalTime documentTime) {
-        this.documentTime = documentTime;
-    }
-
-    public DateFormat getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(DateFormat dateFormat) {
-        this.dateFormat = dateFormat;
-    }
-
-    public TimeFormat getTimeFormat() {
-        return timeFormat;
-    }
-
-    public void setTimeFormat(TimeFormat timeFormat) {
-        this.timeFormat = timeFormat;
     }
 
     public String getEdiVersion() {
