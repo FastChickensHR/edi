@@ -7,7 +7,7 @@ public enum DateFormat {
     /**
      * Date format YYYYMMDD (e.g., 20231115)
      */
-    DATE("YYYYMMDD", "^\\d{8}$"),
+    DATE("CCYYMMDD", "^\\d{8}$"),
 
     /**
      * Century and year format CCYY (e.g., 2023)

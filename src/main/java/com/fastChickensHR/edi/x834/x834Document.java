@@ -3,6 +3,7 @@ package com.fastChickensHR.edi.x834;
 import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.header.TransactionSetHeader;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,8 @@ import java.util.List;
  * This class handles document structure, formatting, and validation.
  * Now uses x834Context to share document-level information with segments.
  */
+@Getter
 public class x834Document {
-
     // Currently implemented segments
     private final TransactionSetHeader headerSegment;
 
@@ -51,15 +52,6 @@ public class x834Document {
         }
 
         return document.toString();
-    }
-
-    /**
-     * Gets the header segment (ST)
-     *
-     * @return The HeaderLoopBeginningSegment
-     */
-    public TransactionSetHeader getHeaderSegment() {
-        return headerSegment;
     }
 
     public static class Builder {

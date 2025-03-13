@@ -12,7 +12,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 /**
  * Context object that contains document-level information needed by segments.
@@ -61,7 +60,6 @@ public class x834Context {
     }
 
     // Getters and setters
-
     public char getElementSeparator() {
         return elementSeparator.getValue();
     }
