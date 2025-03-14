@@ -1,0 +1,5 @@
+Copyright (C) ${year} ${owner} <${email}>
+
+This file is part of the FastChickensHR project.
+
+For license information see the LICENSE file in the root of this project.

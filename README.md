@@ -116,9 +116,21 @@ The library includes comprehensive documentation for each segment type:
 
 This library adheres to the X12 834 5010 standard as defined in the ASC X12N/005010X220 Implementation Guide. Regular updates ensure continued compliance with industry standards.
 
-## License
+## Development Setup
 
-Copyright © 2023 FastChickens HR, Inc. All rights reserved.
+### Git Hook Installation
+
+This project uses Git hooks to ensure all files have proper license headers.
+After cloning the repository, run the following command to set up the hooks:
+
+```bash
+./bin/setup-git-hooks.sh
+```
+
+This will configure Git to run our license header check before each commit.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
