@@ -13,10 +13,7 @@ import lombok.experimental.Accessors;
  */
 @Getter
 public abstract class BeginningSegment extends Segment {
-    // Constants for segment identifier
     public static final String SEGMENT_ID = "BGN";
-
-    // Default values
     public static final String DEFAULT_TRANSACTION_SET_PURPOSE_CODE = "00"; // Original
 
     private final String bgn01; // Transaction Set Purpose Code
