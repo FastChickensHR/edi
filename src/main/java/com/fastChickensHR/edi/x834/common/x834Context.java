@@ -9,6 +9,7 @@ import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
 import com.fastChickensHR.edi.x834.constants.SubElementSeparator;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@Accessors(chain = true)
 public class x834Context {
     // Document formatting
     private ElementSeparator elementSeparator;
@@ -29,8 +31,8 @@ public class x834Context {
     // Document metadata
     private String transactionSetControlNumber;
     private String groupControlNumber;
-    private String senderCode;
-    private String receiverCode;
+    private String senderID;
+    private String receiverID;
     private LocalDate documentDate;
     private LocalDateTime documentTime;
     private DateFormat dateFormat;
@@ -59,7 +61,6 @@ public class x834Context {
         this.lineTerminator = LineTerminator.LF;
     }
 
-    // Getters and setters
     public char getElementSeparator() {
         return elementSeparator.getValue();
     }
@@ -86,6 +87,12 @@ public class x834Context {
 
     public String getImplementationConventionReference() {
         return IMPLEMENTATION_CONVENTION_REFERENCE;
+    }
+
+    public x834Context setDocumentDate(LocalDate date) {
+        this.documentDate = date;
+        this.formattedDocumentDate = formatDate(date);
+        return this;
     }
 
     /**

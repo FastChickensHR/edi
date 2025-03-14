@@ -15,6 +15,7 @@ public class FileEffectiveDateTest {
 
 
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
+                .setDateTimePeriod( "20250313")
                 .build();
         segment.setContext(context);
 

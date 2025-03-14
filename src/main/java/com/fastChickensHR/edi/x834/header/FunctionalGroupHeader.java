@@ -125,6 +125,8 @@ public abstract class FunctionalGroupHeader extends Segment {
 
         public Builder(x834Context context) {
             this.context = context;
+            setGs02(context.getSenderID());
+            setGs03(context.getReceiverID());
             this.gs04 = context.getFormattedDocumentDate();
             this.gs05 = context.getFormattedDocumentTime();
         }

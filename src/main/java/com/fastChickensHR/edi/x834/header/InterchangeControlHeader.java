@@ -26,7 +26,7 @@ public abstract class InterchangeControlHeader extends Segment {
     public static final String DEFAULT_REPETITION_SEPARATOR = "^"; // Standard repetition separator
     public static final String DEFAULT_INTERCHANGE_CONTROL_VERSION = "00501"; // Version 5.1
     public static final String DEFAULT_ACKNOWLEDGMENT_REQUESTED = "0"; // No acknowledgment requested
-    public static final String DEFAULT_USAGE_INDICATOR = "P"; // Production data
+    public static final String DEFAULT_USAGE_INDICATOR = "T";
 
     private final String isa01; // Authorization Information Qualifier
     private final String isa02; // Authorization Information
@@ -190,6 +190,8 @@ public abstract class InterchangeControlHeader extends Segment {
 
 
         public Builder(x834Context context) {
+            setIsa06(context.getSenderID());
+            setIsa08(context.getReceiverID());
             this.isa09 = context.getFormattedDocumentDate();
             this.isa10 = context.getFormattedDocumentTime();
         }
