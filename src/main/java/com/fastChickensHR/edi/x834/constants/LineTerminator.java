@@ -7,6 +7,9 @@
  */
 package com.fastChickensHR.edi.x834.constants;
 
+import lombok.Getter;
+
+@Getter
 public enum LineTerminator {
     LF("\n"),
     CRLF("\r\n"),
@@ -18,7 +21,4 @@ public enum LineTerminator {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
 }

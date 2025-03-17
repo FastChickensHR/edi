@@ -46,7 +46,8 @@ public class StateOfMichigan834 {
         TransactionSetPolicyNumber.Builder policyNumberBuilder = new TransactionSetPolicyNumber.Builder()
                 .setMasterPolicyNumber("MIHHS-EMP-2023");
 
-        SponsorName.Builder sponsorBuilder = new SponsorName.Builder();
+        SponsorName.Builder sponsorBuilder = new SponsorName.Builder()
+                .setPlanSponsorName("FASTCHKN");
 
         Payer.Builder payerBuilder = new Payer.Builder();
 

@@ -7,6 +7,9 @@
  */
 package com.fastChickensHR.edi.x834.constants;
 
+import lombok.Getter;
+
+@Getter
 public enum SegmentTerminator {
     TILDE('~'),
     LINE_FEED('\n'),
@@ -18,7 +21,4 @@ public enum SegmentTerminator {
         this.value = value;
     }
 
-    public char getValue() {
-        return value;
-    }
 }
