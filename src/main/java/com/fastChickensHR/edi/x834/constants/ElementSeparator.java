@@ -7,6 +7,9 @@
  */
 package com.fastChickensHR.edi.x834.constants;
 
+import lombok.Getter;
+
+@Getter
 public enum ElementSeparator {
     ASTERISK('*'),
     CARET('^'),
@@ -18,7 +21,4 @@ public enum ElementSeparator {
         this.value = value;
     }
 
-    public char getValue() {
-        return value;
-    }
 }

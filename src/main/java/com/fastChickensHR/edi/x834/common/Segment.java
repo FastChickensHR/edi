@@ -7,21 +7,15 @@
  */
 package com.fastChickensHR.edi.x834.common;
 
+import lombok.Setter;
+
 /**
  * Base class for all EDI segments.
  * Now context-aware to reduce direct dependency on X834Document.
  */
+@Setter
 public abstract class Segment {
     protected x834Context context;
-
-    /**
-     * Sets the document context for this segment
-     *
-     * @param context The x834Context containing document-level information
-     */
-    public void setContext(x834Context context) {
-        this.context = context;
-    }
 
     /**
      * @return The x834Context for this segment

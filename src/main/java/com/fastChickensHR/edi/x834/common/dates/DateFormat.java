@@ -7,9 +7,12 @@
  */
 package com.fastChickensHR.edi.x834.common.dates;
 
+import lombok.Getter;
+
 /**
  * Enumeration of standard EDI date formats.
  */
+@Getter
 public enum DateFormat {
     /**
      * Date format YYYYMMDD (e.g., 20231115)
@@ -35,11 +38,4 @@ public enum DateFormat {
         this.validationPattern = validationPattern;
     }
 
-    public String getFormat() {
-        return format;
-    }
-
-    public String getValidationPattern() {
-        return validationPattern;
-    }
 }

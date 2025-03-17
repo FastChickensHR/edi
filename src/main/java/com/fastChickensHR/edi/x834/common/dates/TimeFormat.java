@@ -7,9 +7,12 @@
  */
 package com.fastChickensHR.edi.x834.common.dates;
 
+import lombok.Getter;
+
 /**
  * Enumeration of standard EDI time formats.
  */
+@Getter
 public enum TimeFormat {
     /**
      * Time format HHMM (e.g., 1230)
@@ -30,11 +33,4 @@ public enum TimeFormat {
         this.validationPattern = validationPattern;
     }
 
-    public String getFormat() {
-        return format;
-    }
-
-    public String getValidationPattern() {
-        return validationPattern;
-    }
 }
