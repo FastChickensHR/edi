@@ -11,6 +11,8 @@ import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.header.*;
+import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
+import com.fastChickensHR.edi.x834.loop1000B.Payer;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ public class x834Document {
     private final BeginningSegment beginningSegment;
     private final FileEffectiveDate fileEffectiveDate;
     private final TransactionSetPolicyNumber transactionSetPolicyNumber;
+    private final SponsorName sponsorName;
+    private final Payer payer;
 
     // List to maintain segment order
     private final List<Segment> segments = new ArrayList<>();
@@ -44,16 +48,19 @@ public class x834Document {
         this.beginningSegment = builder.beginningSegment;
         this.fileEffectiveDate = builder.fileEffectiveDate;
         this.transactionSetPolicyNumber = builder.transactionSetPolicyNumber;
+        this.sponsorName = builder.sponsorName;
+        this.payer = builder.payer;
         this.buildErrors.addAll(builder.buildErrors);
         this.isValid = builder.isValid;
 
-        // Add header segments in the correct order
         if (interchangeControlHeader != null) segments.add(interchangeControlHeader);
         if (functionalGroupHeader != null) segments.add(functionalGroupHeader);
         if (transactionSetHeader != null) segments.add(transactionSetHeader);
         if (beginningSegment != null) segments.add(beginningSegment);
         if (fileEffectiveDate != null) segments.add(fileEffectiveDate);
         if (transactionSetPolicyNumber != null) segments.add(transactionSetPolicyNumber);
+        if (sponsorName != null) segments.add(sponsorName);
+        if (payer != null) segments.add(payer);
 
         // Add other segments
         segments.addAll(builder.additionalSegments);
@@ -89,7 +96,7 @@ public class x834Document {
      * Generates the complete EDI document string if the document is valid
      *
      * @return An Optional containing the formatted EDI 834 document as a string,
-     *         or empty if the document is invalid
+     * or empty if the document is invalid
      */
     public Optional<String> generateDocument() {
         if (!isValid) {
@@ -112,6 +119,8 @@ public class x834Document {
         private BeginningSegment beginningSegment;
         private FileEffectiveDate fileEffectiveDate;
         private TransactionSetPolicyNumber transactionSetPolicyNumber;
+        private SponsorName sponsorName;
+        private Payer payer;
 
         // Other segments
         private final List<Segment> additionalSegments = new ArrayList<>();
@@ -123,6 +132,8 @@ public class x834Document {
         private BeginningSegment.Builder beginningSegmentBuilder;
         private FileEffectiveDate.Builder fileEffectiveDateBuilder;
         private TransactionSetPolicyNumber.Builder policyNumberBuilder;
+        private SponsorName.Builder sponsorNameBuilder;
+        private Payer.Builder payerBuilder;
 
         // For tracking errors
         private final List<String> buildErrors = new ArrayList<>();
@@ -134,57 +145,46 @@ public class x834Document {
         public Builder() {
         }
 
-        /**
-         * Provide the InterchangeControlHeader builder
-         */
         public Builder withInterchangeControlHeader(InterchangeControlHeader.Builder builder) {
             this.interchangeBuilder = builder;
             return this;
         }
 
-        /**
-         * Provide the FunctionalGroupHeader builder
-         */
         public Builder withFunctionalGroupHeader(FunctionalGroupHeader.Builder builder) {
             this.functionalGroupBuilder = builder;
             return this;
         }
 
-        /**
-         * Provide the TransactionSetHeader builder
-         */
         public Builder withTransactionSetHeader(TransactionSetHeader.Builder builder) {
             this.transactionSetBuilder = builder;
             return this;
         }
 
-        /**
-         * Provide the BeginningSegment builder
-         */
         public Builder withBeginningSegment(BeginningSegment.Builder builder) {
             this.beginningSegmentBuilder = builder;
             return this;
         }
 
-        /**
-         * Provide the FileEffectiveDate builder
-         */
         public Builder withFileEffectiveDate(FileEffectiveDate.Builder builder) {
             this.fileEffectiveDateBuilder = builder;
             return this;
         }
 
-        /**
-         * Provide the TransactionSetPolicyNumber builder
-         */
         public Builder withTransactionSetPolicyNumber(TransactionSetPolicyNumber.Builder builder) {
             this.policyNumberBuilder = builder;
             return this;
         }
 
-        /**
-         * Add additional segments to the document
-         */
+        public Builder withSponsorName(SponsorName.Builder builder) {
+            this.sponsorNameBuilder = builder;
+            return this;
+        }
+
+        public Builder withPayer(Payer.Builder builder) {
+            this.payerBuilder = builder;
+            return this;
+        }
+
         public Builder addSegment(Segment segment) {
             this.additionalSegments.add(segment);
             return this;
@@ -232,6 +232,15 @@ public class x834Document {
             if (policyNumberBuilder == null) {
                 buildErrors.add("TransactionSetPolicyNumber builder is required");
                 isValid = false;
+
+            }
+            if (sponsorNameBuilder == null) {
+                buildErrors.add("SponsorName builder is required");
+                isValid = false;
+            }
+            if (payerBuilder == null) {
+                buildErrors.add("Payer builder is required");
+                isValid = false;
             }
         }
 
@@ -247,6 +256,8 @@ public class x834Document {
                 beginningSegment = beginningSegmentBuilder.build();
                 fileEffectiveDate = fileEffectiveDateBuilder.build();
                 transactionSetPolicyNumber = policyNumberBuilder.build();
+                sponsorName = sponsorNameBuilder.build();
+                payer = payerBuilder.build();
             } catch (ValidationException e) {
                 buildErrors.add("Validation error: " + e.getMessage());
                 isValid = false;

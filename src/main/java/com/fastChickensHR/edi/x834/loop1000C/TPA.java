@@ -5,17 +5,20 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.loop1000A;
+package com.fastChickensHR.edi.x834.loop1000C;
 
 import com.fastChickensHR.edi.x834.common.N1Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
-public class SponsorName extends N1Segment {
-    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "P5";
-    public static final String DEFAULT_IDENTIFICATION_CODE_QUALIFIER = "FI";
+@Getter
+public class TPA extends N1Segment {
+    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "TP";
+    public static final String DEFAULT_IDENTIFICATION_CODE_QUALIFIER = "";
 
-    private SponsorName(Builder builder) throws ValidationException {
+    private TPA(Builder builder) throws ValidationException {
         super(builder);
     }
 
@@ -23,11 +26,28 @@ public class SponsorName extends N1Segment {
         return new Builder();
     }
 
+    public String getTPAName() {
+        return getN102();
+    }
+
+    public String getTPAIdentifier() {
+        return getN104();
+    }
+
+    @Setter
     @Accessors(chain = true)
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
             this.n101 = DEFAULT_ENTITY_IDENTIFIER_CODE;
             this.n103 = DEFAULT_IDENTIFICATION_CODE_QUALIFIER;
+        }
+
+        public Builder setTPAName(String value) {
+            return setN102(value);
+        }
+
+        public Builder setTPAIdentifier(String value) {
+            return setN104(value);
         }
 
         @Override
@@ -36,8 +56,8 @@ public class SponsorName extends N1Segment {
         }
 
         @Override
-        public SponsorName build() throws ValidationException {
-            return new SponsorName(this);
+        public TPA build() throws ValidationException {
+            return new TPA(this);
         }
     }
 }
