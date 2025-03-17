@@ -9,6 +9,8 @@ package com.fastChickensHR.edi.examples;
 
 import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.header.*;
+import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
+import com.fastChickensHR.edi.x834.loop1000B.Payer;
 import com.fastChickensHR.edi.x834.x834Document;
 
 import java.time.LocalDate;
@@ -44,6 +46,10 @@ public class StateOfMichigan834 {
         TransactionSetPolicyNumber.Builder policyNumberBuilder = new TransactionSetPolicyNumber.Builder()
                 .setMasterPolicyNumber("MIHHS-EMP-2023");
 
+        SponsorName.Builder sponsorBuilder = new SponsorName.Builder();
+
+        Payer.Builder payerBuilder = new Payer.Builder();
+
         return new x834Document.Builder()
                 .withInterchangeControlHeader(interchangeBuilder)
                 .withFunctionalGroupHeader(functionalBuilder)
@@ -51,6 +57,8 @@ public class StateOfMichigan834 {
                 .withBeginningSegment(beginningSegmentBuilder)
                 .withFileEffectiveDate(fileEffectiveDateBuilder)
                 .withTransactionSetPolicyNumber(policyNumberBuilder)
+                .withSponsorName(sponsorBuilder)
+                .withPayer(payerBuilder)
                 .build();
     }
 
