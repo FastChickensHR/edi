@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class N1SegmentTest {
 
-    // Concrete implementation of N1Segment for testing
     private static class TestN1Segment extends N1Segment {
         public static final String TEST_ENTITY_CODE = "TEST";
 
@@ -30,7 +29,6 @@ class N1SegmentTest {
 
             @Override
             public TestN1Segment build() throws ValidationException {
-                // You could add validation logic here if needed
                 return new TestN1Segment(this);
             }
         }
