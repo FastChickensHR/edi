@@ -7,5 +7,38 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-public class MemberPolicyNumber {
+import com.fastChickensHR.edi.x834.common.RefSegment;
+import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import lombok.experimental.Accessors;
+
+public class MemberPolicyNumber extends RefSegment {
+    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "1L";
+
+    private MemberPolicyNumber(MemberPolicyNumber.Builder builder) throws ValidationException {
+        super(builder);
+    }
+
+    public static MemberPolicyNumber.Builder builder() {
+        return new MemberPolicyNumber.Builder();
+    }
+
+    @Accessors(chain = true)
+    public static class Builder extends RefSegment.AbstractBuilder<MemberPolicyNumber.Builder> {
+        public Builder() {
+            this.ref01 = DEFAULT_ENTITY_IDENTIFIER_CODE;
+        }
+
+        @Override
+        protected MemberPolicyNumber.Builder self() {
+            return this;
+        }
+
+        @Override
+        public MemberPolicyNumber build() throws ValidationException {
+            if (ref02 == null || ref02.isEmpty()) {
+                throw new ValidationException("ref02 (Subscriber Number) is required");
+            }
+            return new MemberPolicyNumber(this);
+        }
+    }
 }

@@ -22,8 +22,6 @@ class SponsorNameTest {
 
     @Test
     public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-
-
         SponsorName segment = new SponsorName.Builder()
                 .setN102(planSponsorName)
                 .setN104(sponsorIdentifier)
