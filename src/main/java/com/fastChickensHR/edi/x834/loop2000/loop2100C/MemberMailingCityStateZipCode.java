@@ -16,9 +16,9 @@ import lombok.Getter;
  * Implements city name (N401), state/province code (N402), and postal code (N403)
  */
 @Getter
-public class MemberResidenceCityStateZipCode extends N4Segment {
+public class MemberMailingCityStateZipCode extends N4Segment {
 
-    private MemberResidenceCityStateZipCode(Builder builder) throws ValidationException {
+    private MemberMailingCityStateZipCode(Builder builder) throws ValidationException {
         super(builder);
     }
 
@@ -32,8 +32,8 @@ public class MemberResidenceCityStateZipCode extends N4Segment {
         }
 
         @Override
-        public MemberResidenceCityStateZipCode build() throws ValidationException {
-            return new MemberResidenceCityStateZipCode(this);
+        public MemberMailingCityStateZipCode build() throws ValidationException {
+            return new MemberMailingCityStateZipCode(this);
         }
     }
 
