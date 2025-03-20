@@ -126,7 +126,7 @@ class N3SegmentTest {
         segment.setContext(context);
 
         String rendered = segment.render().trim();
-        String expected = "N3*" + addressLine1 + "*~";
+        String expected = "N3*" + addressLine1 + "~";
 
         assertEquals(expected, rendered);
     }
