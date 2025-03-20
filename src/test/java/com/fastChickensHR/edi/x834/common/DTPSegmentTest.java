@@ -15,13 +15,13 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DtpSegmentTest {
+class DTPSegmentTest {
     x834Context context = new x834Context();
 
-    private static class TestDtpSegment extends DtpSegment {
+    private static class TestDTPSegment extends DTPSegment {
         public static final String TEST_QUALIFIER = "123";
 
-        private TestDtpSegment(AbstractBuilder<?> builder) throws ValidationException {
+        private TestDTPSegment(AbstractBuilder<?> builder) throws ValidationException {
             super(builder);
         }
 
@@ -37,21 +37,21 @@ class DtpSegmentTest {
             }
 
             @Override
-            public TestDtpSegment build() throws ValidationException {
+            public TestDTPSegment build() throws ValidationException {
                 if (dtp01 == null || dtp01.isEmpty()) {
                     throw new ValidationException("dtp01 (Date Time Qualifier) is required");
                 }
                 if (dtp03 == null || dtp03.isEmpty()) {
                     throw new ValidationException("dtp03 (Date Time Period) is required");
                 }
-                return new TestDtpSegment(this);
+                return new TestDTPSegment(this);
             }
         }
     }
 
     @Test
     void testSegmentIdentifier() throws ValidationException {
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp02("D8")
                 .setDtp03("20250101")
                 .build();
@@ -65,7 +65,7 @@ class DtpSegmentTest {
         String format = "D8";
         String date = "20250101";
 
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
                 .setDtp02(format)
                 .setDtp03(date)
@@ -84,7 +84,7 @@ class DtpSegmentTest {
         String format = "D8";
         String date = "20250101";
 
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
                 .setDtp02(format)
                 .setDtp03(date)
@@ -105,7 +105,7 @@ class DtpSegmentTest {
         String format = "RD8";
         String date = "20251231";
 
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
                 .setDtp02(format)
                 .setDtp03(date)
@@ -122,7 +122,7 @@ class DtpSegmentTest {
         String format = "RD8";
         String date = "20251231";
 
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDateTimeQualifier(qualifier)
                 .setDateTimeFormat(format)
                 .setDateTimePeriod(date)
@@ -139,7 +139,7 @@ class DtpSegmentTest {
         String format = "D8";
         String date = "20250615";
 
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
                 .setDtp02(format)
                 .setDtp03(date)
@@ -157,7 +157,7 @@ class DtpSegmentTest {
         context.setDateFormat(DateFormat.CENTURY_YEAR);
         context.setDocumentDate(LocalDate.of(2025, 3, 30));
 
-        TestDtpSegment segment = new TestDtpSegment.Builder(context)
+        TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .build();
 
         assertEquals("123", segment.getDtp01()); // Default from TestDtpSegment
@@ -169,7 +169,7 @@ class DtpSegmentTest {
     void testValidationRequiresDtp01AndDtp03() {
         // Test missing dtp01
         ValidationException exception1 = assertThrows(ValidationException.class, () -> {
-            new TestDtpSegment.Builder(context)
+            new TestDTPSegment.Builder(context)
                     .setDtp01("") // Empty value
                     .setDtp02("D8")
                     .setDtp03("20250101")
@@ -179,7 +179,7 @@ class DtpSegmentTest {
 
         // Test missing dtp03
         ValidationException exception2 = assertThrows(ValidationException.class, () -> {
-            new TestDtpSegment.Builder(context)
+            new TestDTPSegment.Builder(context)
                     .setDtp01("123")
                     .setDtp02("D8")
                     .setDtp03("") // Empty value

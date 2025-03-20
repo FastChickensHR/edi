@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.x834.common.DtpSegment;
+import com.fastChickensHR.edi.x834.common.DTPSegment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
@@ -17,14 +17,14 @@ import lombok.experimental.Accessors;
  * Represents a Member Level Date segment in the 834 EDI format.
  * This segment is used to indicate various date values associated with a member in Loop 2000.
  */
-public class MemberLevelDates extends DtpSegment {
+public class MemberLevelDates extends DTPSegment {
 
     private MemberLevelDates(Builder builder) throws ValidationException {
         super(builder);
     }
 
     @Accessors(chain = true)
-    public static class Builder extends DtpSegment.AbstractBuilder<Builder> {
+    public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
         public Builder(x834Context context) {
             super(context);
         }

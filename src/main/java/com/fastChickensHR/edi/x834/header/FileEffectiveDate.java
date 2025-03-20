@@ -7,12 +7,12 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.common.DtpSegment;
+import com.fastChickensHR.edi.x834.common.DTPSegment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.experimental.Accessors;
 
-public class FileEffectiveDate extends DtpSegment {
+public class FileEffectiveDate extends DTPSegment {
     public static final String DEFAULT_DATE_TIME_QUALIFIER = "007";
 
     private FileEffectiveDate(FileEffectiveDate.Builder builder) throws ValidationException {
@@ -24,7 +24,7 @@ public class FileEffectiveDate extends DtpSegment {
     }
 
     @Accessors(chain = true)
-    public static class Builder extends DtpSegment.AbstractBuilder<Builder> {
+    public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
 
         public Builder(x834Context context) {
             super(context);
