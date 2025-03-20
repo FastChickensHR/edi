@@ -11,7 +11,7 @@ import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberResidenceCityStateZipCodeTest {
+class MemberMailingCityStateZipCodeTest {
 
     @Test
     void testCreateWithRequiredFields() throws ValidationException {
@@ -19,7 +19,7 @@ class MemberResidenceCityStateZipCodeTest {
         String stateCode = "IL";
         String postalCode = "62701";
 
-        MemberResidenceCityStateZipCode location = MemberResidenceCityStateZipCode.builder()
+        MemberMailingCityStateZipCode location = MemberMailingCityStateZipCode.builder()
                 .setCityName(cityName)
                 .setStateOrProvinceCode(stateCode)
                 .setPostalCode(postalCode)
@@ -45,7 +45,7 @@ class MemberResidenceCityStateZipCodeTest {
         String locationIdentifier = "12345";
         String countrySubdivision = "CENTRAL";
 
-        MemberResidenceCityStateZipCode location = MemberResidenceCityStateZipCode.builder()
+        MemberMailingCityStateZipCode location = MemberMailingCityStateZipCode.builder()
                 .setCityName(cityName)
                 .setStateOrProvinceCode(stateCode)
                 .setPostalCode(postalCode)
@@ -70,7 +70,7 @@ class MemberResidenceCityStateZipCodeTest {
         String stateCode = "IL";
         String postalCode = "62701";
 
-        MemberResidenceCityStateZipCode location = MemberResidenceCityStateZipCode.builder()
+        MemberMailingCityStateZipCode location = MemberMailingCityStateZipCode.builder()
                 .setN401(cityName)
                 .setN402(stateCode)
                 .setN403(postalCode)
@@ -83,7 +83,7 @@ class MemberResidenceCityStateZipCodeTest {
 
     @Test
     void testSegmentIdentifier() throws ValidationException {
-        MemberResidenceCityStateZipCode location = MemberResidenceCityStateZipCode.builder()
+        MemberMailingCityStateZipCode location = MemberMailingCityStateZipCode.builder()
                 .setCityName("Springfield")
                 .setStateOrProvinceCode("IL")
                 .setPostalCode("62701")
@@ -99,7 +99,7 @@ class MemberResidenceCityStateZipCodeTest {
         String postalCode = "62701";
         String countryCode = "US";
 
-        MemberResidenceCityStateZipCode location = MemberResidenceCityStateZipCode.builder()
+        MemberMailingCityStateZipCode location = MemberMailingCityStateZipCode.builder()
                 .setCityName(cityName)
                 .setStateOrProvinceCode(stateCode)
                 .setPostalCode(postalCode)
@@ -118,7 +118,7 @@ class MemberResidenceCityStateZipCodeTest {
     void testPostalCodeFormatWithHyphen() throws ValidationException {
         String postalCode = "62701-1234";
 
-        MemberResidenceCityStateZipCode location = MemberResidenceCityStateZipCode.builder()
+        MemberMailingCityStateZipCode location = MemberMailingCityStateZipCode.builder()
                 .setCityName("Springfield")
                 .setStateOrProvinceCode("IL")
                 .setPostalCode(postalCode)
