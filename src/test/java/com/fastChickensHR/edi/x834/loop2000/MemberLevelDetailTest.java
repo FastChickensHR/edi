@@ -73,8 +73,6 @@ class MemberLevelDetailTest {
         assertEquals("N", segment.getHandicapIndicator(), "HandicapIndicator should match INS10");
         assertEquals("20250101", segment.getDeathDate(), "DeathDate should match INS11");
         assertEquals(confidentialityCode, segment.getConfidentialityCode(), "ConfidentialityCode should match INS12");
-
-
     }
 
     @Test
