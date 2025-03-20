@@ -48,10 +48,25 @@ public abstract class Segment {
         builder.append(getSegmentIdentifier());
 
         String[] elements = getElementValues();
-        for (String element : elements) {
+
+        if (elements == null || elements.length == 0) {
+            throw new IllegalStateException("Element values array cannot be null or empty");
+        }
+
+        // Find the last non-null value's index
+        int lastNonNullIndex = -1;
+        for (int i = elements.length - 1; i >= 0; i--) {
+            if (elements[i] != null) {
+                lastNonNullIndex = i;
+                break;
+            }
+        }
+
+        // Render only up to the last non-null element
+        for (int i = 0; i <= lastNonNullIndex; i++) {
             builder.append(context.getElementSeparator());
-            if (element != null) {
-                builder.append(element);
+            if (elements[i] != null) {
+                builder.append(elements[i]);
             }
         }
 

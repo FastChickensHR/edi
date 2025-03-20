@@ -13,7 +13,8 @@ import lombok.Getter;
 public enum SegmentTerminator {
     TILDE('~'),
     LINE_FEED('\n'),
-    CARRIAGE_RETURN('\r');
+    CARRIAGE_RETURN('\r'),
+    EXCLAMATION_POINT('!');
 
     private final char value;
 
