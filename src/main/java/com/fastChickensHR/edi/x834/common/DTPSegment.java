@@ -8,18 +8,17 @@
 package com.fastChickensHR.edi.x834.common;
 
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
 
 @Getter
-public abstract class DtpSegment extends Segment {
+public abstract class DTPSegment extends Segment {
     public static final String SEGMENT_ID = "DTP";
 
     protected final String dtp01; // Date/Time Qualifier
     protected final String dtp02; // Date Time Period Format Qualifier
     protected final String dtp03; // Date Time Period
 
-    protected DtpSegment(AbstractBuilder<?> builder) throws ValidationException {
+    protected DTPSegment(AbstractBuilder<?> builder) throws ValidationException {
         this.dtp01 = builder.dtp01;
         this.dtp02 = builder.dtp02;
         this.dtp03 = builder.dtp03;
@@ -63,7 +62,7 @@ public abstract class DtpSegment extends Segment {
 
         protected abstract T self();
 
-        public abstract DtpSegment build() throws ValidationException;
+        public abstract DTPSegment build() throws ValidationException;
 
         public T setDateTimeQualifier(String value) {
             this.dtp01 = value;
