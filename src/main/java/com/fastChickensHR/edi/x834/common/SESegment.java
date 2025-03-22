@@ -45,8 +45,7 @@ abstract public class SESegment extends Segment {
         return getSe02();
     }
 
-    @Setter
-    @Accessors(chain = true)
+
     public abstract static class AbstractBuilder<T extends SESegment.AbstractBuilder<T>> {
         private String se01;
         private String se02;
@@ -55,11 +54,21 @@ abstract public class SESegment extends Segment {
 
         public abstract SESegment build() throws ValidationException;
 
-        public AbstractBuilder<T> setTransactionSegmentCount(String value) {
+        public T setSe01(String value) {
+            this.se01 = value;
+            return self();
+        }
+
+        public T setTransactionSegmentCount(String value) {
             return setSe01(value);
         }
 
-        public AbstractBuilder<T> setSetControlNumber(String value) {
+        public T setSe02(String value) {
+            this.se02 = value;
+            return self();
+        }
+
+        public T setSetControlNumber(String value) {
             return setSe02(value);
         }
     }
