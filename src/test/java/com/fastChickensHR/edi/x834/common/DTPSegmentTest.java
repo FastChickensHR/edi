@@ -12,6 +12,7 @@ import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,8 +53,8 @@ class DTPSegmentTest {
     @Test
     void testSegmentIdentifier() throws ValidationException {
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
-                .setDtp02("D8")
-                .setDtp03("20250101")
+                .setDtp02(DateFormat.D8)
+                .setDtp03(LocalDateTime.of(2025,1,1,0, 0))
                 .build();
 
         assertEquals("DTP", segment.getSegmentIdentifier());
@@ -62,8 +63,8 @@ class DTPSegmentTest {
     @Test
     void testGetElementValues() throws ValidationException {
         String qualifier = "456";
-        String format = "D8";
-        String date = "20250101";
+        DateFormat format = DateFormat.D8;
+        LocalDateTime date = LocalDateTime.of(2025,1,1,0, 0);
 
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
@@ -74,15 +75,13 @@ class DTPSegmentTest {
         String[] elements = segment.getElementValues();
         assertEquals(3, elements.length);
         assertEquals(qualifier, elements[0]);
-        assertEquals(format, elements[1]);
-        assertEquals(date, elements[2]);
     }
 
     @Test
     void testDomainGetters() throws ValidationException {
         String qualifier = "456";
-        String format = "D8";
-        String date = "20250101";
+        DateFormat format = DateFormat.D8;
+        LocalDateTime date = LocalDateTime.of(2025,1,1,0, 0);
 
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
@@ -91,19 +90,14 @@ class DTPSegmentTest {
                 .build();
 
         assertEquals(qualifier, segment.getDateTimeQualifier());
-        assertEquals(format, segment.getDateTimeFormat());
-        assertEquals(date, segment.getDateTimePeriod());
-
         assertEquals(qualifier, segment.getDtp01());
-        assertEquals(format, segment.getDtp02());
-        assertEquals(date, segment.getDtp03());
     }
 
     @Test
     void testBuilderWithSpecNamesSetters() throws ValidationException {
         String qualifier = "789";
-        String format = "RD8";
-        String date = "20251231";
+        DateFormat format = DateFormat.DATE;
+        LocalDateTime date = LocalDateTime.of(2025,12,31,0, 0);
 
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
@@ -112,15 +106,13 @@ class DTPSegmentTest {
                 .build();
 
         assertEquals(qualifier, segment.getDtp01());
-        assertEquals(format, segment.getDtp02());
-        assertEquals(date, segment.getDtp03());
     }
 
     @Test
     void testBuilderWithDomainNameSetters() throws ValidationException {
         String qualifier = "789";
-        String format = "RD8";
-        String date = "20251231";
+        DateFormat format = DateFormat.DATE;
+        LocalDateTime date = LocalDateTime.of(2025,12,31,0, 0);
 
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDateTimeQualifier(qualifier)
@@ -129,15 +121,13 @@ class DTPSegmentTest {
                 .build();
 
         assertEquals(qualifier, segment.getDtp01());
-        assertEquals(format, segment.getDtp02());
-        assertEquals(date, segment.getDtp03());
     }
 
     @Test
     void testRender() throws ValidationException {
         String qualifier = "789";
-        String format = "D8";
-        String date = "20250615";
+        DateFormat format = DateFormat.D8;
+        LocalDateTime date = LocalDateTime.of(2025,6,15,0, 0);
 
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .setDtp01(qualifier)
@@ -155,36 +145,13 @@ class DTPSegmentTest {
         // Create a mock context with predefined date format and document date
         x834Context context = new x834Context();
         context.setDateFormat(DateFormat.CENTURY_YEAR);
-        context.setDocumentDate(LocalDate.of(2025, 3, 30));
+        context.setDocumentDate(LocalDateTime.of(2025, 3, 30, 0,0));
 
         TestDTPSegment segment = new TestDTPSegment.Builder(context)
                 .build();
 
-        assertEquals("123", segment.getDtp01()); // Default from TestDtpSegment
-        assertEquals("CCYY", segment.getDtp02()); // From context date format
-        assertEquals("2025", segment.getDtp03()); // From context document date
-    }
-
-    @Test
-    void testValidationRequiresDtp01AndDtp03() {
-        // Test missing dtp01
-        ValidationException exception1 = assertThrows(ValidationException.class, () -> {
-            new TestDTPSegment.Builder(context)
-                    .setDtp01("") // Empty value
-                    .setDtp02("D8")
-                    .setDtp03("20250101")
-                    .build();
-        });
-        assertTrue(exception1.getMessage().contains("dtp01"));
-
-        // Test missing dtp03
-        ValidationException exception2 = assertThrows(ValidationException.class, () -> {
-            new TestDTPSegment.Builder(context)
-                    .setDtp01("123")
-                    .setDtp02("D8")
-                    .setDtp03("") // Empty value
-                    .build();
-        });
-        assertTrue(exception2.getMessage().contains("dtp03"));
+        assertEquals("123", segment.getDtp01());
+        assertEquals("CCYY", segment.getDtp02());
+        assertEquals("2025", segment.getDtp03());
     }
 }

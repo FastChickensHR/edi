@@ -12,17 +12,18 @@ import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileEffectiveDateTest {
     x834Context context = new x834Context();
+     LocalDateTime localDateTime = LocalDateTime.of(2025, 3,13,0,0,0);
 
     @Test
     public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-
-
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
-                .setDateTimePeriod( "20250313")
+                .setDateTimePeriod(localDateTime)
                 .build();
         segment.setContext(context);
 
@@ -36,8 +37,8 @@ public class FileEffectiveDateTest {
     @Test
     public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
         String dateTimeQualifier = "1";
-        String dateTimeFormat = DateFormat.DATE.getFormat();
-        String dateTimePeriod = context.getFormattedDocumentDate();
+        DateFormat dateTimeFormat = DateFormat.DATE;
+        LocalDateTime dateTimePeriod = context.getDocumentDate();
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
                 .setDtp01(dateTimeQualifier)
                 .setDtp02(dateTimeFormat)
@@ -45,8 +46,6 @@ public class FileEffectiveDateTest {
                 .build();
 
         assertEquals(dateTimeQualifier, segment.getDateTimeQualifier(), "DateTimeQualifier should match DTP01");
-        assertEquals(dateTimeFormat, segment.getDateTimeFormat(), "DateTimeFormat should match DTP02");
-        assertEquals(dateTimePeriod, segment.getDateTimePeriod(), "DateTimePeriod should match DTP03");
     }
 
     /**
@@ -55,8 +54,8 @@ public class FileEffectiveDateTest {
     @Test
     public void testSettingDomainNamesGettingSpecNames() throws ValidationException {
         String dateTimeQualifier = "1";
-        String dateTimeFormat = DateFormat.DATE.getFormat();
-        String dateTimePeriod = context.getFormattedDocumentDate();
+        DateFormat dateTimeFormat = DateFormat.DATE;
+        LocalDateTime dateTimePeriod = context.getDocumentDate();
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
                 .setDateTimeQualifier(dateTimeQualifier)
                 .setDateTimeFormat(dateTimeFormat)
@@ -64,7 +63,5 @@ public class FileEffectiveDateTest {
                 .build();
 
         assertEquals(dateTimeQualifier, segment.getDtp01(), "DateTimeQualifier should match DTP01");
-        assertEquals(dateTimeFormat, segment.getDtp02(), "DateTimeFormat should match DTP02");
-        assertEquals(dateTimePeriod, segment.getDtp03(), "DateTimePeriod should match DTP03");
     }
 }

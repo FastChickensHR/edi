@@ -40,7 +40,7 @@ public class x834Context {
     private String groupControlNumber;
     private String senderID;
     private String receiverID;
-    private LocalDate documentDate;
+    private LocalDateTime documentDate;
     private LocalDateTime documentTime;
     private DateFormat dateFormat;
     private TimeFormat timeFormat;
@@ -56,7 +56,7 @@ public class x834Context {
      * Creates a new X834Context with default values.
      */
     public x834Context() {
-        this.documentDate = LocalDate.now();
+        this.documentDate = LocalDateTime.now();
         this.documentTime = LocalDateTime.now();
         this.dateFormat = DateFormat.DATE;
         this.timeFormat = TimeFormat.TIME;
@@ -96,7 +96,7 @@ public class x834Context {
         return IMPLEMENTATION_CONVENTION_REFERENCE;
     }
 
-    public x834Context setDocumentDate(LocalDate date) {
+    public x834Context setDocumentDate(LocalDateTime date) {
         this.documentDate = date;
         this.formattedDocumentDate = formatDate(date);
         return this;
@@ -108,7 +108,7 @@ public class x834Context {
      * @param date The date to format
      * @return Formatted date string
      */
-    public String formatDate(LocalDate date) {
+    public String formatDate(LocalDateTime date) {
         return DateFormatter.formatDate(getDateFormat(), date);
     }
 

@@ -23,7 +23,6 @@ public class MemberLevelDates extends DTPSegment {
         super(builder);
     }
 
-    @Accessors(chain = true)
     public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
         public Builder(x834Context context) {
             super(context);

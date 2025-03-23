@@ -13,6 +13,7 @@ import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.header.*;
 import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
 import com.fastChickensHR.edi.x834.loop1000B.Payer;
+import com.fastChickensHR.edi.x834.loop2000.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -33,6 +34,12 @@ public class x834Document {
     private final TransactionSetPolicyNumber transactionSetPolicyNumber;
     private final SponsorName sponsorName;
     private final Payer payer;
+    private final MemberLevelDetail memberLevelDetail;
+    private final MemberPolicyNumber memberPolicyNumber;
+    private final MemberIdentificationNumber memberIdentificationNumber;
+    private final SubscriberNumber subscriberNumber;
+    private final MemberLevelDates memberLevelDates;
+
 
     // List to maintain segment order
     private final List<Segment> segments = new ArrayList<>();
@@ -50,6 +57,11 @@ public class x834Document {
         this.transactionSetPolicyNumber = builder.transactionSetPolicyNumber;
         this.sponsorName = builder.sponsorName;
         this.payer = builder.payer;
+        this.memberLevelDetail = builder.memberLevelDetail;
+        this.memberPolicyNumber = builder.memberPolicyNumber;
+        this.memberIdentificationNumber = builder.memberIdentificationNumber;
+        this.subscriberNumber = builder.subscriberNumber;
+        this.memberLevelDates = builder.memberLevelDates;
         this.buildErrors.addAll(builder.buildErrors);
         this.isValid = builder.isValid;
 
@@ -61,6 +73,11 @@ public class x834Document {
         if (transactionSetPolicyNumber != null) segments.add(transactionSetPolicyNumber);
         if (sponsorName != null) segments.add(sponsorName);
         if (payer != null) segments.add(payer);
+        if (memberLevelDetail != null) segments.add(memberLevelDetail);
+        if (memberPolicyNumber != null) segments.add(memberPolicyNumber);
+        if (memberIdentificationNumber != null) segments.add(memberIdentificationNumber);
+        if (subscriberNumber != null) segments.add(subscriberNumber);
+        if (memberLevelDates != null) segments.add(memberLevelDates);
 
         // Add other segments
         segments.addAll(builder.additionalSegments);
@@ -121,6 +138,12 @@ public class x834Document {
         private TransactionSetPolicyNumber transactionSetPolicyNumber;
         private SponsorName sponsorName;
         private Payer payer;
+        private MemberLevelDetail memberLevelDetail;
+        private MemberPolicyNumber memberPolicyNumber;
+        private MemberIdentificationNumber memberIdentificationNumber;
+        private SubscriberNumber subscriberNumber;
+        private MemberLevelDates memberLevelDates;
+
 
         // Other segments
         private final List<Segment> additionalSegments = new ArrayList<>();
@@ -134,6 +157,12 @@ public class x834Document {
         private TransactionSetPolicyNumber.Builder policyNumberBuilder;
         private SponsorName.Builder sponsorNameBuilder;
         private Payer.Builder payerBuilder;
+        private MemberLevelDetail.Builder memberLevelDetailBuilder;
+        private MemberPolicyNumber.Builder memberPolicyNumberBuilder;
+        private MemberIdentificationNumber.Builder memberIdentificationNumberBuilder;
+        private SubscriberNumber.Builder subscriberNumberBuilder;
+        private MemberLevelDates.Builder memberLevelDatesBuilder;
+
 
         // For tracking errors
         private final List<String> buildErrors = new ArrayList<>();
@@ -185,6 +214,62 @@ public class x834Document {
             return this;
         }
 
+        /**
+         * Adds a MemberLevelDetail segment to the document.
+         *
+         * @param builder The MemberLevelDetail builder
+         * @return This builder instance for method chaining
+         */
+        public Builder withMemberLevelDetail(MemberLevelDetail.Builder builder) {
+            this.memberLevelDetailBuilder = builder;
+            return this;
+        }
+
+        /**
+         * Adds a MemberPolicyNumber segment to the document.
+         *
+         * @param builder The MemberPolicyNumber builder
+         * @return This builder instance for method chaining
+         */
+        public Builder withMemberPolicyNumber(MemberPolicyNumber.Builder builder) {
+            this.memberPolicyNumberBuilder = builder;
+            return this;
+        }
+
+        /**
+         * Adds a MemberIdentificationNumber segment to the document.
+         *
+         * @param builder The MemberIdentificationNumber builder
+         * @return This builder instance for method chaining
+         */
+        public Builder withMemberIdentificationNumber(MemberIdentificationNumber.Builder builder) {
+            this.memberIdentificationNumberBuilder = builder;
+            return this;
+        }
+
+        /**
+         * Adds a SubscriberNumber segment to the document.
+         *
+         * @param builder The SubscriberNumber builder
+         * @return This builder instance for method chaining
+         */
+        public Builder withSubscriberNumber(SubscriberNumber.Builder builder) {
+            this.subscriberNumberBuilder = builder;
+            return this;
+        }
+
+        /**
+         * Adds a MemberLevelDates segment to the document.
+         *
+         * @param builder The MemberLevelDates builder
+         * @return This builder instance for method chaining
+         */
+        public Builder withMemberLevelDates(MemberLevelDates.Builder builder) {
+            this.memberLevelDatesBuilder = builder;
+            return this;
+        }
+
+
         public Builder addSegment(Segment segment) {
             this.additionalSegments.add(segment);
             return this;
@@ -232,7 +317,6 @@ public class x834Document {
             if (policyNumberBuilder == null) {
                 buildErrors.add("TransactionSetPolicyNumber builder is required");
                 isValid = false;
-
             }
             if (sponsorNameBuilder == null) {
                 buildErrors.add("SponsorName builder is required");
@@ -242,6 +326,10 @@ public class x834Document {
                 buildErrors.add("Payer builder is required");
                 isValid = false;
             }
+            if (memberLevelDetailBuilder == null) {
+                buildErrors.add("MemberLevelDetail builder is required");
+                isValid = false;
+            }
         }
 
         /**
@@ -249,7 +337,6 @@ public class x834Document {
          */
         private void assembleComponents() {
             try {
-                // Build all components in the correct order
                 interchangeControlHeader = interchangeBuilder.build();
                 functionalGroupHeader = functionalGroupBuilder.build();
                 transactionSetHeader = transactionSetBuilder.build();
@@ -258,6 +345,10 @@ public class x834Document {
                 transactionSetPolicyNumber = policyNumberBuilder.build();
                 sponsorName = sponsorNameBuilder.build();
                 payer = payerBuilder.build();
+                memberLevelDetail = memberLevelDetailBuilder.build();
+                memberPolicyNumber = memberPolicyNumberBuilder.build();
+                memberIdentificationNumber = memberIdentificationNumberBuilder.build();
+                subscriberNumber = subscriberNumberBuilder.build();
             } catch (ValidationException e) {
                 buildErrors.add("Validation error: " + e.getMessage());
                 isValid = false;

@@ -150,12 +150,12 @@ public abstract class FunctionalGroupHeader extends Segment {
             return setGs03(code);
         }
 
-        public Builder setGs04(LocalDate value) {
+        public Builder setGs04(LocalDateTime value) {
             this.gs04 = DateFormatter.formatDate(context.getDateFormat(), value);
             return this;
         }
 
-        public Builder setTransactionSetCreationDate(LocalDate value) {
+        public Builder setTransactionSetCreationDate(LocalDateTime value) {
             return setGs04(value);
         }
 

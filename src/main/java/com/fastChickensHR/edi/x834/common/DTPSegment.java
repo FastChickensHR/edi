@@ -7,16 +7,20 @@
  */
 package com.fastChickensHR.edi.x834.common;
 
+import com.fastChickensHR.edi.x834.common.dates.DateFormat;
+import com.fastChickensHR.edi.x834.common.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @Getter
 public abstract class DTPSegment extends Segment {
     public static final String SEGMENT_ID = "DTP";
 
-    protected final String dtp01; // Date/Time Qualifier
-    protected final String dtp02; // Date Time Period Format Qualifier
-    protected final String dtp03; // Date Time Period
+    protected final String dtp01;
+    protected final String dtp02;
+    protected final String dtp03;
 
     protected DTPSegment(AbstractBuilder<?> builder) throws ValidationException {
         this.dtp01 = builder.dtp01;
@@ -69,13 +73,13 @@ public abstract class DTPSegment extends Segment {
             return self();
         }
 
-        public T setDateTimeFormat(String value) {
-            this.dtp02 = value;
+        public T setDateTimeFormat(DateFormat value) {
+            this.dtp02 = value.getFormat();
             return self();
         }
 
-        public T setDateTimePeriod(String value) {
-            this.dtp03 = value;
+        public T setDateTimePeriod(LocalDateTime value) {
+            this.dtp03 = DateFormatter.formatDate(context.getDateFormat(), value);
             return self();
         }
 
@@ -83,11 +87,11 @@ public abstract class DTPSegment extends Segment {
             return setDateTimeQualifier(value);
         }
 
-        public T setDtp02(String value) {
+        public T setDtp02(DateFormat value) {
             return setDateTimeFormat(value);
         }
 
-        public T setDtp03(String value) {
+        public T setDtp03(LocalDateTime value) {
             return setDateTimePeriod(value);
         }
     }
