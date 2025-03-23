@@ -34,17 +34,9 @@ public class x834Document {
     private final TransactionSetPolicyNumber transactionSetPolicyNumber;
     private final SponsorName sponsorName;
     private final Payer payer;
-    private final MemberLevelDetail memberLevelDetail;
-    private final MemberPolicyNumber memberPolicyNumber;
-    private final MemberIdentificationNumber memberIdentificationNumber;
-    private final SubscriberNumber subscriberNumber;
-    private final MemberLevelDates memberLevelDates;
+    private final List<Member> members = new ArrayList<>();
 
-
-    // List to maintain segment order
     private final List<Segment> segments = new ArrayList<>();
-
-    // For tracking errors
     private final List<String> buildErrors = new ArrayList<>();
     private boolean isValid = true;
 
@@ -57,11 +49,7 @@ public class x834Document {
         this.transactionSetPolicyNumber = builder.transactionSetPolicyNumber;
         this.sponsorName = builder.sponsorName;
         this.payer = builder.payer;
-        this.memberLevelDetail = builder.memberLevelDetail;
-        this.memberPolicyNumber = builder.memberPolicyNumber;
-        this.memberIdentificationNumber = builder.memberIdentificationNumber;
-        this.subscriberNumber = builder.subscriberNumber;
-        this.memberLevelDates = builder.memberLevelDates;
+        this.members.addAll(builder.members);
         this.buildErrors.addAll(builder.buildErrors);
         this.isValid = builder.isValid;
 
@@ -73,13 +61,7 @@ public class x834Document {
         if (transactionSetPolicyNumber != null) segments.add(transactionSetPolicyNumber);
         if (sponsorName != null) segments.add(sponsorName);
         if (payer != null) segments.add(payer);
-        if (memberLevelDetail != null) segments.add(memberLevelDetail);
-        if (memberPolicyNumber != null) segments.add(memberPolicyNumber);
-        if (memberIdentificationNumber != null) segments.add(memberIdentificationNumber);
-        if (subscriberNumber != null) segments.add(subscriberNumber);
-        if (memberLevelDates != null) segments.add(memberLevelDates);
 
-        // Add other segments
         segments.addAll(builder.additionalSegments);
 
         if (isValid) {
@@ -115,7 +97,7 @@ public class x834Document {
      * @return An Optional containing the formatted EDI 834 document as a string,
      * or empty if the document is invalid
      */
-    public Optional<String> generateDocument() {
+    public Optional<String> generateDocument() throws ValidationException {
         if (!isValid) {
             return Optional.empty();
         }
@@ -124,12 +106,17 @@ public class x834Document {
         for (Segment segment : segments) {
             document.append(segment.render());
         }
+        for (Member member : members) {
+            for (Segment segment : member.generateSegments()) {
+                segment.setContext(member.getContext());
+                document.append(segment.render());
+            }
+        }
 
         return Optional.of(document.toString());
     }
 
     public static class Builder {
-        // Required header components
         private InterchangeControlHeader interchangeControlHeader;
         private FunctionalGroupHeader functionalGroupHeader;
         private TransactionSetHeader transactionSetHeader;
@@ -138,12 +125,7 @@ public class x834Document {
         private TransactionSetPolicyNumber transactionSetPolicyNumber;
         private SponsorName sponsorName;
         private Payer payer;
-        private MemberLevelDetail memberLevelDetail;
-        private MemberPolicyNumber memberPolicyNumber;
-        private MemberIdentificationNumber memberIdentificationNumber;
-        private SubscriberNumber subscriberNumber;
-        private MemberLevelDates memberLevelDates;
-
+        private List<Member> members = new ArrayList<>();
 
         // Other segments
         private final List<Segment> additionalSegments = new ArrayList<>();
@@ -157,12 +139,6 @@ public class x834Document {
         private TransactionSetPolicyNumber.Builder policyNumberBuilder;
         private SponsorName.Builder sponsorNameBuilder;
         private Payer.Builder payerBuilder;
-        private MemberLevelDetail.Builder memberLevelDetailBuilder;
-        private MemberPolicyNumber.Builder memberPolicyNumberBuilder;
-        private MemberIdentificationNumber.Builder memberIdentificationNumberBuilder;
-        private SubscriberNumber.Builder subscriberNumberBuilder;
-        private MemberLevelDates.Builder memberLevelDatesBuilder;
-
 
         // For tracking errors
         private final List<String> buildErrors = new ArrayList<>();
@@ -214,62 +190,19 @@ public class x834Document {
             return this;
         }
 
-        /**
-         * Adds a MemberLevelDetail segment to the document.
-         *
-         * @param builder The MemberLevelDetail builder
-         * @return This builder instance for method chaining
-         */
-        public Builder withMemberLevelDetail(MemberLevelDetail.Builder builder) {
-            this.memberLevelDetailBuilder = builder;
+        public Builder withMembers(List<Member> members) {
+            if (members != null) {
+                this.members = new ArrayList<>(members);
+            }
             return this;
         }
 
         /**
-         * Adds a MemberPolicyNumber segment to the document.
+         * Adds an individual EDI segment to the additional segments list associated with this builder.
          *
-         * @param builder The MemberPolicyNumber builder
-         * @return This builder instance for method chaining
+         * @param segment The EDI segment to add
+         * @return This builder instance to allow for method chaining
          */
-        public Builder withMemberPolicyNumber(MemberPolicyNumber.Builder builder) {
-            this.memberPolicyNumberBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Adds a MemberIdentificationNumber segment to the document.
-         *
-         * @param builder The MemberIdentificationNumber builder
-         * @return This builder instance for method chaining
-         */
-        public Builder withMemberIdentificationNumber(MemberIdentificationNumber.Builder builder) {
-            this.memberIdentificationNumberBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Adds a SubscriberNumber segment to the document.
-         *
-         * @param builder The SubscriberNumber builder
-         * @return This builder instance for method chaining
-         */
-        public Builder withSubscriberNumber(SubscriberNumber.Builder builder) {
-            this.subscriberNumberBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Adds a MemberLevelDates segment to the document.
-         *
-         * @param builder The MemberLevelDates builder
-         * @return This builder instance for method chaining
-         */
-        public Builder withMemberLevelDates(MemberLevelDates.Builder builder) {
-            this.memberLevelDatesBuilder = builder;
-            return this;
-        }
-
-
         public Builder addSegment(Segment segment) {
             this.additionalSegments.add(segment);
             return this;
@@ -326,10 +259,6 @@ public class x834Document {
                 buildErrors.add("Payer builder is required");
                 isValid = false;
             }
-            if (memberLevelDetailBuilder == null) {
-                buildErrors.add("MemberLevelDetail builder is required");
-                isValid = false;
-            }
         }
 
         /**
@@ -345,10 +274,6 @@ public class x834Document {
                 transactionSetPolicyNumber = policyNumberBuilder.build();
                 sponsorName = sponsorNameBuilder.build();
                 payer = payerBuilder.build();
-                memberLevelDetail = memberLevelDetailBuilder.build();
-                memberPolicyNumber = memberPolicyNumberBuilder.build();
-                memberIdentificationNumber = memberIdentificationNumberBuilder.build();
-                subscriberNumber = subscriberNumberBuilder.build();
             } catch (ValidationException e) {
                 buildErrors.add("Validation error: " + e.getMessage());
                 isValid = false;
