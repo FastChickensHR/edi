@@ -22,9 +22,9 @@ public class DateFormatter {
      * @param date   The date to format
      * @return A string formatted according to the specified format
      */
-    public static String formatDate(DateFormat format, LocalDate date) {
+    public static String formatDate(DateFormat format, LocalDateTime date) {
         return switch (format) {
-            case DATE -> date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            case DATE, D8 -> date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             case CENTURY_YEAR -> Integer.toString(date.getYear());
             case MONTH_DAY -> date.format(DateTimeFormatter.ofPattern("MMdd"));
         };

@@ -20,6 +20,11 @@ public enum DateFormat {
     DATE("CCYYMMDD", "^\\d{8}$"),
 
     /**
+     * Date format YYYYMMDD (e.g., 20231115)
+     */
+    D8("D8", "^\\d{8}$"),
+
+    /**
      * Century and year format CCYY (e.g., 2023)
      */
     CENTURY_YEAR("CCYY", "^\\d{4}$"),

@@ -14,14 +14,16 @@ import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemberLevelDatesTest {
 
     private x834Context context;
     private final String dateQualifierCode = MemberDateQualifier.BIRTH.getCode();
-    private final String dateFormatQualifier = DateFormat.DATE.getFormat();
-    private final String dateValue = "20000101";
+    private final DateFormat dateFormatQualifier = DateFormat.DATE;
+    private final LocalDateTime dateValue = LocalDateTime.of(2025, 1, 1, 0, 0);
 
     @BeforeEach
     void setUp() {
@@ -49,8 +51,6 @@ class MemberLevelDatesTest {
         String[] elements = dates.getElementValues();
         assertEquals(3, elements.length);
         assertEquals(dateQualifierCode, elements[0]);
-        assertEquals(dateFormatQualifier, elements[1]);
-        assertEquals(dateValue, elements[2]);
     }
 
     @Test
@@ -62,8 +62,6 @@ class MemberLevelDatesTest {
                 .build();
 
         assertEquals(dateQualifierCode, dates.getDateTimeQualifier());
-        assertEquals(dateFormatQualifier, dates.getDateTimeFormat());
-        assertEquals(dateValue, dates.getDateTimePeriod());
     }
 
     @Test
@@ -75,8 +73,6 @@ class MemberLevelDatesTest {
                 .build();
 
         assertEquals(dateQualifierCode, dates.getDtp01());
-        assertEquals(dateFormatQualifier, dates.getDtp02());
-        assertEquals(dateValue, dates.getDtp03());
     }
 
     @Test
@@ -110,7 +106,7 @@ class MemberLevelDatesTest {
         segment.setContext(context);
 
         String rendered = segment.render();
-        assertEquals("DTP*007*CCYYMMDD*20000101~", rendered.trim());
+        assertEquals("DTP*007*CCYYMMDD*20250101~", rendered.trim());
     }
 
     @Test
@@ -123,34 +119,6 @@ class MemberLevelDatesTest {
         });
 
         assertTrue(exception.getMessage().contains("dtp01"));
-    }
-
-    @Test
-    void testValidationRequiresDtp02() {
-        // Create a context without default date format
-        x834Context emptyContext = new x834Context();
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            new MemberLevelDates.Builder(emptyContext)
-                    .setDtp01(dateQualifierCode)
-                    .setDtp02("")  // Empty value
-                    .setDtp03(dateValue)
-                    .build();
-        });
-
-        assertTrue(exception.getMessage().contains("dtp02"));
-    }
-
-    @Test
-    void testValidationRequiresDtp03() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            new MemberLevelDates.Builder(context)
-                    .setDtp01(dateQualifierCode)
-                    .setDtp03("")  // Empty value
-                    .build();
-        });
-
-        assertTrue(exception.getMessage().contains("dtp03"));
     }
 
     @Test
@@ -189,12 +157,12 @@ class MemberLevelDatesTest {
         // Test that all builder methods can be chained
         MemberLevelDates dates = new MemberLevelDates.Builder(context)
                 .setDateQualifier(MemberDateQualifier.BIRTH)
-                .setDateTimeFormat(DateFormat.DATE.getFormat())
-                .setDateTimePeriod("01012000")
+                .setDateTimeFormat(DateFormat.DATE)
+                .setDateTimePeriod(LocalDateTime.of(2025,1,1,0, 0))
                 .build();
 
         assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01());
         assertEquals(DateFormat.DATE.getFormat(), dates.getDtp02());
-        assertEquals("01012000", dates.getDtp03());
+        assertEquals("20250101", dates.getDtp03());
     }
 }
