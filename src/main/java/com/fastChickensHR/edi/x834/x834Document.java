@@ -12,6 +12,7 @@ import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
+import com.fastChickensHR.edi.x834.trailer.Trailer;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class x834Document {
     private final List<String> buildErrors;
     private final boolean isValid;
     private final x834Context context;
+    private final Trailer trailer;
 
     /**
      * Private constructor used by the Builder class
@@ -39,10 +41,11 @@ public class x834Document {
     private x834Document(Builder builder) {
         this.context = builder.context;
         this.header = builder.header;
-        this.members = new ArrayList<>(builder.members);
-        this.additionalSegments = new ArrayList<>(builder.additionalSegments);
-        this.buildErrors = new ArrayList<>(builder.buildErrors);
+        this.members = builder.members;
+        this.additionalSegments = builder.additionalSegments;
+        this.buildErrors = builder.buildErrors;
         this.isValid = builder.isValid;
+        this.trailer = builder.trailer;
     }
 
     /**
@@ -60,7 +63,7 @@ public class x834Document {
      * @return List of error messages
      */
     public List<String> getErrors() {
-        return new ArrayList<>(buildErrors);
+        return buildErrors;
     }
 
     /**
@@ -70,32 +73,42 @@ public class x834Document {
      * or empty if the document is invalid
      */
     public Optional<String> generateDocument() throws ValidationException {
-        if (!isValid()) {
+        if (!isValid) {
             return Optional.empty();
         }
 
-        // Generate all segments
-        List<Segment> allSegments = new ArrayList<>();
+        StringBuilder document = new StringBuilder();
 
-        // Add header segments
-        allSegments.addAll(header.generateSegments());
+        if (header != null) {
+            List<Segment> headerSegments = header.generateSegments();
+            for (Segment segment : headerSegments) {
+                segment.setContext(context);
+                document.append(segment.render());
+            }
+        }
 
-        // Add member segments
         for (Member member : members) {
-            allSegments.addAll(member.generateSegments());
+            List<Segment> memberSegments = member.generateSegments();
+            for (Segment segment : memberSegments) {
+                segment.setContext(context);
+                document.append(segment.render());
+            }
         }
 
-        // Add any additional segments
-        allSegments.addAll(additionalSegments);
-
-        // Format segments into EDI document
-        StringBuilder documentBuilder = new StringBuilder();
-        for (Segment segment : allSegments) {
-            segment.setContext( context);
-            documentBuilder.append(segment.render());
+        for (Segment segment : additionalSegments) {
+            segment.setContext(context);
+            document.append(segment.render());
         }
 
-        return Optional.of(documentBuilder.toString());
+        if (trailer != null) {
+            List<Segment> trailerSegments = trailer.generateSegments();
+            for (Segment segment : trailerSegments) {
+                segment.setContext(context);
+                document.append(segment.render());
+            }
+        }
+
+        return Optional.of(document.toString());
     }
 
     /**
@@ -103,17 +116,12 @@ public class x834Document {
      */
     public static class Builder {
         private Header header;
+        private Trailer trailer;
         private final List<Member> members = new ArrayList<>();
         private final List<Segment> additionalSegments = new ArrayList<>();
         private final List<String> buildErrors = new ArrayList<>();
         private boolean isValid = true;
-        /**
-         * -- GETTER --
-         *  Gets the context associated with this builder.
-         *  Useful for creating components that need to share the same context.
-         *
-         * @return The context for this document
-         */
+
         @Getter
         private final x834Context context;
 
@@ -149,24 +157,33 @@ public class x834Document {
          * @return This builder instance
          */
         public Builder withHeader(Header.Builder headerBuilder) {
-            try {
-                this.header = headerBuilder.build();
-            } catch (Exception e) {
-                recordError("Failed to build Header: " + e.getMessage());
-            }
+            this.header = headerBuilder.build();
             return this;
         }
 
         /**
-         * Creates and sets a header with default configuration using the document's context
+         * Sets the trailer for this document
          *
+         * @param trailer The completely configured trailer
          * @return This builder instance
          */
-        public Builder withDefaultHeader() {
+        public Builder withTrailer(Trailer trailer) {
+            this.trailer = trailer;
+            return this;
+        }
+
+        /**
+         * Convenience method to set the trailer using a trailer builder
+         *
+         * @param trailerBuilder The trailer builder to use
+         * @return This builder instance
+         */
+        public Builder withTrailer(Trailer.Builder trailerBuilder) {
             try {
-                this.header = new Header.Builder(this.context).build();
-            } catch (Exception e) {
-                recordError("Failed to build default Header: " + e.getMessage());
+                this.trailer = trailerBuilder.build();
+            } catch (ValidationException e) {
+                buildErrors.add("Trailer validation error: " + e.getMessage());
+                isValid = false;
             }
             return this;
         }
@@ -178,7 +195,7 @@ public class x834Document {
          * @return This builder instance
          */
         public Builder addMember(Member member) {
-            this.members.add(member);
+            members.add(member);
             return this;
         }
 
@@ -200,42 +217,8 @@ public class x834Document {
          * @return This builder instance
          */
         public Builder addSegment(Segment segment) {
-            this.additionalSegments.add(segment);
+            additionalSegments.add(segment);
             return this;
-        }
-
-        /**
-         * Adds multiple additional segments to the document
-         *
-         * @param segments The list of segments to add
-         * @return This builder instance
-         */
-        public Builder withAdditionalSegments(List<Segment> segments) {
-            this.additionalSegments.addAll(segments);
-            return this;
-        }
-
-        /**
-         * Records an error during the build process
-         *
-         * @param error The error message
-         */
-        private void recordError(String error) {
-            buildErrors.add(error);
-            isValid = false;
-        }
-
-        /**
-         * Validates that all required components are present
-         */
-        private void validate() {
-            if (header == null) {
-                recordError("Header is required");
-            }
-
-            if (members.isEmpty()) {
-                recordError("At least one Member is required");
-            }
         }
 
         /**
@@ -244,7 +227,40 @@ public class x834Document {
          * @return The configured x834Document
          */
         public x834Document build() {
-            validate();
+            // Validate required components
+            if (header == null) {
+                buildErrors.add("Header is required");
+                isValid = false;
+            }
+
+            if (trailer == null) {
+                buildErrors.add("Trailer is required");
+                isValid = false;
+            }
+
+            if (members.isEmpty()) {
+                buildErrors.add("At least one member is required");
+                isValid = false;
+            }
+
+            // Additional validation
+            try {
+                if (header != null) {
+                    header.validate();
+                }
+
+                if (trailer != null) {
+                    trailer.validate();
+                }
+
+                for (Member member : members) {
+                    member.validate();
+                }
+            } catch (ValidationException e) {
+                buildErrors.add("Validation error: " + e.getMessage());
+                isValid = false;
+            }
+
             return new x834Document(this);
         }
     }

@@ -19,6 +19,7 @@ import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.trailer.Trailer;
 import com.fastChickensHR.edi.x834.x834Document;
 
 import java.time.LocalDateTime;
@@ -45,7 +46,7 @@ public class StateOfMichigan834 {
      * @param memberCount Number of primary members to include in the document
      * @return A fully populated 834 document
      */
-    public static x834Document createMichiganDocument(int memberCount) {
+    public static x834Document createMichiganDocument(int memberCount) throws ValidationException {
         Header header = new Header.Builder(context)
                 .setInterchangeControlNumber("000000001")
                 .setGroupControlNumber("42789")
@@ -58,9 +59,12 @@ public class StateOfMichigan834 {
 
         List<Member> members = generateMembers(memberCount);
 
+        Trailer trailer = new Trailer.Builder(context).build();
+
         return new x834Document.Builder(context)
                 .withHeader(header)
                 .withMembers(members)
+                .withTrailer(trailer)
                 .build();
     }
 
