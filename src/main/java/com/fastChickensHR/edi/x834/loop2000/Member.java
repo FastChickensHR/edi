@@ -9,12 +9,11 @@ package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.common.x834Context;
-import com.fastChickensHR.edi.x834.loop2000.data.*;
+import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
+import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,64 +23,18 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class Member {
-    private x834Context context;
-    // Member identification
-    private String memberId;
-    private String memberIdQualifier;
-    private String subscriberNumber;
-    private String policyNumber;
-
-    // Demographics
-    private String firstName;
-    private String lastName;
-    private String middleName;
-    private LocalDateTime birthDate;
-    private String gender;
-
-    // Enrollment details
-    private MemberIndicator memberIndicator;
-    private MaintenanceTypeCode maintenanceTypeCode;
-    private LocalDateTime enrollmentDate;
-    private LocalDateTime coverageStartDate;
-    private LocalDateTime coverageEndDate;
-
-    // Relationship
-    private IndividualRelationshipCode relationshipCode;
-
-    // Address
-    private String addressLine1;
-    private String addressLine2;
-    private String city;
-    private String state;
-    private String zipCode;
-
-    // Contact info
-    private String phoneNumber;
-    private String email;
-
-    // Dependents of this member
-    private final List<Member> dependents = new ArrayList<>();
+public class Member extends BaseMember {
+    private final List<DependentMember> dependents = new ArrayList<>();
 
     /**
      * Adds a dependent to this member
      *
      * @param dependent The dependent member
      */
-    public void addDependent(Member dependent) {
+    public void addDependent(DependentMember dependent) {
         dependents.add(dependent);
     }
 
-    /**
-     * Adds multiple dependents to this member
-     *
-     * @param dependentList List of dependent members
-     * @return This member instance for method chaining
-     */
-    public Member addDependents(List<Member> dependentList) {
-        dependentList.forEach(this::addDependent);
-        return this;
-    }
 
     /**
      * Validates this member has the minimum required fields
@@ -107,7 +60,7 @@ public class Member {
             throw new ValidationException("Member validation failed: " + String.join("\n", errors));
         }
 
-        for (Member dependent : dependents) {
+        for (DependentMember dependent : dependents) {
             dependent.validate();
         }
     }
@@ -119,61 +72,60 @@ public class Member {
      */
     public List<Segment> generateSegments() throws ValidationException {
         List<Segment> segments = new ArrayList<>();
-            MemberLevelDetail memberLevelDetail = new MemberLevelDetail.Builder()
-                    .setMaintenanceTypeCode(maintenanceTypeCode.getCode())
-                    .setIndividualRelationshipCode(relationshipCode.getCode())
-                    .setBenefitStatusCode(BenefitStatusCode.ACTIVE.getCode())
-                    .setMemberIndicator(memberIndicator.getCode())
+        MemberLevelDetail memberLevelDetail = new MemberLevelDetail.Builder()
+                .setMaintenanceTypeCode(maintenanceTypeCode.getCode())
+                .setIndividualRelationshipCode(relationshipCode.getCode())
+                .setBenefitStatusCode(BenefitStatusCode.ACTIVE.getCode())
+                .setMemberIndicator(memberIndicator.getCode())
+                .build();
+        segments.add(memberLevelDetail);
+
+        if (policyNumber != null && !policyNumber.isEmpty()) {
+            MemberPolicyNumber policyNumberSegment = new MemberPolicyNumber.Builder()
+                    .setReferenceIdentification(policyNumber)
                     .build();
-            segments.add(memberLevelDetail);
+            segments.add(policyNumberSegment);
+        }
 
-            if (policyNumber != null && !policyNumber.isEmpty()) {
-                MemberPolicyNumber policyNumberSegment = new MemberPolicyNumber.Builder()
-                        .setReferenceIdentification(policyNumber)
-                        .build();
-                segments.add(policyNumberSegment);
+        if (memberId != null && !memberId.isEmpty()) {
+            MemberIdentificationNumber idNumberSegment = new MemberIdentificationNumber.Builder()
+                    .setReferenceIdentification(memberId)
+                    .setReferenceIdentificationQualifier(memberIdQualifier)
+                    .build();
+            segments.add(idNumberSegment);
+        }
+
+        if (subscriberNumber != null && !subscriberNumber.isEmpty()) {
+            SubscriberNumber subscriberNumberSegment = new SubscriberNumber.Builder()
+                    .setReferenceIdentification(subscriberNumber)
+                    .build();
+            segments.add(subscriberNumberSegment);
+        }
+
+        if (enrollmentDate != null || coverageStartDate != null || coverageEndDate != null) {
+            MemberLevelDates.Builder datesBuilder = new MemberLevelDates.Builder(context);
+
+            if (enrollmentDate != null) {
+                datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_BEGIN);
+                datesBuilder.setDateTimePeriod(enrollmentDate);
             }
 
-            if (memberId != null && !memberId.isEmpty()) {
-                MemberIdentificationNumber idNumberSegment = new MemberIdentificationNumber.Builder()
-                        .setReferenceIdentification(memberId)
-                        .setReferenceIdentificationQualifier(memberIdQualifier)
-                        .build();
-                segments.add(idNumberSegment);
+            if (coverageStartDate != null) {
+                datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_BEGIN);
+                datesBuilder.setDateTimePeriod(coverageStartDate);
             }
 
-            if (subscriberNumber != null && !subscriberNumber.isEmpty()) {
-                SubscriberNumber subscriberNumberSegment = new SubscriberNumber.Builder()
-                        .setReferenceIdentification(subscriberNumber)
-                        .build();
-                segments.add(subscriberNumberSegment);
+            if (coverageEndDate != null) {
+                datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_END);
+                datesBuilder.setDateTimePeriod(coverageEndDate);
             }
 
-            if (enrollmentDate != null || coverageStartDate != null || coverageEndDate != null) {
-                MemberLevelDates.Builder datesBuilder = new MemberLevelDates.Builder(context);
+            segments.add(datesBuilder.build());
+        }
 
-                if (enrollmentDate != null) {
-                    datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_BEGIN);
-                    datesBuilder.setDateTimePeriod(enrollmentDate);
-                }
-
-                if (coverageStartDate != null) {
-                    datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_BEGIN);
-                    datesBuilder.setDateTimePeriod(coverageStartDate);
-                }
-
-                if (coverageEndDate != null) {
-                    datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_END);
-                    datesBuilder.setDateTimePeriod(coverageEndDate);
-                }
-
-                segments.add(datesBuilder.build());
-            }
-
-            for (Member dependent : dependents) {
-                segments.addAll(dependent.generateSegments());
-            }
-
+        for (DependentMember dependent : dependents) {
+            segments.addAll(dependent.generateSegments());
+        }
 
         return segments;
     }

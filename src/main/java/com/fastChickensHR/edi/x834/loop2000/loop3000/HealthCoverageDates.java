@@ -10,7 +10,6 @@ package com.fastChickensHR.edi.x834.loop2000.loop3000;
 import com.fastChickensHR.edi.x834.common.DTPSegment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
-import com.fastChickensHR.edi.x834.loop2000.data.HealthCoverageDateQualifier;
 import lombok.Getter;
 
 /**
@@ -36,6 +35,10 @@ public class HealthCoverageDates extends DTPSegment {
         }
         if (dtp02 == null || dtp02.trim().isEmpty()) {
             throw new ValidationException("Date Time Format (DTP02) is required for Health Coverage Dates");
+        }
+        System.out.println("MARK HERE: " + dtp02);
+        if (!dtp02.equals("D8") && !dtp02.equals("RD8")) {
+            throw new ValidationException("Health Coverage Dates must have a Date Time Format (DTP02) of D8 or RD8");
         }
         if (dtp03 == null || dtp03.trim().isEmpty()) {
             throw new ValidationException("Date Time Period (DTP03) is required for Health Coverage Dates");
@@ -83,18 +86,5 @@ public class HealthCoverageDates extends DTPSegment {
      */
     public static Builder builder(x834Context context) {
         return new Builder(context);
-    }
-
-    /**
-     * Gets the health coverage date qualifier as an enum if possible.
-     *
-     * @return the qualifier as enum, or null if not a valid qualifier
-     */
-    public HealthCoverageDateQualifier getQualifierAsEnum() {
-        try {
-            return HealthCoverageDateQualifier.fromCode(dtp01);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
     }
 }

@@ -12,9 +12,9 @@ import com.fastChickensHR.edi.domain.Dependent;
 import com.fastChickensHR.edi.domain.Person;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
-import com.fastChickensHR.edi.x834.header.*;
-import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
-import com.fastChickensHR.edi.x834.loop1000B.Payer;
+import com.fastChickensHR.edi.x834.constants.ElementSeparator;
+import com.fastChickensHR.edi.x834.header.Header;
+import com.fastChickensHR.edi.x834.loop2000.DependentMember;
 import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
@@ -36,6 +36,7 @@ public class StateOfMichigan834 {
     private static final x834Context context = new x834Context()
             .setSenderID("FASTCHKN")
             .setReceiverID("MICHGVEDI")
+            .setElementSeparator(ElementSeparator.PIPE)
             .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
 
     /**
@@ -45,41 +46,20 @@ public class StateOfMichigan834 {
      * @return A fully populated 834 document
      */
     public static x834Document createMichiganDocument(int memberCount) {
-        // Generate members from test data
+        Header header = new Header.Builder(context)
+                .setInterchangeControlNumber("000000001")
+                .setGroupControlNumber("42789")
+                .setReferenceIdentification("220701MI834")
+                .setMasterPolicyNumber("MIHHS-EMP-2023")
+                .setPlanSponsorName("FASTCHKN")
+                .setPayerName("FASTCHKN INSURANCE")
+                .setPayerIdentification("123456789")
+                .build();
+
         List<Member> members = generateMembers(memberCount);
 
-        InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context)
-                .setInterchangeControlNumber("000000001");
-
-        FunctionalGroupHeader.Builder functionalBuilder = new FunctionalGroupHeader.Builder(context)
-                .setGroupControlNumber("42789");
-
-        TransactionSetHeader.Builder transactionSetBuilder = new TransactionSetHeader.Builder()
-                .setTransactionSetIdentifierCode("834")
-                .setTransactionSetControlNumber("0001");
-
-        BeginningSegment.Builder beginningSegmentBuilder = new BeginningSegment.Builder(context)
-                .setReferenceIdentification("220701MI834");
-
-        FileEffectiveDate.Builder fileEffectiveDateBuilder = new FileEffectiveDate.Builder(context);
-
-        TransactionSetPolicyNumber.Builder policyNumberBuilder = new TransactionSetPolicyNumber.Builder()
-                .setMasterPolicyNumber("MIHHS-EMP-2023");
-
-        SponsorName.Builder sponsorBuilder = new SponsorName.Builder()
-                .setPlanSponsorName("FASTCHKN");
-
-        Payer.Builder payerBuilder = new Payer.Builder();
-
-        return new x834Document.Builder()
-                .withInterchangeControlHeader(interchangeBuilder)
-                .withFunctionalGroupHeader(functionalBuilder)
-                .withTransactionSetHeader(transactionSetBuilder)
-                .withBeginningSegment(beginningSegmentBuilder)
-                .withFileEffectiveDate(fileEffectiveDateBuilder)
-                .withTransactionSetPolicyNumber(policyNumberBuilder)
-                .withSponsorName(sponsorBuilder)
-                .withPayer(payerBuilder)
+        return new x834Document.Builder(context)
+                .withHeader(header)
                 .withMembers(members)
                 .build();
     }
@@ -92,18 +72,14 @@ public class StateOfMichigan834 {
      */
     private static List<Member> generateMembers(int count) {
         List<Member> members = new ArrayList<>();
-
-        // Generate test persons using the TestDataGenerator
         List<Person> persons = TestDataGenerator.generatePersons(count);
 
         for (Person person : persons) {
-            // Create primary member from the person
             Member primaryMember = createMemberFromPerson(person);
 
-            // Add dependent members if they exist
             if (person.getDependents() != null && !person.getDependents().isEmpty()) {
                 for (Dependent dependent : person.getDependents()) {
-                    Member dependentMember = createMemberFromDependent(dependent, person);
+                    DependentMember dependentMember = mapDependentToDependentMember(dependent, person);
                     primaryMember.addDependent(dependentMember);
                 }
             }
@@ -155,6 +131,10 @@ public class StateOfMichigan834 {
         if (person.getCoverages() != null && !person.getCoverages().isEmpty()) {
         }
 
+        person.getDependents().forEach(dependent -> {
+            member.addDependent(mapDependentToDependentMember(dependent, person));
+        });
+
         return member;
     }
 
@@ -165,8 +145,8 @@ public class StateOfMichigan834 {
      * @param primary   The primary person this dependent belongs to
      * @return An EDI Member object
      */
-    private static Member createMemberFromDependent(Dependent dependent, Person primary) {
-        Member member = new Member();
+    private static DependentMember mapDependentToDependentMember(Dependent dependent, Person primary) {
+        DependentMember member = new DependentMember();
         member.setContext(context);
 
         member.setMemberId(primary.getEmployeeId() + "-D");
@@ -180,7 +160,6 @@ public class StateOfMichigan834 {
         member.setGender(dependent.getGender());
         member.setRelationshipCode(IndividualRelationshipCode.SELF);
 
-        // Set Michigan-specific enrollment details
         member.setMemberIndicator(MemberIndicator.NOT_INSURED);
         member.setMaintenanceTypeCode(MaintenanceTypeCode.ADDITION);
         member.setEnrollmentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
@@ -211,13 +190,17 @@ public class StateOfMichigan834 {
         x834Document document = createMichiganDocument(10);
 
         // Generate and print the document
-        Optional<String> generatedDocument = document.generateDocument();
-        if (generatedDocument.isPresent()) {
-            System.out.println("Generated Michigan 834 Document with test members:");
-            System.out.println(generatedDocument.get());
-        } else {
+        try {
+            Optional<String> generatedDocument = document.generateDocument();
+            if (generatedDocument.isPresent()) {
+                System.out.println("Generated Michigan 834 Document with test members:");
+                System.out.println(generatedDocument.get());
+            } else {
+                System.out.println("Failed to generate document due to validation errors:");
+                document.getErrors().forEach(System.out::println);
+            }
+        } catch (ValidationException e) {
             System.out.println("Failed to generate document due to validation errors:");
-            document.getErrors().forEach(System.out::println);
         }
     }
 }
