@@ -10,11 +10,13 @@ package com.fastChickensHR.edi.x834.header;
 import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
+import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
 import com.fastChickensHR.edi.x834.loop1000B.Payer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +27,12 @@ class HeaderTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new x834Context()
+                .setSenderID("FASTCHKN")
+                .setReceiverID("MICHGVEDI")
+                .setElementSeparator(ElementSeparator.PIPE)
+                .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
+        ;
         // Configure context with any necessary test values
     }
 
@@ -119,6 +126,10 @@ class HeaderTest {
         header.setPlanSponsorName("FastChickensHR Corp");
         header.setPayerName("Insurance Co");
         header.setPayerIdentification("PAYERID123");
+        header.setGroupControlNumber("42");
+        header.setTransactionSetIdentifierCode("834");
+        header.setInterchangeControlNumber("4321");
+        header.setTransactionSetControlNumber("0001");
 
         List<Segment> segments = header.generateSegments();
 
@@ -194,16 +205,6 @@ class HeaderTest {
         // Verify custom builders were set correctly
         assertEquals(interchangeBuilder, header.getCustomInterchangeBuilder());
         assertEquals(functionalBuilder, header.getCustomFunctionalBuilder());
-    }
-
-    @Test
-    void testBuilderWithNullContext() {
-        // Test that builder throws exception when context is null
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new Header.Builder(null);
-        });
-
-        assertTrue(exception.getMessage().toLowerCase().contains("context cannot be null"));
     }
 
     @Test

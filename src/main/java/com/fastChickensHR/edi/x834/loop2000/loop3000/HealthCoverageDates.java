@@ -36,7 +36,6 @@ public class HealthCoverageDates extends DTPSegment {
         if (dtp02 == null || dtp02.trim().isEmpty()) {
             throw new ValidationException("Date Time Format (DTP02) is required for Health Coverage Dates");
         }
-        System.out.println("MARK HERE: " + dtp02);
         if (!dtp02.equals("D8") && !dtp02.equals("RD8")) {
             throw new ValidationException("Health Coverage Dates must have a Date Time Format (DTP02) of D8 or RD8");
         }
