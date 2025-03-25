@@ -35,65 +35,32 @@ Creating an X834 document involves configuring a document context and using buil
 Below is an example showing how to create an 834 document for the State of Michigan:
 
 ```java
-public class StateOfMichigan834 {
-
-    public static x834Document createMichiganDocument() {
-        // Create and configure context
-        x834Context context = new x834Context()
+    public static x834Document createMichiganDocument(int memberCount) throws ValidationException {
+    final x834Context context = new x834Context()
             .setSenderID("FASTCHKN")
             .setReceiverID("MICHGVEDI")
-            .setDocumentDate(LocalDate.of(2023, 8, 8));
+            .setElementSeparator(ElementSeparator.PIPE)
+            .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
 
-        // Configure all required segment builders
-        InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context)
-            .setInterchangeControlNumber("000000001");
-
-        FunctionalGroupHeader.Builder functionalBuilder = new FunctionalGroupHeader.Builder(context)
-            .setGroupControlNumber("42789");
-
-        TransactionSetHeader.Builder transactionSetBuilder = new TransactionSetHeader.Builder()
-            .setTransactionSetIdentifierCode("834")
-            .setTransactionSetControlNumber("0001");
-
-        BeginningSegment.Builder beginningSegmentBuilder = new BeginningSegment.Builder(context)
-            .setReferenceIdentification("220701MI834");
-
-        FileEffectiveDate.Builder fileEffectiveDateBuilder = new FileEffectiveDate.Builder(context);
-
-        TransactionSetPolicyNumber.Builder policyNumberBuilder = new TransactionSetPolicyNumber.Builder()
-            .setMasterPolicyNumber("MIHHS-EMP-2023");
-
-        // Build document from configured builders
-        return new x834Document.Builder()
-            .withInterchangeControlHeader(interchangeBuilder)
-            .withFunctionalGroupHeader(functionalBuilder)
-            .withTransactionSetHeader(transactionSetBuilder)
-            .withBeginningSegment(beginningSegmentBuilder)
-            .withFileEffectiveDate(fileEffectiveDateBuilder)
-            .withTransactionSetPolicyNumber(policyNumberBuilder)
+    Header header = new Header.Builder(context)
+            .setInterchangeControlNumber("000000001")
+            .setGroupControlNumber("42789")
+            .setReferenceIdentification("220701MI834")
+            .setMasterPolicyNumber("MIHHS-EMP-2023")
+            .setPlanSponsorName("FASTCHKN")
+            .setPayerName("FASTCHKN INSURANCE")
+            .setPayerIdentification("123456789")
             .build();
-    }
 
-    public static void main(String[] args) {
-        // Create a Michigan 834 document
-        x834Document michiganDocument = createMichiganDocument();
+    List<Member> members = generateMembers(memberCount, context);
 
-        // Check if document is valid
-        if (michiganDocument.isValid()) {
-            // Generate and print the document
-            Optional<String> ediDocument = michiganDocument.generateDocument();
-            ediDocument.ifPresent(doc -> {
-                System.out.println("Generated Michigan 834 Document:");
-                System.out.println(doc);
-                
-                // In a real application:
-                // saveToFile(doc, "michigan_enrollment_834.edi");
-            });
-        } else {
-            System.err.println("Document validation errors:");
-            michiganDocument.getErrors().forEach(System.err::println);
-        }
-    }
+    Trailer trailer = new Trailer.Builder(context).build();
+
+    return new x834Document.Builder(context)
+            .withHeader(header)
+            .withMembers(members)
+            .withTrailer(trailer)
+            .build();
 }
 ```
 

@@ -34,11 +34,6 @@ import java.util.Optional;
  */
 public class StateOfMichigan834 {
 
-    private static final x834Context context = new x834Context()
-            .setSenderID("FASTCHKN")
-            .setReceiverID("MICHGVEDI")
-            .setElementSeparator(ElementSeparator.PIPE)
-            .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
 
     /**
      * Creates a Michigan 834 document with generated members
@@ -47,6 +42,12 @@ public class StateOfMichigan834 {
      * @return A fully populated 834 document
      */
     public static x834Document createMichiganDocument(int memberCount) throws ValidationException {
+        final x834Context context = new x834Context()
+                .setSenderID("FASTCHKN")
+                .setReceiverID("MICHGVEDI")
+                .setElementSeparator(ElementSeparator.PIPE)
+                .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
+
         Header header = new Header.Builder(context)
                 .setInterchangeControlNumber("000000001")
                 .setGroupControlNumber("42789")
@@ -57,7 +58,7 @@ public class StateOfMichigan834 {
                 .setPayerIdentification("123456789")
                 .build();
 
-        List<Member> members = generateMembers(memberCount);
+        List<Member> members = generateMembers(memberCount, context);
 
         Trailer trailer = new Trailer.Builder(context).build();
 
@@ -74,16 +75,16 @@ public class StateOfMichigan834 {
      * @param count Number of primary members to generate
      * @return List of Member objects ready for EDI 834 use
      */
-    private static List<Member> generateMembers(int count) {
+    private static List<Member> generateMembers(int count, x834Context context) {
         List<Member> members = new ArrayList<>();
         List<Person> persons = TestDataGenerator.generatePersons(count);
 
         for (Person person : persons) {
-            Member primaryMember = createMemberFromPerson(person);
+            Member primaryMember = createMemberFromPerson(person, context);
 
             if (person.getDependents() != null && !person.getDependents().isEmpty()) {
                 for (Dependent dependent : person.getDependents()) {
-                    DependentMember dependentMember = mapDependentToDependentMember(dependent, person);
+                    DependentMember dependentMember = mapDependentToDependentMember(dependent, person, context);
                     primaryMember.addDependent(dependentMember);
                 }
             }
@@ -101,9 +102,8 @@ public class StateOfMichigan834 {
      * @param person The domain person to convert
      * @return An EDI Member object
      */
-    private static Member createMemberFromPerson(Person person) {
-        Member member = new Member();
-        member.setContext(context);
+    private static Member createMemberFromPerson(Person person, x834Context context) {
+        Member member = new Member(context);
 
         member.setMemberId(person.getEmployeeId());
         member.setRelationshipCode(IndividualRelationshipCode.SELF);
@@ -136,7 +136,7 @@ public class StateOfMichigan834 {
         }
 
         person.getDependents().forEach(dependent -> {
-            member.addDependent(mapDependentToDependentMember(dependent, person));
+            member.addDependent(mapDependentToDependentMember(dependent, person, context));
         });
 
         return member;
@@ -149,9 +149,8 @@ public class StateOfMichigan834 {
      * @param primary   The primary person this dependent belongs to
      * @return An EDI Member object
      */
-    private static DependentMember mapDependentToDependentMember(Dependent dependent, Person primary) {
-        DependentMember member = new DependentMember();
-        member.setContext(context);
+    private static DependentMember mapDependentToDependentMember(Dependent dependent, Person primary, x834Context context) {
+        DependentMember member = new DependentMember(context);
 
         member.setMemberId(primary.getEmployeeId() + "-D");
         member.setMemberIdQualifier("34");
