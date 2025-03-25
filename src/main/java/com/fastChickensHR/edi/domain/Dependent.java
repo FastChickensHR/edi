@@ -30,12 +30,9 @@ public class Dependent {
     private LocalDate enrollmentDate;
     private LocalDate coverageStartDate;
     private LocalDate coverageEndDate;
-    // Coverage details
+
     private List<Coverage> coverages = new ArrayList<>();
 
-    /**
-     * Adds a coverage to this dependent
-     */
     public void addCoverage(Coverage coverage) {
         coverages.add(coverage);
     }
