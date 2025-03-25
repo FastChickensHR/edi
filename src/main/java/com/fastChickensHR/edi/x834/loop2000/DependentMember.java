@@ -9,6 +9,7 @@ package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.common.Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +25,16 @@ import java.util.List;
 public class DependentMember extends BaseMember {
     private Member primaryMember;
 
+    /**
+     * Creates a new DependentMember with the specified context
+     *
+     * @param context The 834 context to use for this dependent member
+     * @throws IllegalArgumentException if context is null
+     */
+    public DependentMember(x834Context context) {
+        super(context);
+    }
+
     @Override
     public void validate() throws ValidationException {
         if (relationshipCode == null) {
@@ -33,12 +44,11 @@ public class DependentMember extends BaseMember {
 
     @Override
     public List<Segment> generateSegments() throws ValidationException {
-        List<Segment> segments = new ArrayList<>();
 
         // Generate dependent-specific segments
         // This might be similar to Member's segment generation but with
         // dependent-specific segment identifiers
 
-        return segments;
+        return new ArrayList<>();
     }
 }

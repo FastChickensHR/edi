@@ -25,7 +25,7 @@ import java.util.List;
 @Getter
 @Setter
 public abstract class BaseMember {
-    protected x834Context context;
+    protected final x834Context context;
 
     protected String memberId;
     protected String memberIdQualifier;
@@ -49,6 +49,19 @@ public abstract class BaseMember {
     protected String zipCode;
     protected String phoneNumber;
     protected String email;
+
+    /**
+     * Constructor for BaseMember
+     *
+     * @param context The 834 context to use for this member
+     * @throws IllegalArgumentException if context is null
+     */
+    protected BaseMember(x834Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("Context cannot be null");
+        }
+        this.context = context;
+    }
 
     /**
      * Validates this member has the minimum required fields
