@@ -8,6 +8,7 @@
 package com.fastChickensHR.edi.x834.common;
 
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.common.segments.N3Segment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

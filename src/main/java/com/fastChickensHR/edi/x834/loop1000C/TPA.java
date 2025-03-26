@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop1000C;
 
-import com.fastChickensHR.edi.x834.common.N1Segment;
+import com.fastChickensHR.edi.x834.common.segments.N1Segment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import lombok.Getter;
 import lombok.Setter;

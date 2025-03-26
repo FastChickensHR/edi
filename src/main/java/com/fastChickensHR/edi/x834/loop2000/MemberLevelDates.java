@@ -7,11 +7,10 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.x834.common.DTPSegment;
+import com.fastChickensHR.edi.x834.common.segments.DTPSegment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
-import lombok.experimental.Accessors;
 
 /**
  * Represents a Member Level Date segment in the 834 EDI format.
