@@ -62,24 +62,20 @@ class N4SegmentTest {
 
     @Test
     void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).build();
         assertEquals("N4", segment.getSegmentIdentifier());
     }
 
     @Test
     void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        TestN4Segment.Builder builder = TestN4Segment.builder();
-
-        // Setting using spec field names
-        builder.n401 = cityName;
-        builder.n402 = stateOrProvinceCode;
-        builder.n403 = postalCode;
-        builder.n404 = countryCode;
-        builder.n405 = locationQualifier;
-        builder.n406 = locationIdentifier;
-        builder.n407 = countrySubdivisionCode;
+        TestN4Segment.Builder builder = TestN4Segment.builder()
+                .setN401(cityName)
+                .setN402(stateOrProvinceCode)
+                .setN403(postalCode)
+                .setN404(countryCode)
+                .setN405(locationQualifier)
+                .setN406(locationIdentifier)
+                .setN407(countrySubdivisionCode);
 
         TestN4Segment segment = builder.build();
 
@@ -95,15 +91,7 @@ class N4SegmentTest {
 
     @Test
     void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .setStateOrProvinceCode(stateOrProvinceCode)
-                .setPostalCode(postalCode)
-                .setCountryCode(countryCode)
-                .setLocationQualifier(locationQualifier)
-                .setLocationIdentifier(locationIdentifier)
-                .setCountrySubdivisionCode(countrySubdivisionCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).setStateOrProvinceCode(stateOrProvinceCode).setPostalCode(postalCode).setCountryCode(countryCode).setLocationQualifier(locationQualifier).setLocationIdentifier(locationIdentifier).setCountrySubdivisionCode(countrySubdivisionCode).build();
 
         // Get the element values array which uses the spec field names internally
         String[] elements = segment.getElementValues();
@@ -119,15 +107,7 @@ class N4SegmentTest {
 
     @Test
     void testDirectAccessToSpecFields() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .setStateOrProvinceCode(stateOrProvinceCode)
-                .setPostalCode(postalCode)
-                .setCountryCode(countryCode)
-                .setLocationQualifier(locationQualifier)
-                .setLocationIdentifier(locationIdentifier)
-                .setCountrySubdivisionCode(countrySubdivisionCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).setStateOrProvinceCode(stateOrProvinceCode).setPostalCode(postalCode).setCountryCode(countryCode).setLocationQualifier(locationQualifier).setLocationIdentifier(locationIdentifier).setCountrySubdivisionCode(countrySubdivisionCode).build();
 
         assertEquals(cityName, segment.getN401());
         assertEquals(stateOrProvinceCode, segment.getN402());
@@ -140,31 +120,19 @@ class N4SegmentTest {
 
     @Test
     void testRenderWithAllFields() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .setStateOrProvinceCode(stateOrProvinceCode)
-                .setPostalCode(postalCode)
-                .setCountryCode(countryCode)
-                .setLocationQualifier(locationQualifier)
-                .setLocationIdentifier(locationIdentifier)
-                .setCountrySubdivisionCode(countrySubdivisionCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).setStateOrProvinceCode(stateOrProvinceCode).setPostalCode(postalCode).setCountryCode(countryCode).setLocationQualifier(locationQualifier).setLocationIdentifier(locationIdentifier).setCountrySubdivisionCode(countrySubdivisionCode).build();
 
         segment.setContext(context);
 
         String rendered = segment.render().trim();
-        String expected = "N4*" + cityName + "*" + stateOrProvinceCode + "*" + postalCode + "*" +
-                countryCode + "*" + locationQualifier + "*" + locationIdentifier + "*" +
-                countrySubdivisionCode + "~";
+        String expected = "N4*" + cityName + "*" + stateOrProvinceCode + "*" + postalCode + "*" + countryCode + "*" + locationQualifier + "*" + locationIdentifier + "*" + countrySubdivisionCode + "~";
 
         assertEquals(expected, rendered);
     }
 
     @Test
     void testRenderWithMinimalRequiredFields() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).build();
 
         segment.setContext(context);
 
@@ -176,11 +144,7 @@ class N4SegmentTest {
 
     @Test
     void testRenderWithSomeFields() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .setStateOrProvinceCode(stateOrProvinceCode)
-                .setPostalCode(postalCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).setStateOrProvinceCode(stateOrProvinceCode).setPostalCode(postalCode).build();
 
         segment.setContext(context);
 
@@ -193,8 +157,8 @@ class N4SegmentTest {
     @Test
     void testValidationRequiresCityName() {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
-            TestN4Segment.Builder builder = TestN4Segment.builder();
-            builder.n401 = null;
+            TestN4Segment.Builder builder = TestN4Segment.builder().setN401(null);
+
             builder.build();
         });
 
@@ -203,15 +167,7 @@ class N4SegmentTest {
 
     @Test
     void testBuilderIsProperlyChainable() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .setStateOrProvinceCode(stateOrProvinceCode)
-                .setPostalCode(postalCode)
-                .setCountryCode(countryCode)
-                .setLocationQualifier(locationQualifier)
-                .setLocationIdentifier(locationIdentifier)
-                .setCountrySubdivisionCode(countrySubdivisionCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).setStateOrProvinceCode(stateOrProvinceCode).setPostalCode(postalCode).setCountryCode(countryCode).setLocationQualifier(locationQualifier).setLocationIdentifier(locationIdentifier).setCountrySubdivisionCode(countrySubdivisionCode).build();
 
         assertNotNull(segment);
         assertEquals(cityName, segment.getCityName());
@@ -225,15 +181,7 @@ class N4SegmentTest {
 
     @Test
     void testBuilderMethodsUsingSpecNames() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setN401(cityName)
-                .setN402(stateOrProvinceCode)
-                .setN403(postalCode)
-                .setN404(countryCode)
-                .setN405(locationQualifier)
-                .setN406(locationIdentifier)
-                .setN407(countrySubdivisionCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setN401(cityName).setN402(stateOrProvinceCode).setN403(postalCode).setN404(countryCode).setN405(locationQualifier).setN406(locationIdentifier).setN407(countrySubdivisionCode).build();
 
         assertNotNull(segment);
         assertEquals(cityName, segment.getN401());
@@ -247,12 +195,7 @@ class N4SegmentTest {
 
     @Test
     void testMixedSpecAndDomainSetters() throws ValidationException {
-        TestN4Segment segment = TestN4Segment.builder()
-                .setCityName(cityName)
-                .setN402(stateOrProvinceCode)
-                .setPostalCode(postalCode)
-                .setN404(countryCode)
-                .build();
+        TestN4Segment segment = TestN4Segment.builder().setCityName(cityName).setN402(stateOrProvinceCode).setPostalCode(postalCode).setN404(countryCode).build();
 
         assertNotNull(segment);
         assertEquals(cityName, segment.getCityName());
