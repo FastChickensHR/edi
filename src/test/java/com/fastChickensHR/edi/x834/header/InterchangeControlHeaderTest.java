@@ -49,7 +49,7 @@ class InterchangeControlHeaderTest {
         InterchangeControlHeader header = createHeaderWithSpecNames();
 
         // Verify domain name getters return expected values
-        assertEquals("00", header.getAuthorizationInformationQualifier());
+        assertEquals("00", header.getAuthorizationInformationQualifier().getCode());
         assertEquals(TextUtils.spaces(10), header.getAuthorizationInformation());
         assertEquals("00", header.getSecurityInformationQualifier());
         assertEquals(TextUtils.spaces(10), header.getSecurityInformation());
@@ -76,7 +76,7 @@ class InterchangeControlHeaderTest {
         InterchangeControlHeader header = createHeaderWithDomainNames();
 
         // Verify spec name fields contain expected values
-        assertEquals("00", header.getIsa01());
+        assertEquals("00", header.getIsa01().getCode());
         assertEquals(TextUtils.spaces(10), header.getIsa02());
         assertEquals("00", header.getIsa03());
         assertEquals(TextUtils.spaces(10), header.getIsa04());
