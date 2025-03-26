@@ -5,11 +5,12 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.common;
+package com.fastChickensHR.edi.x834.common.segments;
 
 import com.fastChickensHR.edi.x834.common.dates.DateFormat;
 import com.fastChickensHR.edi.x834.common.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

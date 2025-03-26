@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.x834.common.RefSegment;
+import com.fastChickensHR.edi.x834.common.segments.RefSegment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import lombok.experimental.Accessors;
 

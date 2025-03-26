@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
-import com.fastChickensHR.edi.x834.common.GESegment;
+import com.fastChickensHR.edi.x834.common.segments.GESegment;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 

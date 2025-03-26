@@ -9,9 +9,9 @@ package com.fastChickensHR.edi.x834.common;
 
 import com.fastChickensHR.edi.x834.common.dates.DateFormat;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.common.segments.DTPSegment;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
