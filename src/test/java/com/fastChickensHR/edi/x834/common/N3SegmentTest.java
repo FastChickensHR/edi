@@ -65,11 +65,9 @@ class N3SegmentTest {
 
     @Test
     void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        TestN3Segment.Builder builder = TestN3Segment.builder();
-
-        // Setting using spec field names
-        builder.n301 = addressLine1;
-        builder.n302 = addressLine2;
+        TestN3Segment.Builder builder = TestN3Segment.builder()
+                .setN301(addressLine1)
+                .setN302(addressLine2);
 
         TestN3Segment segment = builder.build();
 
@@ -135,8 +133,7 @@ class N3SegmentTest {
     @Test
     void testValidationRequiresAddressLine1() {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
-            TestN3Segment.Builder builder = TestN3Segment.builder();
-            builder.n301 = null;
+            TestN3Segment.Builder builder = TestN3Segment.builder().setAddressLine1(null);
             builder.build();
         });
 
