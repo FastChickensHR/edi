@@ -8,6 +8,7 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.common.TextUtils;
+import com.fastChickensHR.edi.x834.common.data.AuthorizationInformationQualifier;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import org.junit.jupiter.api.Test;
@@ -272,7 +273,6 @@ class InterchangeControlHeaderTest {
 
     private InterchangeControlHeader createSampleHeader() throws ValidationException {
         return new InterchangeControlHeader.Builder(context)
-                .setAuthorizationInformationQualifier("00")
                 .setAuthorizationInformation(TextUtils.spaces(10))
                 .setSecurityInformationQualifier("00")
                 .setSecurityInformation(TextUtils.spaces(10))
@@ -293,7 +293,7 @@ class InterchangeControlHeaderTest {
 
     private InterchangeControlHeader createHeaderWithSpecNames() throws ValidationException {
         return new InterchangeControlHeader.Builder(context)
-                .setIsa01("00")
+                .setIsa01(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION)
                 .setIsa02(TextUtils.spaces(10))
                 .setIsa03("00")
                 .setIsa04(TextUtils.spaces(10))
@@ -314,7 +314,7 @@ class InterchangeControlHeaderTest {
 
     private InterchangeControlHeader createHeaderWithDomainNames() throws ValidationException {
         return new InterchangeControlHeader.Builder(context)
-                .setAuthorizationInformationQualifier("00")
+                .setAuthorizationInformationQualifier(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION)
                 .setAuthorizationInformation(TextUtils.spaces(10))
                 .setSecurityInformationQualifier("00")
                 .setSecurityInformation(TextUtils.spaces(10))

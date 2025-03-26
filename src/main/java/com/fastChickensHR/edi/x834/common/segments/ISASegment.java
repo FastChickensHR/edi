@@ -8,6 +8,7 @@
 package com.fastChickensHR.edi.x834.common.segments;
 
 import com.fastChickensHR.edi.common.TextUtils;
+import com.fastChickensHR.edi.x834.common.data.AuthorizationInformationQualifier;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import lombok.experimental.Accessors;
 @Getter
 abstract public class ISASegment extends Segment {
     public static final String SEGMENT_ID = "ISA";
-    public static final String DEFAULT_AUTHORIZATION_INFO_QUALIFIER = "00"; // No authorization info present
+    public static final AuthorizationInformationQualifier DEFAULT_AUTHORIZATION_INFO_QUALIFIER = AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION;
     public static final String DEFAULT_AUTHORIZATION_INFO = TextUtils.spaces(10);
     public static final String DEFAULT_SECURITY_INFO_QUALIFIER = "00"; // No security info present
     public static final String DEFAULT_SECURITY_INFO = TextUtils.spaces(10);
@@ -31,7 +32,7 @@ abstract public class ISASegment extends Segment {
     public static final String DEFAULT_ACKNOWLEDGMENT_REQUESTED = "0";
     public static final String DEFAULT_USAGE_INDICATOR = "T";
 
-    protected final String isa01; // Authorization Information Qualifier
+    protected final AuthorizationInformationQualifier isa01;
     protected final String isa02; // Authorization Information
     protected final String isa03; // Security Information Qualifier
     protected final String isa04; // Security Information
@@ -104,13 +105,13 @@ abstract public class ISASegment extends Segment {
     @Override
     public String[] getElementValues() {
         return new String[]{
-                isa01, isa02, isa03, isa04, isa05, isa06, isa07, isa08,
+                isa01.getCode(), isa02, isa03, isa04, isa05, isa06, isa07, isa08,
                 isa09, isa10, isa11, isa12, isa13, isa14, isa15, isa16
         };
     }
 
     // Domain-specific accessor methods
-    public String getAuthorizationInformationQualifier() {
+    public AuthorizationInformationQualifier getAuthorizationInformationQualifier() {
         return isa01;
     }
 
@@ -176,11 +177,12 @@ abstract public class ISASegment extends Segment {
 
     /**
      * Abstract builder for ISA segments.
+     *
      * @param <T> The concrete builder type for method chaining
      */
     @Accessors(chain = true)
     public abstract static class AbstractBuilder<T extends AbstractBuilder<T>> {
-        protected String isa01 = DEFAULT_AUTHORIZATION_INFO_QUALIFIER;
+        protected AuthorizationInformationQualifier isa01 = DEFAULT_AUTHORIZATION_INFO_QUALIFIER;
         protected String isa02 = DEFAULT_AUTHORIZATION_INFO;
         protected String isa03 = DEFAULT_SECURITY_INFO_QUALIFIER;
         protected String isa04 = DEFAULT_SECURITY_INFO;
@@ -200,6 +202,7 @@ abstract public class ISASegment extends Segment {
 
         /**
          * Constructor that initializes the builder with context information
+         *
          * @param context The X834 context containing document-level information
          */
         public AbstractBuilder(x834Context context) {
@@ -216,6 +219,7 @@ abstract public class ISASegment extends Segment {
 
         /**
          * Sets the context object that contains document-level information.
+         *
          * @param context The context to use
          * @return This builder instance for method chaining
          */
@@ -230,7 +234,7 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setIsa01(String isa01) {
+        public T setIsa01(AuthorizationInformationQualifier isa01) {
             this.isa01 = isa01;
             return self();
         }
@@ -310,8 +314,8 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setAuthorizationInformationQualifier(String qualifier) {
-            return setIsa01(qualifier);
+        public T setAuthorizationInformationQualifier(AuthorizationInformationQualifier value) {
+            return setIsa01(value);
         }
 
         public T setAuthorizationInformation(String info) {
@@ -376,6 +380,7 @@ abstract public class ISASegment extends Segment {
 
         /**
          * Returns this builder cast to the concrete type.
+         *
          * @return This builder
          */
         @SuppressWarnings("unchecked")
@@ -385,6 +390,7 @@ abstract public class ISASegment extends Segment {
 
         /**
          * Builds the ISA segment.
+         *
          * @return The built ISA segment
          * @throws ValidationException if validation fails
          */
