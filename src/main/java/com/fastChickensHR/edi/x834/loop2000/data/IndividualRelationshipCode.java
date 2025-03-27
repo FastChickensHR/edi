@@ -32,15 +32,16 @@ public enum IndividualRelationshipCode implements EdiCodeEnum {
     private static final EdiEnumLookup<IndividualRelationshipCode> LOOKUP;
 
     static {
-        // Add specific additional mappings that may not be covered by the standard approach
         LOOKUP = new EdiEnumLookup<>(
                 IndividualRelationshipCode.class,
                 "Individual Relationship Code",
                 Map.ofEntries(
                         Map.entry("wife", SPOUSE),
                         Map.entry("husband", SPOUSE),
+
                         Map.entry("son", CHILD),
                         Map.entry("daughter", CHILD),
+
                         Map.entry("domesticpartner", LIFE_PARTNER)
                 )
         );
