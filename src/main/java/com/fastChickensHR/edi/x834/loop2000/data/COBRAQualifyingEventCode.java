@@ -34,7 +34,6 @@ public enum COBRAQualifyingEventCode implements EdiCodeEnum {
     private static final EdiEnumLookup<COBRAQualifyingEventCode> LOOKUP;
 
     static {
-        // Include additional common terms and phrases users might search for
         LOOKUP = new EdiEnumLookup<>(
                 COBRAQualifyingEventCode.class,
                 "COBRA Qualifying Event Code",
@@ -43,18 +42,26 @@ public enum COBRAQualifyingEventCode implements EdiCodeEnum {
                         Map.entry("terminated", TERMINATION_OF_EMPLOYMENT),
                         Map.entry("quit", TERMINATION_OF_EMPLOYMENT),
                         Map.entry("resignation", TERMINATION_OF_EMPLOYMENT),
+
                         Map.entry("reduced hours", REDUCTION_IN_HOURS),
                         Map.entry("parttime", REDUCTION_IN_HOURS),
+
                         Map.entry("deceased", DEATH_OF_EMPLOYEE),
                         Map.entry("passed away", DEATH_OF_EMPLOYEE),
+
                         Map.entry("divorce", DIVORCE_LEGAL_SEPARATION),
                         Map.entry("separated", DIVORCE_LEGAL_SEPARATION),
+
                         Map.entry("medicare", MEDICARE_ENTITLEMENT),
+
                         Map.entry("agedout", DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT),
                         Map.entry("no longer dependent", DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT),
+
                         Map.entry("chapter11", BANKRUPTCY),
+
                         Map.entry("downsized", LAYOFF),
                         Map.entry("laid off", LAYOFF),
+
                         Map.entry("sabbatical", LEAVE_OF_ABSENCE),
                         Map.entry("fmla", LEAVE_OF_ABSENCE),
                         Map.entry("loa", LEAVE_OF_ABSENCE)
