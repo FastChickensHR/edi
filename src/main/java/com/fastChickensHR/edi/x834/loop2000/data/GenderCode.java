@@ -39,19 +39,23 @@ public enum GenderCode implements EdiCodeEnum {
                         Map.entry("man", MALE),
                         Map.entry("boy", MALE),
                         Map.entry("masculine", MALE),
+
                         Map.entry("f", FEMALE),
                         Map.entry("woman", FEMALE),
                         Map.entry("girl", FEMALE),
                         Map.entry("feminine", FEMALE),
+
                         Map.entry("u", UNKNOWN),
                         Map.entry("unspecified", UNKNOWN),
                         Map.entry("undetermined", UNKNOWN),
                         Map.entry("undisclosed", UNKNOWN),
+
                         Map.entry("n", NON_BINARY),
                         Map.entry("nonbinary", NON_BINARY),
                         Map.entry("nb", NON_BINARY),
                         Map.entry("enby", NON_BINARY),
                         Map.entry("genderqueer", NON_BINARY),
+
                         Map.entry("x", NOT_SPECIFIED),
                         Map.entry("declined", NOT_SPECIFIED),
                         Map.entry("not disclosed", NOT_SPECIFIED),
