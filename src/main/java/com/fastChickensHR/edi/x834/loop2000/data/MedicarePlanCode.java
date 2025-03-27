@@ -37,7 +37,6 @@ public enum MedicarePlanCode implements EdiCodeEnum {
                 MedicarePlanCode.class,
                 "Medicare Plan Code",
                 Map.ofEntries(
-                        Map.entry("a", HOSPITAL_ONLY),
                         Map.entry("part a", HOSPITAL_ONLY),
                         Map.entry("hospital insurance", HOSPITAL_ONLY),
                         Map.entry("inpatient", HOSPITAL_ONLY),
@@ -45,7 +44,6 @@ public enum MedicarePlanCode implements EdiCodeEnum {
                         Map.entry("skilled nursing", HOSPITAL_ONLY),
 
                         Map.entry("part b", MEDICAL_ONLY),
-                        Map.entry("b", MEDICAL_ONLY),
                         Map.entry("medical insurance", MEDICAL_ONLY),
                         Map.entry("outpatient", MEDICAL_ONLY),
                         Map.entry("doctor visits", MEDICAL_ONLY),
@@ -61,7 +59,6 @@ public enum MedicarePlanCode implements EdiCodeEnum {
                         Map.entry("traditional medicare", HOSPITAL_AND_MEDICAL),
 
                         Map.entry("part c", MEDICARE_ADVANTAGE),
-                        Map.entry("c", MEDICARE_ADVANTAGE),
                         Map.entry("advantage", MEDICARE_ADVANTAGE),
                         Map.entry("ma", MEDICARE_ADVANTAGE),
                         Map.entry("managed care", MEDICARE_ADVANTAGE),
@@ -70,7 +67,6 @@ public enum MedicarePlanCode implements EdiCodeEnum {
                         Map.entry("ppo", MEDICARE_ADVANTAGE),
 
                         Map.entry("part d", PRESCRIPTION_DRUG),
-                        Map.entry("d", PRESCRIPTION_DRUG),
                         Map.entry("drug coverage", PRESCRIPTION_DRUG),
                         Map.entry("prescription coverage", PRESCRIPTION_DRUG),
                         Map.entry("rx", PRESCRIPTION_DRUG),
