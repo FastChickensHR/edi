@@ -41,9 +41,7 @@ public enum HealthCoverageDateQualifier implements EdiCodeEnum {
                         Map.entry("begin date", EFFECTIVE_DATE),
                         Map.entry("start", EFFECTIVE_DATE),
                         Map.entry("begins", EFFECTIVE_DATE),
-                        Map.entry("beginning", EFFECTIVE_DATE),
                         Map.entry("effective", EFFECTIVE_DATE),
-                        Map.entry("commencement", EFFECTIVE_DATE),
 
                         Map.entry("end date", EXPIRATION_DATE),
                         Map.entry("termination date", EXPIRATION_DATE),
@@ -56,8 +54,6 @@ public enum HealthCoverageDateQualifier implements EdiCodeEnum {
                         Map.entry("eligibility start", ELIGIBILITY_BEGIN),
                         Map.entry("eligible from", ELIGIBILITY_BEGIN),
                         Map.entry("eligible start", ELIGIBILITY_BEGIN),
-                        Map.entry("benefits begin", ELIGIBILITY_BEGIN),
-                        Map.entry("benefits start", ELIGIBILITY_BEGIN),
 
                         Map.entry("eligibility stop", ELIGIBILITY_END),
                         Map.entry("eligible until", ELIGIBILITY_END),
@@ -67,7 +63,6 @@ public enum HealthCoverageDateQualifier implements EdiCodeEnum {
 
                         Map.entry("cobra start", COBRA_BEGIN),
                         Map.entry("cobra effective", COBRA_BEGIN),
-                        Map.entry("cobra eligibility", COBRA_BEGIN),
                         Map.entry("consolidated omnibus budget reconciliation act start", COBRA_BEGIN),
 
                         Map.entry("cobra stop", COBRA_END),
