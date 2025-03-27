@@ -7,14 +7,18 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
+import com.fastChickensHR.edi.x834.common.data.EdiCodeEnum;
+import com.fastChickensHR.edi.x834.common.data.EdiEnumLookup;
 import lombok.Getter;
+
+import java.util.Map;
 
 /**
  * Enumeration representing Employment Status Codes used in the EDI 834
  * Health Insurance Enrollment transaction.
  */
 @Getter
-public enum EmploymentStatusCode {
+public enum EmploymentStatusCode implements EdiCodeEnum {
     ACTIVE("1", "Active"),
     FULL_TIME("2", "Full-time"),
     PART_TIME("3", "Part-time"),
@@ -31,6 +35,59 @@ public enum EmploymentStatusCode {
 
     private final String code;
     private final String description;
+    private static final EdiEnumLookup<EmploymentStatusCode> LOOKUP;
+
+    static {
+        // Include additional common terms and phrases users might search for
+        LOOKUP = new EdiEnumLookup<>(
+                EmploymentStatusCode.class,
+                "Employment Status Code",
+                Map.ofEntries(
+                        Map.entry("current", ACTIVE),
+                        Map.entry("employed", ACTIVE),
+                        Map.entry("working", ACTIVE),
+                        Map.entry("ft", FULL_TIME),
+                        Map.entry("fulltime", FULL_TIME),
+                        Map.entry("40hours", FULL_TIME),
+                        Map.entry("pt", PART_TIME),
+                        Map.entry("parttime", PART_TIME),
+                        Map.entry("hourly", PART_TIME),
+                        Map.entry("pension", RETIRED),
+                        Map.entry("retiree", RETIRED),
+                        Map.entry("laid off", TERMINATED),
+                        Map.entry("fired", TERMINATED),
+                        Map.entry("resigned", TERMINATED),
+                        Map.entry("quit", TERMINATED),
+                        Map.entry("loa", LEAVE_OF_ABSENCE),
+                        Map.entry("sabbatical", LEAVE_OF_ABSENCE),
+                        Map.entry("fmla", LEAVE_OF_ABSENCE),
+                        Map.entry("medical leave", LEAVE_OF_ABSENCE),
+                        Map.entry("disability", DISABLED),
+                        Map.entry("ltd", DISABLED),
+                        Map.entry("military", MILITARY_DUTY),
+                        Map.entry("army", MILITARY_DUTY),
+                        Map.entry("navy", MILITARY_DUTY),
+                        Map.entry("airforce", MILITARY_DUTY),
+                        Map.entry("marines", MILITARY_DUTY),
+                        Map.entry("reserve", MILITARY_DUTY),
+                        Map.entry("consolidated omnibus budget reconciliation act", COBRA),
+                        Map.entry("survivor", SURVIVING_INSURED),
+                        Map.entry("widow", SURVIVING_INSURED),
+                        Map.entry("widower", SURVIVING_INSURED),
+                        Map.entry("dependent", SURVIVING_INSURED),
+                        Map.entry("contractor", CONTRACT_EMPLOYEE),
+                        Map.entry("1099", CONTRACT_EMPLOYEE),
+                        Map.entry("temporary", CONTRACT_EMPLOYEE),
+                        Map.entry("oncall", ON_CALL_EMPLOYEE),
+                        Map.entry("prn", ON_CALL_EMPLOYEE),
+                        Map.entry("asneeded", ON_CALL_EMPLOYEE),
+                        Map.entry("seasonal", SEASONAL_EMPLOYEE),
+                        Map.entry("summer", SEASONAL_EMPLOYEE),
+                        Map.entry("holiday", SEASONAL_EMPLOYEE),
+                        Map.entry("temp", SEASONAL_EMPLOYEE)
+                )
+        );
+    }
 
     EmploymentStatusCode(String code, String description) {
         this.code = code;
@@ -38,19 +95,15 @@ public enum EmploymentStatusCode {
     }
 
     /**
-     * Gets an EmploymentStatusCode instance from its code value.
+     * Gets an EmploymentStatusCode instance from any input string.
+     * Matches against codes, names, descriptions, and common variations.
      *
-     * @param code the code to look up
+     * @param input the string to look up
      * @return the matching EmploymentStatusCode
-     * @throws IllegalArgumentException if no matching code is found
+     * @throws IllegalArgumentException if no match is found
      */
-    public static EmploymentStatusCode fromCode(String code) {
-        for (EmploymentStatusCode value : values()) {
-            if (value.getCode().equals(code)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("Invalid Employment Status Code: " + code);
+    public static EmploymentStatusCode fromString(String input) {
+        return LOOKUP.fromString(input);
     }
 
     @Override
@@ -58,4 +111,3 @@ public enum EmploymentStatusCode {
         return code;
     }
 }
-

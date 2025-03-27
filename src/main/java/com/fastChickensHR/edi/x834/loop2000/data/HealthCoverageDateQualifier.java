@@ -7,14 +7,18 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
+import com.fastChickensHR.edi.x834.common.data.EdiCodeEnum;
+import com.fastChickensHR.edi.x834.common.data.EdiEnumLookup;
 import lombok.Getter;
+
+import java.util.Map;
 
 /**
  * Enumeration representing Date Time Qualifiers used in the DTP01 field
  * of the EDI 834 Health Coverage Dates (DTP) segment.
  */
 @Getter
-public enum HealthCoverageDateQualifier {
+public enum HealthCoverageDateQualifier implements EdiCodeEnum {
     EFFECTIVE_DATE("348", "Plan Begin Date"),
     EXPIRATION_DATE("349", "Plan End Date"),
     ELIGIBILITY_BEGIN("356", "Eligibility Begin Date"),
@@ -25,6 +29,61 @@ public enum HealthCoverageDateQualifier {
 
     private final String code;
     private final String description;
+    private static final EdiEnumLookup<HealthCoverageDateQualifier> LOOKUP;
+
+    static {
+        // Include additional common terms and phrases users might search for
+        LOOKUP = new EdiEnumLookup<>(
+                HealthCoverageDateQualifier.class,
+                "Health Coverage Date Qualifier",
+                Map.ofEntries(
+                        Map.entry("start date", EFFECTIVE_DATE),
+                        Map.entry("begin date", EFFECTIVE_DATE),
+                        Map.entry("start", EFFECTIVE_DATE),
+                        Map.entry("begins", EFFECTIVE_DATE),
+                        Map.entry("beginning", EFFECTIVE_DATE),
+                        Map.entry("effective", EFFECTIVE_DATE),
+                        Map.entry("commencement", EFFECTIVE_DATE),
+
+                        Map.entry("end date", EXPIRATION_DATE),
+                        Map.entry("termination date", EXPIRATION_DATE),
+                        Map.entry("expires", EXPIRATION_DATE),
+                        Map.entry("expiry", EXPIRATION_DATE),
+                        Map.entry("ending", EXPIRATION_DATE),
+                        Map.entry("termination", EXPIRATION_DATE),
+                        Map.entry("cancellation", EXPIRATION_DATE),
+
+                        Map.entry("eligibility start", ELIGIBILITY_BEGIN),
+                        Map.entry("eligible from", ELIGIBILITY_BEGIN),
+                        Map.entry("eligible start", ELIGIBILITY_BEGIN),
+                        Map.entry("benefits begin", ELIGIBILITY_BEGIN),
+                        Map.entry("benefits start", ELIGIBILITY_BEGIN),
+
+                        Map.entry("eligibility stop", ELIGIBILITY_END),
+                        Map.entry("eligible until", ELIGIBILITY_END),
+                        Map.entry("eligible end", ELIGIBILITY_END),
+                        Map.entry("benefits end", ELIGIBILITY_END),
+                        Map.entry("benefits stop", ELIGIBILITY_END),
+
+                        Map.entry("cobra start", COBRA_BEGIN),
+                        Map.entry("cobra effective", COBRA_BEGIN),
+                        Map.entry("cobra eligibility", COBRA_BEGIN),
+                        Map.entry("consolidated omnibus budget reconciliation act start", COBRA_BEGIN),
+
+                        Map.entry("cobra stop", COBRA_END),
+                        Map.entry("cobra termination", COBRA_END),
+                        Map.entry("cobra expiration", COBRA_END),
+                        Map.entry("consolidated omnibus budget reconciliation act end", COBRA_END),
+
+                        Map.entry("premium paid", PREMIUM_PAID_TO_DATE),
+                        Map.entry("paid through", PREMIUM_PAID_TO_DATE),
+                        Map.entry("paid to", PREMIUM_PAID_TO_DATE),
+                        Map.entry("paid until", PREMIUM_PAID_TO_DATE),
+                        Map.entry("premium through", PREMIUM_PAID_TO_DATE),
+                        Map.entry("payment date", PREMIUM_PAID_TO_DATE)
+                )
+        );
+    }
 
     HealthCoverageDateQualifier(String code, String description) {
         this.code = code;
@@ -32,19 +91,15 @@ public enum HealthCoverageDateQualifier {
     }
 
     /**
-     * Gets a HealthCoverageDateQualifier instance from its code value.
+     * Gets a HealthCoverageDateQualifier instance from any input string.
+     * Matches against codes, names, descriptions, and common variations.
      *
-     * @param code the code to look up
+     * @param input the string to look up
      * @return the matching HealthCoverageDateQualifier
-     * @throws IllegalArgumentException if no matching code is found
+     * @throws IllegalArgumentException if no match is found
      */
-    public static HealthCoverageDateQualifier fromCode(String code) {
-        for (HealthCoverageDateQualifier value : values()) {
-            if (value.getCode().equals(code)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("Invalid Health Coverage Date Qualifier: " + code);
+    public static HealthCoverageDateQualifier fromString(String input) {
+        return LOOKUP.fromString(input);
     }
 
     @Override

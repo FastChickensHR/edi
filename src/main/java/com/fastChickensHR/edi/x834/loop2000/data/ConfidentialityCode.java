@@ -7,14 +7,18 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
+import com.fastChickensHR.edi.x834.common.data.EdiCodeEnum;
+import com.fastChickensHR.edi.x834.common.data.EdiEnumLookup;
 import lombok.Getter;
+
+import java.util.Map;
 
 /**
  * Enumeration representing Confidentiality Codes used in the EDI 834
  * Health Insurance Enrollment transaction.
  */
 @Getter
-public enum ConfidentialityCode {
+public enum ConfidentialityCode implements EdiCodeEnum {
     UNRESTRICTED("U", "Unrestricted"),
     RESTRICTED("R", "Restricted"),
     CONFIDENTIAL("C", "Confidential"),
@@ -26,6 +30,41 @@ public enum ConfidentialityCode {
 
     private final String code;
     private final String description;
+    private static final EdiEnumLookup<ConfidentialityCode> LOOKUP;
+
+    static {
+        // Include additional synonyms and related terms
+        LOOKUP = new EdiEnumLookup<>(
+                ConfidentialityCode.class,
+                "Confidentiality Code",
+                Map.ofEntries(
+                        Map.entry("u", UNRESTRICTED),
+                        Map.entry("public", UNRESTRICTED),
+                        Map.entry("open", UNRESTRICTED),
+                        Map.entry("r", RESTRICTED),
+                        Map.entry("limited", RESTRICTED),
+                        Map.entry("c", CONFIDENTIAL),
+                        Map.entry("private", CONFIDENTIAL),
+                        Map.entry("classified", CONFIDENTIAL),
+                        Map.entry("v", VERY_RESTRICTED),
+                        Map.entry("secret", VERY_RESTRICTED),
+                        Map.entry("topsecret", VERY_RESTRICTED),
+                        Map.entry("n", NORMAL),
+                        Map.entry("standard", NORMAL),
+                        Map.entry("default", NORMAL),
+                        Map.entry("basic", LOW),
+                        Map.entry("l", LOW),
+                        Map.entry("minimal", LOW),
+                        Map.entry("m", MEDIUM),
+                        Map.entry("moderate", MEDIUM),
+                        Map.entry("intermediate", MEDIUM),
+                        Map.entry("h", HIGH),
+                        Map.entry("elevated", HIGH),
+                        Map.entry("maximum", HIGH),
+                        Map.entry("critical", HIGH)
+                )
+        );
+    }
 
     ConfidentialityCode(String code, String description) {
         this.code = code;
@@ -33,19 +72,15 @@ public enum ConfidentialityCode {
     }
 
     /**
-     * Gets a ConfidentialityCode instance from its code value.
+     * Gets a ConfidentialityCode instance from any input string.
+     * Matches against codes, names, descriptions, and common variations.
      *
-     * @param code the code to look up
+     * @param input the string to look up
      * @return the matching ConfidentialityCode
-     * @throws IllegalArgumentException if no matching code is found
+     * @throws IllegalArgumentException if no match is found
      */
-    public static ConfidentialityCode fromCode(String code) {
-        for (ConfidentialityCode value : values()) {
-            if (value.getCode().equals(code)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("Invalid Confidentiality Code: " + code);
+    public static ConfidentialityCode fromString(String input) {
+        return LOOKUP.fromString(input);
     }
 
     @Override
@@ -53,4 +88,3 @@ public enum ConfidentialityCode {
         return code;
     }
 }
-

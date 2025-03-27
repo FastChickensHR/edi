@@ -198,7 +198,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns02(String value) {
-            this.ins02 = IndividualRelationshipCode.fromCode(value);
+            this.ins02 = IndividualRelationshipCode.fromString(value);
             return this;
         }
 
@@ -207,7 +207,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns03(String value) {
-            this.ins03 = MaintenanceTypeCode.fromCode(value);
+            this.ins03 = MaintenanceTypeCode.fromString(value);
             return this;
         }
 
@@ -216,7 +216,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns04(String value) {
-            this.ins04 = MaintenanceReasonCode.fromCode(value);
+            this.ins04 = MaintenanceReasonCode.fromString(value);
             return this;
         }
 
@@ -225,7 +225,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns05(String value) {
-            this.ins05 = BenefitStatusCode.fromCode(value);
+            this.ins05 = BenefitStatusCode.fromString(value);
             return this;
         }
 
@@ -234,7 +234,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns06(String value) {
-            this.ins06 = MedicarePlanCode.fromCode(value);
+            this.ins06 = MedicarePlanCode.fromString(value);
             return this;
         }
 
@@ -243,7 +243,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns07(String value) {
-            this.ins07 = COBRAQualifyingEventCode.fromCode(value);
+            this.ins07 = COBRAQualifyingEventCode.fromString(value);
             return this;
         }
 
@@ -252,7 +252,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns08(String value) {
-            this.ins08 = EmploymentStatusCode.fromCode(value);
+            this.ins08 = EmploymentStatusCode.fromString(value);
             return this;
         }
 
@@ -261,7 +261,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns09(String value) {
-            this.ins09 = StudentStatusCode.fromCode(value);
+            this.ins09 = StudentStatusCode.fromString(value);
             return this;
         }
 
@@ -270,7 +270,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns10(String value) {
-            this.ins10 = HandicapIndicator.fromCode(value);
+            this.ins10 = HandicapIndicator.fromString(value);
             return this;
         }
 
@@ -283,7 +283,7 @@ public abstract class MemberLevelDetail extends Segment {
         }
 
         public Builder setIns12(String value) {
-            this.ins12 = ConfidentialityCode.fromCode(value);
+            this.ins12 = ConfidentialityCode.fromString(value);
             return this;
         }
 
