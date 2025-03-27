@@ -7,9 +7,9 @@
  */
 package com.fastChickensHR.edi.x834.common.data;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility class that helps with unified enum lookups.
@@ -24,37 +24,23 @@ public final class EdiEnumLookup<T extends Enum<T> & EdiCodeEnum> {
     /**
      * Creates an EdiEnumLookup for the specified enum class with standard and additional mappings.
      *
-     * @param enumClass the Class object of the enum type
-     * @param enumName the name of the enum type (for error messages)
+     * @param enumClass          the Class object of the enum type
+     * @param enumName           the name of the enum type (for error messages)
      * @param additionalMappings optional additional text mappings to enum constants
      */
     public EdiEnumLookup(Class<T> enumClass, String enumName, Map<String, T> additionalMappings) {
         this.enumClass = enumClass;
         this.enumName = enumName;
 
-        // Build a comprehensive lookup map
         Map<String, T> map = new HashMap<>();
 
-        // Add all enum constants with various lookup methods
         for (T constant : enumClass.getEnumConstants()) {
-            // Map code to enum
             map.put(constant.getCode(), constant);
 
-            // Map normalized name and description to enum
             map.put(normalizeText(constant.name()), constant);
             map.put(normalizeText(constant.getDescription()), constant);
-
-            // Map individual words in name and description
-            Arrays.stream(constant.name().split("_"))
-                    .map(EdiEnumLookup::normalizeText)
-                    .forEach(word -> map.put(word, constant));
-
-            Arrays.stream(constant.getDescription().split("\\s+"))
-                    .map(EdiEnumLookup::normalizeText)
-                    .forEach(word -> map.put(word, constant));
         }
 
-        // Add all additional mappings
         if (additionalMappings != null) {
             additionalMappings.forEach((key, value) ->
                     map.put(normalizeText(key), value));

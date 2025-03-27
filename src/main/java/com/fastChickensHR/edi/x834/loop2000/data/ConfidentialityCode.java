@@ -39,29 +39,22 @@ public enum ConfidentialityCode implements EdiCodeEnum {
                 "Confidentiality Code",
                 Map.ofEntries(
                         Map.entry("u", UNRESTRICTED),
-                        Map.entry("public", UNRESTRICTED),
                         Map.entry("open", UNRESTRICTED),
+
                         Map.entry("r", RESTRICTED),
-                        Map.entry("limited", RESTRICTED),
+
                         Map.entry("c", CONFIDENTIAL),
-                        Map.entry("private", CONFIDENTIAL),
-                        Map.entry("classified", CONFIDENTIAL),
+
                         Map.entry("v", VERY_RESTRICTED),
-                        Map.entry("secret", VERY_RESTRICTED),
-                        Map.entry("topsecret", VERY_RESTRICTED),
+
                         Map.entry("n", NORMAL),
                         Map.entry("standard", NORMAL),
-                        Map.entry("default", NORMAL),
-                        Map.entry("basic", LOW),
+
                         Map.entry("l", LOW),
-                        Map.entry("minimal", LOW),
+
                         Map.entry("m", MEDIUM),
-                        Map.entry("moderate", MEDIUM),
-                        Map.entry("intermediate", MEDIUM),
-                        Map.entry("h", HIGH),
-                        Map.entry("elevated", HIGH),
-                        Map.entry("maximum", HIGH),
-                        Map.entry("critical", HIGH)
+
+                        Map.entry("h", HIGH)
                 )
         );
     }
