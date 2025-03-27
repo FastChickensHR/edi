@@ -40,7 +40,7 @@ class MemberLevelDetailTest {
         segment.setContext(context);
 
         assertEquals("INS", segment.getSegmentIdentifier(), "Expected segment identifier should be 'INS'");
-        assertEquals("INS*Y*18*001*AC*A*E*1*2*F*N*20250101~", segment.render().trim(),
+        assertEquals("INS*Y*18*001*AC*A*D*1*2*F*N*20250101~", segment.render().trim(),
                 "The segment is not formatted correctly.");
     }
 
@@ -66,7 +66,7 @@ class MemberLevelDetailTest {
         assertEquals("001", segment.getMaintenanceTypeCode(), "MaintenanceTypeCode should match INS03");
         assertEquals(maintenanceReasonCode, segment.getMaintenanceReasonCode(), "MaintenanceReasonCode should match INS04");
         assertEquals("A", segment.getBenefitStatusCode(), "BenefitStatusCode should match INS05");
-        assertEquals("E", segment.getMedicarePlanCode(), "MedicarePlanCode should match INS06");
+        assertEquals("D", segment.getMedicarePlanCode(), "MedicarePlanCode should match INS06");
         assertEquals("1", segment.getCOBRAQualifyingEventCode(), "COBRAQualifierCode should match INS07");
         assertEquals(employmentStatusCode, segment.getEmploymentStatusCode(), "EmploymentStatusCode should match INS08");
         assertEquals("F", segment.getStudentStatusCode(), "StudentStatusCode should match INS09");
@@ -97,7 +97,7 @@ class MemberLevelDetailTest {
         assertEquals("001", segment.getIns03(), "MaintenanceTypeCode should match INS03");
         assertEquals(maintenanceReasonCode, segment.getIns04(), "MaintenanceReasonCode should match INS04");
         assertEquals("A", segment.getIns05(), "BenefitStatusCode should match INS05");
-        assertEquals("E", segment.getIns06(), "MedicarePlanCode should match INS06");
+        assertEquals("D", segment.getIns06(), "MedicarePlanCode should match INS06");
         assertEquals("1", segment.getIns07(), "COBRAQualifierCode should match INS07");
         assertEquals(employmentStatusCode, segment.getIns08(), "EmploymentStatusCode should match INS08");
         assertEquals("F", segment.getIns09(), "StudentStatusCode should match INS09");
