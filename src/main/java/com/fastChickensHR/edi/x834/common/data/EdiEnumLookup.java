@@ -35,7 +35,7 @@ public final class EdiEnumLookup<T extends Enum<T> & EdiCodeEnum> {
         Map<String, T> map = new HashMap<>();
 
         for (T constant : enumClass.getEnumConstants()) {
-            map.put(constant.getCode(), constant);
+            map.put(normalizeText(constant.getCode()), constant);
 
             map.put(normalizeText(constant.name()), constant);
             map.put(normalizeText(constant.getDescription()), constant);
@@ -70,7 +70,7 @@ public final class EdiEnumLookup<T extends Enum<T> & EdiCodeEnum> {
         }
 
         String normalized = normalizeText(input);
-        T result = lookupMap.get(normalized);
+        T result = this.lookupMap.get(normalized);
 
         if (result == null) {
             throw new IllegalArgumentException("Invalid " + enumName + " value: " + input);
