@@ -40,9 +40,8 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
         LOOKUP = new EdiEnumLookup<>(
                 MaintenanceTypeCode.class,
                 "Maintenance Type Code",
-                Map.ofEntries(
+                Map.<String, MaintenanceTypeCode>ofEntries(
                         Map.entry("1", ADDITION),
-                        Map.entry("001", ADDITION),
                         Map.entry("add", ADDITION),
                         Map.entry("new", ADDITION),
                         Map.entry("enroll", ADDITION),
@@ -51,7 +50,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("join", ADDITION),
 
                         Map.entry("2", CHANGE),
-                        Map.entry("002", CHANGE),
                         Map.entry("modify", CHANGE),
                         Map.entry("update", CHANGE),
                         Map.entry("edit", CHANGE),
@@ -60,7 +58,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("revise", CHANGE),
 
                         Map.entry("3", CANCELLATION),
-                        Map.entry("003", CANCELLATION),
                         Map.entry("cancel", CANCELLATION),
                         Map.entry("terminate", CANCELLATION),
                         Map.entry("end", CANCELLATION),
@@ -69,14 +66,12 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("stop", CANCELLATION),
 
                         Map.entry("4", REINSTATEMENT),
-                        Map.entry("004", REINSTATEMENT),
                         Map.entry("reinstate", REINSTATEMENT),
                         Map.entry("restore", REINSTATEMENT),
                         Map.entry("reactivate", REINSTATEMENT),
                         Map.entry("resume", REINSTATEMENT),
 
                         Map.entry("21", CHANGE_WITH_MEMBER_ID),
-                        Map.entry("021", CHANGE_WITH_MEMBER_ID),
                         Map.entry("id change", CHANGE_WITH_MEMBER_ID),
                         Map.entry("change id", CHANGE_WITH_MEMBER_ID),
                         Map.entry("update id", CHANGE_WITH_MEMBER_ID),
@@ -85,7 +80,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("subscriber id", CHANGE_WITH_MEMBER_ID),
 
                         Map.entry("22", CHANGE_ADDRESS),
-                        Map.entry("022", CHANGE_ADDRESS),
                         Map.entry("address change", CHANGE_ADDRESS),
                         Map.entry("update address", CHANGE_ADDRESS),
                         Map.entry("new address", CHANGE_ADDRESS),
@@ -94,7 +88,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("address update", CHANGE_ADDRESS),
 
                         Map.entry("23", CHANGE_DEMOGRAPHIC),
-                        Map.entry("023", CHANGE_DEMOGRAPHIC),
                         Map.entry("demographic change", CHANGE_DEMOGRAPHIC),
                         Map.entry("change name", CHANGE_DEMOGRAPHIC),
                         Map.entry("update personal info", CHANGE_DEMOGRAPHIC),
@@ -103,7 +96,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("gender change", CHANGE_DEMOGRAPHIC),
 
                         Map.entry("24", CHANGE_BENEFIT_COVERAGE),
-                        Map.entry("024", CHANGE_BENEFIT_COVERAGE),
                         Map.entry("benefit change", CHANGE_BENEFIT_COVERAGE),
                         Map.entry("update benefits", CHANGE_BENEFIT_COVERAGE),
                         Map.entry("change coverage", CHANGE_BENEFIT_COVERAGE),
@@ -111,7 +103,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("coverage update", CHANGE_BENEFIT_COVERAGE),
 
                         Map.entry("25", CHANGE_BILLING),
-                        Map.entry("025", CHANGE_BILLING),
                         Map.entry("billing change", CHANGE_BILLING),
                         Map.entry("payment update", CHANGE_BILLING),
                         Map.entry("update payment", CHANGE_BILLING),
@@ -120,7 +111,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("bank account", CHANGE_BILLING),
 
                         Map.entry("26", CHANGE_EMPLOYMENT),
-                        Map.entry("026", CHANGE_EMPLOYMENT),
                         Map.entry("employment change", CHANGE_EMPLOYMENT),
                         Map.entry("job change", CHANGE_EMPLOYMENT),
                         Map.entry("employment update", CHANGE_EMPLOYMENT),
@@ -129,7 +119,6 @@ public enum MaintenanceTypeCode implements EdiCodeEnum {
                         Map.entry("department change", CHANGE_EMPLOYMENT),
 
                         Map.entry("30", COBRA_ELECTION),
-                        Map.entry("030", COBRA_ELECTION),
                         Map.entry("cobra", COBRA_ELECTION),
                         Map.entry("elect cobra", COBRA_ELECTION),
                         Map.entry("cobra enrollment", COBRA_ELECTION),
