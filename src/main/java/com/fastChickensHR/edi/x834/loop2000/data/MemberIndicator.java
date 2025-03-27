@@ -34,8 +34,6 @@ public enum MemberIndicator implements EdiCodeEnum {
                 Map.ofEntries(
                         Map.entry("y", INSURED),
                         Map.entry("yes", INSURED),
-                        Map.entry("true", INSURED),
-                        Map.entry("1", INSURED),
                         Map.entry("covered", INSURED),
                         Map.entry("enrolled", INSURED),
                         Map.entry("active", INSURED),
@@ -48,8 +46,6 @@ public enum MemberIndicator implements EdiCodeEnum {
 
                         Map.entry("n", NOT_INSURED),
                         Map.entry("no", NOT_INSURED),
-                        Map.entry("false", NOT_INSURED),
-                        Map.entry("0", NOT_INSURED),
                         Map.entry("not covered", NOT_INSURED),
                         Map.entry("not enrolled", NOT_INSURED),
                         Map.entry("inactive", NOT_INSURED),
