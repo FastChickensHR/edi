@@ -38,7 +38,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                 StudentStatusCode.class,
                 "Student Status Code",
                 Map.ofEntries(
-                        Map.entry("f", FULL_TIME),
                         Map.entry("fulltime", FULL_TIME),
                         Map.entry("full time", FULL_TIME),
                         Map.entry("full-time", FULL_TIME),
@@ -48,7 +47,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("full course load", FULL_TIME),
                         Map.entry("regular student", FULL_TIME),
 
-                        Map.entry("p", PART_TIME),
                         Map.entry("parttime", PART_TIME),
                         Map.entry("part time", PART_TIME),
                         Map.entry("part-time", PART_TIME),
@@ -58,7 +56,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("reduced schedule", PART_TIME),
                         Map.entry("half time", PART_TIME),
 
-                        Map.entry("n", NOT_A_STUDENT),
                         Map.entry("not student", NOT_A_STUDENT),
                         Map.entry("non student", NOT_A_STUDENT),
                         Map.entry("non-student", NOT_A_STUDENT),
@@ -68,7 +65,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("no school", NOT_A_STUDENT),
                         Map.entry("not attending", NOT_A_STUDENT),
 
-                        Map.entry("c", CONTINUING_EDUCATION),
                         Map.entry("cont ed", CONTINUING_EDUCATION),
                         Map.entry("continuing ed", CONTINUING_EDUCATION),
                         Map.entry("cont education", CONTINUING_EDUCATION),
@@ -79,7 +75,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("non-degree", CONTINUING_EDUCATION),
                         Map.entry("non degree", CONTINUING_EDUCATION),
 
-                        Map.entry("g", GRADUATED),
                         Map.entry("grad", GRADUATED),
                         Map.entry("alumni", GRADUATED),
                         Map.entry("alumnus", GRADUATED),
@@ -91,7 +86,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("earned degree", GRADUATED),
                         Map.entry("commencement", GRADUATED),
 
-                        Map.entry("b", ON_BREAK),
                         Map.entry("break", ON_BREAK),
                         Map.entry("vacation", ON_BREAK),
                         Map.entry("school break", ON_BREAK),
@@ -103,7 +97,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("winter break", ON_BREAK),
                         Map.entry("spring break", ON_BREAK),
 
-                        Map.entry("l", LEAVE_OF_ABSENCE),
                         Map.entry("leave", LEAVE_OF_ABSENCE),
                         Map.entry("loa", LEAVE_OF_ABSENCE),
                         Map.entry("absence", LEAVE_OF_ABSENCE),
@@ -114,7 +107,6 @@ public enum StudentStatusCode implements EdiCodeEnum {
                         Map.entry("personal leave", LEAVE_OF_ABSENCE),
                         Map.entry("family leave", LEAVE_OF_ABSENCE),
 
-                        Map.entry("u", UNKNOWN),
                         Map.entry("unk", UNKNOWN),
                         Map.entry("unspecified", UNKNOWN),
                         Map.entry("not provided", UNKNOWN),
