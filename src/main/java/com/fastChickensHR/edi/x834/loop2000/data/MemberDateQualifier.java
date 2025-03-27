@@ -145,8 +145,6 @@ public enum MemberDateQualifier implements EdiCodeEnum {
                         Map.entry("changed status", STATUS_CHANGE),
                         Map.entry("status modification", STATUS_CHANGE),
 
-                        // Note that TERMINATION shares the same code as EXPIRATION (036)
-                        // Special handling needed in the lookup implementation
                         Map.entry("term", TERMINATION),
                         Map.entry("terminated", TERMINATION),
                         Map.entry("termination date", TERMINATION),
