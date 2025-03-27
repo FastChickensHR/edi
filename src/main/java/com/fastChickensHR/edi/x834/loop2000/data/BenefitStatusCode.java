@@ -40,14 +40,6 @@ public enum BenefitStatusCode implements EdiCodeEnum {
                         Map.entry("active coverage", ACTIVE),
                         Map.entry("current", ACTIVE),
                         Map.entry("enrolled", ACTIVE),
-                        Map.entry("eligible", ACTIVE),
-                        Map.entry("in force", ACTIVE),
-                        Map.entry("valid", ACTIVE),
-                        Map.entry("regular", ACTIVE),
-                        Map.entry("standard", ACTIVE),
-                        Map.entry("current employee", ACTIVE),
-                        Map.entry("primary", ACTIVE),
-                        Map.entry("employee", ACTIVE),
 
                         Map.entry("c", COBRA),
                         Map.entry("cobra coverage", COBRA),
@@ -56,8 +48,6 @@ public enum BenefitStatusCode implements EdiCodeEnum {
                         Map.entry("continuation coverage", COBRA),
                         Map.entry("continued benefits", COBRA),
                         Map.entry("extended coverage", COBRA),
-                        Map.entry("post-employment", COBRA),
-                        Map.entry("post employment", COBRA),
                         Map.entry("cobra eligible", COBRA),
                         Map.entry("cobra qualified", COBRA),
 
@@ -69,9 +59,6 @@ public enum BenefitStatusCode implements EdiCodeEnum {
                         Map.entry("long term disability", DISABLED),
                         Map.entry("short term disability", DISABLED),
                         Map.entry("std", DISABLED),
-                        Map.entry("medical leave", DISABLED),
-                        Map.entry("disability leave", DISABLED),
-                        Map.entry("incapacitated", DISABLED),
 
                         Map.entry("r", RETIREE),
                         Map.entry("retired", RETIREE),
@@ -82,8 +69,6 @@ public enum BenefitStatusCode implements EdiCodeEnum {
                         Map.entry("former employee", RETIREE),
                         Map.entry("emeritus", RETIREE),
                         Map.entry("retired employee", RETIREE),
-                        Map.entry("post-retirement", RETIREE),
-                        Map.entry("post retirement", RETIREE),
 
                         Map.entry("s", SURVIVING_INSURED),
                         Map.entry("survivor", SURVIVING_INSURED),
@@ -92,8 +77,6 @@ public enum BenefitStatusCode implements EdiCodeEnum {
                         Map.entry("widower", SURVIVING_INSURED),
                         Map.entry("bereaved", SURVIVING_INSURED),
                         Map.entry("surviving spouse", SURVIVING_INSURED),
-                        Map.entry("beneficiary", SURVIVING_INSURED),
-                        Map.entry("dependent benefit", SURVIVING_INSURED),
                         Map.entry("survivor benefits", SURVIVING_INSURED),
                         Map.entry("death benefit", SURVIVING_INSURED),
 
