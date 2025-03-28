@@ -7,8 +7,10 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.common.segments.ISASegment;
+import com.fastChickensHR.edi.common.TextUtils;
+import com.fastChickensHR.edi.common.data.*;
 import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.segments.ISASegment;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
 
@@ -19,6 +21,17 @@ import lombok.Getter;
 @Getter
 public class InterchangeControlHeader extends ISASegment {
     private final x834Context context;
+    public static final AuthorizationInformationQualifier DEFAULT_AUTHORIZATION_INFO_QUALIFIER = AuthorizationInformationQualifier.fromString("00");
+    public static final String DEFAULT_AUTHORIZATION_INFO = TextUtils.spaces(10);
+    public static final SecurityInformationQualifier DEFAULT_SECURITY_INFO_QUALIFIER = SecurityInformationQualifier.fromString("00");
+    public static final String DEFAULT_SECURITY_INFO = TextUtils.spaces(10);
+    public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_SENDER_QUALIFIER = InterchangeIdQualifier.fromString("30");
+    public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER = InterchangeIdQualifier.fromString("ZZ");
+    public static final String DEFAULT_REPETITION_SEPARATOR = "^";
+    public static final InterchangeControlVersionNumber DEFAULT_INTERCHANGE_CONTROL_VERSION = InterchangeControlVersionNumber.fromString("00501");
+    public static final AcknowledgmentRequested DEFAULT_ACKNOWLEDGMENT_REQUESTED = AcknowledgmentRequested.fromString("0");
+    public static final InterchangeUsageIndicator DEFAULT_USAGE_INDICATOR = InterchangeUsageIndicator.fromString("T");
+    public static final String DEFAULT_COMPONENT_ELEMENT_SEPARATOR = ":";
 
     protected InterchangeControlHeader(Builder builder) throws ValidationException {
         super(builder);
@@ -33,30 +46,32 @@ public class InterchangeControlHeader extends ISASegment {
 
         /**
          * Constructor that initializes the builder with context information
+         *
          * @param context The X834 context containing document-level information
          */
         public Builder(x834Context context) {
-            super(context);
-            this.context = context;
-        }
-
-        /**
-         * Default constructor
-         */
-        public Builder() {
             super();
+            this.context = context;
+            this.isa01 = DEFAULT_AUTHORIZATION_INFO_QUALIFIER;
+            this.isa02 = DEFAULT_AUTHORIZATION_INFO;
+            this.isa03 = DEFAULT_SECURITY_INFO_QUALIFIER;
+            this.isa04 = DEFAULT_SECURITY_INFO;
+            this.isa05 = DEFAULT_INTERCHANGE_SENDER_QUALIFIER;
+            this.setIsa06(context.getSenderID());
+            this.isa07 = DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER;
+            this.isa08 = context.getReceiverID();
+            this.isa09 = context.getFormattedDocumentDate();
+            this.isa10 = context.getFormattedDocumentTime();
+            this.isa11 = DEFAULT_REPETITION_SEPARATOR;
+            this.isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;
+            this.isa14 = DEFAULT_ACKNOWLEDGMENT_REQUESTED;
+            this.isa15 = DEFAULT_USAGE_INDICATOR;
+            this.isa16 = DEFAULT_COMPONENT_ELEMENT_SEPARATOR;
         }
 
-        /**
-         * Sets the x834 document context.
-         * @param context The context to use
-         * @return This builder instance for method chaining
-         */
         @Override
-        public Builder context(x834Context context) {
-            super.context(context);
-            this.context = context;
-            return self();
+        protected Builder self() {
+            return this;
         }
 
         @Override

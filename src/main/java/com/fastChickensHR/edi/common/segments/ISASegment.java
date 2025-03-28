@@ -10,7 +10,6 @@ package com.fastChickensHR.edi.common.segments;
 import com.fastChickensHR.edi.common.TextUtils;
 import com.fastChickensHR.edi.common.data.*;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -21,16 +20,6 @@ import lombok.experimental.Accessors;
 @Getter
 abstract public class ISASegment extends Segment {
     public static final String SEGMENT_ID = "ISA";
-    public static final AuthorizationInformationQualifier DEFAULT_AUTHORIZATION_INFO_QUALIFIER = AuthorizationInformationQualifier.fromString("00");
-    public static final String DEFAULT_AUTHORIZATION_INFO = TextUtils.spaces(10);
-    public static final SecurityInformationQualifier DEFAULT_SECURITY_INFO_QUALIFIER = SecurityInformationQualifier.fromString("00");
-    public static final String DEFAULT_SECURITY_INFO = TextUtils.spaces(10);
-    public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_SENDER_QUALIFIER = InterchangeIdQualifier.fromString("30");
-    public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER = InterchangeIdQualifier.fromString("ZZ");
-    public static final String DEFAULT_REPETITION_SEPARATOR = "^";
-    public static final InterchangeControlVersionNumber DEFAULT_INTERCHANGE_CONTROL_VERSION = InterchangeControlVersionNumber.fromString("00501");
-    public static final AcknowledgmentRequested DEFAULT_ACKNOWLEDGMENT_REQUESTED = AcknowledgmentRequested.fromString("0");
-    public static final InterchangeUsageIndicator DEFAULT_USAGE_INDICATOR = InterchangeUsageIndicator.fromString("T");
 
     protected final AuthorizationInformationQualifier isa01;
     protected final String isa02;
@@ -42,14 +31,12 @@ abstract public class ISASegment extends Segment {
     protected final String isa08; // Interchange Receiver ID
     protected final String isa09; // Interchange Date (YYMMDD)
     protected final String isa10; // Interchange Time (HHMM)
-    protected final String isa11; // Interchange Control Standards Identifier
+    protected final String isa11; // Repetition Separator
     protected final InterchangeControlVersionNumber isa12;
     protected final String isa13; // Interchange Control Number
     protected final AcknowledgmentRequested isa14;
     protected final InterchangeUsageIndicator isa15;
     protected final String isa16; // Component Element Separator
-
-    protected final x834Context context;
 
     protected ISASegment(AbstractBuilder<?> builder) throws ValidationException {
         this.isa01 = builder.isa01;
@@ -68,23 +55,40 @@ abstract public class ISASegment extends Segment {
         this.isa14 = builder.isa14;
         this.isa15 = builder.isa15;
         this.isa16 = builder.isa16;
-        this.context = builder.context;
 
         validateRequiredFields();
     }
 
     private void validateRequiredFields() throws ValidationException {
+        if(isa01 == null) {
+            throw new ValidationException("ISA01 (Authorization Information Qualifier) cannot be blank");
+        }
+        if(isa02 == null) {
+            throw new ValidationException("ISA02 (Authorization Information) cannot be blank");
+        }
         if (isa02.length() != 10) {
             throw new ValidationException("ISA02 (Authorization Information) must be 10 characters in length");
         }
+        if (isa03 == null) {
+            throw new ValidationException("ISA03 (Security Information Qualifier) cannot be blank");
+        }
+        if (isa04 == null) {
+            throw new ValidationException("ISA04 (Security Information) cannot be blank");
+        }
         if (isa04.length() != 10) {
             throw new ValidationException("ISA04 (Security Information) must be 10 characters in length");
+        }
+        if (isa05 == null) {
+            throw new ValidationException("ISA05 (Interchange ID Qualifier) cannot be blank");
         }
         if (isa06 == null || isa06.trim().isEmpty()) {
             throw new ValidationException("ISA06 (Interchange Sender ID) cannot be blank");
         }
         if (isa06.length() != 15) {
             throw new ValidationException("ISA06 (Interchange Sender ID must be 15 characters in length");
+        }
+        if (isa07 == null) {
+            throw new ValidationException("ISA07 (Interchange Receiver ID) cannot be blank");
         }
         if (isa08 == null || isa08.trim().isEmpty()) {
             throw new ValidationException("ISA08 (Interchange Receiver ID) cannot be blank");
@@ -95,8 +99,20 @@ abstract public class ISASegment extends Segment {
         if (isa10 == null || isa10.trim().isEmpty()) {
             throw new ValidationException("ISA10 (Interchange Time) cannot be blank");
         }
+        if (isa11 == null || isa11.trim().isEmpty()) {
+            throw new ValidationException("ISA11 (Repetition Separator) cannot be blank");
+        }
+        if (isa12 == null) {
+            throw new ValidationException("ISA12 (Interchange Control Version Number) cannot be blank");
+        }
         if (isa13 == null || isa13.trim().isEmpty()) {
             throw new ValidationException("ISA13 (Interchange Control Number) cannot be blank");
+        }
+        if (isa14 == null) {
+            throw new ValidationException("ISA14 (Acknowledgment Requested) cannot be blank");
+        }
+        if (isa15 == null) {
+            throw new ValidationException("ISA15 (Interchange Usage Indicator) cannot be blank");
         }
         if (isa16 == null || isa16.trim().isEmpty()) {
             throw new ValidationException("ISA16 (Component Element Separator) cannot be blank");
@@ -190,56 +206,24 @@ abstract public class ISASegment extends Segment {
      */
     @Accessors(chain = true)
     public abstract static class AbstractBuilder<T extends AbstractBuilder<T>> {
-        protected AuthorizationInformationQualifier isa01 = DEFAULT_AUTHORIZATION_INFO_QUALIFIER;
-        protected String isa02 = DEFAULT_AUTHORIZATION_INFO;
-        protected SecurityInformationQualifier isa03 = DEFAULT_SECURITY_INFO_QUALIFIER;
-        protected String isa04 = DEFAULT_SECURITY_INFO;
-        protected InterchangeIdQualifier isa05 = DEFAULT_INTERCHANGE_SENDER_QUALIFIER;
+        protected AuthorizationInformationQualifier isa01;
+        protected String isa02;
+        protected SecurityInformationQualifier isa03;
+        protected String isa04;
+        protected InterchangeIdQualifier isa05;
         protected String isa06;
-        protected InterchangeIdQualifier isa07 = DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER;
+        protected InterchangeIdQualifier isa07;
         protected String isa08;
         protected String isa09;
         protected String isa10;
-        protected String isa11 = DEFAULT_REPETITION_SEPARATOR;
-        protected InterchangeControlVersionNumber isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;
+        protected String isa11;
+        protected InterchangeControlVersionNumber isa12;
         protected String isa13;
-        protected AcknowledgmentRequested isa14 = DEFAULT_ACKNOWLEDGMENT_REQUESTED;
-        protected InterchangeUsageIndicator isa15 = DEFAULT_USAGE_INDICATOR;
-        protected String isa16 = ":";
-        protected x834Context context;
-
-        /**
-         * Constructor that initializes the builder with context information
-         *
-         * @param context The X834 context containing document-level information
-         */
-        public AbstractBuilder(x834Context context) {
-            this.context = context;
-            setIsa06(context.getSenderID());
-            setIsa08(context.getReceiverID());
-            this.isa09 = context.getFormattedDocumentDate();
-            this.isa10 = context.getFormattedDocumentTime();
-        }
+        protected AcknowledgmentRequested isa14;
+        protected InterchangeUsageIndicator isa15;
+        protected String isa16;
 
         public AbstractBuilder() {
-            // Default constructor for cases where context is set later
-        }
-
-        /**
-         * Sets the context object that contains document-level information.
-         *
-         * @param context The context to use
-         * @return This builder instance for method chaining
-         */
-        public T context(x834Context context) {
-            this.context = context;
-            if (context != null) {
-                setIsa06(context.getSenderID());
-                setIsa08(context.getReceiverID());
-                this.isa09 = context.getFormattedDocumentDate();
-                this.isa10 = context.getFormattedDocumentTime();
-            }
-            return self();
         }
 
         public T setIsa01(String value) {
@@ -403,32 +387,5 @@ abstract public class ISASegment extends Segment {
          * @throws ValidationException if validation fails
          */
         public abstract ISASegment build() throws ValidationException;
-    }
-
-    /**
-     * Concrete implementation of ISASegment that can be instantiated
-     */
-    public static class ConcreteISASegment extends ISASegment {
-        private ConcreteISASegment(Builder builder) throws ValidationException {
-            super(builder);
-        }
-
-        /**
-         * Concrete builder implementation for ISASegment
-         */
-        public static class Builder extends AbstractBuilder<Builder> {
-            public Builder(x834Context context) {
-                super(context);
-            }
-
-            public Builder() {
-                super();
-            }
-
-            @Override
-            public ISASegment build() throws ValidationException {
-                return new ConcreteISASegment(this);
-            }
-        }
     }
 }

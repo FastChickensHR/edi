@@ -66,7 +66,6 @@ public class Header {
      * @throws ValidationException If validation fails
      */
     public void validate() throws ValidationException {
-        // Only validate basic fields if custom builders aren't set
         if (customInterchangeBuilder == null && (interchangeControlNumber == null || interchangeControlNumber.isEmpty())) {
             throw new ValidationException("Interchange Control Number is required");
         }
@@ -76,7 +75,6 @@ public class Header {
         if (customTransactionSetBuilder == null && (transactionSetIdentifierCode == null || transactionSetIdentifierCode.isEmpty())) {
             throw new ValidationException("Transaction Set Identifier Code is required");
         }
-        // Add other validation as needed
     }
 
     /**
@@ -124,7 +122,6 @@ public class Header {
                 customPayerBuilder :
                 createDefaultPayerBuilder();
 
-        // Build all segments and add them to the list
         segments.add(interchangeBuilder.build());
         segments.add(functionalBuilder.build());
         segments.add(transactionSetBuilder.build());
@@ -154,7 +151,6 @@ public class Header {
     public static class Builder {
         private final x834Context context;
 
-        // Simple fields
         private String interchangeControlNumber;
         private String groupControlNumber = "1";
         private String transactionSetIdentifierCode = "834";
@@ -279,7 +275,6 @@ public class Header {
         public Header build() {
             Header header = new Header(context);
 
-            // Set simple fields
             header.interchangeControlNumber = this.interchangeControlNumber;
             header.groupControlNumber = this.groupControlNumber;
             header.transactionSetIdentifierCode = this.transactionSetIdentifierCode;
@@ -290,7 +285,6 @@ public class Header {
             header.payerName = this.payerName;
             header.payerIdentification = this.payerIdentification;
 
-            // Set custom builders
             header.customInterchangeBuilder = this.customInterchangeBuilder;
             header.customFunctionalBuilder = this.customFunctionalBuilder;
             header.customTransactionSetBuilder = this.customTransactionSetBuilder;

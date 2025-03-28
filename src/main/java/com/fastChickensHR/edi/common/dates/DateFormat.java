@@ -37,7 +37,6 @@ public enum DateFormat {
     private final String format;
     private final String validationPattern;
 
-    // Proper enum constructor
     DateFormat(String format, String validationPattern) {
         this.format = format;
         this.validationPattern = validationPattern;
