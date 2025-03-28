@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.loop2100C;
 
-import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

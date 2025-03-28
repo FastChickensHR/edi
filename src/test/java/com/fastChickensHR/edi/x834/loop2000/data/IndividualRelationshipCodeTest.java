@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.common.data.EdiEnumLookup;
+import com.fastChickensHR.edi.common.EdiEnumLookup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.common.data.EdiCodeEnum;
-import com.fastChickensHR.edi.x834.common.data.EdiEnumLookup;
+import com.fastChickensHR.edi.common.EdiCodeEnum;
+import com.fastChickensHR.edi.common.EdiEnumLookup;
 import lombok.Getter;
 
 import java.util.Map;
