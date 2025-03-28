@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.common.dates.DateFormat;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.common.x834Context;
+import com.fastChickensHR.edi.x834.x834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

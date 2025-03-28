@@ -11,7 +11,7 @@ import com.fastChickensHR.edi.common.TextUtils;
 import com.fastChickensHR.edi.common.data.*;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.common.segments.ISASegment;
-import com.fastChickensHR.edi.x834.common.x834Context;
+import com.fastChickensHR.edi.x834.x834Context;
 import lombok.Getter;
 
 /**

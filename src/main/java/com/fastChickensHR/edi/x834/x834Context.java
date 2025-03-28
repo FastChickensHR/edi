@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.common;
+package com.fastChickensHR.edi.x834;
 
 import com.fastChickensHR.edi.common.dates.DateFormat;
 import com.fastChickensHR.edi.common.dates.DateFormatter;
@@ -40,7 +40,6 @@ public class x834Context {
     private String senderID;
     private String receiverID;
     private LocalDateTime documentDate;
-    private LocalDateTime documentTime;
     private DateFormat dateFormat;
     private TimeFormat timeFormat;
     private String formattedDocumentDate;
@@ -56,11 +55,10 @@ public class x834Context {
      */
     public x834Context() {
         this.documentDate = LocalDateTime.now();
-        this.documentTime = LocalDateTime.now();
         this.dateFormat = DateFormat.DATE;
         this.timeFormat = TimeFormat.TIME;
         this.formattedDocumentDate = formatDate(documentDate);
-        this.formattedDocumentTime = formatTime(documentTime);
+        this.formattedDocumentTime = formatTime(documentDate);
         this.elementSeparator = ElementSeparator.ASTERISK;
         this.segmentTerminator = SegmentTerminator.TILDE;
         this.subElementSeparator = SubElementSeparator.GREATER_THAN;
