@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.common.data.InterchangeUsageIndicator;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.common.x834Context;
+import com.fastChickensHR.edi.x834.x834Context;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -30,7 +30,6 @@ class InterchangeControlHeaderTest {
         context.setSenderID("SENDER123");
         context.setReceiverID("RECEIVER456");
         context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
-        context.setDocumentTime(LocalDateTime.of(2023, 6, 30, 0, 0));
 
         InterchangeControlHeader header = new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber).build();
 
@@ -59,7 +58,6 @@ class InterchangeControlHeaderTest {
         context.setSenderID("ABC");
         context.setReceiverID("RECEIVER456");
         context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
-        context.setDocumentTime(LocalDateTime.of(2023, 6, 30, 0, 0));
 
         InterchangeControlHeader header = new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber).build();
 
@@ -79,12 +77,10 @@ class InterchangeControlHeaderTest {
 
     @Test
     void testCustomValuesOverrideDefaults() throws ValidationException {
-        // Setup
         x834Context context = new x834Context();
         context.setSenderID("SENDER123");
         context.setReceiverID("RECEIVER456");
         context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
-        context.setDocumentTime(LocalDateTime.of(2023, 6, 30, 0, 0));
 
         InterchangeControlHeader header = new InterchangeControlHeader.Builder(context)
                 .setIsa11("*")

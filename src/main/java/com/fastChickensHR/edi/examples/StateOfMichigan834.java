@@ -11,7 +11,7 @@ import com.fastChickensHR.edi.common.TestDataGenerator;
 import com.fastChickensHR.edi.domain.Dependent;
 import com.fastChickensHR.edi.domain.Person;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.common.x834Context;
+import com.fastChickensHR.edi.x834.x834Context;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;

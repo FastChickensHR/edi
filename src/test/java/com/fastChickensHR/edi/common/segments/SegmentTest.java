@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.common.segments;
 
-import com.fastChickensHR.edi.x834.common.x834Context;
+import com.fastChickensHR.edi.x834.x834Context;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
 import org.junit.jupiter.api.BeforeEach;
