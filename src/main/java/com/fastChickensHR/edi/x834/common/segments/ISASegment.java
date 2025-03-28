@@ -9,6 +9,7 @@ package com.fastChickensHR.edi.x834.common.segments;
 
 import com.fastChickensHR.edi.common.TextUtils;
 import com.fastChickensHR.edi.x834.common.data.AuthorizationInformationQualifier;
+import com.fastChickensHR.edi.x834.common.data.InterchangeControlVersionNumber;
 import com.fastChickensHR.edi.x834.common.data.InterchangeIdQualifier;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
@@ -29,7 +30,7 @@ abstract public class ISASegment extends Segment {
     public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_SENDER_QUALIFIER = InterchangeIdQualifier.fromString("30");
     public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER = InterchangeIdQualifier.fromString("ZZ");
     public static final String DEFAULT_REPETITION_SEPARATOR = "^";
-    public static final String DEFAULT_INTERCHANGE_CONTROL_VERSION = "00501";
+    public static final InterchangeControlVersionNumber DEFAULT_INTERCHANGE_CONTROL_VERSION = InterchangeControlVersionNumber.fromString("00501");
     public static final String DEFAULT_ACKNOWLEDGMENT_REQUESTED = "0";
     public static final String DEFAULT_USAGE_INDICATOR = "T";
 
@@ -44,7 +45,7 @@ abstract public class ISASegment extends Segment {
     protected final String isa09; // Interchange Date (YYMMDD)
     protected final String isa10; // Interchange Time (HHMM)
     protected final String isa11; // Interchange Control Standards Identifier
-    protected final String isa12; // Interchange Control Version Number
+    protected final InterchangeControlVersionNumber isa12;
     protected final String isa13; // Interchange Control Number
     protected final String isa14; // Acknowledgment Requested
     protected final String isa15; // Usage Indicator (Test/Production)
@@ -113,11 +114,10 @@ abstract public class ISASegment extends Segment {
     public String[] getElementValues() {
         return new String[]{
                 isa01.getCode(), isa02, isa03, isa04, isa05.getCode(), isa06, isa07.getCode(), isa08,
-                isa09, isa10, isa11, isa12, isa13, isa14, isa15, isa16
+                isa09, isa10, isa11, isa12.getCode(), isa13, isa14, isa15, isa16
         };
     }
 
-    // Domain-specific accessor methods
     public AuthorizationInformationQualifier getAuthorizationInformationQualifier() {
         return isa01;
     }
@@ -162,7 +162,7 @@ abstract public class ISASegment extends Segment {
         return isa11;
     }
 
-    public String getInterchangeControlVersionNumber() {
+    public InterchangeControlVersionNumber getInterchangeControlVersionNumber() {
         return isa12;
     }
 
@@ -200,7 +200,7 @@ abstract public class ISASegment extends Segment {
         protected String isa09;
         protected String isa10;
         protected String isa11 = DEFAULT_REPETITION_SEPARATOR;
-        protected String isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;
+        protected InterchangeControlVersionNumber isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;
         protected String isa13;
         protected String isa14 = DEFAULT_ACKNOWLEDGMENT_REQUESTED;
         protected String isa15 = DEFAULT_USAGE_INDICATOR;
@@ -296,8 +296,8 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setIsa12(String isa12) {
-            this.isa12 = isa12;
+        public T setIsa12(String value) {
+            this.isa12 = InterchangeControlVersionNumber.fromString(value);
             return self();
         }
 
