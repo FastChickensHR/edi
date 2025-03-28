@@ -9,6 +9,7 @@ package com.fastChickensHR.edi.x834.common.segments;
 
 import com.fastChickensHR.edi.common.TextUtils;
 import com.fastChickensHR.edi.x834.common.data.AuthorizationInformationQualifier;
+import com.fastChickensHR.edi.x834.common.data.InterchangeIdQualifier;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
@@ -25,8 +26,8 @@ abstract public class ISASegment extends Segment {
     public static final String DEFAULT_AUTHORIZATION_INFO = TextUtils.spaces(10);
     public static final String DEFAULT_SECURITY_INFO_QUALIFIER = "00"; // No security info present
     public static final String DEFAULT_SECURITY_INFO = TextUtils.spaces(10);
-    public static final String DEFAULT_INTERCHANGE_SENDER_QUALIFIER = "30";
-    public static final String DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER = "ZZ";
+    public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_SENDER_QUALIFIER = InterchangeIdQualifier.fromString("30");
+    public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER = InterchangeIdQualifier.fromString("ZZ");
     public static final String DEFAULT_REPETITION_SEPARATOR = "^";
     public static final String DEFAULT_INTERCHANGE_CONTROL_VERSION = "00501";
     public static final String DEFAULT_ACKNOWLEDGMENT_REQUESTED = "0";
@@ -34,11 +35,11 @@ abstract public class ISASegment extends Segment {
 
     protected final AuthorizationInformationQualifier isa01;
     protected final String isa02;
-    protected final String isa03; // Security Information Qualifier
-    protected final String isa04; // Security Information
-    protected final String isa05; // Interchange ID Qualifier (Sender)
+    protected final String isa03;
+    protected final String isa04;
+    protected final InterchangeIdQualifier isa05;
     protected final String isa06; // Interchange Sender ID
-    protected final String isa07; // Interchange ID Qualifier (Receiver)
+    protected final InterchangeIdQualifier isa07;
     protected final String isa08; // Interchange Receiver ID
     protected final String isa09; // Interchange Date (YYMMDD)
     protected final String isa10; // Interchange Time (HHMM)
@@ -77,6 +78,9 @@ abstract public class ISASegment extends Segment {
         if (isa02.length() != 10) {
             throw new ValidationException("ISA02 (Authorization Information) must be 10 characters in length");
         }
+        if (isa04.length() != 10) {
+            throw new ValidationException("ISA04 (Security Information) must be 10 characters in length");
+        }
         if (isa06 == null || isa06.trim().isEmpty()) {
             throw new ValidationException("ISA06 (Interchange Sender ID) cannot be blank");
         }
@@ -108,7 +112,7 @@ abstract public class ISASegment extends Segment {
     @Override
     public String[] getElementValues() {
         return new String[]{
-                isa01.getCode(), isa02, isa03, isa04, isa05, isa06, isa07, isa08,
+                isa01.getCode(), isa02, isa03, isa04, isa05.getCode(), isa06, isa07.getCode(), isa08,
                 isa09, isa10, isa11, isa12, isa13, isa14, isa15, isa16
         };
     }
@@ -130,7 +134,7 @@ abstract public class ISASegment extends Segment {
         return isa04;
     }
 
-    public String getInterchangeSenderQualifier() {
+    public InterchangeIdQualifier getInterchangeSenderQualifier() {
         return isa05;
     }
 
@@ -138,7 +142,7 @@ abstract public class ISASegment extends Segment {
         return isa06;
     }
 
-    public String getInterchangeReceiverQualifier() {
+    public InterchangeIdQualifier getInterchangeReceiverQualifier() {
         return isa07;
     }
 
@@ -189,9 +193,9 @@ abstract public class ISASegment extends Segment {
         protected String isa02 = DEFAULT_AUTHORIZATION_INFO;
         protected String isa03 = DEFAULT_SECURITY_INFO_QUALIFIER;
         protected String isa04 = DEFAULT_SECURITY_INFO;
-        protected String isa05 = DEFAULT_INTERCHANGE_SENDER_QUALIFIER;
+        protected InterchangeIdQualifier isa05 = DEFAULT_INTERCHANGE_SENDER_QUALIFIER;
         protected String isa06;
-        protected String isa07 = DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER;
+        protected InterchangeIdQualifier isa07 = DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER;
         protected String isa08;
         protected String isa09;
         protected String isa10;
@@ -257,8 +261,8 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setIsa05(String isa05) {
-            this.isa05 = isa05;
+        public T setIsa05(String value) {
+            this.isa05 = InterchangeIdQualifier.fromString(value);
             return self();
         }
 
@@ -267,8 +271,8 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setIsa07(String isa07) {
-            this.isa07 = isa07;
+        public T setIsa07(String value) {
+            this.isa07 = InterchangeIdQualifier.fromString(value);
             return self();
         }
 
