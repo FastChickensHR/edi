@@ -8,8 +8,8 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.common.TextUtils;
-import com.fastChickensHR.edi.x834.common.data.AuthorizationInformationQualifier;
-import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.data.AuthorizationInformationQualifier;
+import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,7 +42,7 @@ class InterchangeControlHeaderTest {
 
         assertEquals("00", header.getAuthorizationInformationQualifier().getCode());
         assertEquals(TextUtils.spaces(10), header.getAuthorizationInformation());
-        assertEquals("00", header.getSecurityInformationQualifier());
+        assertEquals("00", header.getSecurityInformationQualifier().getCode());
         assertEquals(TextUtils.spaces(10), header.getSecurityInformation());
         assertEquals("ZZ", header.getInterchangeSenderQualifier().getCode());
         assertEquals(TextUtils.padRight("SENDERNAME",15), header.getInterchangeSenderID());
@@ -64,7 +64,7 @@ class InterchangeControlHeaderTest {
 
         assertEquals("00", header.getIsa01().getCode());
         assertEquals(TextUtils.spaces(10), header.getIsa02());
-        assertEquals("00", header.getIsa03());
+        assertEquals("00", header.getIsa03().getCode());
         assertEquals(TextUtils.spaces(10), header.getIsa04());
         assertEquals("ZZ", header.getIsa05().getCode());
         assertEquals(TextUtils.padRight("SENDERNAME",15), header.getIsa06());

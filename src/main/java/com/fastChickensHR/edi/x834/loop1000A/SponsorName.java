@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop1000A;
 
-import com.fastChickensHR.edi.x834.common.segments.N1Segment;
-import com.fastChickensHR.edi.x834.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.segments.N1Segment;
+import com.fastChickensHR.edi.common.exception.ValidationException;
 import lombok.experimental.Accessors;
 
 public class SponsorName extends N1Segment {
