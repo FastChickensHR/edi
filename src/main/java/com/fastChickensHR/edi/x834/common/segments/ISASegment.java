@@ -33,7 +33,7 @@ abstract public class ISASegment extends Segment {
     public static final String DEFAULT_USAGE_INDICATOR = "T";
 
     protected final AuthorizationInformationQualifier isa01;
-    protected final String isa02; // Authorization Information
+    protected final String isa02;
     protected final String isa03; // Security Information Qualifier
     protected final String isa04; // Security Information
     protected final String isa05; // Interchange ID Qualifier (Sender)
@@ -74,6 +74,9 @@ abstract public class ISASegment extends Segment {
     }
 
     private void validateRequiredFields() throws ValidationException {
+        if (isa02.length() != 10) {
+            throw new ValidationException("ISA02 (Authorization Information) must be 10 characters in length");
+        }
         if (isa06 == null || isa06.trim().isEmpty()) {
             throw new ValidationException("ISA06 (Interchange Sender ID) cannot be blank");
         }
@@ -234,8 +237,8 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setIsa01(AuthorizationInformationQualifier isa01) {
-            this.isa01 = isa01;
+        public T setIsa01(String value) {
+            this.isa01 = AuthorizationInformationQualifier.fromString(value);
             return self();
         }
 
@@ -314,7 +317,7 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setAuthorizationInformationQualifier(AuthorizationInformationQualifier value) {
+        public T setAuthorizationInformationQualifier(String value) {
             return setIsa01(value);
         }
 
