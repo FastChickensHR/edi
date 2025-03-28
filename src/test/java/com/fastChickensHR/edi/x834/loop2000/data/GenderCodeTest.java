@@ -23,7 +23,6 @@ class GenderCodeTest {
 
     @Test
     void testEnumValues() {
-        // Verify enum constants exist and match expected values
         assertEquals(5, GenderCode.values().length);
 
         assertTrue(Arrays.asList(GenderCode.values()).contains(GenderCode.MALE));
@@ -35,7 +34,6 @@ class GenderCodeTest {
 
     @Test
     void testEnumProperties() {
-        // Test code and description for each enum value
         assertEquals("M", GenderCode.MALE.getCode());
         assertEquals("Male", GenderCode.MALE.getDescription());
 
@@ -51,7 +49,6 @@ class GenderCodeTest {
         assertEquals("X", GenderCode.NOT_SPECIFIED.getCode());
         assertEquals("Not Specified", GenderCode.NOT_SPECIFIED.getDescription());
 
-        // Test toString() returns the code
         for (GenderCode code : GenderCode.values()) {
             assertEquals(code.getCode(), code.toString());
         }
@@ -65,7 +62,6 @@ class GenderCodeTest {
         assertEquals(GenderCode.NON_BINARY, GenderCode.fromString("N"));
         assertEquals(GenderCode.NOT_SPECIFIED, GenderCode.fromString("X"));
 
-        // Test that invalid inputs throw exceptions
         assertThrows(IllegalArgumentException.class, () -> GenderCode.fromString("InvalidCode"));
     }
 
