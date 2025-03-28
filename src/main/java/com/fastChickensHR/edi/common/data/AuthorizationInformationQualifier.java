@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * Enumeration representing Authorization Information Qualifiers used in the ISA01 field
- * of the EDI 834 Interchange Control Header (ISA) segment.
+ * of the EDI Interchange Control Header (ISA) segment.
  */
 @Getter
 public enum AuthorizationInformationQualifier implements EdiCodeEnum {

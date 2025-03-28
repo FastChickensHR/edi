@@ -7,117 +7,32 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.common.TextUtils;
-import com.fastChickensHR.edi.common.data.AuthorizationInformationQualifier;
+import com.fastChickensHR.edi.common.data.InterchangeUsageIndicator;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Test class for InterchangeControlHeader.
- * Verifies the behavior of the segment identifier, field getters/setters,
- * and validation functionality.
+ * Focuses only on testing the X834-specific defaults and behavior, as general ISA behavior
+ * is already tested in ISASegmentTest.
  */
 class InterchangeControlHeaderTest {
-    x834Context context = new x834Context();
-
-    @Test
-    void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        InterchangeControlHeader header = createSampleHeader();
-        assertEquals("ISA", header.getSegmentIdentifier());
-    }
-
-    @Test
-    void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        InterchangeControlHeader header = createHeaderWithSpecNames();
-
-        assertEquals("00", header.getAuthorizationInformationQualifier().getCode());
-        assertEquals(TextUtils.spaces(10), header.getAuthorizationInformation());
-        assertEquals("00", header.getSecurityInformationQualifier().getCode());
-        assertEquals(TextUtils.spaces(10), header.getSecurityInformation());
-        assertEquals("ZZ", header.getInterchangeSenderQualifier().getCode());
-        assertEquals(TextUtils.padRight("SENDERNAME",15), header.getInterchangeSenderID());
-        assertEquals("ZZ", header.getInterchangeReceiverQualifier().getCode());
-        assertEquals(TextUtils.padRight("RECEIVERNAME", 15), header.getInterchangeReceiverID());
-        assertEquals("230415", header.getInterchangeDate());
-        assertEquals("1200", header.getInterchangeTime());
-        assertEquals("^", header.getInterchangeControlStandardsIdentifier());
-        assertEquals("00501", header.getInterchangeControlVersionNumber().getCode());
-        assertEquals("000000001", header.getInterchangeControlNumber());
-        assertEquals("0", header.getAcknowledgmentRequested().getCode());
-        assertEquals("P", header.getUsageIndicator().getCode());
-        assertEquals(":", header.getComponentElementSeparator());
-    }
-
-    @Test
-    void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        InterchangeControlHeader header = createHeaderWithDomainNames();
-
-        assertEquals("00", header.getIsa01().getCode());
-        assertEquals(TextUtils.spaces(10), header.getIsa02());
-        assertEquals("00", header.getIsa03().getCode());
-        assertEquals(TextUtils.spaces(10), header.getIsa04());
-        assertEquals("ZZ", header.getIsa05().getCode());
-        assertEquals(TextUtils.padRight("SENDERNAME",15), header.getIsa06());
-        assertEquals("ZZ", header.getIsa07().getCode());
-        assertEquals(TextUtils.padRight("RECEIVERNAME", 15), header.getIsa08());
-        assertEquals("230415", header.getIsa09());
-        assertEquals("1200", header.getIsa10());
-        assertEquals("^", header.getIsa11());
-        assertEquals("00501", header.getIsa12().getCode());
-        assertEquals("000000001", header.getIsa13());
-        assertEquals("0", header.getIsa14().getCode());
-        assertEquals("P", header.getIsa15().getCode());
-        assertEquals(":", header.getIsa16());
-    }
-
-    @Test
-    void testToEdiSegmentFormatting() throws ValidationException {
-        InterchangeControlHeader header = createSampleHeader();
-        header.setContext(context);
-
-        String expectedEdiSegment =
-                "ISA*00*          *00*          *ZZ*SENDERNAME     *ZZ*RECEIVERNAME   *230415*1200*^*00501*000000001*0*P*:~";
-
-        assertEquals(expectedEdiSegment, header.render().trim());
-    }
-
-    @Test
-    void testGetElementValues() throws ValidationException {
-        InterchangeControlHeader header = createSampleHeader();
-        String[] elements = header.getElementValues();
-
-        assertEquals(16, elements.length);
-        assertEquals("00", elements[0]);
-        assertEquals(TextUtils.spaces(10), elements[1]);
-        assertEquals("00", elements[2]);
-        assertEquals(TextUtils.spaces(10), elements[3]);
-        assertEquals("ZZ", elements[4]);
-        assertEquals(TextUtils.padRight("SENDERNAME", 15), elements[5]);
-        assertEquals("ZZ", elements[6]);
-        assertEquals(TextUtils.padRight("RECEIVERNAME", 15), elements[7]);
-        assertEquals("230415", elements[8]);
-        assertEquals("1200", elements[9]);
-        assertEquals("^", elements[10]);
-        assertEquals("00501", elements[11]);
-        assertEquals("000000001", elements[12]);
-        assertEquals("0", elements[13]);
-        assertEquals("P", elements[14]);
-        assertEquals(":", elements[15]);
-    }
-
+    String interchangeControlNumber = "FakeControlNumber";
     @Test
     void testDefaultValues() throws ValidationException {
-        InterchangeControlHeader header = createMinimalHeader();
+        x834Context context = new x834Context();
+        context.setSenderID("SENDER123");
+        context.setReceiverID("RECEIVER456");
+        context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
+        context.setDocumentTime(LocalDateTime.of(2023, 6, 30, 0, 0));
+
+        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber).build();
 
         assertEquals(InterchangeControlHeader.DEFAULT_AUTHORIZATION_INFO_QUALIFIER, header.getAuthorizationInformationQualifier());
         assertEquals(InterchangeControlHeader.DEFAULT_AUTHORIZATION_INFO, header.getAuthorizationInformation());
@@ -129,176 +44,57 @@ class InterchangeControlHeaderTest {
         assertEquals(InterchangeControlHeader.DEFAULT_INTERCHANGE_CONTROL_VERSION, header.getInterchangeControlVersionNumber());
         assertEquals(InterchangeControlHeader.DEFAULT_ACKNOWLEDGMENT_REQUESTED, header.getAcknowledgmentRequested());
         assertEquals(InterchangeControlHeader.DEFAULT_USAGE_INDICATOR, header.getUsageIndicator());
-    }
+        assertEquals(InterchangeControlHeader.DEFAULT_COMPONENT_ELEMENT_SEPARATOR, header.getComponentElementSeparator());
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidIsa06_ShouldThrowValidationException(String invalidValue) {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            InterchangeControlHeader.Builder builder = new InterchangeControlHeader.Builder(context)
-                    .setInterchangeSenderID(invalidValue)
-                    .setInterchangeReceiverID("RECEIVERNAME")
-                    .setInterchangeControlNumber("000000001")
-                    .setComponentElementSeparator(":");
-
-            builder.build();
-        });
-
-        assertTrue(exception.getMessage().contains("ISA06"));
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidIsa08_ShouldThrowValidationException(String invalidValue) {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            InterchangeControlHeader.Builder builder = new InterchangeControlHeader.Builder(context)
-                    .setInterchangeSenderID("SENDERNAME")
-                    .setInterchangeReceiverID(invalidValue)
-                    .setInterchangeControlNumber("000000001")
-                    .setComponentElementSeparator(":");
-
-            builder.build();
-        });
-
-        assertTrue(exception.getMessage().contains("ISA08"));
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidIsa13_ShouldThrowValidationException(String invalidValue) {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            InterchangeControlHeader.Builder builder = new InterchangeControlHeader.Builder(context)
-                    .setInterchangeSenderID("SENDERNAME")
-                    .setInterchangeReceiverID("RECEIVERNAME")
-                    .setInterchangeControlNumber(invalidValue)
-                    .setComponentElementSeparator(":");
-
-            builder.build();
-        });
-
-        assertTrue(exception.getMessage().contains("ISA13"));
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"  ",})
-    void testInvalidIsa16_ShouldThrowValidationException(String invalidValue) {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            InterchangeControlHeader.Builder builder = new InterchangeControlHeader.Builder(context)
-                    .setInterchangeSenderID("SENDERNAME")
-                    .setInterchangeReceiverID("RECEIVERNAME")
-                    .setInterchangeControlNumber("000000001")
-                    .setComponentElementSeparator(invalidValue);
-
-            builder.build();
-        });
-
-        assertTrue(exception.getMessage().contains("ISA16"));
+        assertEquals("SENDER123      ", header.getInterchangeSenderID());
+        assertEquals(context.getReceiverID(), header.getInterchangeReceiverID());
+        assertEquals(context.getFormattedDocumentDate(), header.getInterchangeDate());
+        assertEquals(context.getFormattedDocumentTime(), header.getInterchangeTime());
+        assertEquals(context, header.getContext());
     }
 
     @Test
-    void testValidDateFormats() throws ValidationException {
-        LocalDate now = LocalDate.now();
-        String dateStr = now.format(DateTimeFormatter.ofPattern("yyMMdd"));
+    void testPaddingOfSenderID() throws ValidationException {
+        x834Context context = new x834Context();
+        context.setSenderID("ABC");
+        context.setReceiverID("RECEIVER456");
+        context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
+        context.setDocumentTime(LocalDateTime.of(2023, 6, 30, 0, 0));
 
-        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context)
-                .setInterchangeSenderID("SENDERNAME")
-                .setInterchangeReceiverID("RECEIVERNAME")
-                .setInterchangeControlNumber("000000001")
-                .setInterchangeDate(dateStr)
-                .setComponentElementSeparator(":")
-                .build();
+        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber).build();
 
-        assertEquals(dateStr, header.getInterchangeDate());
+        assertEquals("ABC            ", header.getInterchangeSenderID());
     }
 
     @Test
-    void testValidTimeFormats() throws ValidationException {
-        LocalTime now = LocalTime.now();
-        String timeStr = now.format(DateTimeFormatter.ofPattern("HHmm"));
+    void testContextAccess() throws ValidationException {
+        x834Context context = new x834Context();
+        context.setSenderID("SENDER123");
+        context.setReceiverID("RECEIVER456");
+
+        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber).build();
+
+        assertSame(context, header.getContext());
+    }
+
+    @Test
+    void testCustomValuesOverrideDefaults() throws ValidationException {
+        // Setup
+        x834Context context = new x834Context();
+        context.setSenderID("SENDER123");
+        context.setReceiverID("RECEIVER456");
+        context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
+        context.setDocumentTime(LocalDateTime.of(2023, 6, 30, 0, 0));
 
         InterchangeControlHeader header = new InterchangeControlHeader.Builder(context)
-                .setInterchangeSenderID("SENDERNAME")
-                .setInterchangeReceiverID("RECEIVERNAME")
-                .setInterchangeControlNumber("000000001")
-                .setInterchangeTime(timeStr)
-                .setComponentElementSeparator(":")
+                .setIsa11("*")
+                .setInterchangeControlNumber(interchangeControlNumber)
+                .setIsa15(InterchangeUsageIndicator.fromString("P").getCode())
                 .build();
 
-        assertEquals(timeStr, header.getInterchangeTime());
-    }
+        assertEquals("*", header.getInterchangeControlStandardsIdentifier());
+        assertEquals(InterchangeUsageIndicator.fromString("P"), header.getUsageIndicator());
 
-    private InterchangeControlHeader createSampleHeader() throws ValidationException {
-        return new InterchangeControlHeader.Builder(context)
-                .setAuthorizationInformation(TextUtils.spaces(10))
-                .setSecurityInformationQualifier("00")
-                .setSecurityInformation(TextUtils.spaces(10))
-                .setInterchangeSenderQualifier("ZZ")
-                .setInterchangeSenderID("SENDERNAME")
-                .setInterchangeReceiverQualifier("ZZ")
-                .setInterchangeReceiverID("RECEIVERNAME")
-                .setInterchangeDate("230415")
-                .setInterchangeTime("1200")
-                .setInterchangeControlStandardsIdentifier("^")
-                .setInterchangeControlVersionNumber("00501")
-                .setInterchangeControlNumber("000000001")
-                .setAcknowledgmentRequested("0")
-                .setUsageIndicator("P")
-                .setComponentElementSeparator(":")
-                .build();
-    }
-
-    private InterchangeControlHeader createHeaderWithSpecNames() throws ValidationException {
-        return new InterchangeControlHeader.Builder(context)
-                .setIsa01(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getCode())
-                .setIsa02(TextUtils.spaces(10))
-                .setIsa03("00")
-                .setIsa04(TextUtils.spaces(10))
-                .setIsa05("ZZ")
-                .setIsa06("SENDERNAME")
-                .setIsa07("ZZ")
-                .setIsa08("RECEIVERNAME")
-                .setIsa09("230415")
-                .setIsa10("1200")
-                .setIsa11("^")
-                .setIsa12("00501")
-                .setIsa13("000000001")
-                .setIsa14("0")
-                .setIsa15("P")
-                .setIsa16(":")
-                .build();
-    }
-
-    private InterchangeControlHeader createHeaderWithDomainNames() throws ValidationException {
-        return new InterchangeControlHeader.Builder(context)
-                .setAuthorizationInformationQualifier(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getCode())
-                .setAuthorizationInformation(TextUtils.spaces(10))
-                .setSecurityInformationQualifier("00")
-                .setSecurityInformation(TextUtils.spaces(10))
-                .setInterchangeSenderQualifier("ZZ")
-                .setInterchangeSenderID("SENDERNAME")
-                .setInterchangeReceiverQualifier("ZZ")
-                .setInterchangeReceiverID("RECEIVERNAME")
-                .setInterchangeDate("230415")
-                .setInterchangeTime("1200")
-                .setInterchangeControlStandardsIdentifier("^")
-                .setInterchangeControlVersionNumber("00501")
-                .setInterchangeControlNumber("000000001")
-                .setAcknowledgmentRequested("0")
-                .setUsageIndicator("P")
-                .setComponentElementSeparator(":")
-                .build();
-    }
-
-    private InterchangeControlHeader createMinimalHeader() throws ValidationException {
-        return new InterchangeControlHeader.Builder(context)
-                .setInterchangeSenderID("SENDERNAME")
-                .setInterchangeReceiverID("RECEIVERNAME")
-                .setInterchangeControlNumber("000000001")
-                .setComponentElementSeparator(":")
-                .build();
+        assertEquals(InterchangeControlHeader.DEFAULT_AUTHORIZATION_INFO_QUALIFIER, header.getAuthorizationInformationQualifier());
     }
 }

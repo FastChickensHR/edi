@@ -118,7 +118,6 @@ class HeaderTest {
 
     @Test
     void testGenerateSegments() throws ValidationException {
-        // Test segment generation with required fields
         Header header = new Header(context);
         header.setInterchangeControlNumber("000000001");
         header.setReferenceIdentification("REF123");
@@ -136,8 +135,6 @@ class HeaderTest {
         assertNotNull(segments);
         assertFalse(segments.isEmpty());
 
-        // Should contain segments for ISA, GS, ST, BGN, DTP, REF, N1 (sponsor), N1 (payer)
-        // The exact number depends on how many segments each component creates
         assertTrue(segments.size() >= 8);
 
         // Verify segment identifiers in expected order
@@ -150,21 +147,16 @@ class HeaderTest {
 
     @Test
     void testValidation() {
-        // Test validation with missing required fields
         Header header = new Header(context);
-        // Intentionally not setting required fields
-
         Exception exception = assertThrows(ValidationException.class, () -> {
             header.validate();
         });
 
-        // The validation message should mention missing fields
         assertTrue(exception.getMessage().contains("required"));
     }
 
     @Test
     void testHeaderBuilder() throws ValidationException {
-        // Test the Header.Builder functionality
         Header.Builder builder = new Header.Builder(context)
                 .setInterchangeControlNumber("000000001")
                 .setGroupControlNumber("42")
@@ -178,7 +170,6 @@ class HeaderTest {
 
         Header header = builder.build();
 
-        // Verify all fields were set correctly through the builder
         assertEquals("000000001", header.getInterchangeControlNumber());
         assertEquals("42", header.getGroupControlNumber());
         assertEquals("834", header.getTransactionSetIdentifierCode());
@@ -192,7 +183,6 @@ class HeaderTest {
 
     @Test
     void testBuilderWithCustomBuilders() throws ValidationException {
-        // Test setting custom builders through the Header.Builder
         InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context);
         FunctionalGroupHeader.Builder functionalBuilder = new FunctionalGroupHeader.Builder(context);
 
@@ -202,22 +192,18 @@ class HeaderTest {
 
         Header header = builder.build();
 
-        // Verify custom builders were set correctly
         assertEquals(interchangeBuilder, header.getCustomInterchangeBuilder());
         assertEquals(functionalBuilder, header.getCustomFunctionalBuilder());
     }
 
     @Test
     void testBuilderDefaultValues() throws ValidationException {
-        // Test default values in the builder
         Header header = new Header.Builder(context).build();
 
-        // Verify default values against what we expect
         assertEquals("1", header.getGroupControlNumber());
         assertEquals("834", header.getTransactionSetIdentifierCode());
         assertEquals("0001", header.getTransactionSetControlNumber());
 
-        // Other fields should be null since they're required
         assertNull(header.getInterchangeControlNumber());
         assertNull(header.getReferenceIdentification());
         assertNull(header.getMasterPolicyNumber());
