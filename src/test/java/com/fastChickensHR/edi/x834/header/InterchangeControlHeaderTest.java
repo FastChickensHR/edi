@@ -54,7 +54,7 @@ class InterchangeControlHeaderTest {
         assertEquals("00501", header.getInterchangeControlVersionNumber().getCode());
         assertEquals("000000001", header.getInterchangeControlNumber());
         assertEquals("0", header.getAcknowledgmentRequested().getCode());
-        assertEquals("P", header.getUsageIndicator());
+        assertEquals("P", header.getUsageIndicator().getCode());
         assertEquals(":", header.getComponentElementSeparator());
     }
 
@@ -76,7 +76,7 @@ class InterchangeControlHeaderTest {
         assertEquals("00501", header.getIsa12().getCode());
         assertEquals("000000001", header.getIsa13());
         assertEquals("0", header.getIsa14().getCode());
-        assertEquals("P", header.getIsa15());
+        assertEquals("P", header.getIsa15().getCode());
         assertEquals(":", header.getIsa16());
     }
 

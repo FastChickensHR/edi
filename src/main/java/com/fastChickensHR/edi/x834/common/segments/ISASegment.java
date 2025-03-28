@@ -8,10 +8,7 @@
 package com.fastChickensHR.edi.x834.common.segments;
 
 import com.fastChickensHR.edi.common.TextUtils;
-import com.fastChickensHR.edi.x834.common.data.AcknowledgmentRequested;
-import com.fastChickensHR.edi.x834.common.data.AuthorizationInformationQualifier;
-import com.fastChickensHR.edi.x834.common.data.InterchangeControlVersionNumber;
-import com.fastChickensHR.edi.x834.common.data.InterchangeIdQualifier;
+import com.fastChickensHR.edi.x834.common.data.*;
 import com.fastChickensHR.edi.x834.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.common.x834Context;
 import lombok.Getter;
@@ -33,7 +30,7 @@ abstract public class ISASegment extends Segment {
     public static final String DEFAULT_REPETITION_SEPARATOR = "^";
     public static final InterchangeControlVersionNumber DEFAULT_INTERCHANGE_CONTROL_VERSION = InterchangeControlVersionNumber.fromString("00501");
     public static final AcknowledgmentRequested DEFAULT_ACKNOWLEDGMENT_REQUESTED = AcknowledgmentRequested.fromString("0");
-    public static final String DEFAULT_USAGE_INDICATOR = "T";
+    public static final InterchangeUsageIndicator DEFAULT_USAGE_INDICATOR = InterchangeUsageIndicator.fromString("T");
 
     protected final AuthorizationInformationQualifier isa01;
     protected final String isa02;
@@ -49,7 +46,7 @@ abstract public class ISASegment extends Segment {
     protected final InterchangeControlVersionNumber isa12;
     protected final String isa13; // Interchange Control Number
     protected final AcknowledgmentRequested isa14;
-    protected final String isa15; // Usage Indicator (Test/Production)
+    protected final InterchangeUsageIndicator isa15;
     protected final String isa16; // Component Element Separator
 
     protected final x834Context context;
@@ -104,6 +101,9 @@ abstract public class ISASegment extends Segment {
         if (isa16 == null || isa16.trim().isEmpty()) {
             throw new ValidationException("ISA16 (Component Element Separator) cannot be blank");
         }
+        if (isa16.length() != 1) {
+            throw new ValidationException("ISA16 (Component Element Separator) must be exactly 1 character");
+        }
     }
 
     @Override
@@ -115,7 +115,7 @@ abstract public class ISASegment extends Segment {
     public String[] getElementValues() {
         return new String[]{
                 isa01.getCode(), isa02, isa03, isa04, isa05.getCode(), isa06, isa07.getCode(), isa08,
-                isa09, isa10, isa11, isa12.getCode(), isa13, isa14.getCode(), isa15, isa16
+                isa09, isa10, isa11, isa12.getCode(), isa13, isa14.getCode(), isa15.getCode(), isa16
         };
     }
 
@@ -175,7 +175,7 @@ abstract public class ISASegment extends Segment {
         return isa14;
     }
 
-    public String getUsageIndicator() {
+    public InterchangeUsageIndicator getUsageIndicator() {
         return isa15;
     }
 
@@ -204,7 +204,7 @@ abstract public class ISASegment extends Segment {
         protected InterchangeControlVersionNumber isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;
         protected String isa13;
         protected AcknowledgmentRequested isa14 = DEFAULT_ACKNOWLEDGMENT_REQUESTED;
-        protected String isa15 = DEFAULT_USAGE_INDICATOR;
+        protected InterchangeUsageIndicator isa15 = DEFAULT_USAGE_INDICATOR;
         protected String isa16 = ":";
         protected x834Context context;
 
@@ -312,8 +312,8 @@ abstract public class ISASegment extends Segment {
             return self();
         }
 
-        public T setIsa15(String isa15) {
-            this.isa15 = isa15;
+        public T setIsa15(String value) {
+            this.isa15 = InterchangeUsageIndicator.fromString(value);
             return self();
         }
 
