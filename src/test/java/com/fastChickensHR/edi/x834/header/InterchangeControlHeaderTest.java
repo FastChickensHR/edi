@@ -293,7 +293,7 @@ class InterchangeControlHeaderTest {
 
     private InterchangeControlHeader createHeaderWithSpecNames() throws ValidationException {
         return new InterchangeControlHeader.Builder(context)
-                .setIsa01(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION)
+                .setIsa01(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getCode())
                 .setIsa02(TextUtils.spaces(10))
                 .setIsa03("00")
                 .setIsa04(TextUtils.spaces(10))
@@ -314,7 +314,7 @@ class InterchangeControlHeaderTest {
 
     private InterchangeControlHeader createHeaderWithDomainNames() throws ValidationException {
         return new InterchangeControlHeader.Builder(context)
-                .setAuthorizationInformationQualifier(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION)
+                .setAuthorizationInformationQualifier(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getCode())
                 .setAuthorizationInformation(TextUtils.spaces(10))
                 .setSecurityInformationQualifier("00")
                 .setSecurityInformation(TextUtils.spaces(10))
