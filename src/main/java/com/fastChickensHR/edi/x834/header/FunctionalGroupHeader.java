@@ -8,6 +8,8 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.common.data.FunctionalIdentifierCode;
+import com.fastChickensHR.edi.common.data.ResponsibleAgencyCode;
+import com.fastChickensHR.edi.common.data.VersionCode;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.common.segments.GSSegment;
 import com.fastChickensHR.edi.x834.x834Context;
@@ -20,8 +22,8 @@ import lombok.Getter;
 @Getter
 public class FunctionalGroupHeader extends GSSegment {
     public static final FunctionalIdentifierCode DEFAULT_FUNCTIONAL_ID_CODE = FunctionalIdentifierCode.fromString("BE");  // Benefits Enrollment
-    public static final String DEFAULT_RESPONSIBLE_AGENCY_CODE = "X";  // Accredited Standards Committee X12
-    public static final String DEFAULT_VERSION_CODE = "005010X220A1";
+    public static final ResponsibleAgencyCode DEFAULT_RESPONSIBLE_AGENCY_CODE = ResponsibleAgencyCode.ASC_X12;
+    public static final VersionCode DEFAULT_VERSION_CODE = VersionCode.fromString("005010X220A1");
 
     private final x834Context context;
 

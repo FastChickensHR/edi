@@ -8,6 +8,8 @@
 package com.fastChickensHR.edi.common.segments;
 
 import com.fastChickensHR.edi.common.data.FunctionalIdentifierCode;
+import com.fastChickensHR.edi.common.data.ResponsibleAgencyCode;
+import com.fastChickensHR.edi.common.data.VersionCode;
 import com.fastChickensHR.edi.common.dates.DateFormat;
 import com.fastChickensHR.edi.common.dates.DateFormatter;
 import com.fastChickensHR.edi.common.dates.TimeFormat;
@@ -31,8 +33,8 @@ abstract public class GSSegment extends Segment {
     protected final String gs04; // Date (YYYYMMDD)
     protected final String gs05; // Time (HHMM)
     protected final String gs06; // Group Control Number
-    protected final String gs07; // Responsible Agency Code
-    protected final String gs08; // Version/Release/Industry Identifier Code
+    protected final ResponsibleAgencyCode gs07;
+    protected final VersionCode gs08;
 
     protected GSSegment(AbstractBuilder<?> builder) throws ValidationException {
         this.gs01 = builder.gs01;
@@ -54,8 +56,14 @@ abstract public class GSSegment extends Segment {
         if (gs02 == null || gs02.trim().isEmpty()) {
             throw new ValidationException("Application Sender's Code (GS02) is required");
         }
+        if (gs02.length() < 2 || gs02.length() > 15) {
+            throw new ValidationException("Application Sender's Code (GS02) must be between 2 and 15 characters");
+        }
         if (gs03 == null || gs03.trim().isEmpty()) {
             throw new ValidationException("Application Receiver's Code (GS03) is required");
+        }
+        if (gs03.length() < 2 || gs03.length() > 15) {
+            throw new ValidationException("Application Receiver's Code (GS03) must be between 2 and 15 characters");
         }
         if (gs04 == null || gs04.trim().isEmpty()) {
             throw new ValidationException("Date (GS04) is required");
@@ -66,10 +74,13 @@ abstract public class GSSegment extends Segment {
         if (gs06 == null || gs06.trim().isEmpty()) {
             throw new ValidationException("Group Control Number (GS06) is required");
         }
-        if (gs07 == null || gs07.trim().isEmpty()) {
+        if (gs06.length() > 9) {
+            throw new ValidationException("Group Control Number (GS06) must be 9 or less characters");
+        }
+        if (gs07 == null) {
             throw new ValidationException("Responsible Agency Code (GS07) is required");
         }
-        if (gs08 == null || gs08.trim().isEmpty()) {
+        if (gs08 == null) {
             throw new ValidationException("Version/Release/Industry Identifier Code (GS08) is required");
         }
     }
@@ -82,7 +93,7 @@ abstract public class GSSegment extends Segment {
     @Override
     public String[] getElementValues() {
         return new String[]{
-                gs01.getCode(), gs02, gs03, gs04, gs05, gs06, gs07, gs08
+                gs01.getCode(), gs02, gs03, gs04, gs05, gs06, gs07.getCode(), gs08.getCode()
         };
     }
 
@@ -110,11 +121,11 @@ abstract public class GSSegment extends Segment {
         return gs06;
     }
 
-    public String getResponsibleAgencyCode() {
+    public ResponsibleAgencyCode getResponsibleAgencyCode() {
         return gs07;
     }
 
-    public String getVersionReleaseIndustryCode() {
+    public VersionCode getVersionReleaseIndustryCode() {
         return gs08;
     }
 
@@ -131,8 +142,8 @@ abstract public class GSSegment extends Segment {
         protected String gs04; // Date
         protected String gs05; // Time
         protected String gs06; // Group Control Number
-        protected String gs07; // Responsible Agency Code
-        protected String gs08; // Version/Release/Industry Identifier Code
+        protected ResponsibleAgencyCode gs07;
+        protected VersionCode gs08;
 
         protected AbstractBuilder() {
         }
@@ -167,13 +178,13 @@ abstract public class GSSegment extends Segment {
             return self();
         }
 
-        public T setGs07(String gs07) {
-            this.gs07 = gs07;
+        public T setGs07(String value) {
+            this.gs07 = ResponsibleAgencyCode.fromString(value);
             return self();
         }
 
-        public T setGs08(String gs08) {
-            this.gs08 = gs08;
+        public T setGs08(String value) {
+            this.gs08 = VersionCode.fromString(value);
             return self();
         }
 
