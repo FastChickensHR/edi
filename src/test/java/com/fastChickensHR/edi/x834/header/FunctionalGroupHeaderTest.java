@@ -50,10 +50,8 @@ class FunctionalGroupHeaderTest {
      */
     @Test
     void testDefaultValuesFromBuilder() throws ValidationException {
-        // Build a header with only the required context
         FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
 
-        // Verify the default values are set correctly
         assertEquals(FunctionalGroupHeader.DEFAULT_FUNCTIONAL_ID_CODE, header.getFunctionalIdentifierCode(),
                 "Should use the default functional ID code (BE)");
         assertEquals(FunctionalGroupHeader.DEFAULT_RESPONSIBLE_AGENCY_CODE, header.getResponsibleAgencyCode(),
@@ -61,7 +59,6 @@ class FunctionalGroupHeaderTest {
         assertEquals(FunctionalGroupHeader.DEFAULT_VERSION_CODE, header.getVersionReleaseIndustryCode(),
                 "Should use the default version code (005010X220A1)");
 
-        // Verify context values are copied correctly
         assertEquals(senderID, header.getApplicationSenderCode(),
                 "Should use the sender ID from context");
         assertEquals(receiverID, header.getApplicationReceiverCode(),
@@ -87,27 +84,23 @@ class FunctionalGroupHeaderTest {
      */
     @Test
     void testOverridingDefaultValues() throws ValidationException {
-        // Define non-default values
         FunctionalIdentifierCode customFunctionalId = FunctionalIdentifierCode.fromString("FA");
-        String customResponsibleAgency = "Y";
-        String customVersionCode = "005010X999";
+        String customResponsibleAgency = "T";
+        String customVersionCode = "004050";
 
-        // Build with overridden values
         FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context)
                 .setFunctionalIdentifierCode(customFunctionalId.getCode())
                 .setResponsibleAgencyCode(customResponsibleAgency)
                 .setVersionReleaseIndustryCode(customVersionCode)
                 .build();
 
-        // Verify the custom values are used instead of defaults
         assertEquals(customFunctionalId, header.getFunctionalIdentifierCode(),
                 "Should use the custom functional ID code");
-        assertEquals(customResponsibleAgency, header.getResponsibleAgencyCode(),
+        assertEquals(customResponsibleAgency, header.getResponsibleAgencyCode().getCode(),
                 "Should use the custom responsible agency code");
-        assertEquals(customVersionCode, header.getVersionReleaseIndustryCode(),
+        assertEquals(customVersionCode, header.getVersionReleaseIndustryCode().getCode(),
                 "Should use the custom version code");
 
-        // Verify context values are still copied correctly
         assertEquals(senderID, header.getApplicationSenderCode(),
                 "Should still use the sender ID from context");
         assertEquals(receiverID, header.getApplicationReceiverCode(),

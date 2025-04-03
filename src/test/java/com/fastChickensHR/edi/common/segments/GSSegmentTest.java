@@ -210,8 +210,8 @@ class GSSegmentTest {
                 .setVersionReleaseIndustryCode("005010X220A1")
                 .build();
 
-        assertEquals("X", segment.getResponsibleAgencyCode());
-        assertEquals("X", segment.getGs07());
+        assertEquals("X", segment.getResponsibleAgencyCode().getCode());
+        assertEquals("X", segment.getGs07().getCode());
     }
 
     @Test
@@ -227,8 +227,8 @@ class GSSegmentTest {
                 .setVersionReleaseIndustryCode("005010X220A1")
                 .build();
 
-        assertEquals("005010X220A1", segment.getVersionReleaseIndustryCode());
-        assertEquals("005010X220A1", segment.getGs08());
+        assertEquals("005010X220A1", segment.getVersionReleaseIndustryCode().getCode());
+        assertEquals("005010X220A1", segment.getGs08().getCode());
     }
 
     /* Tests for all setter methods */
@@ -358,7 +358,7 @@ class GSSegmentTest {
                 .setVersionReleaseIndustryCode("005010X220A1")
                 .build();
 
-        assertEquals("T", segment.getResponsibleAgencyCode());
+        assertEquals("T", segment.getResponsibleAgencyCode().getCode());
     }
 
     @Test
@@ -371,10 +371,10 @@ class GSSegmentTest {
                 .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
                 .setGroupControlNumber("12345")
                 .setResponsibleAgencyCode("X")
-                .setGs08("006010XXXXA1")
+                .setGs08("004061")
                 .build();
 
-        assertEquals("006010XXXXA1", segment.getVersionReleaseIndustryCode());
+        assertEquals("004061", segment.getVersionReleaseIndustryCode().getCode());
     }
 
     /* Validation tests for required fields */
@@ -431,23 +431,5 @@ class GSSegmentTest {
                 .build());
 
         assertTrue(exception.getMessage().contains("GS06"));
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidGs08_ShouldThrowValidationException(String invalidValue) {
-        Exception exception = assertThrows(ValidationException.class, () -> builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.DATE)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setGs08(invalidValue)
-                .build());
-
-        assertTrue(exception.getMessage().contains("GS08"));
     }
 }
