@@ -7,11 +7,10 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.common.segments.Segment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.segments.STSegment;
+import com.fastChickensHR.edi.x834.x834Context;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * Abstract class representing the beginning segment of the header loop in an EDI document.
@@ -20,87 +19,41 @@ import lombok.experimental.Accessors;
  * and implementation convention reference (ST03).
  */
 @Getter
-public abstract class TransactionSetHeader extends Segment {
-    // Constants for segment and field identifiers
-    public static final String SEGMENT_ID = "ST";
-    public static final String DEFAULT_TRANSACTION_SET_ID = "834";
-    public static final String DEFAULT_CONTROL_NUMBER = "0001";
-    public static final String DEFAULT_CONVENTION_REFERENCE = "005010X220A1";
-
-    private final String st01; // Transaction Set Identifier Code
-    private final String st02; // Transaction Set Control Number
-    private final String st03; // Implementation Convention Reference
+public class TransactionSetHeader extends STSegment {
+    private final static String DEFAULT_TRANSACTION_SET_ID = "834";
+    private final static String DEFAULT_CONTROL_NUMBER = "0001";
+    private final static String DEFAULT_CONVENTION_REFERENCE = "005010X220A1";
 
     protected TransactionSetHeader(Builder builder) throws ValidationException {
-        this.st01 = builder.st01;
-        this.st02 = builder.st02;
-        this.st03 = builder.st03;
-
-        validateRequiredFields();
+        super(builder);
     }
 
-    private void validateRequiredFields() throws ValidationException {
-        if (st01 == null || st01.trim().isEmpty()) {
-            throw new ValidationException("ST01 (Transaction Set Identifier Code) cannot be blank");
-        }
-        if (st02 == null || st02.trim().isEmpty()) {
-            throw new ValidationException("ST02 (Transaction Control Number) cannot be blank");
-        }
-    }
+    /**
+     * Builder for the FunctionalGroupHeader.
+     */
+    public static class Builder extends STSegment.AbstractBuilder<TransactionSetHeader.Builder> {
+        protected x834Context context;
 
-    @Override
-    public String getSegmentIdentifier() {
-        return SEGMENT_ID;
-    }
-
-    @Override
-    public String[] getElementValues() {
-        return new String[]{st01, st02, st03};
-    }
-
-    public String getTransactionSetIdentifierCode() {
-        return st01;
-    }
-
-    public String getTransactionSetControlNumber() {
-        return st02;
-    }
-
-    public String getImplementationConventionReference() {
-        return st03;
-    }
-
-    @Setter
-    @Accessors(chain = true)
-    public static class Builder {
-        private String st01 = DEFAULT_TRANSACTION_SET_ID;
-        private String st02 = DEFAULT_CONTROL_NUMBER;
-        private String st03 = DEFAULT_CONVENTION_REFERENCE;
-
-        public Builder setTransactionSetIdentifierCode(String code) {
-            return setSt01(code);
+        public Builder() {
+            super();
+            this.setSt01(DEFAULT_TRANSACTION_SET_ID);
+            this.setSt02(DEFAULT_CONTROL_NUMBER);
+            this.setSt03(DEFAULT_CONVENTION_REFERENCE);
         }
 
-        public Builder setTransactionSetControlNumber(String number) {
-            return setSt02(number);
-        }
-
-        public Builder setImplementationConventionReference(String reference) {
-            return setSt03(reference);
+        @Override
+        protected TransactionSetHeader.Builder self() {
+            return this;
         }
 
         /**
-         * Builds a new TransactionSetHeader instance
+         * Builds a new FunctionalGroupHeader instance
+         *
+         * @return A new FunctionalGroupHeader instance
+         * @throws ValidationException if validation fails
          */
         public TransactionSetHeader build() throws ValidationException {
-            return new TransactionSetHeaderImpl(this);
-        }
-    }
-
-    // Concrete implementation class that can be instantiated
-    private static class TransactionSetHeaderImpl extends TransactionSetHeader {
-        private TransactionSetHeaderImpl(Builder builder) throws ValidationException {
-            super(builder);
+            return new TransactionSetHeader(this);
         }
     }
 }

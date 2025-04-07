@@ -8,6 +8,7 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.common.data.FunctionalIdentifierCode;
+import com.fastChickensHR.edi.common.data.ResponsibleAgencyCode;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.x834Context;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,11 +53,11 @@ class FunctionalGroupHeaderTest {
     void testDefaultValuesFromBuilder() throws ValidationException {
         FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
 
-        assertEquals(FunctionalGroupHeader.DEFAULT_FUNCTIONAL_ID_CODE, header.getFunctionalIdentifierCode(),
+        assertEquals("BE", header.getFunctionalIdentifierCode().getCode(),
                 "Should use the default functional ID code (BE)");
-        assertEquals(FunctionalGroupHeader.DEFAULT_RESPONSIBLE_AGENCY_CODE, header.getResponsibleAgencyCode(),
+        assertEquals(ResponsibleAgencyCode.ASC_X12, header.getResponsibleAgencyCode(),
                 "Should use the default responsible agency code (X)");
-        assertEquals(FunctionalGroupHeader.DEFAULT_VERSION_CODE, header.getVersionReleaseIndustryCode(),
+        assertEquals("005010X220A1", header.getVersionReleaseIndustryCode().getCode(),
                 "Should use the default version code (005010X220A1)");
 
         assertEquals(senderID, header.getApplicationSenderCode(),
