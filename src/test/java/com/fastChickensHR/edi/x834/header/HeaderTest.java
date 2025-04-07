@@ -84,7 +84,6 @@ class HeaderTest {
 
     @Test
     void testCustomBuilderSettersAndGetters() {
-        // Test setting and getting custom builders
         Header header = new Header(context);
 
         InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context);
@@ -137,12 +136,10 @@ class HeaderTest {
 
         assertTrue(segments.size() >= 8);
 
-        // Verify segment identifiers in expected order
         assertEquals("ISA", segments.get(0).getSegmentIdentifier());
         assertEquals("GS", segments.get(1).getSegmentIdentifier());
         assertEquals("ST", segments.get(2).getSegmentIdentifier());
         assertEquals("BGN", segments.get(3).getSegmentIdentifier());
-        // Additional segments would follow
     }
 
     @Test

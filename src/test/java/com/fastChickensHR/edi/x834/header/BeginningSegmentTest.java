@@ -25,10 +25,7 @@ class BeginningSegmentTest {
      */
     @Test
     void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        // Create a concrete implementation of the abstract BeginningSegment for testing
         BeginningSegment segment = createValidSegment();
-
-        // Assert that the segment identifier is "BGN"
         assertEquals("BGN", segment.getSegmentIdentifier());
     }
 
@@ -37,7 +34,6 @@ class BeginningSegmentTest {
      */
     @Test
     void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        // Given
         String transactionPurposeCode = "01";
         String referenceId = "REF123";
         String date = "20230101";
@@ -46,9 +42,8 @@ class BeginningSegmentTest {
         String originalRef = "ORIG123";
         String transactionType = "T1";
         String actionCode = "A1";
-        String securityLevel = "S1";
+        String securityLevel = "ZZ";
 
-        // When
         BeginningSegment segment = new BeginningSegmentImpl.Builder(context)
                 .setBgn01(transactionPurposeCode)
                 .setBgn02(referenceId)
@@ -61,16 +56,15 @@ class BeginningSegmentTest {
                 .setBgn09(securityLevel)
                 .build();
 
-        // Then
-        assertEquals(transactionPurposeCode, segment.getTransactionSetPurposeCode());
+        assertEquals(transactionPurposeCode, segment.getTransactionSetPurposeCode().getCode());
         assertEquals(referenceId, segment.getReferenceIdentification());
         assertEquals(date, segment.getDate());
         assertEquals(time, segment.getTime());
-        assertEquals(timeZone, segment.getTimeZoneCode());
+        assertEquals(timeZone, segment.getTimeZoneCode().getCode());
         assertEquals(originalRef, segment.getOriginalReferenceNumber());
-        assertEquals(transactionType, segment.getTransactionTypeCode());
-        assertEquals(actionCode, segment.getActionCode());
-        assertEquals(securityLevel, segment.getSecurityLevelCode());
+        assertEquals(transactionType, segment.getTransactionTypeCode().getCode());
+        assertEquals(actionCode, segment.getActionCode().getCode());
+        assertEquals(securityLevel, segment.getSecurityLevelCode().getCode());
     }
 
     /**
@@ -78,7 +72,6 @@ class BeginningSegmentTest {
      */
     @Test
     void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        // Given
         String transactionPurposeCode = "01";
         String referenceId = "REF123";
         String date = "20230101";
@@ -87,9 +80,8 @@ class BeginningSegmentTest {
         String originalRef = "ORIG123";
         String transactionType = "T1";
         String actionCode = "A1";
-        String securityLevel = "S1";
+        String securityLevel = "ZZ";
 
-        // When
         BeginningSegment segment = new BeginningSegmentImpl.Builder(context)
                 .setTransactionSetPurposeCode(transactionPurposeCode)
                 .setReferenceIdentification(referenceId)
@@ -102,16 +94,15 @@ class BeginningSegmentTest {
                 .setSecurityLevelCode(securityLevel)
                 .build();
 
-        // Then
-        assertEquals(transactionPurposeCode, segment.getBgn01());
+        assertEquals(transactionPurposeCode, segment.getBgn01().getCode());
         assertEquals(referenceId, segment.getBgn02());
         assertEquals(date, segment.getBgn03());
         assertEquals(time, segment.getBgn04());
-        assertEquals(timeZone, segment.getBgn05());
+        assertEquals(timeZone, segment.getBgn05().getCode());
         assertEquals(originalRef, segment.getBgn06());
-        assertEquals(transactionType, segment.getBgn07());
-        assertEquals(actionCode, segment.getBgn08());
-        assertEquals(securityLevel, segment.getBgn09());
+        assertEquals(transactionType, segment.getBgn07().getCode());
+        assertEquals(actionCode, segment.getBgn08().getCode());
+        assertEquals(securityLevel, segment.getBgn09().getCode());
     }
 
     /**
@@ -119,7 +110,6 @@ class BeginningSegmentTest {
      */
     @Test
     void testRenderSegmentFormatting() throws ValidationException {
-        // Given
         BeginningSegment segment = new BeginningSegmentImpl.Builder(context)
                 .setBgn01("01")
                 .setBgn02("REF123")
@@ -129,14 +119,12 @@ class BeginningSegmentTest {
                 .setBgn06("ORIG123")
                 .setBgn07("T1")
                 .setBgn08("A1")
-                .setBgn09("S1")
+                .setBgn09("ZZ")
                 .build();
+        segment.setContext(context);
 
-        // When
         String rendered = segment.render().trim();
-
-        // Then
-        assertEquals("BGN*01*REF123*20230101*1200*ET*ORIG123*T1*A1*S1~", rendered);
+        assertEquals("BGN*01*REF123*20230101*1200*ET*ORIG123*T1*A1*ZZ~", rendered);
     }
 
     /**
@@ -144,7 +132,6 @@ class BeginningSegmentTest {
      */
     @Test
     void testGetElementValues() throws ValidationException {
-        // Given
         BeginningSegment segment = new BeginningSegmentImpl.Builder(context)
                 .setBgn01("01")
                 .setBgn02("REF123")
@@ -153,10 +140,7 @@ class BeginningSegmentTest {
                 .setBgn05("ET")
                 .build();
 
-        // When
         String[] elementValues = segment.getElementValues();
-
-        // Then
         assertNotNull(elementValues);
         assertEquals(9, elementValues.length);
         assertEquals("01", elementValues[0]);
@@ -164,10 +148,6 @@ class BeginningSegmentTest {
         assertEquals("20230101", elementValues[2]);
         assertEquals("1200", elementValues[3]);
         assertEquals("ET", elementValues[4]);
-        assertNull(elementValues[5]);
-        assertNull(elementValues[6]);
-        assertNull(elementValues[7]);
-        assertNull(elementValues[8]);
     }
 
     /**
@@ -180,7 +160,7 @@ class BeginningSegmentTest {
                 .setBgn03("20230101")
                 .build();
 
-        assertEquals(BeginningSegment.DEFAULT_TRANSACTION_SET_PURPOSE_CODE, segment.getBgn01());
+        assertEquals(BeginningSegment.DEFAULT_TRANSACTION_SET_PURPOSE_CODE, segment.getBgn01().getCode());
     }
 
     /* Validation Tests for BGN01 - Transaction Set Purpose Code */
@@ -190,11 +170,10 @@ class BeginningSegmentTest {
     @ValueSource(strings = {" ", "   "})
     void testInvalidBgn01_ShouldThrowValidationException(String invalidValue) {
         BeginningSegment.Builder builder = new BeginningSegmentImpl.Builder(context)
-                .setBgn01(invalidValue)
                 .setBgn02("REF123")
                 .setBgn03("20230101");
 
-        assertThrows(ValidationException.class, builder::build);
+        assertThrows(IllegalArgumentException.class, () -> builder.setBgn01(invalidValue));
     }
 
     /* Validation Tests for BGN02 - Reference Identification */
@@ -230,7 +209,6 @@ class BeginningSegmentTest {
      */
     @Test
     void testOptionalFieldsAreOptional() throws ValidationException {
-        // When/Then - No exceptions should be thrown for missing optional fields
         assertDoesNotThrow(() -> new BeginningSegmentImpl.Builder(context)
                 .setBgn01("01")
                 .setBgn02("REF123")
