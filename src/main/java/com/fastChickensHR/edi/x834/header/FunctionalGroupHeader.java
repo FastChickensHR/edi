@@ -21,9 +21,9 @@ import lombok.Getter;
  */
 @Getter
 public class FunctionalGroupHeader extends GSSegment {
-    public static final FunctionalIdentifierCode DEFAULT_FUNCTIONAL_ID_CODE = FunctionalIdentifierCode.fromString("BE");  // Benefits Enrollment
-    public static final ResponsibleAgencyCode DEFAULT_RESPONSIBLE_AGENCY_CODE = ResponsibleAgencyCode.ASC_X12;
-    public static final VersionCode DEFAULT_VERSION_CODE = VersionCode.fromString("005010X220A1");
+    private static final FunctionalIdentifierCode DEFAULT_FUNCTIONAL_ID_CODE = FunctionalIdentifierCode.fromString("BE");
+    private static final ResponsibleAgencyCode DEFAULT_RESPONSIBLE_AGENCY_CODE = ResponsibleAgencyCode.ASC_X12;
+    private static final VersionCode DEFAULT_VERSION_CODE = VersionCode.fromString("005010X220A1");
 
     private final x834Context context;
 
