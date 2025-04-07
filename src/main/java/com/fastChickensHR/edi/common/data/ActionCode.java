@@ -117,6 +117,7 @@ public enum ActionCode implements EdiCodeEnum {
     SEND_RECORD_WINTER("94", "Send Record at End of the Winter Term"),
     SEND_RECORD_SPRING("95", "Send Record at End of the Spring Term"),
     SEND_RECORD_SUMMER("96", "Send Record at End of the Summer Term"),
+    CERTIFIED_TOTAL("A1", "Certified in total"),
     SEND_RECORD_INTERSESSION("97", "Send Record at End of the Intersession Term");
 
     private final String code;

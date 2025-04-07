@@ -49,6 +49,7 @@ public enum TransactionTypeCode implements EdiCodeEnum {
     RESPONSE_NO_UPDATES("18", "Response - No Further Updates to Follow"),
     RESPONSE_UPDATES_FOLLOW("19", "Response - Further Updates to Follow"),
     AIR_EXPORT_WAYBILL("20", "Air Export Waybill and Invoice"),
+    REPORT_SENT_BY_NCES("T1", "Report sent by National Center for Education Statistics (NCES)"),
     MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
     private final String code;
