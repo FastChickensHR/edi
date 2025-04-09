@@ -10,168 +10,140 @@ package com.fastChickensHR.edi.common.segments;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.x834Context;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RefSegmentTest {
-    private static class TestRefSegment extends RefSegment {
-        public static final String TEST_QUALIFIER = "1L";
-
-        private TestRefSegment(AbstractBuilder<?> builder) throws ValidationException {
-            super(builder);
-        }
-
-        public static class Builder extends AbstractBuilder<Builder> {
-            public Builder() {
-                this.ref01 = TEST_QUALIFIER;
-            }
-
-            @Override
-            protected Builder self() {
-                return this;
-            }
-
-            @Override
-            public TestRefSegment build() throws ValidationException {
-                if (ref01 == null || ref01.isEmpty()) {
-                    throw new ValidationException("ref01 (Reference Identification Qualifier) is required");
-                }
-                if (ref02 == null || ref02.isEmpty()) {
-                    throw new ValidationException("ref02 (Reference Identification) is required");
-                }
-                return new TestRefSegment(this);
-            }
-        }
-    }
+    x834Context context = new x834Context();
 
     @Test
-    void testSegmentIdentifier() throws ValidationException {
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef02("12345")
+    void testCreation_WithValidValues_ShouldCreateSegment() throws ValidationException {
+        RefSegment segment = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("12345")
                 .build();
 
+        assertEquals("38", segment.getReferenceIdentificationQualifier().getCode());
+        assertEquals("12345", segment.getReferenceIdentification());
         assertEquals("REF", segment.getSegmentIdentifier());
     }
 
     @Test
-    void testGetElementValues() throws ValidationException {
-        String qualifier = "TJ";
-        String identification = "ABC123";
+    void testCreation_UsingDirectSetters_ShouldCreateSegment() throws ValidationException {
+        // Arrange & Act
+        RefSegment segment = new RefSegment.Builder()
+                .setRef01("ZZ")
+                .setRef02("ABC123")
+                .build();
 
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef01(qualifier)
-                .setRef02(identification)
+        assertEquals("ZZ", segment.getRef01().getCode());
+        assertEquals("ABC123", segment.getRef02());
+    }
+
+    @Test
+    void testToString_ShouldReturnFormattedString() throws ValidationException {
+        RefSegment segment = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("12345")
+                .build();
+        segment.setContext(context);
+        String segmentString = segment.render().trim();
+
+        assertEquals("REF*38*12345~", segmentString);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t"})
+    void testValidation_InvalidReferenceIdentificationQualifier_ShouldThrowException(String invalidValue) {
+        RefSegment.Builder builder = new RefSegment.Builder()
+                .setReferenceIdentification("12345");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> builder.setReferenceIdentificationQualifier(invalidValue));
+        assertTrue(exception.getMessage().contains("Input cannot be null or empty"));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t"})
+    void testValidation_InvalidReferenceIdentification_ShouldThrowException(String invalidValue) {
+        RefSegment.Builder builder = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification(invalidValue);
+
+        ValidationException exception = assertThrows(ValidationException.class, builder::build);
+        assertTrue(exception.getMessage().contains("REF02"));
+    }
+
+    @Test
+    void testGetElementValues_ShouldReturnCorrectArray() throws ValidationException {
+        RefSegment segment = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("12345")
                 .build();
 
         String[] elements = segment.getElementValues();
-        assertEquals(2, elements.length);
-        assertEquals(qualifier, elements[0]);
-        assertEquals(identification, elements[1]);
+
+        assertEquals(3, elements.length);
+        assertEquals("38", elements[0]);
+        assertEquals("12345", elements[1]);
     }
 
     @Test
-    void testDomainGetters() throws ValidationException {
-        String qualifier = "TJ";
-        String identification = "ABC123";
-
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef01(qualifier)
-                .setRef02(identification)
+    void testChainedBuilderMethods_ShouldCreateSegment() throws ValidationException {
+        RefSegment segment = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("12345")
                 .build();
 
-        assertEquals(qualifier, segment.getReferenceIdentificationQualifier());
-        assertEquals(identification, segment.getReferenceIdentification());
-
-        assertEquals(qualifier, segment.getRef01());
-        assertEquals(identification, segment.getRef02());
+        assertEquals("38", segment.getReferenceIdentificationQualifier().getCode());
+        assertEquals("12345", segment.getReferenceIdentification());
     }
 
     @Test
-    void testBuilderWithSpecNamesSetters() throws ValidationException {
-        String qualifier = "ZZ";
-        String identification = "XYZ789";
-
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef01(qualifier)
-                .setRef02(identification)
+    void testSetterAliases_ShouldSetCorrectFields() throws ValidationException {
+        RefSegment segment1 = new RefSegment.Builder()
+                .setRef01("38")
+                .setRef02("9876")
                 .build();
 
-        assertEquals(qualifier, segment.getRef01());
-        assertEquals(identification, segment.getRef02());
-    }
-
-    @Test
-    void testBuilderWithDomainNameSetters() throws ValidationException {
-        String qualifier = "ZZ";
-        String identification = "XYZ789";
-
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setReferenceIdentificationQualifier(qualifier)
-                .setReferenceIdentification(identification)
+        RefSegment segment2 = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("9876")
                 .build();
 
-        assertEquals(qualifier, segment.getRef01());
-        assertEquals(identification, segment.getRef02());
+        assertEquals(segment1.getRef01(), segment2.getRef01());
+        assertEquals(segment1.getRef02(), segment2.getRef02());
     }
 
     @Test
-    void testRender() throws ValidationException {
-        String qualifier = "Q4";
-        String identification = "97531";
-
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef01(qualifier)
-                .setRef02(identification)
-                .build();
-        segment.setContext(new x834Context());
-
-        String rendered = segment.render();
-        assertEquals("REF*Q4*97531~", rendered.trim());
-    }
-
-    @Test
-    void testDefaultQualifier() throws ValidationException {
-        String identification = "ABC123";
-
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef02(identification)
+    void testEquals_WithDifferentSegments_ShouldNotBeEqual() throws ValidationException {
+        RefSegment segment1 = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("12345")
                 .build();
 
-        assertEquals(TestRefSegment.TEST_QUALIFIER, segment.getRef01());
-        assertEquals(identification, segment.getRef02());
-    }
-
-    @Test
-    void testValidationRequiresRef01AndRef02() {
-        // Test missing ref01
-        ValidationException exception1 = assertThrows(ValidationException.class, () -> {
-            new TestRefSegment.Builder()
-                    .setRef01("") // Empty value
-                    .setRef02("12345")
-                    .build();
-        });
-        assertTrue(exception1.getMessage().contains("ref01"));
-
-        ValidationException exception2 = assertThrows(ValidationException.class, () -> {
-            new TestRefSegment.Builder()
-                    .setRef01("ZZ")
-                    .setRef02("") // Empty value
-                    .build();
-        });
-        assertTrue(exception2.getMessage().contains("ref02"));
-    }
-
-    @Test
-    void testChainedSetters() throws ValidationException {
-        String qualifier = "18";
-        String identification = "98765";
-
-        TestRefSegment segment = new TestRefSegment.Builder()
-                .setRef01(qualifier)
-                .setRef02(identification)
+        RefSegment segment2 = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("ZZ")
+                .setReferenceIdentification("12345")
                 .build();
 
-        assertEquals(qualifier, segment.getRef01());
-        assertEquals(identification, segment.getRef02());
+        assertNotEquals(segment1, segment2);
+    }
+
+    @Test
+    void testAccessorMethods_ShouldReturnCorrectValues() throws ValidationException {
+        RefSegment segment = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification("12345")
+                .build();
+
+        assertEquals("38", segment.getReferenceIdentificationQualifier().getCode());
+        assertEquals("38", segment.getRef01().getCode());
+        assertEquals("12345", segment.getReferenceIdentification());
+        assertEquals("12345", segment.getRef02());
     }
 }

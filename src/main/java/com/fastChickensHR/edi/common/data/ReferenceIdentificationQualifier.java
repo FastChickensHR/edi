@@ -94,6 +94,11 @@ public enum ReferenceIdentificationQualifier implements EdiCodeEnum {
     ACRN("2V", "Special Government Accounting Classification Reference Number (ACRN)"),
     CHANGE_ORDER_AUTHORITY("2W", "Change Order Authority"),
     SUPPLEMENTAL_AGREEMENT_AUTHORITY("2X", "Supplemental Agreement Authority"),
+    INTERNAL_ORDER_NUMBER("IL", "Internal Order Number"),
+    MUTUALLY_DEFINED("ZZ", "Mutually Defined"),
+    MASTER_POLICY_NUMBER("38", "Master Policy Number"),
+    DEPARTMENT_NUMBER("DX", "Department/Agency Number"),
+    OPERATOR_IDENTIFICATION_NUMBER("OF", "Operator Identification Number"),
     WAGE_DETERMINATION("2Y", "Wage Determination");
 
     private final String code;
