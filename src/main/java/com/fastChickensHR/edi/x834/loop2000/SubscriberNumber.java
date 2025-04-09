@@ -25,7 +25,7 @@ public class SubscriberNumber extends RefSegment {
     @Accessors(chain = true)
     public static class Builder extends RefSegment.AbstractBuilder<SubscriberNumber.Builder> {
         public Builder() {
-            this.ref01 = DEFAULT_ENTITY_IDENTIFIER_CODE;
+            setRef01(DEFAULT_ENTITY_IDENTIFIER_CODE);
         }
 
         @Override

@@ -31,14 +31,14 @@ class SubscriberNumberTest {
     @Test
     public void testSettingAndGettingValues() throws ValidationException {
         SubscriberNumber segment = SubscriberNumber.builder()
-                .setRef01("XZ") // Override default
+                .setRef01("ZZ") // Override default
                 .setRef02(referenceIdentification)
                 .build();
 
-        assertEquals("XZ", segment.getRef01(), "Reference Identification Qualifier should match ref01");
+        assertEquals("ZZ", segment.getRef01().getCode(), "Reference Identification Qualifier should match ref01");
         assertEquals(referenceIdentification, segment.getRef02(), "Reference Identification should match ref02");
 
-        assertEquals("XZ", segment.getReferenceIdentificationQualifier(), "Reference Identification Qualifier should match ref01");
+        assertEquals("ZZ", segment.getReferenceIdentificationQualifier().getCode(), "Reference Identification Qualifier should match ref01");
         assertEquals(referenceIdentification, segment.getReferenceIdentification(), "Reference Identification should match ref02");
     }
 
@@ -48,7 +48,7 @@ class SubscriberNumberTest {
                 .setRef02(referenceIdentification)
                 .build();
 
-        assertEquals(SubscriberNumber.DEFAULT_ENTITY_IDENTIFIER_CODE, segment.getRef01(),
+        assertEquals(SubscriberNumber.DEFAULT_ENTITY_IDENTIFIER_CODE, segment.getRef01().getCode(),
                 "Reference Identification Qualifier should be set to default value");
     }
 

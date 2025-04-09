@@ -35,10 +35,10 @@ class MemberPolicyNumberTest {
                 .setRef02(referenceIdentification)
                 .build();
 
-        assertEquals("ZZ", segment.getRef01(), "Reference Identification Qualifier should match ref01");
+        assertEquals("ZZ", segment.getRef01().getCode(), "Reference Identification Qualifier should match ref01");
         assertEquals(referenceIdentification, segment.getRef02(), "Reference Identification should match ref02");
 
-        assertEquals("ZZ", segment.getReferenceIdentificationQualifier(), "Reference Identification Qualifier should match ref01");
+        assertEquals("ZZ", segment.getReferenceIdentificationQualifier().getCode(), "Reference Identification Qualifier should match ref01");
         assertEquals(referenceIdentification, segment.getReferenceIdentification(), "Reference Identification should match ref02");
     }
 
@@ -48,7 +48,7 @@ class MemberPolicyNumberTest {
                 .setRef02(referenceIdentification)
                 .build();
 
-        assertEquals(MemberPolicyNumber.DEFAULT_ENTITY_IDENTIFIER_CODE, segment.getRef01(),
+        assertEquals(MemberPolicyNumber.DEFAULT_ENTITY_IDENTIFIER_CODE, segment.getRef01().getCode(),
                 "Reference Identification Qualifier should be set to default value");
     }
 
