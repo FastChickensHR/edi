@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.common.segments.DTPSegment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.segments.DTPSegment;
 import com.fastChickensHR.edi.x834.x834Context;
 import lombok.experimental.Accessors;
 
@@ -27,8 +27,10 @@ public class FileEffectiveDate extends DTPSegment {
     public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
 
         public Builder(x834Context context) {
-            super(context);
-            this.dtp01 = DEFAULT_DATE_TIME_QUALIFIER;
+            super();
+            this.setDtp01(DEFAULT_DATE_TIME_QUALIFIER);
+            this.setDtp02(context.getDateFormat());
+            this.dtp03 = context.getFormattedDocumentDate();
         }
 
         @Override

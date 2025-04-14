@@ -36,7 +36,7 @@ public class FileEffectiveDateTest {
      */
     @Test
     public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        String dateTimeQualifier = "1";
+        String dateTimeQualifier = "001";
         DateFormat dateTimeFormat = DateFormat.DATE;
         LocalDateTime dateTimePeriod = context.getDocumentDate();
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
@@ -45,7 +45,7 @@ public class FileEffectiveDateTest {
                 .setDtp03(dateTimePeriod)
                 .build();
 
-        assertEquals(dateTimeQualifier, segment.getDateTimeQualifier(), "DateTimeQualifier should match DTP01");
+        assertEquals(dateTimeQualifier, segment.getDateTimeQualifier().getCode(), "DateTimeQualifier should match DTP01");
     }
 
     /**
@@ -53,7 +53,7 @@ public class FileEffectiveDateTest {
      */
     @Test
     public void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        String dateTimeQualifier = "1";
+        String dateTimeQualifier = "001";
         DateFormat dateTimeFormat = DateFormat.DATE;
         LocalDateTime dateTimePeriod = context.getDocumentDate();
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
@@ -62,6 +62,6 @@ public class FileEffectiveDateTest {
                 .setDateTimePeriod(dateTimePeriod)
                 .build();
 
-        assertEquals(dateTimeQualifier, segment.getDtp01(), "DateTimeQualifier should match DTP01");
+        assertEquals(dateTimeQualifier, segment.getDtp01().getCode(), "DateTimeQualifier should match DTP01");
     }
 }

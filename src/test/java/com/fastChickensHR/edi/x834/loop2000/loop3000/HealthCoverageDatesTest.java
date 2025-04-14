@@ -29,8 +29,8 @@ class HealthCoverageDatesTest {
                 .build();
 
         assertEquals("DTP", dates.getSegmentIdentifier());
-        assertEquals("348", dates.getDtp01());
-        assertEquals("D8", dates.getDtp02());
+        assertEquals("348", dates.getDtp01().getCode());
+        assertEquals("D8", dates.getDtp02().getFormat());
         assertEquals("20250101", dates.getDtp03());
     }
 
@@ -42,8 +42,8 @@ class HealthCoverageDatesTest {
                 .setDtp03(LocalDateTime.of(2025,12,31,0, 0))
                 .build();
 
-        assertEquals("349", dates.getDtp01());
-        assertEquals("D8", dates.getDtp02());
+        assertEquals("349", dates.getDtp01().getCode());
+        assertEquals("D8", dates.getDtp02().getFormat());
         assertEquals("20251231", dates.getDtp03());
     }
 }
