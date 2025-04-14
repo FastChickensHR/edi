@@ -7,6 +7,8 @@
  */
 package com.fastChickensHR.edi.common.segments;
 
+import com.fastChickensHR.edi.common.data.EntityIdentifierCode;
+import com.fastChickensHR.edi.common.data.IdentificationCodeQualifier;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import lombok.Getter;
 
@@ -14,9 +16,9 @@ import lombok.Getter;
 public abstract class N1Segment extends Segment {
     public static final String SEGMENT_ID = "N1";
 
-    protected final String n101;
+    protected final EntityIdentifierCode n101;
     protected final String n102;
-    protected final String n103;
+    protected final IdentificationCodeQualifier n103;
     protected final String n104;
 
     protected N1Segment(AbstractBuilder<?> builder) throws ValidationException {
@@ -24,6 +26,20 @@ public abstract class N1Segment extends Segment {
         this.n102 = builder.n102;
         this.n103 = builder.n103;
         this.n104 = builder.n104;
+
+        validate();
+    }
+
+    private void validate() throws ValidationException {
+        if (n101 == null) {
+            throw new ValidationException("Entity Identifier Code (N101) is required");
+        }
+        if ((n102 == null || n102.isEmpty()) && n103 == null) {
+            throw new ValidationException("One of Plan Sponsor Name (N102) or Identification Code Qualifier (N103) are required");
+        }
+        if (n102 != null && n102.length() > 60) {
+            throw new ValidationException("Plan Sponsor Name (N102) must be 60 characters or less");
+        }
     }
 
     @Override
@@ -33,10 +49,10 @@ public abstract class N1Segment extends Segment {
 
     @Override
     public String[] getElementValues() {
-        return new String[]{n101, n102, n103, n104};
+        return new String[]{n101.getCode(), n102, n103.getCode(), n104};
     }
 
-    public String getEntityIdentifierCode() {
+    public EntityIdentifierCode getEntityIdentifierCode() {
         return getN101();
     }
 
@@ -44,7 +60,7 @@ public abstract class N1Segment extends Segment {
         return getN102();
     }
 
-    public String getIdentificationCodeQualifier() {
+    public IdentificationCodeQualifier getIdentificationCodeQualifier() {
         return getN103();
     }
 
@@ -53,9 +69,9 @@ public abstract class N1Segment extends Segment {
     }
 
     public abstract static class AbstractBuilder<T extends AbstractBuilder<T>> {
-        protected String n101;
+        protected EntityIdentifierCode n101;
         protected String n102;
-        protected String n103;
+        protected IdentificationCodeQualifier n103;
         protected String n104;
 
         protected abstract T self();
@@ -63,7 +79,7 @@ public abstract class N1Segment extends Segment {
         public abstract N1Segment build() throws ValidationException;
 
         public T setEntityIdentifierCode(String value) {
-            this.n101 = value;
+            this.n101 = EntityIdentifierCode.fromString(value);
             return self();
         }
 
@@ -73,7 +89,7 @@ public abstract class N1Segment extends Segment {
         }
 
         public T setIdentificationCodeQualifier(String value) {
-            this.n103 = value;
+            this.n103 = IdentificationCodeQualifier.fromString(value);
             return self();
         }
 

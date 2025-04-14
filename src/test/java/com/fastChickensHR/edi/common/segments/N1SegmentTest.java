@@ -14,9 +14,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class N1SegmentTest {
+    String entityCode = "01";
+    String qualifier = "PB";
 
     private static class TestN1Segment extends N1Segment {
-        public static final String TEST_ENTITY_CODE = "TEST";
 
         private TestN1Segment(AbstractBuilder<?> builder) throws ValidationException {
             super(builder);
@@ -37,15 +38,13 @@ class N1SegmentTest {
 
     @Test
     void testSegmentIdentifier() throws ValidationException {
-        TestN1Segment segment = new TestN1Segment.Builder().build();
+        TestN1Segment segment = new TestN1Segment.Builder().setN101(entityCode).setN102("fake name").build();
         assertEquals("N1", segment.getSegmentIdentifier(), "Segment ID should be N1");
     }
 
     @Test
     void testGetElementValues() throws ValidationException {
-        String entityCode = "ABC";
         String name = "Test Name";
-        String qualifier = "QR";
         String identifier = "123456";
 
         TestN1Segment segment = new TestN1Segment.Builder()
@@ -65,9 +64,7 @@ class N1SegmentTest {
 
     @Test
     void testDomainGetters() throws ValidationException {
-        String entityCode = "ABC";
         String name = "Test Name";
-        String qualifier = "QR";
         String identifier = "123456";
 
         TestN1Segment segment = new TestN1Segment.Builder()
@@ -77,17 +74,15 @@ class N1SegmentTest {
                 .setSponsorIdentifier(identifier)
                 .build();
 
-        assertEquals(entityCode, segment.getEntityIdentifierCode(), "getEntityIdentifierCode should return the correct value");
+        assertEquals(entityCode, segment.getEntityIdentifierCode().getCode(), "getEntityIdentifierCode should return the correct value");
         assertEquals(name, segment.getPlanSponsorName(), "getPlanSponsorName should return the correct value");
-        assertEquals(qualifier, segment.getIdentificationCodeQualifier(), "getIdentificationCodeQualifier should return the correct value");
+        assertEquals(qualifier, segment.getIdentificationCodeQualifier().getCode(), "getIdentificationCodeQualifier should return the correct value");
         assertEquals(identifier, segment.getSponsorIdentifier(), "getSponsorIdentifier should return the correct value");
     }
 
     @Test
     void testBuilderWithSpecNamesSetters() throws ValidationException {
-        String entityCode = "ABC";
         String name = "Test Name";
-        String qualifier = "QR";
         String identifier = "123456";
 
         TestN1Segment segment = new TestN1Segment.Builder()
@@ -97,17 +92,15 @@ class N1SegmentTest {
                 .setN104(identifier)
                 .build();
 
-        assertEquals(entityCode, segment.getN101(), "N101 should be set correctly");
+        assertEquals(entityCode, segment.getN101().getCode(), "N101 should be set correctly");
         assertEquals(name, segment.getN102(), "N102 should be set correctly");
-        assertEquals(qualifier, segment.getN103(), "N103 should be set correctly");
+        assertEquals(qualifier, segment.getN103().getCode(), "N103 should be set correctly");
         assertEquals(identifier, segment.getN104(), "N104 should be set correctly");
     }
 
     @Test
     void testBuilderWithDomainNameSetters() throws ValidationException {
-        String entityCode = "ABC";
         String name = "Test Name";
-        String qualifier = "QR";
         String identifier = "123456";
 
         TestN1Segment segment = new TestN1Segment.Builder()
@@ -117,22 +110,22 @@ class N1SegmentTest {
                 .setSponsorIdentifier(identifier)
                 .build();
 
-        assertEquals(entityCode, segment.getN101(), "N101 should be set correctly");
+        assertEquals(entityCode, segment.getN101().getCode(), "N101 should be set correctly");
         assertEquals(name, segment.getN102(), "N102 should be set correctly");
-        assertEquals(qualifier, segment.getN103(), "N103 should be set correctly");
+        assertEquals(qualifier, segment.getN103().getCode(), "N103 should be set correctly");
         assertEquals(identifier, segment.getN104(), "N104 should be set correctly");
     }
 
     @Test
     void testRender() throws ValidationException {
         TestN1Segment segment = new TestN1Segment.Builder()
-                .setEntityIdentifierCode("ABC")
+                .setEntityIdentifierCode(entityCode)
                 .setPlanSponsorName("Test Name")
-                .setIdentificationCodeQualifier("QR")
+                .setIdentificationCodeQualifier(qualifier)
                 .setSponsorIdentifier("123456")
                 .build();
 
         segment.setContext(new x834Context());
-        assertEquals("N1*ABC*Test Name*QR*123456~", segment.render().trim(), "Render should properly format the segment");
+        assertEquals("N1*01*Test Name*PB*123456~", segment.render().trim(), "Render should properly format the segment");
     }
 }
