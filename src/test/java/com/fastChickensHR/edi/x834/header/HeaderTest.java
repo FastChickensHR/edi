@@ -123,7 +123,6 @@ class HeaderTest {
         header.setMasterPolicyNumber("POL123456");
         header.setPlanSponsorName("FastChickensHR Corp");
         header.setPayerName("Insurance Co");
-        header.setPayerIdentification("PAYERID123");
         header.setGroupControlNumber("42");
         header.setTransactionSetIdentifierCode("834");
         header.setInterchangeControlNumber("4321");
@@ -145,9 +144,7 @@ class HeaderTest {
     @Test
     void testValidation() {
         Header header = new Header(context);
-        Exception exception = assertThrows(ValidationException.class, () -> {
-            header.validate();
-        });
+        Exception exception = assertThrows(ValidationException.class, header::validate);
 
         assertTrue(exception.getMessage().contains("required"));
     }

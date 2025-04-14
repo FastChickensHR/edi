@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop1000A;
 
-import com.fastChickensHR.edi.common.segments.N1Segment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.segments.N1Segment;
 import lombok.experimental.Accessors;
 
 public class SponsorName extends N1Segment {
@@ -26,8 +26,8 @@ public class SponsorName extends N1Segment {
     @Accessors(chain = true)
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
-            this.n101 = DEFAULT_ENTITY_IDENTIFIER_CODE;
-            this.n103 = DEFAULT_IDENTIFICATION_CODE_QUALIFIER;
+            this.setN101(DEFAULT_ENTITY_IDENTIFIER_CODE);
+            this.setN103(DEFAULT_IDENTIFICATION_CODE_QUALIFIER);
         }
 
         @Override

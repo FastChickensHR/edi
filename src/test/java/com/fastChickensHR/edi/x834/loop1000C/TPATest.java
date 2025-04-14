@@ -23,6 +23,7 @@ class TPATest {
     @Test
     public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
         TPA segment = new TPA.Builder()
+                .setN101(entityIdentifierCode)
                 .setN102(tpaName)
                 .setN103(identificationCodeQualifier)
                 .setN104(tpaIdentifier)
@@ -42,24 +43,24 @@ class TPATest {
                 .setN104(tpaIdentifier)
                 .build();
 
-        assertEquals(entityIdentifierCode, segment.getEntityIdentifierCode(), "Entity Identifier Code should match N101");
+        assertEquals(entityIdentifierCode, segment.getEntityIdentifierCode().getCode(), "Entity Identifier Code should match N101");
         assertEquals(tpaName, segment.getTPAName(), "TPA Name should match N102");
-        assertEquals(identificationCodeQualifier, segment.getIdentificationCodeQualifier(), "Identification Code Qualifier should match N103");
+        assertEquals(identificationCodeQualifier, segment.getIdentificationCodeQualifier().getCode(), "Identification Code Qualifier should match N103");
         assertEquals(tpaIdentifier, segment.getTPAIdentifier(), "TPA Identifier should match N104");
     }
 
     @Test
     public void testSettingSpecNamesGettingSpecNames() throws ValidationException {
         TPA segment = new TPA.Builder()
-                .setEntityIdentifierCode(entityIdentifierCode)
                 .setTPAName(tpaName)
+                .setEntityIdentifierCode(entityIdentifierCode)
                 .setIdentificationCodeQualifier(identificationCodeQualifier)
                 .setTPAIdentifier(tpaIdentifier)
                 .build();
 
-        assertEquals(entityIdentifierCode, segment.getN101(), "Entity Identifier Code should match N101");
+        assertEquals(entityIdentifierCode, segment.getN101().getCode(), "Entity Identifier Code should match N101");
         assertEquals(tpaName, segment.getN102(), "TPA Name should match N102");
-        assertEquals(identificationCodeQualifier, segment.getN103(), "Identification Code Qualifier should match N103");
+        assertEquals(identificationCodeQualifier, segment.getN103().getCode(), "Identification Code Qualifier should match N103");
         assertEquals(tpaIdentifier, segment.getN104(), "TPA Identifier should match N104");
     }
 }

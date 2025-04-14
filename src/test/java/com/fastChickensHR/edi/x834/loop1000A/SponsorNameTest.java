@@ -17,7 +17,7 @@ class SponsorNameTest {
     x834Context context = new x834Context();
     String entityIdentifierCode = "T3";
     String planSponsorName = "fake plan sponsor name";
-    String identificationCodeQualifier = "FLL";
+    String identificationCodeQualifier = "FL";
     String sponsorIdentifier = "FPO";
 
     @Test
@@ -41,9 +41,9 @@ class SponsorNameTest {
                 .setN104(sponsorIdentifier)
                 .build();
 
-        assertEquals(entityIdentifierCode, segment.getEntityIdentifierCode(), "Entity Identifier Code should match N101");
+        assertEquals(entityIdentifierCode, segment.getEntityIdentifierCode().getCode(), "Entity Identifier Code should match N101");
         assertEquals(planSponsorName, segment.getPlanSponsorName(), "Plan Sponsor Name should match N102");
-        assertEquals(identificationCodeQualifier, segment.getIdentificationCodeQualifier(), "Identification Code Qualifier should match N103");
+        assertEquals(identificationCodeQualifier, segment.getIdentificationCodeQualifier().getCode(), "Identification Code Qualifier should match N103");
         assertEquals(sponsorIdentifier, segment.getSponsorIdentifier(), "Sponsor Identifier should match N104");
     }
 
@@ -56,9 +56,9 @@ class SponsorNameTest {
                 .setSponsorIdentifier(sponsorIdentifier)
                 .build();
 
-        assertEquals(entityIdentifierCode, segment.getN101(), "Entity Identifier Code should match N101");
+        assertEquals(entityIdentifierCode, segment.getN101().getCode(), "Entity Identifier Code should match N101");
         assertEquals(planSponsorName, segment.getN102(), "Plan Sponsor Name should match N102");
-        assertEquals(identificationCodeQualifier, segment.getN103(), "Identification Code Qualifier should match N103");
+        assertEquals(identificationCodeQualifier, segment.getN103().getCode(), "Identification Code Qualifier should match N103");
         assertEquals(sponsorIdentifier, segment.getN104(), "Sponsor Identifier should match N104");
     }
 }

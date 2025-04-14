@@ -16,7 +16,6 @@ import lombok.experimental.Accessors;
 @Getter
 public class TPA extends N1Segment {
     public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "TP";
-    public static final String DEFAULT_IDENTIFICATION_CODE_QUALIFIER = "";
 
     private TPA(Builder builder) throws ValidationException {
         super(builder);
@@ -38,8 +37,7 @@ public class TPA extends N1Segment {
     @Accessors(chain = true)
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
-            this.n101 = DEFAULT_ENTITY_IDENTIFIER_CODE;
-            this.n103 = DEFAULT_IDENTIFICATION_CODE_QUALIFIER;
+            this.setN101(DEFAULT_ENTITY_IDENTIFIER_CODE);
         }
 
         public Builder setTPAName(String value) {

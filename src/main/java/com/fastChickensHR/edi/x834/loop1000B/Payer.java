@@ -26,8 +26,8 @@ public class Payer extends N1Segment {
     @Accessors(chain = true)
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
-            this.n101 = DEFAULT_ENTITY_IDENTIFIER_CODE;
-            this.n103 = DEFAULT_IDENTIFICATION_CODE_QUALIFIER;
+            this.setN101(DEFAULT_ENTITY_IDENTIFIER_CODE);
+            this.setN103(DEFAULT_IDENTIFICATION_CODE_QUALIFIER);
         }
 
         @Override
