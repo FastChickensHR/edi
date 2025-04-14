@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.loop3000;
 
-import com.fastChickensHR.edi.common.segments.DTPSegment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.common.segments.DTPSegment;
 import com.fastChickensHR.edi.x834.x834Context;
 import lombok.Getter;
 
@@ -30,13 +30,13 @@ public class HealthCoverageDates extends DTPSegment {
      * @throws ValidationException if validation fails
      */
     protected void validate() throws ValidationException {
-        if (dtp01 == null || dtp01.trim().isEmpty()) {
+        if (dtp01 == null) {
             throw new ValidationException("Date Time Qualifier (DTP01) is required for Health Coverage Dates");
         }
-        if (dtp02 == null || dtp02.trim().isEmpty()) {
+        if (dtp02 == null) {
             throw new ValidationException("Date Time Format (DTP02) is required for Health Coverage Dates");
         }
-        if (!dtp02.equals("D8") && !dtp02.equals("RD8")) {
+        if (!dtp02.getFormat().equals("D8") && !dtp02.getFormat().equals("RD8")) {
             throw new ValidationException("Health Coverage Dates must have a Date Time Format (DTP02) of D8 or RD8");
         }
         if (dtp03 == null || dtp03.trim().isEmpty()) {
@@ -50,11 +50,11 @@ public class HealthCoverageDates extends DTPSegment {
     public static class Builder extends AbstractBuilder<Builder> {
 
         public Builder(x834Context context) {
-            super(context);
+            super();
         }
 
         public Builder() {
-            super(null);
+            super();
         }
 
         @Override

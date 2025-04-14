@@ -61,7 +61,7 @@ class MemberLevelDatesTest {
                 .setDtp03(dateValue)
                 .build();
 
-        assertEquals(dateQualifierCode, dates.getDateTimeQualifier());
+        assertEquals(dateQualifierCode, dates.getDateTimeQualifier().getCode());
     }
 
     @Test
@@ -72,7 +72,7 @@ class MemberLevelDatesTest {
                 .setDateTimePeriod(dateValue)
                 .build();
 
-        assertEquals(dateQualifierCode, dates.getDtp01());
+        assertEquals(dateQualifierCode, dates.getDtp01().getCode());
     }
 
     @Test
@@ -82,8 +82,8 @@ class MemberLevelDatesTest {
                 .setDateTimePeriod(dateValue)
                 .build();
 
-        assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01());
-        assertEquals(MemberDateQualifier.BIRTH.toString(), dates.getDateTimeQualifier());
+        assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
+        assertEquals(MemberDateQualifier.BIRTH.toString(), dates.getDateTimeQualifier().getCode());
     }
 
     @Test
@@ -93,7 +93,7 @@ class MemberLevelDatesTest {
                 .setDtp03(dateValue)
                 .build();
 
-        assertEquals(MemberDateQualifier.COVERAGE_BEGIN.getCode(), dates.getDateTimeQualifier());
+        assertEquals(MemberDateQualifier.COVERAGE_BEGIN.getCode(), dates.getDateTimeQualifier().getCode());
     }
 
     @Test
@@ -111,14 +111,14 @@ class MemberLevelDatesTest {
 
     @Test
     void testValidationRequiresDtp01() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new MemberLevelDates.Builder(context)
                     .setDtp01("")  // Empty value
                     .setDtp03(dateValue)
                     .build();
         });
 
-        assertTrue(exception.getMessage().contains("dtp01"));
+        assertTrue(exception.getMessage().contains("Input cannot be null or empty"));
     }
 
     @Test
@@ -128,12 +128,11 @@ class MemberLevelDatesTest {
                 .setDtp03(dateValue)
                 .build();
 
-        assertEquals(DateFormat.DATE.getFormat(), dates.getDtp02());
+        assertEquals(DateFormat.DATE, dates.getDtp02());
     }
 
     @Test
     void testDifferentQualifiersWorkCorrectly() throws ValidationException {
-        // Test a few different qualifiers
         MemberDateQualifier[] qualifiers = {
                 MemberDateQualifier.EFFECTIVE,
                 MemberDateQualifier.HIRE,
@@ -147,8 +146,8 @@ class MemberLevelDatesTest {
                     .setDateTimePeriod(dateValue)
                     .build();
 
-            assertEquals(qualifier.getCode(), dates.getDtp01());
-            assertEquals(qualifier.toString(), dates.getDateTimeQualifier());
+            assertEquals(qualifier.getCode(), dates.getDtp01().getCode());
+            assertEquals(qualifier.toString(), dates.getDateTimeQualifier().getCode());
         }
     }
 
@@ -161,8 +160,8 @@ class MemberLevelDatesTest {
                 .setDateTimePeriod(LocalDateTime.of(2025,1,1,0, 0))
                 .build();
 
-        assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01());
-        assertEquals(DateFormat.DATE.getFormat(), dates.getDtp02());
+        assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
+        assertEquals(DateFormat.DATE, dates.getDtp02());
         assertEquals("20250101", dates.getDtp03());
     }
 }

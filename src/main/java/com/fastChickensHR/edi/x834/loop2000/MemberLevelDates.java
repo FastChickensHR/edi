@@ -7,10 +7,11 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.common.segments.DTPSegment;
+import com.fastChickensHR.edi.common.data.DateTimeQualifier;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.common.segments.DTPSegment;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
+import com.fastChickensHR.edi.x834.x834Context;
 
 /**
  * Represents a Member Level Date segment in the 834 EDI format.
@@ -24,7 +25,9 @@ public class MemberLevelDates extends DTPSegment {
 
     public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
         public Builder(x834Context context) {
-            super(context);
+            super();
+            setDtp02(context.getDateFormat());
+            setDtp03(context.getDocumentDate());
         }
 
         @Override
@@ -39,24 +42,12 @@ public class MemberLevelDates extends DTPSegment {
          * @return This builder instance for method chaining
          */
         public Builder setDateQualifier(MemberDateQualifier qualifier) {
-            this.dtp01 = qualifier.getCode();
+            this.dtp01 = DateTimeQualifier.fromString(qualifier.getCode());
             return this;
         }
 
         @Override
         public MemberLevelDates build() throws ValidationException {
-            if (dtp01 == null || dtp01.isEmpty()) {
-                throw new ValidationException("dtp01 (Date Time Qualifier) is required");
-            }
-
-            if (dtp02 == null || dtp02.isEmpty()) {
-                throw new ValidationException("dtp02 (Date Time Format Qualifier) is required");
-            }
-
-            if (dtp03 == null || dtp03.isEmpty()) {
-                throw new ValidationException("dtp03 (Date Time Period) is required");
-            }
-
             return new MemberLevelDates(this);
         }
     }
