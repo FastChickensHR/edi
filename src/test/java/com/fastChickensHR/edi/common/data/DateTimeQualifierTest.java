@@ -23,7 +23,7 @@ class DateTimeQualifierTest {
     void testEnumValues() {
         DateTimeQualifier[] values = DateTimeQualifier.values();
 
-        assertEquals(100, values.length, "DateTimeQualifier should have values");
+        assertEquals(398, values.length, "DateTimeQualifier should have values");
 
         assertTrue(Arrays.stream(values).anyMatch(v -> v == DateTimeQualifier.INVOICE));
         assertTrue(Arrays.stream(values).anyMatch(v -> v == DateTimeQualifier.PURCHASE_ORDER));
@@ -54,17 +54,14 @@ class DateTimeQualifierTest {
 
     @Test
     void testFromString() {
-        // Direct code lookups
         assertEquals(DateTimeQualifier.INVOICE, DateTimeQualifier.fromString("003"));
         assertEquals(DateTimeQualifier.SHIPPED, DateTimeQualifier.fromString("011"));
         assertEquals(DateTimeQualifier.DELIVERED, DateTimeQualifier.fromString("035"));
 
-        // Name-based lookups
         assertEquals(DateTimeQualifier.INVOICE, DateTimeQualifier.fromString("INVOICE"));
         assertEquals(DateTimeQualifier.SHIPPED, DateTimeQualifier.fromString("SHIPPED"));
         assertEquals(DateTimeQualifier.DELIVERED, DateTimeQualifier.fromString("DELIVERED"));
 
-        // Should throw for invalid inputs
         assertThrows(IllegalArgumentException.class, () -> DateTimeQualifier.fromString("xyz"));
         assertThrows(IllegalArgumentException.class, () -> DateTimeQualifier.fromString(""));
         assertThrows(IllegalArgumentException.class, () -> DateTimeQualifier.fromString(null));
