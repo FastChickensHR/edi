@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
  * benefit status code, and other member-specific information.
  */
 @Getter
-public abstract class MemberLevelDetail extends Segment {
+public abstract class INSSegment extends Segment {
     public static final String SEGMENT_ID = "INS";
 
     private final MemberIndicator ins01;
@@ -37,7 +37,7 @@ public abstract class MemberLevelDetail extends Segment {
     private final String ins11; // Death Date
     private final ConfidentialityCode ins12;
 
-    protected MemberLevelDetail(Builder builder) throws ValidationException {
+    protected INSSegment(Builder builder) throws ValidationException {
         this.ins01 = builder.ins01;
         this.ins02 = builder.ins02;
         this.ins03 = builder.ins03;
@@ -294,14 +294,14 @@ public abstract class MemberLevelDetail extends Segment {
         /**
          * Builds a new MemberLevelDetail instance
          */
-        public MemberLevelDetail build() throws ValidationException {
-            return new MemberLevelDetailImpl(this);
+        public INSSegment build() throws ValidationException {
+            return new INSSegmentImpl(this);
         }
     }
 
     // Concrete implementation class that can be instantiated
-    private static class MemberLevelDetailImpl extends MemberLevelDetail {
-        private MemberLevelDetailImpl(Builder builder) throws ValidationException {
+    private static class INSSegmentImpl extends INSSegment {
+        private INSSegmentImpl(Builder builder) throws ValidationException {
             super(builder);
         }
     }

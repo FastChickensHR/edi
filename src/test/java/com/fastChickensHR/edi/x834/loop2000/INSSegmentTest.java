@@ -16,14 +16,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberLevelDetailTest {
+class INSSegmentTest {
     String maintenanceReasonCode = MaintenanceReasonCode.ACTIVE.toString();
     String employmentStatusCode = EmploymentStatusCode.FULL_TIME.toString();
     String confidentialityCode = ConfidentialityCode.LOW.toString();
     @Test
     void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
         x834Context context = new x834Context();
-        MemberLevelDetail segment = new MemberLevelDetail.Builder()
+        INSSegment segment = new INSSegment.Builder()
                 .setMemberIndicator("Y")
                 .setIndividualRelationshipCode("18")
                 .setMaintenanceTypeCode("001")
@@ -46,7 +46,7 @@ class MemberLevelDetailTest {
 
     @Test
     void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        MemberLevelDetail segment = new MemberLevelDetail.Builder()
+        INSSegment segment = new INSSegment.Builder()
                 .setIns01("Y")
                 .setIns02("18")
                 .setIns03("001")
@@ -77,7 +77,7 @@ class MemberLevelDetailTest {
 
     @Test
     void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        MemberLevelDetail segment = new MemberLevelDetail.Builder()
+        INSSegment segment = new INSSegment.Builder()
                 .setMemberIndicator("Y")
                 .setIndividualRelationshipCode("18")
                 .setMaintenanceTypeCode("001")
