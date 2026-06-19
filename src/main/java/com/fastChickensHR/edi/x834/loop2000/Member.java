@@ -63,13 +63,13 @@ public class Member extends BaseMember {
      */
     public List<Segment> generateSegments() throws ValidationException {
         List<Segment> segments = new ArrayList<>();
-        MemberLevelDetail memberLevelDetail = new MemberLevelDetail.Builder()
+        INSSegment INSSegment = new INSSegment.Builder()
                 .setMaintenanceTypeCode(maintenanceTypeCode.getCode())
                 .setIndividualRelationshipCode(relationshipCode.getCode())
                 .setBenefitStatusCode(BenefitStatusCode.ACTIVE.getCode())
                 .setMemberIndicator(memberIndicator.getCode())
                 .build();
-        segments.add(memberLevelDetail);
+        segments.add(INSSegment);
 
         if (policyNumber != null && !policyNumber.isEmpty()) {
             MemberPolicyNumber policyNumberSegment = new MemberPolicyNumber.Builder()
