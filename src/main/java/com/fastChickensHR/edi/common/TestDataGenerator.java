@@ -11,7 +11,7 @@ import com.fastChickensHR.edi.domain.Address;
 import com.fastChickensHR.edi.domain.Coverage;
 import com.fastChickensHR.edi.domain.Dependent;
 import com.fastChickensHR.edi.domain.Person;
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -58,7 +58,7 @@ public class TestDataGenerator {
 
         // Set demographics
         person.setFirstName(faker.name().firstName());
-        person.setMiddleName(faker.random().nextBoolean() ? faker.name().firstName() : null);
+        person.setMiddleName(random.nextBoolean() ? faker.name().firstName() : null);
         person.setLastName(faker.name().lastName());
         person.setBirthDate(
                 faker.date().birthday(18, 65).toInstant()
@@ -70,7 +70,7 @@ public class TestDataGenerator {
         // Set contact information
         Address address = new Address();
         address.setAddressLine1(faker.address().streetAddress());
-        address.setAddressLine2(faker.random().nextBoolean() ? faker.address().secondaryAddress() : null);
+        address.setAddressLine2(random.nextBoolean() ? faker.address().secondaryAddress() : null);
         address.setCity(faker.address().city());
         address.setState(faker.address().stateAbbr());
         address.setZipCode(faker.address().zipCode());
