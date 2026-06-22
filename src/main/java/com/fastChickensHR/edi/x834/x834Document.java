@@ -11,6 +11,7 @@ import com.fastChickensHR.edi.common.segments.Segment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
+import com.fastChickensHR.edi.x834.loop2000.X834MemberWriter;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
 import lombok.Getter;
 
@@ -86,8 +87,9 @@ public class x834Document {
             }
         }
 
+        X834MemberWriter memberWriter = new X834MemberWriter(context);
         for (Member member : members) {
-            List<Segment> memberSegments = member.generateSegments();
+            List<Segment> memberSegments = memberWriter.toSegments(member);
             for (Segment segment : memberSegments) {
                 segment.setContext(context);
                 document.append(segment.render());

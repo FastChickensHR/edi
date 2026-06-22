@@ -103,7 +103,7 @@ public class StateOfMichigan834 {
      * @return An EDI Member object
      */
     private static Member createMemberFromPerson(Person person, x834Context context) {
-        Member member = new Member(context);
+        Member member = new Member();
 
         member.setMemberId(person.getEmployeeId());
         member.setRelationshipCode(IndividualRelationshipCode.SELF);
@@ -150,7 +150,7 @@ public class StateOfMichigan834 {
      * @return An EDI Member object
      */
     private static DependentMember mapDependentToDependentMember(Dependent dependent, Person primary, x834Context context) {
-        DependentMember member = new DependentMember(context);
+        DependentMember member = new DependentMember();
 
         member.setMemberId(primary.getEmployeeId() + "-D");
         member.setMemberIdQualifier("34");

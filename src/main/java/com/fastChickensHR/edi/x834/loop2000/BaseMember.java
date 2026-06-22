@@ -7,9 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.common.segments.Segment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
@@ -17,16 +15,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
- * Base class for both primary members and dependents.
+ * Base domain class for both primary members and dependents.
+ * <p>
+ * This is a plain data object describing a person. It is intentionally
+ * decoupled from any specific EDI transaction format; serialization to
+ * the X12 834 wire format is the responsibility of a dedicated writer
+ * (see {@link X834MemberWriter}).
  */
 @Getter
 @Setter
 public abstract class BaseMember {
-    protected final x834Context context;
-
     protected String memberId;
     protected String memberIdQualifier;
     protected String subscriberNumber;
@@ -51,29 +51,9 @@ public abstract class BaseMember {
     protected String email;
 
     /**
-     * Constructor for BaseMember
-     *
-     * @param context The 834 context to use for this member
-     * @throws IllegalArgumentException if context is null
-     */
-    protected BaseMember(x834Context context) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context cannot be null");
-        }
-        this.context = context;
-    }
-
-    /**
-     * Validates this member has the minimum required fields
+     * Validates this member has the minimum required fields.
      *
      * @throws ValidationException If validation fails
      */
     public abstract void validate() throws ValidationException;
-
-    /**
-     * Generates all the segments for this member
-     *
-     * @return List of segments in the correct order
-     */
-    public abstract List<Segment> generateSegments() throws ValidationException;
 }
