@@ -5,9 +5,10 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.testdata;
+package com.fastChickensHR.edi.fakeData;
 
 import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.enrollment.SubscriberEnrollment;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
@@ -118,7 +119,7 @@ public final class DocumentGenerator {
                     mg.withChildren(kids);
                 }
             }
-            GeneratedEmployee emp = mg.buildEmployee();
+            SubscriberEnrollment emp = mg.buildEmployee();
             builder.addMember(emp.member());
             for (HealthCoverage hd : emp.coverages()) {
                 builder.addSegment(hd);

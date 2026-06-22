@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.testdata;
+package com.fastChickensHR.edi.fakeData;
 
 import net.datafaker.Faker;
 

@@ -5,8 +5,9 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.testdata;
+package com.fastChickensHR.edi.fakeData;
 
+import com.fastChickensHR.edi.x834.enrollment.SubscriberEnrollment;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;
 import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.data.CoverageLevelCode;
@@ -119,7 +120,7 @@ class TestDataFakerTest {
     void buildEmployeeProducesDefaultHealthDentalVision() throws Exception {
         TestDataFaker faker = TestDataFaker.withSeed(SEED);
         x834Context ctx = faker.context().build();
-        GeneratedEmployee emp = faker.member(ctx).withSpouse().withChildren(2).buildEmployee();
+        SubscriberEnrollment emp = faker.member(ctx).withSpouse().withChildren(2).buildEmployee();
 
         assertEquals(3, emp.coverages().size());
         assertEquals("HLT", emp.coverages().get(0).getInsuranceLineCode());

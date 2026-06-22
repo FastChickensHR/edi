@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.testdata;
+package com.fastChickensHR.edi.fakeData;
 
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.BaseMember;
@@ -17,6 +17,7 @@ import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.InsuranceLineCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.enrollment.SubscriberEnrollment;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 import com.fastChickensHR.edi.x834.x834Context;
 import net.datafaker.Faker;
@@ -95,7 +96,7 @@ public final class MemberGenerator {
      * {@link HealthCoverage} segments (Health/Dental/Vision by default, or
      * the lines configured with {@link #withCoverageLines(InsuranceLineCode...)}).
      */
-    public GeneratedEmployee buildEmployee() throws ValidationException {
+    public SubscriberEnrollment buildEmployee() throws ValidationException {
         Member member = build();
         List<InsuranceLineCode> lines = coverageLines != null
                 ? coverageLines
@@ -110,7 +111,7 @@ public final class MemberGenerator {
                     .withCoverageLevel(level)
                     .build());
         }
-        return new GeneratedEmployee(member, coverages);
+        return new SubscriberEnrollment(member, coverages);
     }
 
     private CoverageLevelCode deriveCoverageLevel(Member member) {

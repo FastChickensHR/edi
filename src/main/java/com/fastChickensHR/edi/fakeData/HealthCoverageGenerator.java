@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.testdata;
+package com.fastChickensHR.edi.fakeData;
 
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.CoverageLevelCode;
