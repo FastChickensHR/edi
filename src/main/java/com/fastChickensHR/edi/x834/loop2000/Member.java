@@ -7,11 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.common.segments.Segment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
-import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
-import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,26 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a member (employee/participant/person) in an 834 file.
- * May be a primary member (subscriber) or dependent.
+ * Represents a member (employee/participant/person).
+ * May be a primary member (subscriber) carrying zero or more dependents.
+ * <p>
+ * This is a pure domain object — it carries no knowledge of the X12 834
+ * wire format. Translation to 834 segments is performed by
+ * {@link X834MemberWriter}.
  */
 @Getter
 @Setter
 public class Member extends BaseMember {
     private final List<DependentMember> dependents = new ArrayList<>();
 
-    /**
-     * Creates a new Member with the specified context
-     *
-     * @param context The 834 context to use for this member
-     * @throws IllegalArgumentException if context is null
-     */
-    public Member(x834Context context) {
-        super(context);
+    public Member() {
+        // No-arg constructor; the X12 834 context is no longer a concern of the domain model.
     }
 
     /**
-     * Adds a dependent to this member
+     * Adds a dependent to this member.
      *
      * @param dependent The dependent member
      */
@@ -47,77 +41,12 @@ public class Member extends BaseMember {
     }
 
     /**
-     * Validates this member has the minimum required fields
+     * Validates this member has the minimum required fields.
      *
      * @throws ValidationException If validation fails
      */
     @Override
     public void validate() throws ValidationException {
         // Implementation omitted for shortness
-    }
-
-    /**
-     * Generates all the segments for this member and its dependents
-     *
-     * @return List of segments in the correct order
-     */
-    public List<Segment> generateSegments() throws ValidationException {
-        List<Segment> segments = new ArrayList<>();
-        INSSegment INSSegment = new INSSegment.Builder()
-                .setMaintenanceTypeCode(maintenanceTypeCode.getCode())
-                .setIndividualRelationshipCode(relationshipCode.getCode())
-                .setBenefitStatusCode(BenefitStatusCode.ACTIVE.getCode())
-                .setMemberIndicator(memberIndicator.getCode())
-                .build();
-        segments.add(INSSegment);
-
-        if (policyNumber != null && !policyNumber.isEmpty()) {
-            MemberPolicyNumber policyNumberSegment = new MemberPolicyNumber.Builder()
-                    .setReferenceIdentification(policyNumber)
-                    .build();
-            segments.add(policyNumberSegment);
-        }
-
-        if (memberId != null && !memberId.isEmpty()) {
-            MemberIdentificationNumber idNumberSegment = new MemberIdentificationNumber.Builder()
-                    .setReferenceIdentification(memberId)
-                    .setReferenceIdentificationQualifier(memberIdQualifier)
-                    .build();
-            segments.add(idNumberSegment);
-        }
-
-        if (subscriberNumber != null && !subscriberNumber.isEmpty()) {
-            SubscriberNumber subscriberNumberSegment = new SubscriberNumber.Builder()
-                    .setReferenceIdentification(subscriberNumber)
-                    .build();
-            segments.add(subscriberNumberSegment);
-        }
-
-        if (enrollmentDate != null || coverageStartDate != null || coverageEndDate != null) {
-            MemberLevelDates.Builder datesBuilder = new MemberLevelDates.Builder(context);
-
-            if (enrollmentDate != null) {
-                datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_BEGIN);
-                datesBuilder.setDateTimePeriod(enrollmentDate);
-            }
-
-            if (coverageStartDate != null) {
-                datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_BEGIN);
-                datesBuilder.setDateTimePeriod(coverageStartDate);
-            }
-
-            if (coverageEndDate != null) {
-                datesBuilder.setDateQualifier(MemberDateQualifier.COVERAGE_END);
-                datesBuilder.setDateTimePeriod(coverageEndDate);
-            }
-
-            segments.add(datesBuilder.build());
-        }
-
-        for (DependentMember dependent : dependents) {
-            segments.addAll(dependent.generateSegments());
-        }
-
-        return segments;
     }
 }

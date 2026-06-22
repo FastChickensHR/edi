@@ -127,7 +127,7 @@ public final class MemberGenerator {
 
     /** Builds a new subscriber {@link Member}. */
     public Member build() {
-        Member member = new Member(context);
+        Member member = new Member();
         GenderCode gender = forcedGender != null ? forcedGender : randomAdultGender();
         populateCommon(member, gender, adultBirthDate());
         member.setRelationshipCode(IndividualRelationshipCode.EMPLOYEE);
@@ -135,7 +135,7 @@ public final class MemberGenerator {
         member.setPolicyNumber(faker.bothify("POL-#####"));
 
         if (withSpouse) {
-            DependentMember spouse = new DependentMember(context);
+            DependentMember spouse = new DependentMember();
             GenderCode spouseGender =
                     gender == GenderCode.MALE ? GenderCode.FEMALE : GenderCode.MALE;
             populateCommon(spouse, spouseGender, adultBirthDate());
@@ -151,7 +151,7 @@ public final class MemberGenerator {
         }
 
         for (int i = 0; i < childCount; i++) {
-            DependentMember child = new DependentMember(context);
+            DependentMember child = new DependentMember();
             populateCommon(child, randomAnyGender(), childBirthDate());
             child.setRelationshipCode(IndividualRelationshipCode.CHILD);
             child.setLastName(member.getLastName());

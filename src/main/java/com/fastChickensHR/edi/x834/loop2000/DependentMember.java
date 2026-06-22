@@ -7,32 +7,24 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.common.segments.Segment;
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Represents a dependent in an 834 file.
+ * Represents a dependent in a benefit enrollment.
  * Cannot have dependents of its own.
+ * <p>
+ * Pure domain object; X12 834 serialization is handled by
+ * {@link X834MemberWriter}.
  */
 @Setter
 @Getter
 public class DependentMember extends BaseMember {
     private Member primaryMember;
 
-    /**
-     * Creates a new DependentMember with the specified context
-     *
-     * @param context The 834 context to use for this dependent member
-     * @throws IllegalArgumentException if context is null
-     */
-    public DependentMember(x834Context context) {
-        super(context);
+    public DependentMember() {
+        // No-arg constructor; the X12 834 context is no longer a concern of the domain model.
     }
 
     @Override
@@ -40,15 +32,5 @@ public class DependentMember extends BaseMember {
         if (relationshipCode == null) {
             throw new ValidationException("Dependent must have a relationship code");
         }
-    }
-
-    @Override
-    public List<Segment> generateSegments() throws ValidationException {
-
-        // Generate dependent-specific segments
-        // This might be similar to Member's segment generation but with
-        // dependent-specific segment identifiers
-
-        return new ArrayList<>();
     }
 }
