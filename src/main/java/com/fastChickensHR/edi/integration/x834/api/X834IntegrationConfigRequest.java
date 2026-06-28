@@ -7,13 +7,10 @@
  */
 package com.fastChickensHR.edi.integration.x834.api;
 
-import java.time.LocalDateTime;
-
 /**
  * Request body for creating or replacing an X12 834 integration configuration.
  *
- * <p>{@code elementSeparator}, {@code memberIndicator}, and {@code maintenanceTypeCode}
- * are flat enum names, e.g. {@code "PIPE"}, {@code "INSURED"}, {@code "ADDITION"}.</p>
+ * <p>{@code elementSeparator} is a flat enum name, e.g. {@code "PIPE"}.</p>
  */
 public record X834IntegrationConfigRequest(
         String senderID,
@@ -21,11 +18,6 @@ public record X834IntegrationConfigRequest(
         String elementSeparator,
         String policyNumber,
         String memberIdQualifier,
-        String memberIndicator,
-        String maintenanceTypeCode,
-        LocalDateTime enrollmentDate,
-        LocalDateTime coverageStartDate,
-        LocalDateTime coverageEndDate,
         String referenceIdentification,
         String masterPolicyNumber,
         String planSponsorName,

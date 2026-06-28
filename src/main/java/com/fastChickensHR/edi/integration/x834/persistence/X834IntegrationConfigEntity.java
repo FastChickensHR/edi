@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -73,23 +72,6 @@ public class X834IntegrationConfigEntity {
 
     @Column(name = "member_id_qualifier", nullable = false)
     private String memberIdQualifier;
-
-    /** Stored as enum name, e.g. {@code "INSURED"}. */
-    @Column(name = "member_indicator", nullable = false)
-    private String memberIndicator;
-
-    /** Stored as enum name, e.g. {@code "ADDITION"}. */
-    @Column(name = "maintenance_type_code", nullable = false)
-    private String maintenanceTypeCode;
-
-    @Column(name = "enrollment_date", nullable = false)
-    private LocalDateTime enrollmentDate;
-
-    @Column(name = "coverage_start_date", nullable = false)
-    private LocalDateTime coverageStartDate;
-
-    @Column(name = "coverage_end_date")
-    private LocalDateTime coverageEndDate;
 
     // --- Header ---
 
