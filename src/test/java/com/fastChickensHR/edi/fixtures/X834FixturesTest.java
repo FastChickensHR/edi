@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.fakeData;
+package com.fastChickensHR.edi.fixtures;
 
 import com.fastChickensHR.edi.x834.enrollment.SubscriberEnrollment;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;
@@ -20,13 +20,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestDataFakerTest {
+class X834FixturesTest {
 
     private static final long SEED = 42L;
 
     @Test
     void contextIsFullyPopulated() {
-        x834Context ctx = TestDataFaker.withSeed(SEED).context().build();
+        x834Context ctx = X834Fixtures.seeded(SEED).context().build();
 
         assertNotNull(ctx.getSenderID());
         assertNotNull(ctx.getReceiverID());
@@ -40,9 +40,9 @@ class TestDataFakerTest {
 
     @Test
     void memberIsFullyPopulatedWithFamily() {
-        TestDataFaker faker = TestDataFaker.withSeed(SEED);
-        x834Context ctx = faker.context().build();
-        Member subscriber = faker.member(ctx).withSpouse().withChildren(2).build();
+        X834Fixtures fixtures = X834Fixtures.seeded(SEED);
+        x834Context ctx = fixtures.context().build();
+        Member subscriber = fixtures.member(ctx).withSpouse().withChildren(2).build();
 
         assertNotNull(subscriber.getFirstName());
         assertNotNull(subscriber.getLastName());
@@ -76,8 +76,8 @@ class TestDataFakerTest {
 
     @Test
     void sameSeedProducesIdenticalData() {
-        TestDataFaker a = TestDataFaker.withSeed(SEED);
-        TestDataFaker b = TestDataFaker.withSeed(SEED);
+        X834Fixtures a = X834Fixtures.seeded(SEED);
+        X834Fixtures b = X834Fixtures.seeded(SEED);
 
         x834Context ctxA = a.context().build();
         x834Context ctxB = b.context().build();
@@ -96,16 +96,16 @@ class TestDataFakerTest {
 
     @Test
     void differentSeedsProduceDifferentData() {
-        Member m1 = TestDataFaker.withSeed(1L)
-                .member(TestDataFaker.withSeed(1L).context().build()).build();
-        Member m2 = TestDataFaker.withSeed(2L)
-                .member(TestDataFaker.withSeed(2L).context().build()).build();
+        Member m1 = X834Fixtures.seeded(1L)
+                .member(X834Fixtures.seeded(1L).context().build()).build();
+        Member m2 = X834Fixtures.seeded(2L)
+                .member(X834Fixtures.seeded(2L).context().build()).build();
         assertNotEquals(m1.getEmail(), m2.getEmail());
     }
 
     @Test
     void coverageGeneratorProducesValidHdSegment() throws Exception {
-        HealthCoverage hd = TestDataFaker.withSeed(SEED).coverage()
+        HealthCoverage hd = X834Fixtures.seeded(SEED).coverage()
                 .withInsuranceLine(InsuranceLineCode.HEALTH)
                 .withCoverageLevel(CoverageLevelCode.FAMILY)
                 .build();
@@ -117,10 +117,10 @@ class TestDataFakerTest {
     }
 
     @Test
-    void buildEmployeeProducesDefaultHealthDentalVision() throws Exception {
-        TestDataFaker faker = TestDataFaker.withSeed(SEED);
-        x834Context ctx = faker.context().build();
-        SubscriberEnrollment emp = faker.member(ctx).withSpouse().withChildren(2).buildEmployee();
+    void buildWithCoverageProducesDefaultHealthDentalVision() throws Exception {
+        X834Fixtures fixtures = X834Fixtures.seeded(SEED);
+        x834Context ctx = fixtures.context().build();
+        SubscriberEnrollment emp = fixtures.member(ctx).withSpouse().withChildren(2).buildWithCoverage();
 
         assertEquals(3, emp.coverages().size());
         assertEquals("HLT", emp.coverages().get(0).getInsuranceLineCode());
@@ -134,7 +134,7 @@ class TestDataFakerTest {
 
     @Test
     void documentWith100EmployeesBuildsAndRenders() throws Exception {
-        x834Document doc = TestDataFaker.withSeed(SEED)
+        x834Document doc = X834Fixtures.seeded(SEED)
                 .document()
                 .withEmployees(100)
                 .build();

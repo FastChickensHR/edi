@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.fakeData;
+package com.fastChickensHR.edi.fixtures;
 
 import com.fastChickensHR.edi.x834.x834Context;
 import net.datafaker.Faker;
@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * Fluent builder that produces a fully populated {@link x834Context} using fake data.
+ * Fluent generator that produces a fully populated {@link x834Context} using realistic data.
  * <p>
  * Every field on the context will be set to a realistic-looking value. Callers may
  * override individual fields via the {@code with*} methods.
  */
-public final class x834ContextGenerator {
+public final class X834ContextGenerator {
 
     private final Faker faker;
 
@@ -29,36 +29,36 @@ public final class x834ContextGenerator {
     private String groupControlNumber;
     private LocalDateTime documentDate;
 
-    x834ContextGenerator(TestDataFaker parent) {
+    X834ContextGenerator(X834Fixtures parent) {
         this.faker = parent.faker();
     }
 
-    public x834ContextGenerator withSenderId(String senderId) {
+    public X834ContextGenerator withSenderId(String senderId) {
         this.senderId = senderId;
         return this;
     }
 
-    public x834ContextGenerator withReceiverId(String receiverId) {
+    public X834ContextGenerator withReceiverId(String receiverId) {
         this.receiverId = receiverId;
         return this;
     }
 
-    public x834ContextGenerator withTransactionSetControlNumber(String value) {
+    public X834ContextGenerator withTransactionSetControlNumber(String value) {
         this.transactionSetControlNumber = value;
         return this;
     }
 
-    public x834ContextGenerator withGroupControlNumber(String value) {
+    public X834ContextGenerator withGroupControlNumber(String value) {
         this.groupControlNumber = value;
         return this;
     }
 
-    public x834ContextGenerator withDocumentDate(LocalDateTime documentDate) {
+    public X834ContextGenerator withDocumentDate(LocalDateTime documentDate) {
         this.documentDate = documentDate;
         return this;
     }
 
-    /** Builds a fresh {@link x834Context} populated with fake data. */
+    /** Builds a fresh {@link x834Context} populated with realistic data. */
     public x834Context build() {
         x834Context ctx = new x834Context();
         ctx.setSenderID(senderId != null ? senderId : pad(faker.company().name(), 15));
