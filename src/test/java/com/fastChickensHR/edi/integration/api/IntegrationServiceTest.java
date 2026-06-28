@@ -111,18 +111,21 @@ class IntegrationServiceTest {
     }
 
     @Test
-    void update_appendsNewRowAndReturnsItWhenFound() {
+    void update_closesSysThenInsertsNewRowAndReturnsItWhenFound() {
         IntegrationRequest request = sampleRequest();
         IntegrationEntity current = new IntegrationEntity();
         IntegrationEntity updated = new IntegrationEntity();
         when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.of(current));
         when(mapper.toNewEntity(INTEGRATION_ID, request)).thenReturn(updated);
+        when(repository.save(current)).thenReturn(current);
         when(repository.save(updated)).thenReturn(updated);
 
         Optional<IntegrationEntity> result = service.update(INTEGRATION_ID, request);
 
         assertTrue(result.isPresent());
         assertSame(updated, result.get());
+        verify(mapper).closeSysTo(current);
+        verify(repository).save(current);
         verify(repository).save(updated);
     }
 
@@ -136,13 +139,12 @@ class IntegrationServiceTest {
     }
 
     @Test
-    void delete_savesTombstoneRowAndReturnsTrueWhenFound() {
+    void delete_closesValidToAndReturnsTrueWhenFound() {
         IntegrationEntity current = new IntegrationEntity();
-        IntegrationEntity tombstone = new IntegrationEntity();
         when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.of(current));
-        when(mapper.toTombstoneEntity(INTEGRATION_ID, current)).thenReturn(tombstone);
 
         assertTrue(service.delete(INTEGRATION_ID));
-        verify(repository).save(tombstone);
+        verify(mapper).closeValidTo(current);
+        verify(repository).save(current);
     }
 }

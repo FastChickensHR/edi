@@ -32,7 +32,6 @@ class IntegrationMapperTest {
         IntegrationEntity entity = mapper.toNewEntity(INTEGRATION_ID, request);
 
         assertEquals(INTEGRATION_ID, entity.getIntegrationId());
-        assertFalse(entity.isDeleted());
         assertEquals("State of Michigan 834", entity.getName());
         assertEquals(OWNER_ID, entity.getOwnerId());
         assertEquals("INTERNAL", entity.getFromSystemType());
@@ -40,7 +39,10 @@ class IntegrationMapperTest {
         assertEquals("EXTERNAL", entity.getToSystemType());
         assertEquals("STATE_OF_MICHIGAN", entity.getToSystemValue());
         assertEquals("X12_834", entity.getFormat());
-        assertNotNull(entity.getCreatedAt());
+        assertNotNull(entity.getSysFrom());
+        assertEquals(IntegrationEntity.TEMPORAL_INFINITY, entity.getSysTo());
+        assertNotNull(entity.getValidFrom());
+        assertEquals(IntegrationEntity.TEMPORAL_INFINITY, entity.getValidTo());
     }
 
     @Test
@@ -72,35 +74,19 @@ class IntegrationMapperTest {
         assertThrows(IllegalArgumentException.class, () -> mapper.toNewEntity(INTEGRATION_ID, request));
     }
 
-    // --- toTombstoneEntity ---
+    // --- closeValidTo (delete) ---
 
     @Test
-    void toTombstoneEntity_copiesAllFieldsAndSetsDeleted() {
+    void closeValidTo_setsValidToToNowAndLeavesOtherFieldsUnchanged() {
         IntegrationEntity current = buildEntity();
+        Instant before = Instant.now();
 
-        IntegrationEntity tombstone = mapper.toTombstoneEntity(INTEGRATION_ID, current);
+        mapper.closeValidTo(current);
 
-        assertTrue(tombstone.isDeleted());
-        assertEquals(INTEGRATION_ID, tombstone.getIntegrationId());
-        assertEquals(current.getName(), tombstone.getName());
-        assertEquals(current.getOwnerId(), tombstone.getOwnerId());
-        assertEquals(current.getFromSystemType(), tombstone.getFromSystemType());
-        assertEquals(current.getFromSystemValue(), tombstone.getFromSystemValue());
-        assertEquals(current.getToSystemType(), tombstone.getToSystemType());
-        assertEquals(current.getToSystemValue(), tombstone.getToSystemValue());
-        assertEquals(current.getFormat(), tombstone.getFormat());
-        assertNotNull(tombstone.getCreatedAt());
-    }
-
-    @Test
-    void toTombstoneEntity_doesNotReuseRowId() {
-        IntegrationEntity current = buildEntity();
-        current.setIntegrationId(INTEGRATION_ID);
-
-        IntegrationEntity tombstone = mapper.toTombstoneEntity(INTEGRATION_ID, current);
-
-        // rowId is null until JPA assigns it — tombstone must be a distinct row
-        assertNull(tombstone.getRowId());
+        assertFalse(current.getValidTo().isBefore(before));
+        assertTrue(current.getValidTo().isBefore(Instant.now().plusSeconds(1)));
+        assertEquals(INTEGRATION_ID, current.getIntegrationId());
+        assertEquals("Test Integration", current.getName());
     }
 
     // --- toResponse ---
@@ -118,7 +104,7 @@ class IntegrationMapperTest {
         assertEquals("STATE_OF_MICHIGAN", response.toSystem());
         assertEquals("X12_834", response.format());
         assertEquals("OUTBOUND", response.direction());
-        assertNotNull(response.createdAt());
+        assertEquals(entity.getSysFrom(), response.createdAt());
     }
 
     @Test
@@ -141,8 +127,10 @@ class IntegrationMapperTest {
     private IntegrationEntity buildEntity() {
         IntegrationEntity entity = new IntegrationEntity();
         entity.setIntegrationId(INTEGRATION_ID);
-        entity.setCreatedAt(Instant.now());
-        entity.setDeleted(false);
+        entity.setSysFrom(Instant.now());
+        entity.setSysTo(IntegrationEntity.TEMPORAL_INFINITY);
+        entity.setValidFrom(Instant.now());
+        entity.setValidTo(IntegrationEntity.TEMPORAL_INFINITY);
         entity.setName("Test Integration");
         entity.setOwnerId(OWNER_ID);
         entity.setFromSystemType("INTERNAL");
