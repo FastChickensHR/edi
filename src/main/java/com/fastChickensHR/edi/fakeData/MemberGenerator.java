@@ -8,11 +8,11 @@
 package com.fastChickensHR.edi.fakeData;
 
 import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.x834.loop2000.BaseMember;
-import com.fastChickensHR.edi.x834.loop2000.DependentMember;
+import com.fastChickensHR.edi.domain.Person;
+import com.fastChickensHR.edi.x834.converters.EnrollmentContext;
+import com.fastChickensHR.edi.x834.converters.PersonToMemberConverter;
 import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.data.CoverageLevelCode;
-import com.fastChickensHR.edi.x834.loop2000.data.GenderCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.InsuranceLineCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
@@ -23,17 +23,19 @@ import com.fastChickensHR.edi.x834.x834Context;
 import net.datafaker.Faker;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
  * Fluent generator that produces a fully-populated subscriber {@link Member}, including
- * optional spouse and children as {@link DependentMember}s.
+ * optional spouse and children as dependents.
  * <p>
- * All fields on {@link BaseMember} are populated with realistic fake values:
- * name, gender, date of birth, SSN-based member id, address, phone and email.
+ * Internally generates a domain {@link Person} via {@link PersonGenerator} (using
+ * census-calibrated distributions) and converts it to an X12 834 {@link Member}
+ * via {@link PersonToMemberConverter}. This keeps the two layers properly decoupled
+ * while ensuring the fake-data pipeline flows through the same converter used in
+ * production.
  */
 public final class MemberGenerator {
 
@@ -44,7 +46,6 @@ public final class MemberGenerator {
 
     private boolean withSpouse;
     private int childCount;
-    private GenderCode forcedGender;
     private List<InsuranceLineCode> coverageLines;
 
     MemberGenerator(TestDataFaker parent, x834Context context) {
@@ -65,16 +66,8 @@ public final class MemberGenerator {
 
     /** Adds {@code count} child dependents to the generated subscriber. */
     public MemberGenerator withChildren(int count) {
-        if (count < 0) {
-            throw new IllegalArgumentException("child count must be >= 0");
-        }
+        if (count < 0) throw new IllegalArgumentException("child count must be >= 0");
         this.childCount = count;
-        return this;
-    }
-
-    /** Forces the generated subscriber's gender. */
-    public MemberGenerator withGender(GenderCode gender) {
-        this.forcedGender = gender;
         return this;
     }
 
@@ -86,7 +79,7 @@ public final class MemberGenerator {
     public MemberGenerator withCoverageLines(InsuranceLineCode... lines) {
         this.coverageLines = new ArrayList<>();
         for (InsuranceLineCode line : lines) {
-            this.coverageLines.add(line);
+            coverageLines.add(line);
         }
         return this;
     }
@@ -114,6 +107,36 @@ public final class MemberGenerator {
         return new SubscriberEnrollment(member, coverages);
     }
 
+    /** Builds a new subscriber {@link Member}. */
+    public Member build() {
+        PersonGenerator personGen = new PersonGenerator(parent)
+                .withMarriedRate(withSpouse ? 1.0 : 0.0)
+                .withChildrenWeights(buildChildWeights());
+
+        Person person = personGen.build();
+
+        EnrollmentContext ctx = EnrollmentContext.builder()
+                .policyNumber(faker.bothify("POL-#####"))
+                .memberIdQualifier("0F")
+                .memberIndicator(MemberIndicator.INSURED)
+                .maintenanceTypeCode(MaintenanceTypeCode.ADDITION)
+                .enrollmentDate(LocalDateTime.now().minusDays(random.nextInt(365)))
+                .coverageStartDate(LocalDateTime.now().minusDays(random.nextInt(365)))
+                .build();
+
+        return PersonToMemberConverter.convert(person, ctx);
+    }
+
+    private double[] buildChildWeights() {
+        if (childCount == 0) {
+            return new double[]{1.0, 0.0, 0.0, 0.0};
+        }
+        double[] weights = new double[]{0.0, 0.0, 0.0, 0.0};
+        int idx = Math.min(childCount, 3);
+        weights[idx] = 1.0;
+        return weights;
+    }
+
     private CoverageLevelCode deriveCoverageLevel(Member member) {
         boolean hasSpouse = member.getDependents().stream()
                 .anyMatch(d -> d.getRelationshipCode() == IndividualRelationshipCode.SPOUSE);
@@ -123,94 +146,5 @@ public final class MemberGenerator {
         if (hasSpouse) return CoverageLevelCode.EMPLOYEE_AND_SPOUSE;
         if (hasChildren) return CoverageLevelCode.EMPLOYEE_AND_CHILDREN;
         return CoverageLevelCode.EMPLOYEE_ONLY;
-    }
-
-    /** Builds a new subscriber {@link Member}. */
-    public Member build() {
-        Member member = new Member();
-        GenderCode gender = forcedGender != null ? forcedGender : randomAdultGender();
-        populateCommon(member, gender, adultBirthDate());
-        member.setRelationshipCode(IndividualRelationshipCode.EMPLOYEE);
-        member.setSubscriberNumber(faker.numerify("##########"));
-        member.setPolicyNumber(faker.bothify("POL-#####"));
-
-        if (withSpouse) {
-            DependentMember spouse = new DependentMember();
-            GenderCode spouseGender =
-                    gender == GenderCode.MALE ? GenderCode.FEMALE : GenderCode.MALE;
-            populateCommon(spouse, spouseGender, adultBirthDate());
-            spouse.setRelationshipCode(IndividualRelationshipCode.SPOUSE);
-            spouse.setLastName(member.getLastName());
-            spouse.setAddressLine1(member.getAddressLine1());
-            spouse.setAddressLine2(member.getAddressLine2());
-            spouse.setCity(member.getCity());
-            spouse.setState(member.getState());
-            spouse.setZipCode(member.getZipCode());
-            spouse.setPrimaryMember(member);
-            member.addDependent(spouse);
-        }
-
-        for (int i = 0; i < childCount; i++) {
-            DependentMember child = new DependentMember();
-            populateCommon(child, randomAnyGender(), childBirthDate());
-            child.setRelationshipCode(IndividualRelationshipCode.CHILD);
-            child.setLastName(member.getLastName());
-            child.setAddressLine1(member.getAddressLine1());
-            child.setAddressLine2(member.getAddressLine2());
-            child.setCity(member.getCity());
-            child.setState(member.getState());
-            child.setZipCode(member.getZipCode());
-            child.setPrimaryMember(member);
-            member.addDependent(child);
-        }
-
-        return member;
-    }
-
-    private void populateCommon(BaseMember m, GenderCode gender, LocalDateTime dob) {
-        m.setFirstName(faker.name().firstName());
-        m.setLastName(faker.name().lastName());
-        m.setMiddleName(String.valueOf(faker.name().firstName().charAt(0)));
-        m.setBirthDate(dob);
-        m.setGender(gender.getCode());
-        m.setMemberIndicator(MemberIndicator.INSURED);
-        m.setMaintenanceTypeCode(MaintenanceTypeCode.ADDITION);
-        m.setMemberId(faker.numerify("#########"));
-        m.setMemberIdQualifier("0F"); // Subscriber Number
-        m.setAddressLine1(faker.address().streetAddress());
-        if (random.nextInt(4) == 0) {
-            m.setAddressLine2(faker.address().secondaryAddress());
-        }
-        m.setCity(faker.address().city());
-        m.setState(faker.address().stateAbbr());
-        m.setZipCode(faker.address().zipCode());
-        m.setPhoneNumber(faker.phoneNumber().cellPhone());
-        m.setEmail(faker.internet().emailAddress());
-        LocalDateTime enroll = LocalDateTime.now().minusDays(random.nextInt(365));
-        m.setEnrollmentDate(enroll);
-        m.setCoverageStartDate(enroll);
-    }
-
-    private GenderCode randomAdultGender() {
-        return random.nextBoolean() ? GenderCode.MALE : GenderCode.FEMALE;
-    }
-
-    private GenderCode randomAnyGender() {
-        int r = random.nextInt(10);
-        if (r < 5) return GenderCode.MALE;
-        if (r < 10) return GenderCode.FEMALE;
-        return GenderCode.UNKNOWN;
-    }
-
-    private LocalDateTime adultBirthDate() {
-        return faker.timeAndDate().birthday(21, 65)
-                .atStartOfDay(ZoneId.systemDefault())
-                .toLocalDateTime();
-    }
-
-    private LocalDateTime childBirthDate() {
-        return faker.timeAndDate().birthday(0, 20)
-                .atStartOfDay(ZoneId.systemDefault())
-                .toLocalDateTime();
     }
 }

@@ -99,6 +99,7 @@ public enum ReferenceIdentificationQualifier implements EdiCodeEnum {
     MASTER_POLICY_NUMBER("38", "Master Policy Number"),
     DEPARTMENT_NUMBER("DX", "Department/Agency Number"),
     OPERATOR_IDENTIFICATION_NUMBER("OF", "Operator Identification Number"),
+    SOCIAL_SECURITY_NUMBER("34", "Social Security Number"),
     WAGE_DETERMINATION("2Y", "Wage Determination");
 
     private final String code;
@@ -123,7 +124,9 @@ public enum ReferenceIdentificationQualifier implements EdiCodeEnum {
                         Map.entry("policy number", GROUP_OR_POLICY_NUMBER),
                         Map.entry("mortgage id", MORTGAGE_IDENTIFICATION_NUMBER),
                         Map.entry("tracking id", TRACKING_NUMBER),
-                        Map.entry("claim number", PAYERS_CLAIM_NUMBER)
+                        Map.entry("claim number", PAYERS_CLAIM_NUMBER),
+                        Map.entry("ssn", SOCIAL_SECURITY_NUMBER),
+                        Map.entry("social security number", SOCIAL_SECURITY_NUMBER)
                 )
         );
     }

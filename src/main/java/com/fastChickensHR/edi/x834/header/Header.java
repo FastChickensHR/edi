@@ -140,7 +140,7 @@ public class Header {
             builder.setPlanSponsorName(payerName);
         }
         if (payerIdentification != null) {
-            builder.setEntityIdentifierCode(payerIdentification);
+            builder.setSponsorIdentifier(payerIdentification);
         }
         return builder;
     }
