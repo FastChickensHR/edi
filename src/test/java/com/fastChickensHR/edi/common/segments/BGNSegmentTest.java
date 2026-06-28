@@ -177,6 +177,106 @@ class BGNSegmentTest {
                 "Exception message should mention BGN03: " + exception.getMessage());
     }
 
+    /* Length / format validation tests */
+
+    @Test
+    void testBgn02ExceedingMaxLength_ShouldThrow() {
+        String tooLong = "a".repeat(BGNSegment.BGN02_MAX_LENGTH + 1);
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02(tooLong)
+                .setBgn03("20250101");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN02"));
+    }
+
+    @Test
+    void testBgn03WrongLength_ShouldThrow() {
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02("12345")
+                .setBgn03("2025");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN03"));
+    }
+
+    @Test
+    void testBgn03NonNumeric_ShouldThrow() {
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02("12345")
+                .setBgn03("2025AB01");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN03"));
+    }
+
+    @Test
+    void testBgn04TooShort_ShouldThrow() {
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02("12345")
+                .setBgn03("20250101")
+                .setBgn04("123");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN04"));
+    }
+
+    @Test
+    void testBgn04TooLong_ShouldThrow() {
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02("12345")
+                .setBgn03("20250101")
+                .setBgn04("123456789");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN04"));
+    }
+
+    @Test
+    void testBgn04NonNumeric_ShouldThrow() {
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02("12345")
+                .setBgn03("20250101")
+                .setBgn04("12AB");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN04"));
+    }
+
+    @Test
+    void testBgn06ExceedingMaxLength_ShouldThrow() {
+        String tooLong = "a".repeat(BGNSegment.BGN06_MAX_LENGTH + 1);
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn01("00")
+                .setBgn02("12345")
+                .setBgn03("20250101")
+                .setBgn06(tooLong);
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN06"));
+    }
+
+    @Test
+    void testBgn01Missing_ShouldThrow() {
+        BGNSegmentImpl.Builder builder = new BGNSegmentImpl.Builder()
+                .setBgn02("12345")
+                .setBgn03("20250101");
+
+        ValidationException ex = assertThrows(ValidationException.class, builder::build);
+        assertTrue(ex.getMessage().contains("BGN01"));
+    }
+
+    @Test
+    void testDefaultTransactionSetPurposeCodeConstant() {
+        assertEquals("00", BGNSegment.DEFAULT_TRANSACTION_SET_PURPOSE_CODE);
+    }
+
     /**
      * Tests that the optional fields (BGN04-BGN09) don't cause validation exceptions when not provided.
      */

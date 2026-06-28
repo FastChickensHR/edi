@@ -92,4 +92,9 @@ public final class TestDataFaker {
     public DocumentGenerator document() {
         return new DocumentGenerator(this);
     }
+
+    /** Returns a builder for generating a census-calibrated domain {@code Person}. */
+    public PersonGenerator person() {
+        return new PersonGenerator(this);
+    }
 }

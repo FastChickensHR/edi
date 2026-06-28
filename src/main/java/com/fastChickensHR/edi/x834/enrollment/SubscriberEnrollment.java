@@ -10,6 +10,9 @@ package com.fastChickensHR.edi.x834.enrollment;
 import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 
+import lombok.Value;
+import lombok.experimental.Accessors;
+
 import java.util.List;
 
 /**
@@ -19,5 +22,9 @@ import java.util.List;
  *
  * <p>This is the canonical input contract passed into the x834 builder.
  */
-public record SubscriberEnrollment(Member member, List<HealthCoverage> coverages) {
+@Value
+@Accessors(fluent = true)
+public class SubscriberEnrollment {
+    Member member;
+    List<HealthCoverage> coverages;
 }

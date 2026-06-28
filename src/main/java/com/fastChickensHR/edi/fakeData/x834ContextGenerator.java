@@ -76,7 +76,7 @@ public final class x834ContextGenerator {
     }
 
     private LocalDateTime randomDateTime() {
-        return faker.timeAndDate().past(365, java.util.concurrent.TimeUnit.DAYS)
+        return faker.date().past(365, java.util.concurrent.TimeUnit.DAYS).toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
