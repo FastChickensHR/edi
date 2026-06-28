@@ -111,22 +111,22 @@ public final class DocumentGenerator {
     public x834Document build() throws ValidationException {
         x834Context ctx = context != null ? context : parent.context().build();
 
+        if (ctx.getInterchangeControlNumber() == null) {
+            ctx.setInterchangeControlNumber(String.format("%09d", faker.number().numberBetween(1, 999_999_999)));
+        }
+        if (ctx.getGroupControlNumber() == null) {
+            ctx.setGroupControlNumber("1");
+        }
+
         Header header = new Header.Builder(ctx)
-                .setInterchangeControlNumber(String.format("%09d", faker.number().numberBetween(1, 999_999_999)))
-                .setGroupControlNumber(ctx.getGroupControlNumber() != null ? ctx.getGroupControlNumber() : "1")
                 .setTransactionSetIdentifierCode("834")
-                .setTransactionSetControlNumber(ctx.getTransactionSetControlNumber() != null
-                        ? ctx.getTransactionSetControlNumber() : "0001")
                 .setReferenceIdentification(faker.numerify("REF#######"))
                 .setMasterPolicyNumber(faker.bothify("MP-#####"))
                 .setPlanSponsorName(faker.company().name())
                 .setPayerName(faker.company().name())
                 .build();
 
-        Trailer.Builder trailerBuilder = new Trailer.Builder(ctx)
-                .setTransactionSetControlNumber(ctx.getTransactionSetControlNumber() != null
-                        ? ctx.getTransactionSetControlNumber() : "0001")
-                .setGroupControlNumber(ctx.getGroupControlNumber() != null ? ctx.getGroupControlNumber() : "1");
+        Trailer.Builder trailerBuilder = new Trailer.Builder(ctx);
 
         x834Document.Builder builder = new x834Document.Builder(ctx)
                 .withHeader(header)

@@ -98,12 +98,8 @@ public class x834Document {
         // ISA (index 0) and GS (index 1) are outside the ST/SE envelope; +1 for SE itself.
         int transactionSegmentCount = bodySegments.size() - 2 + 1;
 
-        // GE01 = 1: an 834 always has exactly one ST/SE pair per functional group.
-        // IEA01 = 1: an 834 always has exactly one GS/GE pair per interchange.
         Trailer trailer = trailerBuilder
                 .setNumberOfIncludedSegments(String.valueOf(transactionSegmentCount))
-                .setNumberOfTransactionSetsIncluded("1")
-                .setNumberOfIncludedFunctionalGroups("1")
                 .build();
 
         StringBuilder document = new StringBuilder();
@@ -238,6 +234,8 @@ public class x834Document {
 
             // Additional validation
             try {
+                context.validate();
+
                 if (header != null) {
                     header.validate();
                 }

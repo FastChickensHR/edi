@@ -31,13 +31,13 @@ class x834DocumentTest {
         context = new x834Context()
                 .setSenderID("SENDER01")
                 .setReceiverID("RECEIVER1")
-                .setDocumentDate(LocalDateTime.of(2024, 1, 1, 0, 0));
+                .setDocumentDate(LocalDateTime.of(2024, 1, 1, 0, 0))
+                .setInterchangeControlNumber("000000001")
+                .setGroupControlNumber("1");
     }
 
     private Header buildHeader() {
         return new Header.Builder(context)
-                .setInterchangeControlNumber("000000001")
-                .setGroupControlNumber("1")
                 .setReferenceIdentification("TEST834")
                 .setMasterPolicyNumber("TEST-POL-001")
                 .setPlanSponsorName("TEST SPONSOR")

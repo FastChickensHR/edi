@@ -31,10 +31,7 @@ public class Header {
     private final x834Context context;
 
     // Default fields for simple configuration
-    private String interchangeControlNumber;
-    private String groupControlNumber;
     private String transactionSetIdentifierCode;
-    private String transactionSetControlNumber;
     private String referenceIdentification;
     private String masterPolicyNumber;
     private String planSponsorName;
@@ -66,12 +63,6 @@ public class Header {
      * @throws ValidationException If validation fails
      */
     public void validate() throws ValidationException {
-        if (customInterchangeBuilder == null && (interchangeControlNumber == null || interchangeControlNumber.isEmpty())) {
-            throw new ValidationException("Interchange Control Number is required");
-        }
-        if (customFunctionalBuilder == null && (groupControlNumber == null || groupControlNumber.isEmpty())) {
-            throw new ValidationException("Group Control Number is required");
-        }
         if (customTransactionSetBuilder == null && (transactionSetIdentifierCode == null || transactionSetIdentifierCode.isEmpty())) {
             throw new ValidationException("Transaction Set Identifier Code is required");
         }
@@ -90,17 +81,16 @@ public class Header {
         // Create or use builders as appropriate
         InterchangeControlHeader.Builder interchangeBuilder = customInterchangeBuilder != null ?
                 customInterchangeBuilder :
-                new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber);
+                new InterchangeControlHeader.Builder(context);
 
         FunctionalGroupHeader.Builder functionalBuilder = customFunctionalBuilder != null ?
                 customFunctionalBuilder :
-                new FunctionalGroupHeader.Builder(context).setGroupControlNumber(groupControlNumber);
+                new FunctionalGroupHeader.Builder(context);
 
         TransactionSetHeader.Builder transactionSetBuilder = customTransactionSetBuilder != null ?
                 customTransactionSetBuilder :
-                new TransactionSetHeader.Builder()
-                        .setTransactionSetIdentifierCode(transactionSetIdentifierCode)
-                        .setTransactionSetControlNumber(transactionSetControlNumber);
+                new TransactionSetHeader.Builder(context)
+                        .setTransactionSetIdentifierCode(transactionSetIdentifierCode);
 
         BeginningSegment.Builder beginningSegmentBuilder = customBeginningSegmentBuilder != null ?
                 customBeginningSegmentBuilder :
@@ -151,10 +141,7 @@ public class Header {
     public static class Builder {
         private final x834Context context;
 
-        private String interchangeControlNumber;
-        private String groupControlNumber = "1";
         private String transactionSetIdentifierCode = "834";
-        private String transactionSetControlNumber = "0001";
         private String referenceIdentification;
         private String masterPolicyNumber;
         private String planSponsorName;
@@ -181,23 +168,8 @@ public class Header {
         }
 
         // Simple setters
-        public Builder setInterchangeControlNumber(String interchangeControlNumber) {
-            this.interchangeControlNumber = interchangeControlNumber;
-            return this;
-        }
-
-        public Builder setGroupControlNumber(String groupControlNumber) {
-            this.groupControlNumber = groupControlNumber;
-            return this;
-        }
-
         public Builder setTransactionSetIdentifierCode(String transactionSetIdentifierCode) {
             this.transactionSetIdentifierCode = transactionSetIdentifierCode;
-            return this;
-        }
-
-        public Builder setTransactionSetControlNumber(String transactionSetControlNumber) {
-            this.transactionSetControlNumber = transactionSetControlNumber;
             return this;
         }
 
@@ -275,10 +247,7 @@ public class Header {
         public Header build() {
             Header header = new Header(context);
 
-            header.interchangeControlNumber = this.interchangeControlNumber;
-            header.groupControlNumber = this.groupControlNumber;
             header.transactionSetIdentifierCode = this.transactionSetIdentifierCode;
-            header.transactionSetControlNumber = this.transactionSetControlNumber;
             header.referenceIdentification = this.referenceIdentification;
             header.masterPolicyNumber = this.masterPolicyNumber;
             header.planSponsorName = this.planSponsorName;

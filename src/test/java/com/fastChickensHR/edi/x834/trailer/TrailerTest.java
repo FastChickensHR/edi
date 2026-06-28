@@ -23,8 +23,9 @@ class TrailerTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
-        // Set up any context properties needed for testing
+        context = new x834Context()
+                .setInterchangeControlNumber("000000001")
+                .setGroupControlNumber("1");
     }
 
     @Test
