@@ -9,12 +9,9 @@ package com.fastChickensHR.edi.integration.x834;
 
 import com.fastChickensHR.edi.integration.IntegrationConfig;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
-import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
-import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import lombok.Builder;
 import lombok.Value;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -41,11 +38,6 @@ public class X834IntegrationConfig implements IntegrationConfig {
     // --- Enrollment context ---
     String policyNumber;
     String memberIdQualifier;
-    MemberIndicator memberIndicator;
-    MaintenanceTypeCode maintenanceTypeCode;
-    LocalDateTime enrollmentDate;
-    LocalDateTime coverageStartDate;
-    LocalDateTime coverageEndDate;
 
     // --- Header ---
     String referenceIdentification;

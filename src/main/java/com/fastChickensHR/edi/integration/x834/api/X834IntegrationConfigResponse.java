@@ -8,7 +8,6 @@
 package com.fastChickensHR.edi.integration.x834.api;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -21,11 +20,6 @@ public record X834IntegrationConfigResponse(
         String elementSeparator,
         String policyNumber,
         String memberIdQualifier,
-        String memberIndicator,
-        String maintenanceTypeCode,
-        LocalDateTime enrollmentDate,
-        LocalDateTime coverageStartDate,
-        LocalDateTime coverageEndDate,
         String referenceIdentification,
         String masterPolicyNumber,
         String planSponsorName,

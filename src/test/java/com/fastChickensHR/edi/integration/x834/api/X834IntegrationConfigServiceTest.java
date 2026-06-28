@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,11 +45,6 @@ class X834IntegrationConfigServiceTest {
                 "PIPE",
                 "MIPA2023",
                 "34",
-                "INSURED",
-                "ADDITION",
-                LocalDateTime.of(2023, 8, 1, 0, 0),
-                LocalDateTime.of(2023, 8, 1, 0, 0),
-                null,
                 "220701MI834",
                 "MIHHS-EMP-2023",
                 "FASTCHKN",

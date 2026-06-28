@@ -9,8 +9,6 @@ package com.fastChickensHR.edi.integration.x834.api;
 
 import com.fastChickensHR.edi.integration.x834.persistence.X834IntegrationConfigEntity;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
-import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
-import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -30,11 +28,6 @@ public class X834IntegrationConfigMapper {
                 entity.getElementSeparator(),
                 entity.getPolicyNumber(),
                 entity.getMemberIdQualifier(),
-                entity.getMemberIndicator(),
-                entity.getMaintenanceTypeCode(),
-                entity.getEnrollmentDate(),
-                entity.getCoverageStartDate(),
-                entity.getCoverageEndDate(),
                 entity.getReferenceIdentification(),
                 entity.getMasterPolicyNumber(),
                 entity.getPlanSponsorName(),
@@ -48,10 +41,8 @@ public class X834IntegrationConfigMapper {
      * Builds a new (open-ended) entity row for a create or update request.
      */
     public X834IntegrationConfigEntity toNewEntity(UUID integrationId, X834IntegrationConfigRequest request) {
-        // Validate enum values eagerly so callers get a clear IllegalArgumentException.
+        // Validate enum value eagerly so callers get a clear IllegalArgumentException.
         ElementSeparator.valueOf(request.elementSeparator());
-        MemberIndicator.valueOf(request.memberIndicator());
-        MaintenanceTypeCode.valueOf(request.maintenanceTypeCode());
 
         Instant now = Instant.now();
         X834IntegrationConfigEntity entity = new X834IntegrationConfigEntity();
@@ -65,11 +56,6 @@ public class X834IntegrationConfigMapper {
         entity.setElementSeparator(request.elementSeparator());
         entity.setPolicyNumber(request.policyNumber());
         entity.setMemberIdQualifier(request.memberIdQualifier());
-        entity.setMemberIndicator(request.memberIndicator());
-        entity.setMaintenanceTypeCode(request.maintenanceTypeCode());
-        entity.setEnrollmentDate(request.enrollmentDate());
-        entity.setCoverageStartDate(request.coverageStartDate());
-        entity.setCoverageEndDate(request.coverageEndDate());
         entity.setReferenceIdentification(request.referenceIdentification());
         entity.setMasterPolicyNumber(request.masterPolicyNumber());
         entity.setPlanSponsorName(request.planSponsorName());
