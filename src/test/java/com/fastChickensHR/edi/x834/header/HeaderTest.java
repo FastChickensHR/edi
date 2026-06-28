@@ -31,9 +31,9 @@ class HeaderTest {
                 .setSenderID("FASTCHKN")
                 .setReceiverID("MICHGVEDI")
                 .setElementSeparator(ElementSeparator.PIPE)
-                .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
-        ;
-        // Configure context with any necessary test values
+                .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0))
+                .setInterchangeControlNumber("000000001")
+                .setGroupControlNumber("42");
     }
 
     @Test
@@ -50,20 +50,14 @@ class HeaderTest {
         // Test setters and getters for the header fields
         Header header = new Header(context);
 
-        String interchangeControlNumber = "000000001";
-        String groupControlNumber = "42";
         String transactionSetIdentifierCode = "834";
-        String transactionSetControlNumber = "4321";
         String referenceIdentification = "REF123";
         String masterPolicyNumber = "POL123456";
         String planSponsorName = "FastChickensHR Corp";
         String payerName = "Insurance Co";
         String payerIdentification = "PAYERID123";
 
-        header.setInterchangeControlNumber(interchangeControlNumber);
-        header.setGroupControlNumber(groupControlNumber);
         header.setTransactionSetIdentifierCode(transactionSetIdentifierCode);
-        header.setTransactionSetControlNumber(transactionSetControlNumber);
         header.setReferenceIdentification(referenceIdentification);
         header.setMasterPolicyNumber(masterPolicyNumber);
         header.setPlanSponsorName(planSponsorName);
@@ -71,10 +65,7 @@ class HeaderTest {
         header.setPayerIdentification(payerIdentification);
 
         // Verify all fields were set correctly
-        assertEquals(interchangeControlNumber, header.getInterchangeControlNumber());
-        assertEquals(groupControlNumber, header.getGroupControlNumber());
         assertEquals(transactionSetIdentifierCode, header.getTransactionSetIdentifierCode());
-        assertEquals(transactionSetControlNumber, header.getTransactionSetControlNumber());
         assertEquals(referenceIdentification, header.getReferenceIdentification());
         assertEquals(masterPolicyNumber, header.getMasterPolicyNumber());
         assertEquals(planSponsorName, header.getPlanSponsorName());
@@ -88,7 +79,7 @@ class HeaderTest {
 
         InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context);
         FunctionalGroupHeader.Builder functionalBuilder = new FunctionalGroupHeader.Builder(context);
-        TransactionSetHeader.Builder transactionSetBuilder = new TransactionSetHeader.Builder();
+        TransactionSetHeader.Builder transactionSetBuilder = new TransactionSetHeader.Builder(context);
         BeginningSegment.Builder beginningSegmentBuilder = new BeginningSegment.Builder(context);
         FileEffectiveDate.Builder fileEffectiveDateBuilder = new FileEffectiveDate.Builder(context);
         TransactionSetPolicyNumber.Builder policyNumberBuilder = new TransactionSetPolicyNumber.Builder();
@@ -118,15 +109,11 @@ class HeaderTest {
     @Test
     void testGenerateSegments() throws ValidationException {
         Header header = new Header(context);
-        header.setInterchangeControlNumber("000000001");
         header.setReferenceIdentification("REF123");
         header.setMasterPolicyNumber("POL123456");
         header.setPlanSponsorName("FastChickensHR Corp");
         header.setPayerName("Insurance Co");
-        header.setGroupControlNumber("42");
         header.setTransactionSetIdentifierCode("834");
-        header.setInterchangeControlNumber("4321");
-        header.setTransactionSetControlNumber("0001");
 
         List<Segment> segments = header.generateSegments();
 
@@ -152,10 +139,7 @@ class HeaderTest {
     @Test
     void testHeaderBuilder() throws ValidationException {
         Header.Builder builder = new Header.Builder(context)
-                .setInterchangeControlNumber("000000001")
-                .setGroupControlNumber("42")
                 .setTransactionSetIdentifierCode("834")
-                .setTransactionSetControlNumber("4321")
                 .setReferenceIdentification("REF123")
                 .setMasterPolicyNumber("POL123456")
                 .setPlanSponsorName("FastChickensHR Corp")
@@ -164,10 +148,7 @@ class HeaderTest {
 
         Header header = builder.build();
 
-        assertEquals("000000001", header.getInterchangeControlNumber());
-        assertEquals("42", header.getGroupControlNumber());
         assertEquals("834", header.getTransactionSetIdentifierCode());
-        assertEquals("4321", header.getTransactionSetControlNumber());
         assertEquals("REF123", header.getReferenceIdentification());
         assertEquals("POL123456", header.getMasterPolicyNumber());
         assertEquals("FastChickensHR Corp", header.getPlanSponsorName());
@@ -194,11 +175,8 @@ class HeaderTest {
     void testBuilderDefaultValues() throws ValidationException {
         Header header = new Header.Builder(context).build();
 
-        assertEquals("1", header.getGroupControlNumber());
         assertEquals("834", header.getTransactionSetIdentifierCode());
-        assertEquals("0001", header.getTransactionSetControlNumber());
 
-        assertNull(header.getInterchangeControlNumber());
         assertNull(header.getReferenceIdentification());
         assertNull(header.getMasterPolicyNumber());
         assertNull(header.getPlanSponsorName());

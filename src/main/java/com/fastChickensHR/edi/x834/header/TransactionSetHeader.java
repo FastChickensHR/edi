@@ -41,6 +41,14 @@ public class TransactionSetHeader extends STSegment {
             this.setSt03(DEFAULT_CONVENTION_REFERENCE);
         }
 
+        public Builder(x834Context context) {
+            super();
+            this.context = context;
+            this.setSt01(DEFAULT_TRANSACTION_SET_ID);
+            this.setSt02(context.getTransactionSetControlNumber());
+            this.setSt03(DEFAULT_CONVENTION_REFERENCE);
+        }
+
         @Override
         protected TransactionSetHeader.Builder self() {
             return this;

@@ -108,12 +108,12 @@ public class Trailer {
         @Getter
         private final x834Context context;
 
-        private String transactionSetControlNumber = "0001";
+        private String transactionSetControlNumber;
         private String numberOfIncludedSegments = "10";
         private String numberOfTransactionSetsIncluded = "1";
-        private String groupControlNumber = "1";
+        private String groupControlNumber;
         private String numberOfIncludedFunctionalGroups = "1";
-        private String interchangeControlNumber = "000000001";
+        private String interchangeControlNumber;
 
         // Custom builders for advanced configuration
         private TransactionSetTrailer.Builder customTransactionSetBuilder;
@@ -121,7 +121,8 @@ public class Trailer {
         private InterchangeControlTrailer.Builder customInterchangeControlBuilder;
 
         /**
-         * Creates a new Builder with the specified context
+         * Creates a new Builder with the specified context. Control numbers (SE02, GE02, IEA02)
+         * are read from context automatically; GE01 and IEA01 are always 1 for an 834 document.
          *
          * @param context The 834 context to use for this trailer
          * @throws IllegalArgumentException if context is null
@@ -131,6 +132,9 @@ public class Trailer {
                 throw new IllegalArgumentException("Context cannot be null");
             }
             this.context = context;
+            this.transactionSetControlNumber = context.getTransactionSetControlNumber();
+            this.groupControlNumber = context.getGroupControlNumber();
+            this.interchangeControlNumber = context.getInterchangeControlNumber();
         }
 
         /**

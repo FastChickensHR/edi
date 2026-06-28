@@ -14,6 +14,7 @@ import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.LineTerminator;
 import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
 import com.fastChickensHR.edi.x834.constants.SubElementSeparator;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -35,6 +36,7 @@ public class x834Context {
     private LineTerminator lineTerminator;
 
     // Document metadata
+    private String interchangeControlNumber;
     private String transactionSetControlNumber;
     private String groupControlNumber;
     private String senderID;
@@ -63,6 +65,21 @@ public class x834Context {
         this.segmentTerminator = SegmentTerminator.TILDE;
         this.subElementSeparator = SubElementSeparator.GREATER_THAN;
         this.lineTerminator = LineTerminator.LF;
+        this.transactionSetControlNumber = "0001";
+    }
+
+    /**
+     * Validates that all required context fields are set.
+     *
+     * @throws ValidationException if interchangeControlNumber or groupControlNumber is null
+     */
+    public void validate() throws ValidationException {
+        if (interchangeControlNumber == null || interchangeControlNumber.isEmpty()) {
+            throw new ValidationException("Interchange Control Number is required on x834Context");
+        }
+        if (groupControlNumber == null || groupControlNumber.isEmpty()) {
+            throw new ValidationException("Group Control Number is required on x834Context");
+        }
     }
 
     public char getElementSeparator() {

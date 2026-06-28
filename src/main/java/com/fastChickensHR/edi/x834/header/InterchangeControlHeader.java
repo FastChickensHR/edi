@@ -64,6 +64,7 @@ public class InterchangeControlHeader extends ISASegment {
             this.isa10 = context.getFormattedDocumentTime();
             this.isa11 = DEFAULT_REPETITION_SEPARATOR;
             this.isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;
+            this.isa13 = context.getInterchangeControlNumber();
             this.isa14 = DEFAULT_ACKNOWLEDGMENT_REQUESTED;
             this.isa15 = DEFAULT_USAGE_INDICATOR;
             this.isa16 = DEFAULT_COMPONENT_ELEMENT_SEPARATOR;

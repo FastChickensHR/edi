@@ -31,7 +31,7 @@ public class x834Document {
     private final List<String> buildErrors;
     private final boolean isValid;
     private final x834Context context;
-    private final Trailer trailer;
+    private final Trailer.Builder trailerBuilder;
 
     /**
      * Private constructor used by the Builder class
@@ -45,7 +45,7 @@ public class x834Document {
         this.additionalSegments = builder.additionalSegments;
         this.buildErrors = builder.buildErrors;
         this.isValid = builder.isValid;
-        this.trailer = builder.trailer;
+        this.trailerBuilder = builder.trailerBuilder;
     }
 
     /**
@@ -67,7 +67,10 @@ public class x834Document {
     }
 
     /**
-     * Generates the complete EDI document string if the document is valid
+     * Generates the complete EDI document string if the document is valid.
+     * <p>
+     * Segment counts (SE01, GE01, IEA01) are computed automatically from the
+     * rendered document content and injected into the trailer before rendering.
      *
      * @return An Optional containing the formatted EDI 834 document as a string,
      * or empty if the document is invalid
@@ -77,36 +80,36 @@ public class x834Document {
             return Optional.empty();
         }
 
-        StringBuilder document = new StringBuilder();
+        // Collect all body segments before the trailer
+        List<Segment> bodySegments = new ArrayList<>();
 
         if (header != null) {
-            List<Segment> headerSegments = header.generateSegments();
-            for (Segment segment : headerSegments) {
-                segment.setContext(context);
-                document.append(segment.render());
-            }
+            bodySegments.addAll(header.generateSegments());
         }
 
         X834MemberWriter memberWriter = new X834MemberWriter(context);
         for (Member member : members) {
-            List<Segment> memberSegments = memberWriter.toSegments(member);
-            for (Segment segment : memberSegments) {
-                segment.setContext(context);
-                document.append(segment.render());
-            }
+            bodySegments.addAll(memberWriter.toSegments(member));
         }
 
-        for (Segment segment : additionalSegments) {
+        bodySegments.addAll(additionalSegments);
+
+        // SE01 = count of segments from ST through SE inclusive.
+        // ISA (index 0) and GS (index 1) are outside the ST/SE envelope; +1 for SE itself.
+        int transactionSegmentCount = bodySegments.size() - 2 + 1;
+
+        Trailer trailer = trailerBuilder
+                .setNumberOfIncludedSegments(String.valueOf(transactionSegmentCount))
+                .build();
+
+        StringBuilder document = new StringBuilder();
+        for (Segment segment : bodySegments) {
             segment.setContext(context);
             document.append(segment.render());
         }
-
-        if (trailer != null) {
-            List<Segment> trailerSegments = trailer.generateSegments();
-            for (Segment segment : trailerSegments) {
-                segment.setContext(context);
-                document.append(segment.render());
-            }
+        for (Segment segment : trailer.generateSegments()) {
+            segment.setContext(context);
+            document.append(segment.render());
         }
 
         return Optional.of(document.toString());
@@ -117,7 +120,7 @@ public class x834Document {
      */
     public static class Builder {
         private Header header;
-        private Trailer trailer;
+        private Trailer.Builder trailerBuilder;
         private final List<Member> members = new ArrayList<>();
         private final List<Segment> additionalSegments = new ArrayList<>();
         private final List<String> buildErrors = new ArrayList<>();
@@ -163,29 +166,14 @@ public class x834Document {
         }
 
         /**
-         * Sets the trailer for this document
-         *
-         * @param trailer The completely configured trailer
-         * @return This builder instance
-         */
-        public Builder withTrailer(Trailer trailer) {
-            this.trailer = trailer;
-            return this;
-        }
-
-        /**
-         * Convenience method to set the trailer using a trailer builder
+         * Sets the trailer builder for this document. Segment counts (SE01, GE01, IEA01)
+         * are computed automatically at render time and do not need to be set manually.
          *
          * @param trailerBuilder The trailer builder to use
          * @return This builder instance
          */
         public Builder withTrailer(Trailer.Builder trailerBuilder) {
-            try {
-                this.trailer = trailerBuilder.build();
-            } catch (ValidationException e) {
-                buildErrors.add("Trailer validation error: " + e.getMessage());
-                isValid = false;
-            }
+            this.trailerBuilder = trailerBuilder;
             return this;
         }
 
@@ -234,7 +222,7 @@ public class x834Document {
                 isValid = false;
             }
 
-            if (trailer == null) {
+            if (trailerBuilder == null) {
                 buildErrors.add("Trailer is required");
                 isValid = false;
             }
@@ -246,12 +234,14 @@ public class x834Document {
 
             // Additional validation
             try {
+                context.validate();
+
                 if (header != null) {
                     header.validate();
                 }
 
-                if (trailer != null) {
-                    trailer.validate();
+                if (trailerBuilder != null) {
+                    trailerBuilder.build().validate();
                 }
 
                 for (Member member : members) {

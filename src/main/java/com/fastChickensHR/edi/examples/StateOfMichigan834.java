@@ -53,11 +53,11 @@ public class StateOfMichigan834 {
                 .setSenderID("FASTCHKN")
                 .setReceiverID("MICHGVEDI")
                 .setElementSeparator(ElementSeparator.PIPE)
-                .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0));
+                .setDocumentDate(LocalDateTime.of(2023, 8, 1, 0, 0))
+                .setInterchangeControlNumber("000000001")
+                .setGroupControlNumber("42789");
 
         Header header = new Header.Builder(context)
-                .setInterchangeControlNumber("000000001")
-                .setGroupControlNumber("42789")
                 .setReferenceIdentification("220701MI834")
                 .setMasterPolicyNumber("MIHHS-EMP-2023")
                 .setPlanSponsorName("FASTCHKN")
@@ -73,12 +73,10 @@ public class StateOfMichigan834 {
                     MICHIGAN_ENROLLMENT));
         }
 
-        Trailer trailer = new Trailer.Builder(context).build();
-
         return new x834Document.Builder(context)
                 .withHeader(header)
                 .withMembers(members)
-                .withTrailer(trailer)
+                .withTrailer(new Trailer.Builder(context))
                 .build();
     }
 
