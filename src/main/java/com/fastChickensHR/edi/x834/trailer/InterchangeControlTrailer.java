@@ -21,6 +21,7 @@ import lombok.experimental.Accessors;
  */
 @Getter
 public class InterchangeControlTrailer extends IEASegment {
+    public static final String DEFAULT_NUMBER_OF_INCLUDED_GROUPS = "1";
 
     private InterchangeControlTrailer(Builder builder) throws ValidationException {
         super(builder);

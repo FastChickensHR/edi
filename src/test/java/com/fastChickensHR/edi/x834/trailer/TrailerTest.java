@@ -110,6 +110,7 @@ class TrailerTest {
         functionalBuilder.setGroupControlNumber("8888");
 
         InterchangeControlTrailer.Builder interchangeBuilder = new InterchangeControlTrailer.Builder();
+        interchangeBuilder.setNumberOfIncludedGroups("1");
         interchangeBuilder.setInterchangeControlNumber("7777777");
 
         Trailer trailer = new Trailer.Builder(context)

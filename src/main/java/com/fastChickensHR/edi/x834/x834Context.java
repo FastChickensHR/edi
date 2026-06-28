@@ -77,6 +77,9 @@ public class x834Context {
         if (interchangeControlNumber == null || interchangeControlNumber.isEmpty()) {
             throw new ValidationException("Interchange Control Number is required on x834Context");
         }
+        if (!interchangeControlNumber.matches("\\d{9}")) {
+            throw new ValidationException("Interchange Control Number must be exactly 9 numeric digits");
+        }
         if (groupControlNumber == null || groupControlNumber.isEmpty()) {
             throw new ValidationException("Group Control Number is required on x834Context");
         }

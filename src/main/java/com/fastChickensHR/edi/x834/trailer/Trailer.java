@@ -112,7 +112,7 @@ public class Trailer {
         private String numberOfIncludedSegments = "10";
         private String numberOfTransactionSetsIncluded = "1";
         private String groupControlNumber;
-        private String numberOfIncludedFunctionalGroups = "1";
+        private String numberOfIncludedFunctionalGroups = InterchangeControlTrailer.DEFAULT_NUMBER_OF_INCLUDED_GROUPS;
         private String interchangeControlNumber;
 
         // Custom builders for advanced configuration
