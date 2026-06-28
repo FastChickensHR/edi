@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.fakeData;
+package com.fastChickensHR.edi.fixtures;
 
 import com.fastChickensHR.edi.domain.Address;
 import com.fastChickensHR.edi.domain.Dependent;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * structure rather than the other way around.
  *
  * <pre>{@code
- * Person person = TestDataFaker.withSeed(42L).person().build();
+ * Person person = X834Fixtures.seeded(42L).person().build();
  * }</pre>
  */
 public final class PersonGenerator {
@@ -49,17 +49,17 @@ public final class PersonGenerator {
     // 2020 ACS children-under-18 distribution weights: 0, 1, 2, 3+
     private static final double[] DEFAULT_CHILDREN_WEIGHTS = {0.57, 0.18, 0.15, 0.10};
 
-    private final TestDataFaker parent;
+    private final X834Fixtures parent;
     private final Faker faker;
     private final Random random;
 
     private double marriedRate = DEFAULT_MARRIED_RATE;
     private double[] childrenWeights = DEFAULT_CHILDREN_WEIGHTS;
 
-    PersonGenerator(TestDataFaker parent) {
+    PersonGenerator(X834Fixtures parent) {
         this.parent = parent;
         this.faker = parent.faker();
-        this.random = parent.random();
+        this.random = parent.rng();
     }
 
     /** Override the probability (0.0–1.0) that the generated person has a spouse. */

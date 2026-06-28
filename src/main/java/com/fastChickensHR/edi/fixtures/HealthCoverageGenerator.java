@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.fakeData;
+package com.fastChickensHR.edi.fixtures;
 
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.CoverageLevelCode;
@@ -20,7 +20,7 @@ import java.util.Random;
 
 /**
  * Fluent generator that produces a fully-populated {@link HealthCoverage} (HD) segment
- * with realistic fake values for the most common fields.
+ * with realistic values for the most common fields.
  * <p>
  * Defaults: maintenance type {@link MaintenanceTypeCode#ADDITION},
  * insurance line {@link InsuranceLineCode#HEALTH}, coverage level
@@ -38,9 +38,9 @@ public final class HealthCoverageGenerator {
     private String planDescription;
     private EmploymentStatusCode employmentStatusCode;
 
-    HealthCoverageGenerator(TestDataFaker parent) {
+    HealthCoverageGenerator(X834Fixtures parent) {
         this.faker = parent.faker();
-        this.random = parent.random();
+        this.random = parent.rng();
     }
 
     public HealthCoverageGenerator withMaintenanceType(MaintenanceTypeCode code) {

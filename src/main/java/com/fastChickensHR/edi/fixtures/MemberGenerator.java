@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.fakeData;
+package com.fastChickensHR.edi.fixtures;
 
 import com.fastChickensHR.edi.common.exception.ValidationException;
 import com.fastChickensHR.edi.domain.Person;
@@ -34,12 +34,12 @@ import java.util.Random;
  * Internally generates a domain {@link Person} via {@link PersonGenerator} (using
  * census-calibrated distributions) and converts it to an X12 834 {@link Member}
  * via {@link PersonToMemberConverter}. This keeps the two layers properly decoupled
- * while ensuring the fake-data pipeline flows through the same converter used in
+ * while ensuring the fixture pipeline flows through the same converter used in
  * production.
  */
 public final class MemberGenerator {
 
-    private final TestDataFaker parent;
+    private final X834Fixtures parent;
     private final Faker faker;
     private final Random random;
     private final x834Context context;
@@ -48,13 +48,13 @@ public final class MemberGenerator {
     private int childCount;
     private List<InsuranceLineCode> coverageLines;
 
-    MemberGenerator(TestDataFaker parent, x834Context context) {
+    MemberGenerator(X834Fixtures parent, x834Context context) {
         if (context == null) {
             throw new IllegalArgumentException("context cannot be null");
         }
         this.parent = parent;
         this.faker = parent.faker();
-        this.random = parent.random();
+        this.random = parent.rng();
         this.context = context;
     }
 
@@ -73,7 +73,7 @@ public final class MemberGenerator {
 
     /**
      * Specifies the {@link InsuranceLineCode}s for which {@link HealthCoverage} (HD)
-     * segments should be generated when calling {@link #buildEmployee()}.
+     * segments should be generated when calling {@link #buildWithCoverage()}.
      * If never called, a default set of Health/Dental/Vision is generated.
      */
     public MemberGenerator withCoverageLines(InsuranceLineCode... lines) {
@@ -89,7 +89,7 @@ public final class MemberGenerator {
      * {@link HealthCoverage} segments (Health/Dental/Vision by default, or
      * the lines configured with {@link #withCoverageLines(InsuranceLineCode...)}).
      */
-    public SubscriberEnrollment buildEmployee() throws ValidationException {
+    public SubscriberEnrollment buildWithCoverage() throws ValidationException {
         Member member = build();
         List<InsuranceLineCode> lines = coverageLines != null
                 ? coverageLines
