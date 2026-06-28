@@ -109,7 +109,7 @@ class ReferenceIdentificationQualifierTest {
 
     @Test
     void testEnumCount() {
-        assertEquals(81, ReferenceIdentificationQualifier.values().length);
+        assertEquals(82, ReferenceIdentificationQualifier.values().length);
     }
 
     @Test
