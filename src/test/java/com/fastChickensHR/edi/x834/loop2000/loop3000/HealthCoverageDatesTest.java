@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.loop3000;
 
-import com.fastChickensHR.edi.common.dates.DateFormat;
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.x834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.HealthCoverageDateQualifier;
 import org.junit.jupiter.api.Test;

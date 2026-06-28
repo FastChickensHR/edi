@@ -7,9 +7,9 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.common.EdiCodeEnum;
-import com.fastChickensHR.edi.common.EdiEnumLookup;
-import com.fastChickensHR.edi.common.data.DateTimeQualifier;
+import com.fastChickensHR.edi.x834.util.EdiCodeEnum;
+import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
+import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import lombok.Getter;
 
 import java.util.*;

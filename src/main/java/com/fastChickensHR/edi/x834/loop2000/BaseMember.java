@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;

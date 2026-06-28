@@ -7,9 +7,9 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import com.fastChickensHR.edi.common.data.DateTimeQualifier;
-import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.common.segments.DTPSegment;
+import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.segments.DTPSegment;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import com.fastChickensHR.edi.x834.x834Context;
 

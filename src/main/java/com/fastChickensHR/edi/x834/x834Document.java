@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.common.segments.Segment;
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.segments.Segment;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.X834MemberWriter;

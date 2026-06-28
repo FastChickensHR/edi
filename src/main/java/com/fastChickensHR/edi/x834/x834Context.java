@@ -7,9 +7,9 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.common.dates.DateFormat;
-import com.fastChickensHR.edi.common.dates.DateFormatter;
-import com.fastChickensHR.edi.common.dates.TimeFormat;
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.dates.DateFormatter;
+import com.fastChickensHR.edi.x834.dates.TimeFormat;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.LineTerminator;
 import com.fastChickensHR.edi.x834.constants.SegmentTerminator;

@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.loop2100A;
 
-import com.fastChickensHR.edi.common.segments.N4Segment;
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.segments.N4Segment;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**

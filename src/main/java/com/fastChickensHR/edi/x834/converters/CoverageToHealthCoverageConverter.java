@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.converters;
 
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.domain.Coverage;
 import com.fastChickensHR.edi.x834.loop2000.data.CoverageLevelCode;
 import com.fastChickensHR.edi.x834.loop2000.data.InsuranceLineCode;
