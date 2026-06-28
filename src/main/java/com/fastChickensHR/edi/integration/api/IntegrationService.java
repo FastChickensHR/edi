@@ -40,24 +40,29 @@ public class IntegrationService {
     }
 
     /**
-     * Appends a new row for an existing integration (full replacement, append-only).
-     * Returns empty if no active integration exists for the given id.
+     * Appends a new version for an existing integration (append-only, bitemporal).
+     * The current row's sys_to is closed first to prevent exclusion-constraint violations,
+     * then the new row is inserted with open-ended temporal boundaries.
+     * Returns empty if no currently-valid integration exists for the given id.
      */
     public Optional<IntegrationEntity> update(UUID integrationId, IntegrationRequest request) {
-        if (repository.findCurrentById(integrationId).isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(repository.save(mapper.toNewEntity(integrationId, request)));
+        return repository.findCurrentById(integrationId)
+                .map(current -> {
+                    mapper.closeSysTo(current);
+                    repository.save(current);
+                    return repository.save(mapper.toNewEntity(integrationId, request));
+                });
     }
 
     /**
-     * Soft-deletes an integration by appending a tombstone row.
-     * Returns false if no active integration exists for the given id.
+     * Logically deletes an integration by closing its valid-time period.
+     * Returns false if no currently-valid integration exists for the given id.
      */
     public boolean delete(UUID integrationId) {
         return repository.findCurrentById(integrationId)
                 .map(current -> {
-                    repository.save(mapper.toTombstoneEntity(integrationId, current));
+                    mapper.closeValidTo(current);
+                    repository.save(current);
                     return true;
                 })
                 .orElse(false);

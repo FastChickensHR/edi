@@ -17,19 +17,34 @@ import java.util.UUID;
 
 public interface IntegrationRepository extends JpaRepository<IntegrationEntity, UUID> {
 
-    @Query("""
-            SELECT e FROM IntegrationEntity e
-            WHERE e.integrationId = :integrationId AND e.deleted = false
-            ORDER BY e.createdAt DESC
+    /**
+     * Returns the currently-valid, currently-known row for a given integration.
+     *
+     * <p>"Currently known" = sys_to is open (TEMPORAL_INFINITY).
+     * "Currently valid" = valid_from ≤ now() < valid_to.</p>
+     */
+    @Query(value = """
+            SELECT * FROM integrations
+            WHERE integration_id = :integrationId
+              AND sys_to   = '9999-12-31 23:59:59+00'
+              AND valid_from <= now()
+              AND valid_to   >  now()
+            ORDER BY valid_from DESC
             LIMIT 1
-            """)
+            """, nativeQuery = true)
     Optional<IntegrationEntity> findCurrentById(@Param("integrationId") UUID integrationId);
 
+    /**
+     * Returns one currently-valid, currently-known row per distinct integration_id.
+     *
+     * <p>The exclusion constraint ensures at most one such row exists per integration,
+     * so the result set contains exactly one entry per active integration.</p>
+     */
     @Query(value = """
-            SELECT * FROM (
-                SELECT *, ROW_NUMBER() OVER (PARTITION BY integration_id ORDER BY created_at DESC) AS rn
-                FROM integrations
-            ) t WHERE t.rn = 1 AND t.is_deleted = false
+            SELECT * FROM integrations
+            WHERE sys_to   = '9999-12-31 23:59:59+00'
+              AND valid_from <= now()
+              AND valid_to   >  now()
             """, nativeQuery = true)
     List<IntegrationEntity> findAllCurrent();
 }

@@ -31,21 +31,26 @@ public class IntegrationMapper {
                 entity.getToSystemValue(),
                 entity.getFormat(),
                 domain.direction().name(),
-                entity.getCreatedAt()
+                entity.getSysFrom()
         );
     }
 
     /**
-     * Builds a new (non-deleted) entity row for a create or update request.
+     * Builds a new (open-ended) entity row for a create or update request.
+     * All four temporal fields are set: sys_from and valid_from to now(),
+     * sys_to and valid_to to {@link IntegrationEntity#TEMPORAL_INFINITY}.
      */
     public IntegrationEntity toNewEntity(UUID integrationId, IntegrationRequest request) {
         Partner fromSystem = resolvePartnerFromValue(request.fromSystem());
         Partner toSystem = resolvePartnerFromValue(request.toSystem());
 
+        Instant now = Instant.now();
         IntegrationEntity entity = new IntegrationEntity();
         entity.setIntegrationId(integrationId);
-        entity.setCreatedAt(Instant.now());
-        entity.setDeleted(false);
+        entity.setSysFrom(now);
+        entity.setSysTo(IntegrationEntity.TEMPORAL_INFINITY);
+        entity.setValidFrom(now);
+        entity.setValidTo(IntegrationEntity.TEMPORAL_INFINITY);
         entity.setName(request.name());
         entity.setOwnerId(request.ownerId());
         entity.setFromSystemType(systemType(fromSystem));
@@ -57,21 +62,18 @@ public class IntegrationMapper {
     }
 
     /**
-     * Builds a tombstone (is_deleted = true) row that marks an integration as deleted.
+     * Closes the system-time period of a row, marking it as superseded.
+     * Called before inserting an updated version of the same integration.
      */
-    public IntegrationEntity toTombstoneEntity(UUID integrationId, IntegrationEntity current) {
-        IntegrationEntity tombstone = new IntegrationEntity();
-        tombstone.setIntegrationId(integrationId);
-        tombstone.setCreatedAt(Instant.now());
-        tombstone.setDeleted(true);
-        tombstone.setName(current.getName());
-        tombstone.setOwnerId(current.getOwnerId());
-        tombstone.setFromSystemType(current.getFromSystemType());
-        tombstone.setFromSystemValue(current.getFromSystemValue());
-        tombstone.setToSystemType(current.getToSystemType());
-        tombstone.setToSystemValue(current.getToSystemValue());
-        tombstone.setFormat(current.getFormat());
-        return tombstone;
+    public void closeSysTo(IntegrationEntity entity) {
+        entity.setSysTo(Instant.now());
+    }
+
+    /**
+     * Closes the valid-time period of a row, marking it as logically deleted.
+     */
+    public void closeValidTo(IntegrationEntity entity) {
+        entity.setValidTo(Instant.now());
     }
 
     // --- private helpers ---
