@@ -73,12 +73,10 @@ public class StateOfMichigan834 {
                     MICHIGAN_ENROLLMENT));
         }
 
-        Trailer trailer = new Trailer.Builder(context).build();
-
         return new x834Document.Builder(context)
                 .withHeader(header)
                 .withMembers(members)
-                .withTrailer(trailer)
+                .withTrailer(new Trailer.Builder(context))
                 .build();
     }
 

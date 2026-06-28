@@ -123,15 +123,14 @@ public final class DocumentGenerator {
                 .setPayerName(faker.company().name())
                 .build();
 
-        Trailer trailer = new Trailer.Builder(ctx)
+        Trailer.Builder trailerBuilder = new Trailer.Builder(ctx)
                 .setTransactionSetControlNumber(ctx.getTransactionSetControlNumber() != null
                         ? ctx.getTransactionSetControlNumber() : "0001")
-                .setGroupControlNumber(ctx.getGroupControlNumber() != null ? ctx.getGroupControlNumber() : "1")
-                .build();
+                .setGroupControlNumber(ctx.getGroupControlNumber() != null ? ctx.getGroupControlNumber() : "1");
 
         x834Document.Builder builder = new x834Document.Builder(ctx)
                 .withHeader(header)
-                .withTrailer(trailer);
+                .withTrailer(trailerBuilder);
 
         PersonGenerator personGen = new PersonGenerator(parent)
                 .withMarriedRate(marriedRate)
