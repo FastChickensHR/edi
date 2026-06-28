@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.common.segments.RefSegment;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.segments.RefSegment;
 import lombok.Getter;
 
 /**

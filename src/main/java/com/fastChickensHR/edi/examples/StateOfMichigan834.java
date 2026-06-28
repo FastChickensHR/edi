@@ -7,9 +7,8 @@
  */
 package com.fastChickensHR.edi.examples;
 
-import com.fastChickensHR.edi.common.TestDataGenerator;
-import com.fastChickensHR.edi.domain.Person;
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.fixtures.X834Fixtures;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.converters.EnrollmentContext;
 import com.fastChickensHR.edi.x834.converters.PersonToMemberConverter;
 import com.fastChickensHR.edi.x834.x834Context;
@@ -22,13 +21,14 @@ import com.fastChickensHR.edi.x834.trailer.Trailer;
 import com.fastChickensHR.edi.x834.x834Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Example class demonstrating how to create an 834 document for the State of Michigan.
- * Domain {@link Person} objects are converted to X12 834 {@link Member} records via
+ * Domain {@link com.fastChickensHR.edi.domain.Person} objects are generated via
+ * {@link X834Fixtures} and converted to X12 834 {@link Member} records via
  * {@link PersonToMemberConverter} using a Michigan-specific {@link EnrollmentContext}.
  */
 public class StateOfMichigan834 {
@@ -65,10 +65,13 @@ public class StateOfMichigan834 {
                 .setPayerIdentification("123456789")
                 .build();
 
-        List<Member> members = TestDataGenerator.generatePersons(memberCount)
-                .stream()
-                .map(person -> PersonToMemberConverter.convert(person, MICHIGAN_ENROLLMENT))
-                .collect(Collectors.toList());
+        X834Fixtures fixtures = X834Fixtures.random();
+        List<Member> members = new ArrayList<>();
+        for (int i = 0; i < memberCount; i++) {
+            members.add(PersonToMemberConverter.convert(
+                    fixtures.person().build(),
+                    MICHIGAN_ENROLLMENT));
+        }
 
         Trailer trailer = new Trailer.Builder(context).build();
 

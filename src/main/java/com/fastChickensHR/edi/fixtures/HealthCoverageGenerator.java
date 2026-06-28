@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.fixtures;
 
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.CoverageLevelCode;
 import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.InsuranceLineCode;

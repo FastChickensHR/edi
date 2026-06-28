@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.fixtures;
 
-import com.fastChickensHR.edi.common.exception.ValidationException;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.domain.Person;
 import com.fastChickensHR.edi.x834.converters.EnrollmentContext;
 import com.fastChickensHR.edi.x834.converters.PersonToMemberConverter;

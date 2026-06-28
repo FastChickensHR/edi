@@ -7,11 +7,11 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.common.data.FunctionalIdentifierCode;
-import com.fastChickensHR.edi.common.data.ResponsibleAgencyCode;
-import com.fastChickensHR.edi.common.data.VersionCode;
-import com.fastChickensHR.edi.common.exception.ValidationException;
-import com.fastChickensHR.edi.common.segments.GSSegment;
+import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
+import com.fastChickensHR.edi.x834.data.ResponsibleAgencyCode;
+import com.fastChickensHR.edi.x834.data.VersionCode;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.segments.GSSegment;
 import com.fastChickensHR.edi.x834.x834Context;
 import lombok.Getter;
 
