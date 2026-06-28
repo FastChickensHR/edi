@@ -20,12 +20,22 @@ import lombok.experimental.Accessors;
 @Getter
 abstract public class IEASegment extends Segment {
     public static final String SEGMENT_ID = "IEA";
-    protected final String iea01;
-    protected final String iea02;
+    protected final String iea01; // Number of Included Functional Groups
+    protected final String iea02; // Interchange Control Number
 
     protected IEASegment(IEASegment.AbstractBuilder<?> builder) throws ValidationException {
         this.iea01 = builder.iea01;
         this.iea02 = builder.iea02;
+        validateRequiredFields();
+    }
+
+    private void validateRequiredFields() throws ValidationException {
+        if (iea01 == null || iea01.isBlank()) {
+            throw new ValidationException("IEA01 (Number of Included Functional Groups) cannot be blank");
+        }
+        if (iea02 == null || iea02.isBlank()) {
+            throw new ValidationException("IEA02 (Interchange Control Number) cannot be blank");
+        }
     }
 
     @Override

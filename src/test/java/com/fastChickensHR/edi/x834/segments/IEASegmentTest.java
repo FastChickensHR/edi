@@ -109,11 +109,27 @@ class IEASegmentTest {
     }
 
     @Test
-    void testNullValues() throws ValidationException {
-        TestIEASegment segment = TestIEASegment.builder()
-                .build();
+    void testBlankIea01ThrowsValidationException() {
+        assertThrows(ValidationException.class, () ->
+                TestIEASegment.builder()
+                        .setIea02("000000001")
+                        .build()
+        );
+    }
 
-        assertNull(segment.getIea01());
-        assertNull(segment.getIea02());
+    @Test
+    void testBlankIea02ThrowsValidationException() {
+        assertThrows(ValidationException.class, () ->
+                TestIEASegment.builder()
+                        .setIea01("1")
+                        .build()
+        );
+    }
+
+    @Test
+    void testBothFieldsNullThrowsValidationException() {
+        assertThrows(ValidationException.class, () ->
+                TestIEASegment.builder().build()
+        );
     }
 }
