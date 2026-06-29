@@ -49,7 +49,8 @@ public class RefreshTokenEntity {
     @Column(name = "valid_to", nullable = false)
     private Instant validTo;
 
-    /** BCrypt hash of the raw token — the raw value is never stored. */
+    /** SHA-256 hex digest of the raw token — the raw value is never stored.
+     *  SHA-256 (not BCrypt) is used here because lookup requires a deterministic hash. */
     @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 

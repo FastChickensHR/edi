@@ -55,7 +55,8 @@ public class ApiKeyEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    /** BCrypt hash of the raw key — the raw value is never stored. */
+    /** SHA-256 hex digest of the raw key — the raw value is never stored.
+     *  SHA-256 (not BCrypt) is used here because lookup requires a deterministic hash. */
     @Column(name = "key_hash", nullable = false)
     private String keyHash;
 
