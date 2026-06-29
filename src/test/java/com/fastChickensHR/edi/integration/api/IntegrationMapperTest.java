@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class IntegrationMapperTest {
 
     private static final UUID INTEGRATION_ID = UUID.fromString("a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-    private static final UUID OWNER_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    private static final UUID ORGANIZATION_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    private static final UUID CREATED_BY_USER_ID = UUID.fromString("660e8400-e29b-41d4-a716-446655440001");
 
     private final IntegrationMapper mapper = new IntegrationMapper();
 
@@ -27,13 +28,15 @@ class IntegrationMapperTest {
     @Test
     void toNewEntity_setsAllFieldsCorrectlyForOutboundIntegration() {
         IntegrationRequest request = new IntegrationRequest(
-                "State of Michigan 834", OWNER_ID, "FASTCHICKENS_HR", "STATE_OF_MICHIGAN", "X12_834");
+                "State of Michigan 834", ORGANIZATION_ID, CREATED_BY_USER_ID,
+                "FASTCHICKENS_HR", "STATE_OF_MICHIGAN", "X12_834");
 
         IntegrationEntity entity = mapper.toNewEntity(INTEGRATION_ID, request);
 
         assertEquals(INTEGRATION_ID, entity.getIntegrationId());
         assertEquals("State of Michigan 834", entity.getName());
-        assertEquals(OWNER_ID, entity.getOwnerId());
+        assertEquals(ORGANIZATION_ID, entity.getOrganizationId());
+        assertEquals(CREATED_BY_USER_ID, entity.getCreatedByUserId());
         assertEquals("INTERNAL", entity.getFromSystemType());
         assertEquals("FASTCHICKENS_HR", entity.getFromSystemValue());
         assertEquals("EXTERNAL", entity.getToSystemType());
@@ -48,7 +51,8 @@ class IntegrationMapperTest {
     @Test
     void toNewEntity_resolvesExternalFromSystem() {
         IntegrationRequest request = new IntegrationRequest(
-                "Inbound", OWNER_ID, "STATE_OF_MICHIGAN", "FASTCHICKENS_HR", "X12_834");
+                "Inbound", ORGANIZATION_ID, CREATED_BY_USER_ID,
+                "STATE_OF_MICHIGAN", "FASTCHICKENS_HR", "X12_834");
 
         IntegrationEntity entity = mapper.toNewEntity(INTEGRATION_ID, request);
 
@@ -61,7 +65,8 @@ class IntegrationMapperTest {
     @Test
     void toNewEntity_throwsOnUnknownSystem() {
         IntegrationRequest request = new IntegrationRequest(
-                "Bad", OWNER_ID, "UNKNOWN_SYSTEM", "STATE_OF_MICHIGAN", "X12_834");
+                "Bad", ORGANIZATION_ID, CREATED_BY_USER_ID,
+                "UNKNOWN_SYSTEM", "STATE_OF_MICHIGAN", "X12_834");
 
         assertThrows(IllegalArgumentException.class, () -> mapper.toNewEntity(INTEGRATION_ID, request));
     }
@@ -69,7 +74,8 @@ class IntegrationMapperTest {
     @Test
     void toNewEntity_throwsOnUnknownFormat() {
         IntegrationRequest request = new IntegrationRequest(
-                "Bad", OWNER_ID, "FASTCHICKENS_HR", "STATE_OF_MICHIGAN", "NOT_A_FORMAT");
+                "Bad", ORGANIZATION_ID, CREATED_BY_USER_ID,
+                "FASTCHICKENS_HR", "STATE_OF_MICHIGAN", "NOT_A_FORMAT");
 
         assertThrows(IllegalArgumentException.class, () -> mapper.toNewEntity(INTEGRATION_ID, request));
     }
@@ -99,7 +105,8 @@ class IntegrationMapperTest {
 
         assertEquals(INTEGRATION_ID, response.integrationId());
         assertEquals("Test Integration", response.name());
-        assertEquals(OWNER_ID, response.ownerId());
+        assertEquals(ORGANIZATION_ID, response.organizationId());
+        assertEquals(CREATED_BY_USER_ID, response.createdByUserId());
         assertEquals("FASTCHICKENS_HR", response.fromSystem());
         assertEquals("STATE_OF_MICHIGAN", response.toSystem());
         assertEquals("X12_834", response.format());
@@ -132,7 +139,8 @@ class IntegrationMapperTest {
         entity.setValidFrom(Instant.now());
         entity.setValidTo(IntegrationEntity.TEMPORAL_INFINITY);
         entity.setName("Test Integration");
-        entity.setOwnerId(OWNER_ID);
+        entity.setOrganizationId(ORGANIZATION_ID);
+        entity.setCreatedByUserId(CREATED_BY_USER_ID);
         entity.setFromSystemType("INTERNAL");
         entity.setFromSystemValue("FASTCHICKENS_HR");
         entity.setToSystemType("EXTERNAL");
