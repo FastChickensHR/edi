@@ -18,7 +18,8 @@ import java.util.UUID;
 public record IntegrationResponse(
         UUID integrationId,
         String name,
-        UUID ownerId,
+        UUID organizationId,
+        UUID createdByUserId,
         String fromSystem,
         String toSystem,
         String format,

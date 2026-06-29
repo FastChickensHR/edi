@@ -26,7 +26,8 @@ public class IntegrationMapper {
         return new IntegrationResponse(
                 entity.getIntegrationId(),
                 entity.getName(),
-                entity.getOwnerId(),
+                entity.getOrganizationId(),
+                entity.getCreatedByUserId(),
                 entity.getFromSystemValue(),
                 entity.getToSystemValue(),
                 entity.getFormat(),
@@ -52,7 +53,8 @@ public class IntegrationMapper {
         entity.setValidFrom(now);
         entity.setValidTo(IntegrationEntity.TEMPORAL_INFINITY);
         entity.setName(request.name());
-        entity.setOwnerId(request.ownerId());
+        entity.setOrganizationId(request.organizationId());
+        entity.setCreatedByUserId(request.createdByUserId());
         entity.setFromSystemType(systemType(fromSystem));
         entity.setFromSystemValue(enumName(fromSystem));
         entity.setToSystemType(systemType(toSystem));
@@ -82,7 +84,7 @@ public class IntegrationMapper {
         return Integration.builder()
                 .id(entity.getIntegrationId())
                 .name(entity.getName())
-                .owner(UserId.of(entity.getOwnerId()))
+                .owner(UserId.of(entity.getCreatedByUserId()))
                 .fromSystem(resolvePartner(entity.getFromSystemType(), entity.getFromSystemValue()))
                 .toSystem(resolvePartner(entity.getToSystemType(), entity.getToSystemValue()))
                 .format(IntegrationFormat.valueOf(entity.getFormat()))

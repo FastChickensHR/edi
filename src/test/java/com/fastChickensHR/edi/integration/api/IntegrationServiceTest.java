@@ -38,10 +38,11 @@ class IntegrationServiceTest {
     private IntegrationService service;
 
     private static final UUID INTEGRATION_ID = UUID.fromString("a1b2c3d4-e5f6-7890-abcd-ef1234567890");
-    private static final UUID OWNER_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    private static final UUID ORGANIZATION_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    private static final UUID CREATED_BY_USER_ID = UUID.fromString("660e8400-e29b-41d4-a716-446655440001");
 
     private static IntegrationRequest sampleRequest() {
-        return new IntegrationRequest("Test", OWNER_ID, "FASTCHICKENS_HR", "STATE_OF_MICHIGAN", "X12_834");
+        return new IntegrationRequest("Test", ORGANIZATION_ID, CREATED_BY_USER_ID, "FASTCHICKENS_HR", "STATE_OF_MICHIGAN", "X12_834");
     }
 
     // --- findAll ---
