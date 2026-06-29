@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.integration.x834.persistence;
 
-import com.fastChickensHR.edi.integration.persistence.IntegrationEntity;
+import com.fastChickensHR.edi.common.TemporalConstants;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +23,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class X834IntegrationConfigEntity {
 
-    /**
-     * Sentinel value representing an open-ended temporal boundary ("forever").
-     * Matches {@link IntegrationEntity#TEMPORAL_INFINITY}.
-     */
-    public static final Instant TEMPORAL_INFINITY = Instant.parse("9999-12-31T23:59:59Z");
+    /** @see TemporalConstants#TEMPORAL_INFINITY */
+    public static final Instant TEMPORAL_INFINITY = TemporalConstants.TEMPORAL_INFINITY;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
