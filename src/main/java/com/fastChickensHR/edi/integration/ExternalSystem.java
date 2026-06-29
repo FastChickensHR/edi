@@ -16,7 +16,10 @@ import lombok.Getter;
  */
 @Getter
 public enum ExternalSystem implements Partner {
-    STATE_OF_MICHIGAN("State of Michigan");
+    STATE_OF_MICHIGAN("State of Michigan"),
+    WORKDAY("Workday"),
+    ADP("ADP"),
+    BENEFITFOCUS("Benefitfocus");
 
     private final String displayName;
 

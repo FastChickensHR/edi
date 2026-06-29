@@ -26,13 +26,13 @@ public class IntegrationService {
     private final IntegrationMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<IntegrationEntity> findAll() {
-        return repository.findAllCurrent();
+    public List<IntegrationEntity> findAll(UUID organizationId) {
+        return repository.findAllCurrentByOrganizationId(organizationId);
     }
 
     @Transactional(readOnly = true)
-    public Optional<IntegrationEntity> findById(UUID integrationId) {
-        return repository.findCurrentById(integrationId);
+    public Optional<IntegrationEntity> findById(UUID integrationId, UUID organizationId) {
+        return repository.findCurrentByIdAndOrganizationId(integrationId, organizationId);
     }
 
     public IntegrationEntity create(IntegrationRequest request) {
@@ -43,10 +43,10 @@ public class IntegrationService {
      * Appends a new version for an existing integration (append-only, bitemporal).
      * The current row's sys_to is closed first to prevent exclusion-constraint violations,
      * then the new row is inserted with open-ended temporal boundaries.
-     * Returns empty if no currently-valid integration exists for the given id.
+     * Returns empty if no currently-valid integration exists for the given id within the org.
      */
-    public Optional<IntegrationEntity> update(UUID integrationId, IntegrationRequest request) {
-        return repository.findCurrentById(integrationId)
+    public Optional<IntegrationEntity> update(UUID integrationId, UUID organizationId, IntegrationRequest request) {
+        return repository.findCurrentByIdAndOrganizationId(integrationId, organizationId)
                 .map(current -> {
                     mapper.closeSysTo(current);
                     repository.save(current);
@@ -56,10 +56,10 @@ public class IntegrationService {
 
     /**
      * Logically deletes an integration by closing its valid-time period.
-     * Returns false if no currently-valid integration exists for the given id.
+     * Returns false if no currently-valid integration exists for the given id within the org.
      */
-    public boolean delete(UUID integrationId) {
-        return repository.findCurrentById(integrationId)
+    public boolean delete(UUID integrationId, UUID organizationId) {
+        return repository.findCurrentByIdAndOrganizationId(integrationId, organizationId)
                 .map(current -> {
                     mapper.closeValidTo(current);
                     repository.save(current);
