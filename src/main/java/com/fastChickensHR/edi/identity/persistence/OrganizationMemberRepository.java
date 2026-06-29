@@ -29,6 +29,16 @@ public interface OrganizationMemberRepository extends JpaRepository<Organization
 
     @Query(value = """
             SELECT * FROM organization_members
+            WHERE user_id = :userId
+              AND sys_to   = '9999-12-31 23:59:59+00'
+              AND valid_from <= now()
+              AND valid_to   >  now()
+            """, nativeQuery = true)
+    List<OrganizationMemberEntity> findAllCurrentByUserId(
+            @Param("userId") UUID userId);
+
+    @Query(value = """
+            SELECT * FROM organization_members
             WHERE organization_id = :organizationId
               AND user_id = :userId
               AND sys_to   = '9999-12-31 23:59:59+00'
