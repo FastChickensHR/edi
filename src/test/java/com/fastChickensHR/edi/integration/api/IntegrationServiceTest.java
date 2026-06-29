@@ -50,18 +50,18 @@ class IntegrationServiceTest {
     @Test
     void findAll_returnsResultsFromRepository() {
         List<IntegrationEntity> entities = List.of(new IntegrationEntity(), new IntegrationEntity());
-        when(repository.findAllCurrent()).thenReturn(entities);
+        when(repository.findAllCurrentByOrganizationId(ORGANIZATION_ID)).thenReturn(entities);
 
-        List<IntegrationEntity> result = service.findAll();
+        List<IntegrationEntity> result = service.findAll(ORGANIZATION_ID);
 
         assertEquals(entities, result);
     }
 
     @Test
     void findAll_returnsEmptyListWhenNoActiveIntegrations() {
-        when(repository.findAllCurrent()).thenReturn(List.of());
+        when(repository.findAllCurrentByOrganizationId(ORGANIZATION_ID)).thenReturn(List.of());
 
-        assertTrue(service.findAll().isEmpty());
+        assertTrue(service.findAll(ORGANIZATION_ID).isEmpty());
     }
 
     // --- findById ---
@@ -69,9 +69,10 @@ class IntegrationServiceTest {
     @Test
     void findById_returnsPresentWhenFound() {
         IntegrationEntity entity = new IntegrationEntity();
-        when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.of(entity));
+        when(repository.findCurrentByIdAndOrganizationId(INTEGRATION_ID, ORGANIZATION_ID))
+                .thenReturn(Optional.of(entity));
 
-        Optional<IntegrationEntity> result = service.findById(INTEGRATION_ID);
+        Optional<IntegrationEntity> result = service.findById(INTEGRATION_ID, ORGANIZATION_ID);
 
         assertTrue(result.isPresent());
         assertSame(entity, result.get());
@@ -79,9 +80,10 @@ class IntegrationServiceTest {
 
     @Test
     void findById_returnsEmptyWhenNotFound() {
-        when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.empty());
+        when(repository.findCurrentByIdAndOrganizationId(INTEGRATION_ID, ORGANIZATION_ID))
+                .thenReturn(Optional.empty());
 
-        assertTrue(service.findById(INTEGRATION_ID).isEmpty());
+        assertTrue(service.findById(INTEGRATION_ID, ORGANIZATION_ID).isEmpty());
     }
 
     // --- create ---
@@ -104,9 +106,10 @@ class IntegrationServiceTest {
 
     @Test
     void update_returnsEmptyWhenIntegrationNotFound() {
-        when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.empty());
+        when(repository.findCurrentByIdAndOrganizationId(INTEGRATION_ID, ORGANIZATION_ID))
+                .thenReturn(Optional.empty());
 
-        Optional<IntegrationEntity> result = service.update(INTEGRATION_ID, sampleRequest());
+        Optional<IntegrationEntity> result = service.update(INTEGRATION_ID, ORGANIZATION_ID, sampleRequest());
 
         assertTrue(result.isEmpty());
     }
@@ -116,12 +119,13 @@ class IntegrationServiceTest {
         IntegrationRequest request = sampleRequest();
         IntegrationEntity current = new IntegrationEntity();
         IntegrationEntity updated = new IntegrationEntity();
-        when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.of(current));
+        when(repository.findCurrentByIdAndOrganizationId(INTEGRATION_ID, ORGANIZATION_ID))
+                .thenReturn(Optional.of(current));
         when(mapper.toNewEntity(INTEGRATION_ID, request)).thenReturn(updated);
         when(repository.save(current)).thenReturn(current);
         when(repository.save(updated)).thenReturn(updated);
 
-        Optional<IntegrationEntity> result = service.update(INTEGRATION_ID, request);
+        Optional<IntegrationEntity> result = service.update(INTEGRATION_ID, ORGANIZATION_ID, request);
 
         assertTrue(result.isPresent());
         assertSame(updated, result.get());
@@ -134,17 +138,19 @@ class IntegrationServiceTest {
 
     @Test
     void delete_returnsFalseWhenIntegrationNotFound() {
-        when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.empty());
+        when(repository.findCurrentByIdAndOrganizationId(INTEGRATION_ID, ORGANIZATION_ID))
+                .thenReturn(Optional.empty());
 
-        assertFalse(service.delete(INTEGRATION_ID));
+        assertFalse(service.delete(INTEGRATION_ID, ORGANIZATION_ID));
     }
 
     @Test
     void delete_closesValidToAndReturnsTrueWhenFound() {
         IntegrationEntity current = new IntegrationEntity();
-        when(repository.findCurrentById(INTEGRATION_ID)).thenReturn(Optional.of(current));
+        when(repository.findCurrentByIdAndOrganizationId(INTEGRATION_ID, ORGANIZATION_ID))
+                .thenReturn(Optional.of(current));
 
-        assertTrue(service.delete(INTEGRATION_ID));
+        assertTrue(service.delete(INTEGRATION_ID, ORGANIZATION_ID));
         verify(mapper).closeValidTo(current);
         verify(repository).save(current);
     }

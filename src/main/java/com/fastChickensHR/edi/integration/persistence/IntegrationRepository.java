@@ -47,4 +47,35 @@ public interface IntegrationRepository extends JpaRepository<IntegrationEntity, 
               AND valid_to   >  now()
             """, nativeQuery = true)
     List<IntegrationEntity> findAllCurrent();
+
+    /**
+     * Returns the currently-valid, currently-known row scoped to a specific organization.
+     * Returns empty if the integration exists but belongs to a different organization.
+     */
+    @Query(value = """
+            SELECT * FROM integrations
+            WHERE integration_id = :integrationId
+              AND organization_id = :organizationId
+              AND sys_to   = '9999-12-31 23:59:59+00'
+              AND valid_from <= now()
+              AND valid_to   >  now()
+            ORDER BY valid_from DESC
+            LIMIT 1
+            """, nativeQuery = true)
+    Optional<IntegrationEntity> findCurrentByIdAndOrganizationId(
+            @Param("integrationId") UUID integrationId,
+            @Param("organizationId") UUID organizationId);
+
+    /**
+     * Returns all currently-valid integrations belonging to the given organization.
+     */
+    @Query(value = """
+            SELECT * FROM integrations
+            WHERE organization_id = :organizationId
+              AND sys_to   = '9999-12-31 23:59:59+00'
+              AND valid_from <= now()
+              AND valid_to   >  now()
+            """, nativeQuery = true)
+    List<IntegrationEntity> findAllCurrentByOrganizationId(
+            @Param("organizationId") UUID organizationId);
 }
