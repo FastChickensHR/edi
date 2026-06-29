@@ -96,7 +96,7 @@ class IntegrationTest {
 
     @Test
     void testExternalSystemEnumValues() {
-        assertEquals(1, ExternalSystem.values().length);
+        assertEquals(4, ExternalSystem.values().length);
         assertEquals("State of Michigan", ExternalSystem.STATE_OF_MICHIGAN.getDisplayName());
     }
 
