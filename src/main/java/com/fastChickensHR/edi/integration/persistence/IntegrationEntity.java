@@ -53,8 +53,11 @@ public class IntegrationEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "owner_id", nullable = false)
-    private UUID ownerId;
+    @Column(name = "organization_id")
+    private UUID organizationId;
+
+    @Column(name = "created_by_user_id")
+    private UUID createdByUserId;
 
     @Column(name = "from_system_type", nullable = false)
     private String fromSystemType;

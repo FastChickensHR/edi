@@ -17,7 +17,8 @@ import java.util.UUID;
  */
 public record IntegrationRequest(
         String name,
-        UUID ownerId,
+        UUID organizationId,
+        UUID createdByUserId,
         String fromSystem,
         String toSystem,
         String format
