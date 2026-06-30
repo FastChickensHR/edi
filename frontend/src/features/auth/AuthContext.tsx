@@ -1,10 +1,12 @@
 import { createContext, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { http, setAccessToken } from '@/lib/http'
+import { decodeJwtRole } from '@/lib/auth'
 import { queryClient } from '@/lib/queryClient'
-import type { User, LoginRequest } from '@/types'
+import type { User, LoginRequest, MemberRole } from '@/types'
 
 interface AuthState {
   user: User | null
+  memberRole: MemberRole | null
   isLoading: boolean
   isAuthenticated: boolean
   login: (credentials: LoginRequest) => Promise<void>
@@ -22,6 +24,7 @@ export const AuthContext = createContext<AuthState | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [memberRole, setMemberRole] = useState<MemberRole | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const initialized = useRef(false)
 
@@ -34,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setAccessToken(null)
       setUser(null)
+      setMemberRole(null)
       queryClient.clear()
     }
   }, [])
@@ -48,10 +52,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(({ accessToken, user }) => {
         setAccessToken(accessToken)
         setUser(user)
+        setMemberRole(decodeJwtRole(accessToken))
       })
       .catch(() => {
         setAccessToken(null)
         setUser(null)
+        setMemberRole(null)
       })
       .finally(() => setIsLoading(false))
   }, [])
@@ -67,10 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { accessToken, user } = await http.post<LoginResponse>('/api/auth/login', credentials)
     setAccessToken(accessToken)
     setUser(user)
+    setMemberRole(decodeJwtRole(accessToken))
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: user !== null, login, logout }}>
+    <AuthContext.Provider value={{ user, memberRole, isLoading, isAuthenticated: user !== null, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

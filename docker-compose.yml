@@ -15,5 +15,19 @@ services:
       timeout: 5s
       retries: 5
 
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "yarn install && yarn dev --host"
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_PROXY_TARGET=http://host.docker.internal:8081
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 volumes:
   postgres_data:

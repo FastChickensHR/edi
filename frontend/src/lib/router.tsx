@@ -3,6 +3,10 @@ import { AuthenticatedLayout } from '@/layouts/AuthenticatedLayout'
 import { UnauthenticatedLayout } from '@/layouts/UnauthenticatedLayout'
 import { LoginPage } from '@/pages/LoginPage'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { IntegrationListPage } from '@/pages/IntegrationListPage'
+import { IntegrationCreatePage } from '@/pages/IntegrationCreatePage'
+import { IntegrationEditPage } from '@/pages/IntegrationEditPage'
+import { IntegrationDetailPage } from '@/pages/IntegrationDetailPage'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 
 export const router = createBrowserRouter([
@@ -21,10 +25,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: '/dashboard', element: <DashboardPage /> },
-      // Feature routes will be added here as features are built
-      // { path: '/integrations', element: <IntegrationsPage /> },
-      // { path: '/integrations/:integrationId', element: <IntegrationDetailPage /> },
-      // { path: '/organizations', element: <OrganizationsPage /> },
+      { path: '/integrations', element: <IntegrationListPage /> },
+      { path: '/integrations/new', element: <IntegrationCreatePage /> },
+      { path: '/integrations/:integrationId', element: <IntegrationDetailPage /> },
+      { path: '/integrations/:integrationId/edit', element: <IntegrationEditPage /> },
     ],
   },
   {

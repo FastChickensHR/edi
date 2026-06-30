@@ -6,6 +6,7 @@ import { queryClient } from '@/lib/queryClient'
 import { theme } from '@/theme'
 import { AuthProvider } from '@/features/auth/AuthContext'
 import { OrganizationProvider } from '@/features/organizations/OrganizationContext'
+import { Toaster } from '@/components/Toast'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <AuthProvider>
           <OrganizationProvider>
             <RouterProvider router={router} />
+            <Toaster position="bottom-right" richColors />
           </OrganizationProvider>
         </AuthProvider>
       </ThemeProvider>
