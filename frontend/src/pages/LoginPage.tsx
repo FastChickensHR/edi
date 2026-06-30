@@ -14,18 +14,28 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
+const Header = styled.div`
+  margin-bottom: ${({ theme }) => theme.spacing[8]};
+`
+
 const Title = styled.h1`
   font-size: ${({ theme }) => theme.fontSize['2xl']};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   color: ${({ theme }) => theme.colors.gray[900]};
-  margin: 0 0 ${({ theme }) => theme.spacing[6]};
-  text-align: center;
+  margin: 0 0 ${({ theme }) => theme.spacing[2]};
+  letter-spacing: -0.015em;
+`
+
+const Subtitle = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ theme }) => theme.colors.gray[500]};
+  margin: 0;
 `
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[4]};
+  gap: ${({ theme }) => theme.spacing[5]};
 `
 
 const Label = styled.label`
@@ -34,16 +44,24 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.gray[700]};
 `
 
+const HelperText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.xs};
+  color: ${({ theme }) => theme.colors.gray[400]};
+  margin: 0;
+`
+
 const SubmitButton = styled.button`
-  padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[4]}`};
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing[2.5]} ${theme.spacing[4]}`};
   background-color: ${({ theme }) => theme.colors.blue[600]};
   color: ${({ theme }) => theme.colors.white};
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   font-size: ${({ theme }) => theme.fontSize.sm};
-  font-weight: ${({ theme }) => theme.fontWeight.medium};
+  font-weight: ${({ theme }) => theme.fontWeight.semibold};
   cursor: pointer;
   transition: background-color 150ms ease;
+  margin-top: ${({ theme }) => theme.spacing[2]};
 
   &:hover:not(:disabled) {
     background-color: ${({ theme }) => theme.colors.blue[700]};
@@ -53,6 +71,13 @@ const SubmitButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   }
+`
+
+const Footer = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.xs};
+  color: ${({ theme }) => theme.colors.gray[400]};
+  text-align: center;
+  margin: ${({ theme }) => theme.spacing[6]} 0 0;
 `
 
 export function LoginPage() {
@@ -79,7 +104,10 @@ export function LoginPage() {
 
   return (
     <>
-      <Title>Sign in</Title>
+      <Header>
+        <Title>Sign in</Title>
+        <Subtitle>Enter your credentials to continue</Subtitle>
+      </Header>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Field>
           <Label htmlFor="email">Email</Label>
@@ -112,6 +140,7 @@ export function LoginPage() {
             $hasError={!!errors.organizationId}
             {...register('organizationId')}
           />
+          <HelperText>Provided by your administrator</HelperText>
           {errors.organizationId && <ErrorText>{errors.organizationId.message}</ErrorText>}
         </Field>
         {errors.root && <ErrorText>{errors.root.message}</ErrorText>}
@@ -119,6 +148,7 @@ export function LoginPage() {
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </SubmitButton>
       </Form>
+      <Footer>Contact your administrator for access</Footer>
     </>
   )
 }
