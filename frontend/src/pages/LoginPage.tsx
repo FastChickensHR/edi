@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAuth } from '@/hooks/useAuth'
+import { Input, ErrorText, Field } from '@/components/Input'
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -27,37 +28,10 @@ const Form = styled.form`
   gap: ${({ theme }) => theme.spacing[4]};
 `
 
-const Field = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[1]};
-`
-
 const Label = styled.label`
   font-size: ${({ theme }) => theme.fontSize.sm};
   font-weight: ${({ theme }) => theme.fontWeight.medium};
   color: ${({ theme }) => theme.colors.gray[700]};
-`
-
-const Input = styled.input<{ $hasError?: boolean }>`
-  padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[3]}`};
-  border: 1px solid
-    ${({ theme, $hasError }) => ($hasError ? theme.colors.red[500] : theme.colors.gray[300])};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-size: ${({ theme }) => theme.fontSize.sm};
-  color: ${({ theme }) => theme.colors.gray[900]};
-  outline: none;
-
-  &:focus {
-    border-color: ${({ theme }) => theme.colors.blue[500]};
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.blue[100]};
-  }
-`
-
-const ErrorText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.xs};
-  color: ${({ theme }) => theme.colors.red[600]};
-  margin: 0;
 `
 
 const SubmitButton = styled.button`

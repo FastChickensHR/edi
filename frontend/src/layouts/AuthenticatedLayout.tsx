@@ -3,8 +3,6 @@ import styled from 'styled-components'
 import {
   Squares2X2Icon,
   ArrowsRightLeftIcon,
-  BuildingOfficeIcon,
-  UsersIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/hooks/useAuth'
 import { useOrganization } from '@/hooks/useOrganization'
@@ -144,8 +142,6 @@ const Content = styled.main`
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', Icon: Squares2X2Icon },
   { to: '/integrations', label: 'Integrations', Icon: ArrowsRightLeftIcon },
-  { to: '/organizations', label: 'Organizations', Icon: BuildingOfficeIcon },
-  { to: '/members', label: 'Members', Icon: UsersIcon },
 ]
 
 interface AuthenticatedLayoutProps {
