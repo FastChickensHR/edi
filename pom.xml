@@ -22,6 +22,7 @@
     <description>Open-source toolkit for generating X12 EDI benefit enrollment documents</description>
 
     <modules>
+        <module>edi-core</module>
         <module>edi-834</module>
         <module>edi-csv</module>
     </modules>
