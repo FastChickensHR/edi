@@ -18,6 +18,9 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberName;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -104,6 +107,10 @@ public class X834MemberWriter {
         appendResidenceAddress(segments, member);
         appendDemographics(segments, member);
 
+        // Loop 2100C (member mailing address), emitted after the 2100A block when the member
+        // carries a distinct mailing address.
+        appendMailingAddress(segments, member);
+
         // Loop 2300: this member's own trailing segments (health coverage HD, REF extensions).
         // Emitting them here keeps a member's coverage nested inside its own loop, before any
         // dependent's loop begins.
@@ -139,6 +146,30 @@ public class X834MemberWriter {
                     .setCityName(member.getCity())
                     .setStateOrProvinceCode(member.getState())
                     .setPostalCode(member.getZipCode())
+                    .build());
+        }
+    }
+
+    /**
+     * Loop 2100C (member mailing address): NM1*31 postal-address marker, then N3/N4. Emitted only
+     * when the member carries a {@link AddressType#MAILING} address with a street line; the N4 is
+     * added when city/state/zip are all present.
+     */
+    private void appendMailingAddress(List<Segment> segments, BaseMember member) throws ValidationException {
+        Address mailing = member.getAddress(AddressType.MAILING).orElse(null);
+        if (mailing == null || !mailing.hasStreet()) {
+            return;
+        }
+        segments.add(MemberMailingAddress.builder().build());
+        segments.add(MemberMailingStreetAddress.builder()
+                .setAddressLine1(mailing.getLine1())
+                .setAddressLine2(emptyToNull(mailing.getLine2()))
+                .build());
+        if (mailing.hasCityStateZip()) {
+            segments.add(MemberMailingCityStateZipCode.builder()
+                    .setCityName(mailing.getCity())
+                    .setStateOrProvinceCode(mailing.getState())
+                    .setPostalCode(mailing.getZipCode())
                     .build());
         }
     }

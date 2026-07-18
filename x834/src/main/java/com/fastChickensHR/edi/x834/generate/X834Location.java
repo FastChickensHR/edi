@@ -60,6 +60,13 @@ public final class X834Location {
     public static final String STATE = "state";               // N402
     public static final String ZIP_CODE = "zipCode";          // N403
 
+    // ---- Member level: Loop 2100C mailing address ----
+    public static final String MAILING_ADDRESS_LINE_1 = "mailingAddressLine1"; // 2100C N301
+    public static final String MAILING_ADDRESS_LINE_2 = "mailingAddressLine2"; // 2100C N302
+    public static final String MAILING_CITY = "mailingCity";                   // 2100C N401
+    public static final String MAILING_STATE = "mailingState";                 // 2100C N402
+    public static final String MAILING_ZIP_CODE = "mailingZipCode";            // 2100C N403
+
     // ---- Member level: health coverage (HD segment) ----
     public static final String HD_PREFIX = "hd.";
     public static final String HD_MAINTENANCE_TYPE_CODE = "hd.maintenanceTypeCode";        // HD01

@@ -149,6 +149,62 @@ class X834MemberWriterTest {
     }
 
     @Test
+    void emitsMailingAddress2100CWhenMailingAddressPresent() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        // residence (2100A)
+        member.setAddressLine1("123 MAIN ST");
+        member.setCity("SPRINGFIELD");
+        member.setState("IL");
+        member.setZipCode("62704");
+        // mailing (2100C) — a distinct PO box
+        member.addAddress(Address.builder()
+                .type(AddressType.MAILING)
+                .line1("PO BOX 99")
+                .city("SPRINGFIELD")
+                .state("IL")
+                .zipCode("62705")
+                .build());
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("NM1*31~"), () -> "expected 2100C postal-address marker NM1*31; got:\n" + out);
+        assertTrue(out.contains("N3*PO BOX 99~"), () -> "expected mailing N3; got:\n" + out);
+        assertTrue(out.contains("N4*SPRINGFIELD*IL*62705~"), () -> "expected mailing N4; got:\n" + out);
+        // 2100C must come after the 2100A residence (N4*...*62704) block.
+        assertTrue(out.indexOf("NM1*31") > out.indexOf("N4*SPRINGFIELD*IL*62704"),
+                () -> "mailing loop must follow residence loop; got:\n" + out);
+    }
+
+    @Test
+    void omitsMailingAddressWhenNoMailingType() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.setAddressLine1("123 MAIN ST");
+        member.setCity("SPRINGFIELD");
+        member.setState("IL");
+        member.setZipCode("62704");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("NM1*31"), () -> "no 2100C without a mailing address; got:\n" + out);
+    }
+
+    @Test
+    void workAddressIsAcceptedButNotSerialized() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.addAddress(Address.builder()
+                .type(AddressType.WORK)
+                .line1("500 OFFICE PKWY").city("SPRINGFIELD").state("IL").zipCode("62704")
+                .build());
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("500 OFFICE PKWY"), () -> "WORK address must not be serialized; got:\n" + out);
+    }
+
+    @Test
     void dependentsAlsoGet2100ASegments() throws ValidationException {
         Member subscriber = baseSubscriber();
         subscriber.setLastName("DOE");

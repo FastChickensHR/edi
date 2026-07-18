@@ -45,13 +45,62 @@ public abstract class BaseMember {
     protected LocalDateTime coverageStartDate;
     protected LocalDateTime coverageEndDate;
     protected IndividualRelationshipCode relationshipCode;
-    protected String addressLine1;
-    protected String addressLine2;
-    protected String city;
-    protected String state;
-    protected String zipCode;
     protected String phoneNumber;
     protected String email;
+
+    /**
+     * All of this member's postal addresses, keyed by {@link AddressType}. A member may carry a
+     * residence, a mailing address, and others; the writer serializes the types the 834 supports
+     * (residence → Loop 2100A, mailing → Loop 2100C).
+     */
+    private final List<Address> addresses = new ArrayList<>();
+
+    /**
+     * Adds a typed address to this member. Multiple types may coexist; adding a second address of
+     * a type that already exists replaces the previous one so a member has at most one of each kind.
+     *
+     * @param address the address to add (ignored if null or has no {@link AddressType})
+     */
+    public void addAddress(Address address) {
+        if (address == null || address.getType() == null) {
+            return;
+        }
+        addresses.removeIf(existing -> existing.getType() == address.getType());
+        addresses.add(address);
+    }
+
+    /**
+     * @param type the address kind to look up
+     * @return this member's address of that type, if any
+     */
+    public java.util.Optional<Address> getAddress(AddressType type) {
+        return addresses.stream().filter(a -> a.getType() == type).findFirst();
+    }
+
+    private Address residenceOrCreate() {
+        return getAddress(AddressType.RESIDENCE).orElseGet(() -> {
+            Address residence = new Address();
+            residence.setType(AddressType.RESIDENCE);
+            addresses.add(residence);
+            return residence;
+        });
+    }
+
+    // --- Backward-compatible flat accessors for the residence address (Loop 2100A) ---
+    // Retained so existing callers (setAddressLine1/setCity/...) keep working; each reads/writes
+    // the member's RESIDENCE address within {@link #addresses}.
+
+    public String getAddressLine1() { return getAddress(AddressType.RESIDENCE).map(Address::getLine1).orElse(null); }
+    public String getAddressLine2() { return getAddress(AddressType.RESIDENCE).map(Address::getLine2).orElse(null); }
+    public String getCity() { return getAddress(AddressType.RESIDENCE).map(Address::getCity).orElse(null); }
+    public String getState() { return getAddress(AddressType.RESIDENCE).map(Address::getState).orElse(null); }
+    public String getZipCode() { return getAddress(AddressType.RESIDENCE).map(Address::getZipCode).orElse(null); }
+
+    public void setAddressLine1(String value) { residenceOrCreate().setLine1(value); }
+    public void setAddressLine2(String value) { residenceOrCreate().setLine2(value); }
+    public void setCity(String value) { residenceOrCreate().setCity(value); }
+    public void setState(String value) { residenceOrCreate().setState(value); }
+    public void setZipCode(String value) { residenceOrCreate().setZipCode(value); }
 
     /**
      * Loop 2300 (and other trailing) segments that belong to <em>this</em> member — most

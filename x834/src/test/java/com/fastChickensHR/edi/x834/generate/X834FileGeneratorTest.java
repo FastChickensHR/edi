@@ -187,6 +187,45 @@ class X834FileGeneratorTest {
         assertTrue(out.indexOf("DMG*D8") > out.indexOf("N4*SPRING"), "DMG after N4");
     }
 
+    @Test
+    void emitsMailingAddressLoop2100CFromKernelFields() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LAST_NAME, "DOE"),
+                emp(X834Location.ADDRESS_LINE_1, "123 MAIN ST"),
+                emp(X834Location.CITY, "SPRINGFIELD"),
+                emp(X834Location.STATE, "IL"),
+                emp(X834Location.ZIP_CODE, "62704"),
+                emp(X834Location.MAILING_ADDRESS_LINE_1, "PO BOX 99"),
+                emp(X834Location.MAILING_CITY, "SPRINGFIELD"),
+                emp(X834Location.MAILING_STATE, "IL"),
+                emp(X834Location.MAILING_ZIP_CODE, "62705")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        contains(out, "N3*123 MAIN ST~");     // residence 2100A
+        contains(out, "N4*SPRINGFIELD*IL*62704~");
+        contains(out, "NM1*31~");             // mailing 2100C marker
+        contains(out, "N3*PO BOX 99~");
+        contains(out, "N4*SPRINGFIELD*IL*62705~");
+        assertTrue(out.indexOf("NM1*31") > out.indexOf("N4*SPRINGFIELD*IL*62704"),
+                "mailing 2100C must render after residence 2100A");
+    }
+
     private static void contains(String haystack, String needle) {
         assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
     }

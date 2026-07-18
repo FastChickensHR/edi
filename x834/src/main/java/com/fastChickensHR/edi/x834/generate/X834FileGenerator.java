@@ -13,6 +13,8 @@ import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
+import com.fastChickensHR.edi.x834.loop2000.Address;
+import com.fastChickensHR.edi.x834.loop2000.AddressType;
 import com.fastChickensHR.edi.x834.loop2000.BaseMember;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;
 import com.fastChickensHR.edi.x834.loop2000.Member;
@@ -137,6 +139,21 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.CITY, member::setCity);
         apply(loc, X834Location.STATE, member::setState);
         apply(loc, X834Location.ZIP_CODE, member::setZipCode);
+
+        // Loop 2100C mailing address (optional, when the member's mailing address differs).
+        mailingAddress(loc).ifPresent(member::addAddress);
+    }
+
+    /** Build the member's {@link AddressType#MAILING} address from the {@code mailing*} fields. */
+    private static Optional<Address> mailingAddress(Map<String, String> loc) {
+        Address mailing = new Address();
+        mailing.setType(AddressType.MAILING);
+        apply(loc, X834Location.MAILING_ADDRESS_LINE_1, mailing::setLine1);
+        apply(loc, X834Location.MAILING_ADDRESS_LINE_2, mailing::setLine2);
+        apply(loc, X834Location.MAILING_CITY, mailing::setCity);
+        apply(loc, X834Location.MAILING_STATE, mailing::setState);
+        apply(loc, X834Location.MAILING_ZIP_CODE, mailing::setZipCode);
+        return mailing.hasStreet() ? Optional.of(mailing) : Optional.empty();
     }
 
     /** Custom REF extensions: any {@code "ref.<qualifier>"} field becomes a {@code REF} segment. */
