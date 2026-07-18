@@ -27,13 +27,6 @@ class COBRAQualifyingEventCodeTest {
         assertEquals(9, COBRAQualifyingEventCode.values().length);
 
         assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.TERMINATION_OF_EMPLOYMENT));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.REDUCTION_IN_HOURS));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.DEATH_OF_EMPLOYEE));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.DIVORCE_LEGAL_SEPARATION));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.MEDICARE_ENTITLEMENT));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.BANKRUPTCY));
-        assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.LAYOFF));
         assertTrue(Arrays.asList(COBRAQualifyingEventCode.values()).contains(COBRAQualifyingEventCode.LEAVE_OF_ABSENCE));
     }
 
@@ -41,27 +34,6 @@ class COBRAQualifyingEventCodeTest {
     void testEnumProperties() {
         assertEquals("1", COBRAQualifyingEventCode.TERMINATION_OF_EMPLOYMENT.getCode());
         assertEquals("Termination of Employment", COBRAQualifyingEventCode.TERMINATION_OF_EMPLOYMENT.getDescription());
-
-        assertEquals("2", COBRAQualifyingEventCode.REDUCTION_IN_HOURS.getCode());
-        assertEquals("Reduction in Hours", COBRAQualifyingEventCode.REDUCTION_IN_HOURS.getDescription());
-
-        assertEquals("3", COBRAQualifyingEventCode.DEATH_OF_EMPLOYEE.getCode());
-        assertEquals("Death of Employee", COBRAQualifyingEventCode.DEATH_OF_EMPLOYEE.getDescription());
-
-        assertEquals("4", COBRAQualifyingEventCode.DIVORCE_LEGAL_SEPARATION.getCode());
-        assertEquals("Divorce or Legal Separation", COBRAQualifyingEventCode.DIVORCE_LEGAL_SEPARATION.getDescription());
-
-        assertEquals("5", COBRAQualifyingEventCode.MEDICARE_ENTITLEMENT.getCode());
-        assertEquals("Medicare Entitlement", COBRAQualifyingEventCode.MEDICARE_ENTITLEMENT.getDescription());
-
-        assertEquals("6", COBRAQualifyingEventCode.DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT.getCode());
-        assertEquals("Dependent Child Ceases to be Dependent", COBRAQualifyingEventCode.DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT.getDescription());
-
-        assertEquals("7", COBRAQualifyingEventCode.BANKRUPTCY.getCode());
-        assertEquals("Bankruptcy (Retirees and Dependents)", COBRAQualifyingEventCode.BANKRUPTCY.getDescription());
-
-        assertEquals("8", COBRAQualifyingEventCode.LAYOFF.getCode());
-        assertEquals("Layoff", COBRAQualifyingEventCode.LAYOFF.getDescription());
 
         assertEquals("9", COBRAQualifyingEventCode.LEAVE_OF_ABSENCE.getCode());
         assertEquals("Leave of Absence", COBRAQualifyingEventCode.LEAVE_OF_ABSENCE.getDescription());

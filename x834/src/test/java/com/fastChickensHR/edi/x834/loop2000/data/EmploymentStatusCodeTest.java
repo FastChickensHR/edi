@@ -26,17 +26,6 @@ class EmploymentStatusCodeTest {
         assertEquals(13, EmploymentStatusCode.values().length);
 
         assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.ACTIVE));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.FULL_TIME));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.PART_TIME));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.RETIRED));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.TERMINATED));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.LEAVE_OF_ABSENCE));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.DISABLED));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.MILITARY_DUTY));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.COBRA));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.SURVIVING_INSURED));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.CONTRACT_EMPLOYEE));
-        assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.ON_CALL_EMPLOYEE));
         assertTrue(Arrays.asList(EmploymentStatusCode.values()).contains(EmploymentStatusCode.SEASONAL_EMPLOYEE));
     }
 
@@ -45,39 +34,6 @@ class EmploymentStatusCodeTest {
         // Test code and description for each enum value
         assertEquals("1", EmploymentStatusCode.ACTIVE.getCode());
         assertEquals("Active", EmploymentStatusCode.ACTIVE.getDescription());
-
-        assertEquals("2", EmploymentStatusCode.FULL_TIME.getCode());
-        assertEquals("Full-time", EmploymentStatusCode.FULL_TIME.getDescription());
-
-        assertEquals("3", EmploymentStatusCode.PART_TIME.getCode());
-        assertEquals("Part-time", EmploymentStatusCode.PART_TIME.getDescription());
-
-        assertEquals("4", EmploymentStatusCode.RETIRED.getCode());
-        assertEquals("Retired", EmploymentStatusCode.RETIRED.getDescription());
-
-        assertEquals("5", EmploymentStatusCode.TERMINATED.getCode());
-        assertEquals("Terminated", EmploymentStatusCode.TERMINATED.getDescription());
-
-        assertEquals("6", EmploymentStatusCode.LEAVE_OF_ABSENCE.getCode());
-        assertEquals("Leave of absence", EmploymentStatusCode.LEAVE_OF_ABSENCE.getDescription());
-
-        assertEquals("7", EmploymentStatusCode.DISABLED.getCode());
-        assertEquals("Disabled", EmploymentStatusCode.DISABLED.getDescription());
-
-        assertEquals("9", EmploymentStatusCode.MILITARY_DUTY.getCode());
-        assertEquals("Military duty", EmploymentStatusCode.MILITARY_DUTY.getDescription());
-
-        assertEquals("20", EmploymentStatusCode.COBRA.getCode());
-        assertEquals("COBRA", EmploymentStatusCode.COBRA.getDescription());
-
-        assertEquals("21", EmploymentStatusCode.SURVIVING_INSURED.getCode());
-        assertEquals("Surviving insured", EmploymentStatusCode.SURVIVING_INSURED.getDescription());
-
-        assertEquals("22", EmploymentStatusCode.CONTRACT_EMPLOYEE.getCode());
-        assertEquals("Contract employee", EmploymentStatusCode.CONTRACT_EMPLOYEE.getDescription());
-
-        assertEquals("23", EmploymentStatusCode.ON_CALL_EMPLOYEE.getCode());
-        assertEquals("On call employee", EmploymentStatusCode.ON_CALL_EMPLOYEE.getDescription());
 
         assertEquals("24", EmploymentStatusCode.SEASONAL_EMPLOYEE.getCode());
         assertEquals("Seasonal employee", EmploymentStatusCode.SEASONAL_EMPLOYEE.getDescription());

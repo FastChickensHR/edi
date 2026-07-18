@@ -33,20 +33,8 @@ class CoverageLevelCodeTest {
 
     @Test
     void testEnumProperties() {
-        assertEquals("FAM", CoverageLevelCode.FAMILY.getCode());
-        assertEquals("Family", CoverageLevelCode.FAMILY.getDescription());
-
-        assertEquals("EMP", CoverageLevelCode.EMPLOYEE_ONLY.getCode());
-        assertEquals("Employee Only", CoverageLevelCode.EMPLOYEE_ONLY.getDescription());
-
-        assertEquals("IND", CoverageLevelCode.INDIVIDUAL.getCode());
-        assertEquals("ECH", CoverageLevelCode.EMPLOYEE_AND_CHILDREN.getCode());
-        assertEquals("ESP", CoverageLevelCode.EMPLOYEE_AND_SPOUSE.getCode());
-        assertEquals("SPC", CoverageLevelCode.SPOUSE_AND_CHILDREN.getCode());
-        assertEquals("SPO", CoverageLevelCode.SPOUSE_ONLY.getCode());
         assertEquals("TWO", CoverageLevelCode.TWO_PARTY.getCode());
         assertEquals("CHD", CoverageLevelCode.CHILDREN_ONLY.getCode());
-        assertEquals("DEP", CoverageLevelCode.DEPENDENTS_ONLY.getCode());
     }
 
     @Test

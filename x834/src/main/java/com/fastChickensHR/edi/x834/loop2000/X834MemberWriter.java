@@ -7,11 +7,20 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberName;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceCityStateZipCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -90,6 +99,99 @@ public class X834MemberWriter {
         addDateSegment(segments, MemberDateQualifier.COVERAGE_BEGIN, member.getEnrollmentDate());
         addDateSegment(segments, MemberDateQualifier.COVERAGE_BEGIN, member.getCoverageStartDate());
         addDateSegment(segments, MemberDateQualifier.COVERAGE_END, member.getCoverageEndDate());
+
+        // Loop 2100A (member detail): NM1 name, N3/N4 residence address, DMG demographics —
+        // in the order required by the 834 spec. Each is emitted only when its source data is
+        // present, so a member carrying only INS-level data renders exactly as before.
+        appendMemberName(segments, member);
+        appendResidenceAddress(segments, member);
+        appendDemographics(segments, member);
+
+        // Loop 2100C (member mailing address), emitted after the 2100A block when the member
+        // carries a distinct mailing address.
+        appendMailingAddress(segments, member);
+
+        // Loop 2300: this member's own trailing segments (health coverage HD, REF extensions).
+        // Emitting them here keeps a member's coverage nested inside its own loop, before any
+        // dependent's loop begins.
+        segments.addAll(member.getAdditionalSegments());
+    }
+
+    /** Loop 2100A NM1 (member name). Emitted when a last name is present. */
+    private void appendMemberName(List<Segment> segments, BaseMember member) throws ValidationException {
+        if (isBlank(member.getLastName())) {
+            return;
+        }
+        segments.add(MemberName.builder()
+                .setLastName(member.getLastName())
+                .setFirstName(emptyToNull(member.getFirstName()))
+                .setMiddleName(emptyToNull(member.getMiddleName()))
+                .build());
+    }
+
+    /**
+     * Loop 2100A N3/N4 (member residence address). The N3 is emitted when a street address is
+     * present; the N4 requires city, state and postal code together (per the segment's own
+     * validation), so a partial address emits only the N3.
+     */
+    private void appendResidenceAddress(List<Segment> segments, BaseMember member) throws ValidationException {
+        if (!isBlank(member.getAddressLine1())) {
+            segments.add(MemberResidenceStreetAddress.builder()
+                    .setAddressLine1(member.getAddressLine1())
+                    .setAddressLine2(emptyToNull(member.getAddressLine2()))
+                    .build());
+        }
+        if (!isBlank(member.getCity()) && !isBlank(member.getState()) && !isBlank(member.getZipCode())) {
+            segments.add(MemberResidenceCityStateZipCode.builder()
+                    .setCityName(member.getCity())
+                    .setStateOrProvinceCode(member.getState())
+                    .setPostalCode(member.getZipCode())
+                    .build());
+        }
+    }
+
+    /**
+     * Loop 2100C (member mailing address): NM1*31 postal-address marker, then N3/N4. Emitted only
+     * when the member carries a {@link AddressType#MAILING} address with a street line; the N4 is
+     * added when city/state/zip are all present.
+     */
+    private void appendMailingAddress(List<Segment> segments, BaseMember member) throws ValidationException {
+        Address mailing = member.getAddress(AddressType.MAILING).orElse(null);
+        if (mailing == null || !mailing.hasStreet()) {
+            return;
+        }
+        segments.add(MemberMailingAddress.builder().build());
+        segments.add(MemberMailingStreetAddress.builder()
+                .setAddressLine1(mailing.getLine1())
+                .setAddressLine2(emptyToNull(mailing.getLine2()))
+                .build());
+        if (mailing.hasCityStateZip()) {
+            segments.add(MemberMailingCityStateZipCode.builder()
+                    .setCityName(mailing.getCity())
+                    .setStateOrProvinceCode(mailing.getState())
+                    .setPostalCode(mailing.getZipCode())
+                    .build());
+        }
+    }
+
+    /** Loop 2100A DMG (member demographics). Emitted when a birth date is present. */
+    private void appendDemographics(List<Segment> segments, BaseMember member) throws ValidationException {
+        if (member.getBirthDate() == null) {
+            return;
+        }
+        segments.add(new MemberDemographics.Builder()
+                .setDateTimePeriodFormatQualifier(DateFormat.D8.getFormat())
+                .setBirthDate(DateFormatter.formatDate(DateFormat.D8, member.getBirthDate()))
+                .setGenderCode(emptyToNull(member.getGender()))
+                .build());
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isEmpty();
+    }
+
+    private static String emptyToNull(String value) {
+        return isBlank(value) ? null : value;
     }
 
     private void addDateSegment(List<Segment> segments, MemberDateQualifier qualifier, LocalDateTime date)

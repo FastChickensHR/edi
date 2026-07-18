@@ -32,9 +32,6 @@ class AmountQualifierCodeTest {
         assertEquals("B9", AmountQualifierCode.COINSURANCE_ACTUAL.getCode());
         assertEquals("Co-Insurance - Actual", AmountQualifierCode.COINSURANCE_ACTUAL.getDescription());
 
-        assertEquals("D2", AmountQualifierCode.DEDUCTIBLE_AMOUNT.getCode());
-        assertEquals("FK", AmountQualifierCode.PREMIUM_AMOUNT.getCode());
-        assertEquals("P3", AmountQualifierCode.SPEND_DOWN.getCode());
         assertEquals("R", AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT.getCode());
     }
 

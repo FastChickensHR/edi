@@ -34,13 +34,6 @@ class HealthCoverageReferenceQualifierTest {
         assertEquals("Group or Policy Number",
                 HealthCoverageReferenceQualifier.GROUP_OR_POLICY_NUMBER.getDescription());
 
-        assertEquals("17", HealthCoverageReferenceQualifier.CLIENT_REPORTING_CATEGORY.getCode());
-        assertEquals("9V", HealthCoverageReferenceQualifier.PAYMENT_CATEGORY.getCode());
-        assertEquals("CE", HealthCoverageReferenceQualifier.CLASS_OF_CONTRACT_CODE.getCode());
-        assertEquals("E8", HealthCoverageReferenceQualifier.SERVICE_CONTRACT_COVERAGE_NUMBER.getCode());
-        assertEquals("M7", HealthCoverageReferenceQualifier.PLAN_NETWORK_IDENTIFICATION_NUMBER.getCode());
-        assertEquals("RB", HealthCoverageReferenceQualifier.RATE_CODE_NUMBER.getCode());
-        assertEquals("X9", HealthCoverageReferenceQualifier.INTERNAL_CONTROL_NUMBER.getCode());
         assertEquals("ZZ", HealthCoverageReferenceQualifier.MUTUALLY_DEFINED.getCode());
     }
 

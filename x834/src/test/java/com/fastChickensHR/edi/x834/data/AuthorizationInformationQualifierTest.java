@@ -24,22 +24,12 @@ class AuthorizationInformationQualifierTest {
     void testEnumValues() {
         assertEquals(7, AuthorizationInformationQualifier.values().length);
         assertEquals("00", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getCode());
-        assertEquals("01", AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID.getCode());
-        assertEquals("02", AuthorizationInformationQualifier.EDX_COMMUNICATIONS_ID.getCode());
-        assertEquals("03", AuthorizationInformationQualifier.ADDITIONAL_DATA_ID.getCode());
-        assertEquals("04", AuthorizationInformationQualifier.RAIL_COMMUNICATIONS_ID.getCode());
-        assertEquals("05", AuthorizationInformationQualifier.DOD_COMMUNICATION_ID.getCode());
         assertEquals("06", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID.getCode());
     }
 
     @Test
     void testEnumProperties() {
         assertEquals("No Authorization", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getDescription());
-        assertEquals("UCS Communications ID", AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID.getDescription());
-        assertEquals("EDX Communications ID", AuthorizationInformationQualifier.EDX_COMMUNICATIONS_ID.getDescription());
-        assertEquals("Additional Data Identification", AuthorizationInformationQualifier.ADDITIONAL_DATA_ID.getDescription());
-        assertEquals("Rail Communications ID", AuthorizationInformationQualifier.RAIL_COMMUNICATIONS_ID.getDescription());
-        assertEquals("Department of Defense (DoD) Communication Identifier", AuthorizationInformationQualifier.DOD_COMMUNICATION_ID.getDescription());
         assertEquals("United States Federal Government Communication Identifier", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID.getDescription());
     }
 

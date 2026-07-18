@@ -139,9 +139,12 @@ public class Header {
      * Builder for Header class
      */
     public static class Builder {
+        /** Default transaction set identifier code for an 834 (ST01 / BGN transaction set). */
+        private static final String DEFAULT_TRANSACTION_SET_IDENTIFIER_CODE = "834";
+
         private final X834Context context;
 
-        private String transactionSetIdentifierCode = "834";
+        private String transactionSetIdentifierCode = DEFAULT_TRANSACTION_SET_IDENTIFIER_CODE;
         private String referenceIdentification;
         private String masterPolicyNumber;
         private String planSponsorName;

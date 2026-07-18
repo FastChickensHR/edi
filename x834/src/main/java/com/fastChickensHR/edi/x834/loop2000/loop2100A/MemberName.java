@@ -55,6 +55,21 @@ public class MemberName extends NM1Segment {
             if (nm102 == null || nm102.isEmpty()) {
                 throw new ValidationException("Entity Type Qualifier (NM102) is required");
             }
+
+            // Conditional requirement: a person (NM102 = 1) must carry a last/family name (NM103).
+            if (PERSON_ENTITY_TYPE.equals(nm102) && (nm103 == null || nm103.isEmpty())) {
+                throw new ValidationException(
+                        "Last Name (NM103) is required when the Entity Type Qualifier (NM102) is a person (1)");
+            }
+
+            // Mutual pairing (X12 syntax rule P0809): the identification code qualifier (NM108) and
+            // the identification code (NM109) must either both be present or both be absent.
+            boolean hasQualifier = nm108 != null && !nm108.isEmpty();
+            boolean hasCode = nm109 != null && !nm109.isEmpty();
+            if (hasQualifier != hasCode) {
+                throw new ValidationException(
+                        "Identification Code Qualifier (NM108) and Identification Code (NM109) must be provided together");
+            }
         }
     }
 }

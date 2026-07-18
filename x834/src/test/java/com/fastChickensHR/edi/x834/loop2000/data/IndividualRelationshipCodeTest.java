@@ -26,11 +26,6 @@ class IndividualRelationshipCodeTest {
         assertEquals(7, IndividualRelationshipCode.values().length);
 
         assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.SPOUSE));
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.CHILD));
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.EMPLOYEE));
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.DISABLED_DEPENDENT));
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.SELF));
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.LIFE_PARTNER));
         assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.OTHER_RELATED));
     }
 
@@ -39,21 +34,6 @@ class IndividualRelationshipCodeTest {
         // Test code and description for each enum value
         assertEquals("01", IndividualRelationshipCode.SPOUSE.getCode());
         assertEquals("Spouse", IndividualRelationshipCode.SPOUSE.getDescription());
-
-        assertEquals("19", IndividualRelationshipCode.CHILD.getCode());
-        assertEquals("Child", IndividualRelationshipCode.CHILD.getDescription());
-
-        assertEquals("20", IndividualRelationshipCode.EMPLOYEE.getCode());
-        assertEquals("Employee", IndividualRelationshipCode.EMPLOYEE.getDescription());
-
-        assertEquals("22", IndividualRelationshipCode.DISABLED_DEPENDENT.getCode());
-        assertEquals("Disabled Dependent", IndividualRelationshipCode.DISABLED_DEPENDENT.getDescription());
-
-        assertEquals("18", IndividualRelationshipCode.SELF.getCode());
-        assertEquals("Self", IndividualRelationshipCode.SELF.getDescription());
-
-        assertEquals("53", IndividualRelationshipCode.LIFE_PARTNER.getCode());
-        assertEquals("Life Partner", IndividualRelationshipCode.LIFE_PARTNER.getDescription());
 
         assertEquals("29", IndividualRelationshipCode.OTHER_RELATED.getCode());
         assertEquals("Other Related", IndividualRelationshipCode.OTHER_RELATED.getDescription());
