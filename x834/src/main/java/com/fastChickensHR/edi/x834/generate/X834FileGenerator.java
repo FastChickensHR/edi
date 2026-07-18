@@ -61,12 +61,14 @@ public final class X834FileGenerator implements FileGenerator {
                     .withTrailer(new Trailer.Builder(context));
 
             for (Record record : file.records()) {
-                document.addMember(buildMember(record));
-                // After the members, in Record order: this Record's REF extensions, then its HD.
+                Member member = buildMember(record);
+                // This Record's REF extensions then its HD (Loop 2300) attach to the member, so
+                // they are emitted inside that member's own loop rather than after every member.
                 for (Segment ref : refExtensions(record.fields())) {
-                    document.addSegment(ref);
+                    member.addSegment(ref);
                 }
-                healthCoverage(record.fields()).ifPresent(document::addSegment);
+                healthCoverage(record.fields()).ifPresent(member::addSegment);
+                document.addMember(member);
             }
 
             return document.build().generateDocument().orElseThrow(() ->

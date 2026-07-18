@@ -11,10 +11,13 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.segments.Segment;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base domain class for both primary members and dependents.
@@ -49,6 +52,24 @@ public abstract class BaseMember {
     protected String zipCode;
     protected String phoneNumber;
     protected String email;
+
+    /**
+     * Loop 2300 (and other trailing) segments that belong to <em>this</em> member — most
+     * notably health coverage (HD) and any custom REF extensions. They are emitted by
+     * {@link X834MemberWriter} at the end of this member's own segment stream, so a member's
+     * coverage stays nested inside its own loop rather than being batched after every member.
+     */
+    private final List<Segment> additionalSegments = new ArrayList<>();
+
+    /**
+     * Appends a trailing (Loop 2300) segment to this member — e.g. an HD coverage segment
+     * or a custom REF extension. Order is preserved.
+     *
+     * @param segment the segment to emit within this member's loop
+     */
+    public void addSegment(Segment segment) {
+        additionalSegments.add(segment);
+    }
 
     /**
      * Validates this member has the minimum required fields.

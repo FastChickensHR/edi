@@ -91,9 +91,56 @@ class X834FileGeneratorTest {
         contains(out, "SE*");
         contains(out, "GE*1*1");
         contains(out, "IEA*1*000000001");
-        // HD and REF-extension render AFTER all members (document-level trailing segments)
-        assertTrue(out.indexOf("HD*001") > out.indexOf("INS*Y*01"), "HD must render after the members");
-        assertTrue(out.indexOf("REF*ZZ*NORTH") > out.indexOf("INS*Y*01"), "REF extension must render after the members");
+        // HD and REF-extension belong to the subscriber (INS*Y*20) and render inside that
+        // subscriber's own loop (Loop 2300): after its INS, but BEFORE the dependent's loop
+        // (INS*Y*01) begins — not batched after every member.
+        assertTrue(out.indexOf("HD*001") > out.indexOf("INS*Y*20"), "HD must render after its subscriber's INS");
+        assertTrue(out.indexOf("HD*001") < out.indexOf("INS*Y*01"), "HD must render before the dependent loop");
+        assertTrue(out.indexOf("REF*ZZ*NORTH") > out.indexOf("INS*Y*20"), "REF extension renders inside the subscriber loop");
+        assertTrue(out.indexOf("REF*ZZ*NORTH") < out.indexOf("INS*Y*01"), "REF extension renders before the dependent loop");
+    }
+
+    @Test
+    void eachSubscribersHdNestsInsideItsOwnLoopForMultiMemberFiles() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record sub1 = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "SUB1"),
+                emp(X834Location.HD_MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.HD_INSURANCE_LINE_CODE, "HLT"),
+                emp(X834Location.HD_PLAN_COVERAGE_DESCRIPTION, "PLAN-ONE")));
+        Record sub2 = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "SUB2"),
+                emp(X834Location.HD_MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.HD_INSURANCE_LINE_CODE, "DEN"),
+                emp(X834Location.HD_PLAN_COVERAGE_DESCRIPTION, "PLAN-TWO")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(sub1, sub2)));
+
+        // Each subscriber's HD sits between its own REF*OF and the next subscriber's REF*OF —
+        // i.e. HD is nested in its member's loop, not batched at the end of the transaction.
+        int sub1Ref = out.indexOf("REF*OF*SUB1");
+        int sub1Hd = out.indexOf("PLAN-ONE");
+        int sub2Ref = out.indexOf("REF*OF*SUB2");
+        int sub2Hd = out.indexOf("PLAN-TWO");
+        assertTrue(sub1Ref < sub1Hd && sub1Hd < sub2Ref, "subscriber 1's HD must precede subscriber 2's loop");
+        assertTrue(sub2Ref < sub2Hd, "subscriber 2's HD must follow subscriber 2's INS/REF");
     }
 
     @Test

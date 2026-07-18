@@ -103,6 +103,11 @@ public class X834MemberWriter {
         appendMemberName(segments, member);
         appendResidenceAddress(segments, member);
         appendDemographics(segments, member);
+
+        // Loop 2300: this member's own trailing segments (health coverage HD, REF extensions).
+        // Emitting them here keeps a member's coverage nested inside its own loop, before any
+        // dependent's loop begins.
+        segments.addAll(member.getAdditionalSegments());
     }
 
     /** Loop 2100A NM1 (member name). Emitted when a last name is present. */
