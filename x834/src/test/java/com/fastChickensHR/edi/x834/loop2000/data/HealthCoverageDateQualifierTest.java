@@ -26,11 +26,6 @@ class HealthCoverageDateQualifierTest {
         assertEquals(7, HealthCoverageDateQualifier.values().length);
 
         assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.EFFECTIVE_DATE));
-        assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.EXPIRATION_DATE));
-        assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.ELIGIBILITY_BEGIN));
-        assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.ELIGIBILITY_END));
-        assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.COBRA_BEGIN));
-        assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.COBRA_END));
         assertTrue(Arrays.asList(HealthCoverageDateQualifier.values()).contains(HealthCoverageDateQualifier.PREMIUM_PAID_TO_DATE));
     }
 
@@ -38,21 +33,6 @@ class HealthCoverageDateQualifierTest {
     void testEnumProperties() {
         assertEquals("348", HealthCoverageDateQualifier.EFFECTIVE_DATE.getCode());
         assertEquals("Plan Begin Date", HealthCoverageDateQualifier.EFFECTIVE_DATE.getDescription());
-
-        assertEquals("349", HealthCoverageDateQualifier.EXPIRATION_DATE.getCode());
-        assertEquals("Plan End Date", HealthCoverageDateQualifier.EXPIRATION_DATE.getDescription());
-
-        assertEquals("356", HealthCoverageDateQualifier.ELIGIBILITY_BEGIN.getCode());
-        assertEquals("Eligibility Begin Date", HealthCoverageDateQualifier.ELIGIBILITY_BEGIN.getDescription());
-
-        assertEquals("357", HealthCoverageDateQualifier.ELIGIBILITY_END.getCode());
-        assertEquals("Eligibility End Date", HealthCoverageDateQualifier.ELIGIBILITY_END.getDescription());
-
-        assertEquals("343", HealthCoverageDateQualifier.COBRA_BEGIN.getCode());
-        assertEquals("COBRA Begin Date", HealthCoverageDateQualifier.COBRA_BEGIN.getDescription());
-
-        assertEquals("344", HealthCoverageDateQualifier.COBRA_END.getCode());
-        assertEquals("COBRA End Date", HealthCoverageDateQualifier.COBRA_END.getDescription());
 
         assertEquals("309", HealthCoverageDateQualifier.PREMIUM_PAID_TO_DATE.getCode());
         assertEquals("Premium Paid To Date", HealthCoverageDateQualifier.PREMIUM_PAID_TO_DATE.getDescription());

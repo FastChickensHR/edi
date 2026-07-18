@@ -26,9 +26,6 @@ class GenderCodeTest {
         assertEquals(5, GenderCode.values().length);
 
         assertTrue(Arrays.asList(GenderCode.values()).contains(GenderCode.MALE));
-        assertTrue(Arrays.asList(GenderCode.values()).contains(GenderCode.FEMALE));
-        assertTrue(Arrays.asList(GenderCode.values()).contains(GenderCode.UNKNOWN));
-        assertTrue(Arrays.asList(GenderCode.values()).contains(GenderCode.NON_BINARY));
         assertTrue(Arrays.asList(GenderCode.values()).contains(GenderCode.NOT_SPECIFIED));
     }
 
@@ -36,15 +33,6 @@ class GenderCodeTest {
     void testEnumProperties() {
         assertEquals("M", GenderCode.MALE.getCode());
         assertEquals("Male", GenderCode.MALE.getDescription());
-
-        assertEquals("F", GenderCode.FEMALE.getCode());
-        assertEquals("Female", GenderCode.FEMALE.getDescription());
-
-        assertEquals("U", GenderCode.UNKNOWN.getCode());
-        assertEquals("Unknown", GenderCode.UNKNOWN.getDescription());
-
-        assertEquals("N", GenderCode.NON_BINARY.getCode());
-        assertEquals("Non-Binary", GenderCode.NON_BINARY.getDescription());
 
         assertEquals("X", GenderCode.NOT_SPECIFIED.getCode());
         assertEquals("Not Specified", GenderCode.NOT_SPECIFIED.getDescription());

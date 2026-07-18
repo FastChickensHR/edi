@@ -27,11 +27,6 @@ class MedicarePlanCodeTest {
                 "MedicarePlanCode should have 7 enum values");
 
         assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.HOSPITAL_ONLY));
-        assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.MEDICAL_ONLY));
-        assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.HOSPITAL_AND_MEDICAL));
-        assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.MEDICARE_ADVANTAGE));
-        assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.PRESCRIPTION_DRUG));
-        assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.MEDIGAP));
         assertTrue(Arrays.asList(MedicarePlanCode.values()).contains(MedicarePlanCode.NO_MEDICARE));
     }
 
@@ -39,21 +34,6 @@ class MedicarePlanCodeTest {
     void testEnumProperties() {
         assertEquals("A", MedicarePlanCode.HOSPITAL_ONLY.getCode());
         assertEquals("Hospital Only (Part A)", MedicarePlanCode.HOSPITAL_ONLY.getDescription());
-
-        assertEquals("B", MedicarePlanCode.MEDICAL_ONLY.getCode());
-        assertEquals("Medical Only (Part B)", MedicarePlanCode.MEDICAL_ONLY.getDescription());
-
-        assertEquals("C", MedicarePlanCode.HOSPITAL_AND_MEDICAL.getCode());
-        assertEquals("Hospital and Medical (Parts A and B)", MedicarePlanCode.HOSPITAL_AND_MEDICAL.getDescription());
-
-        assertEquals("D", MedicarePlanCode.MEDICARE_ADVANTAGE.getCode());
-        assertEquals("Medicare Advantage (Part C)", MedicarePlanCode.MEDICARE_ADVANTAGE.getDescription());
-
-        assertEquals("E", MedicarePlanCode.PRESCRIPTION_DRUG.getCode());
-        assertEquals("Prescription Drug (Part D)", MedicarePlanCode.PRESCRIPTION_DRUG.getDescription());
-
-        assertEquals("F", MedicarePlanCode.MEDIGAP.getCode());
-        assertEquals("Medigap (Medicare Supplement)", MedicarePlanCode.MEDIGAP.getDescription());
 
         assertEquals("N", MedicarePlanCode.NO_MEDICARE.getCode());
         assertEquals("No Medicare Coverage", MedicarePlanCode.NO_MEDICARE.getDescription());

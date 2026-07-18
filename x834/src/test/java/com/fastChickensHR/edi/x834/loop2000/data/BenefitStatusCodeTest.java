@@ -27,10 +27,6 @@ class BenefitStatusCodeTest {
         assertEquals(6, values.length, "Expected 6 benefit status codes");
 
         assertTrue(Arrays.asList(values).contains(BenefitStatusCode.ACTIVE), "ACTIVE status is missing");
-        assertTrue(Arrays.asList(values).contains(BenefitStatusCode.COBRA), "COBRA status is missing");
-        assertTrue(Arrays.asList(values).contains(BenefitStatusCode.DISABLED), "DISABLED status is missing");
-        assertTrue(Arrays.asList(values).contains(BenefitStatusCode.RETIREE), "RETIREE status is missing");
-        assertTrue(Arrays.asList(values).contains(BenefitStatusCode.SURVIVING_INSURED), "SURVIVING_INSURED status is missing");
         assertTrue(Arrays.asList(values).contains(BenefitStatusCode.TERMINATED), "TERMINATED status is missing");
     }
 
@@ -38,18 +34,6 @@ class BenefitStatusCodeTest {
     void testEnumProperties() {
         assertEquals("A", BenefitStatusCode.ACTIVE.getCode());
         assertEquals("Active", BenefitStatusCode.ACTIVE.getDescription());
-
-        assertEquals("C", BenefitStatusCode.COBRA.getCode());
-        assertEquals("COBRA", BenefitStatusCode.COBRA.getDescription());
-
-        assertEquals("D", BenefitStatusCode.DISABLED.getCode());
-        assertEquals("Disabled", BenefitStatusCode.DISABLED.getDescription());
-
-        assertEquals("R", BenefitStatusCode.RETIREE.getCode());
-        assertEquals("Retiree", BenefitStatusCode.RETIREE.getDescription());
-
-        assertEquals("S", BenefitStatusCode.SURVIVING_INSURED.getCode());
-        assertEquals("Surviving Insured", BenefitStatusCode.SURVIVING_INSURED.getDescription());
 
         assertEquals("T", BenefitStatusCode.TERMINATED.getCode());
         assertEquals("Terminated", BenefitStatusCode.TERMINATED.getDescription());

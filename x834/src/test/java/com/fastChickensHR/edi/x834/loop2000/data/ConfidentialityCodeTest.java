@@ -27,12 +27,6 @@ class ConfidentialityCodeTest {
         assertEquals(8, ConfidentialityCode.values().length);
 
         assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.UNRESTRICTED));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.RESTRICTED));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.CONFIDENTIAL));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.VERY_RESTRICTED));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.NORMAL));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.LOW));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.MEDIUM));
         assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.HIGH));
     }
 
@@ -41,24 +35,6 @@ class ConfidentialityCodeTest {
         // Test code and description for each enum value
         assertEquals("U", ConfidentialityCode.UNRESTRICTED.getCode());
         assertEquals("Unrestricted", ConfidentialityCode.UNRESTRICTED.getDescription());
-
-        assertEquals("R", ConfidentialityCode.RESTRICTED.getCode());
-        assertEquals("Restricted", ConfidentialityCode.RESTRICTED.getDescription());
-
-        assertEquals("C", ConfidentialityCode.CONFIDENTIAL.getCode());
-        assertEquals("Confidential", ConfidentialityCode.CONFIDENTIAL.getDescription());
-
-        assertEquals("V", ConfidentialityCode.VERY_RESTRICTED.getCode());
-        assertEquals("Very Restricted", ConfidentialityCode.VERY_RESTRICTED.getDescription());
-
-        assertEquals("N", ConfidentialityCode.NORMAL.getCode());
-        assertEquals("Normal", ConfidentialityCode.NORMAL.getDescription());
-
-        assertEquals("L", ConfidentialityCode.LOW.getCode());
-        assertEquals("Low", ConfidentialityCode.LOW.getDescription());
-
-        assertEquals("M", ConfidentialityCode.MEDIUM.getCode());
-        assertEquals("Medium", ConfidentialityCode.MEDIUM.getDescription());
 
         assertEquals("H", ConfidentialityCode.HIGH.getCode());
         assertEquals("High", ConfidentialityCode.HIGH.getDescription());

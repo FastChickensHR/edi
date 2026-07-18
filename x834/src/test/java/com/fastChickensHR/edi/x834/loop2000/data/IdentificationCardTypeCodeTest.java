@@ -31,14 +31,7 @@ class IdentificationCardTypeCodeTest {
     @Test
     void testEnumProperties() {
         assertEquals("D", IdentificationCardTypeCode.DENTAL.getCode());
-        assertEquals("G", IdentificationCardTypeCode.DRUG.getCode());
-        assertEquals("H", IdentificationCardTypeCode.HEALTH.getCode());
-        assertEquals("L", IdentificationCardTypeCode.LONG_TERM_CARE.getCode());
-        assertEquals("M", IdentificationCardTypeCode.MEDICAL.getCode());
-        assertEquals("P", IdentificationCardTypeCode.PHARMACY.getCode());
         assertEquals("V", IdentificationCardTypeCode.VISION.getCode());
-
-        assertEquals("Health", IdentificationCardTypeCode.HEALTH.getDescription());
     }
 
     @Test

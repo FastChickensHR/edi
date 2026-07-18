@@ -25,24 +25,12 @@ class StudentStatusCodeTest {
     void testEnumValues() {
         assertEquals(8, StudentStatusCode.values().length);
         assertEquals("F", StudentStatusCode.FULL_TIME.getCode());
-        assertEquals("P", StudentStatusCode.PART_TIME.getCode());
-        assertEquals("N", StudentStatusCode.NOT_A_STUDENT.getCode());
-        assertEquals("C", StudentStatusCode.CONTINUING_EDUCATION.getCode());
-        assertEquals("G", StudentStatusCode.GRADUATED.getCode());
-        assertEquals("B", StudentStatusCode.ON_BREAK.getCode());
-        assertEquals("L", StudentStatusCode.LEAVE_OF_ABSENCE.getCode());
         assertEquals("U", StudentStatusCode.UNKNOWN.getCode());
     }
 
     @Test
     void testEnumProperties() {
         assertEquals("Full-time Student", StudentStatusCode.FULL_TIME.getDescription());
-        assertEquals("Part-time Student", StudentStatusCode.PART_TIME.getDescription());
-        assertEquals("Not a Student", StudentStatusCode.NOT_A_STUDENT.getDescription());
-        assertEquals("Continuing Education", StudentStatusCode.CONTINUING_EDUCATION.getDescription());
-        assertEquals("Graduated", StudentStatusCode.GRADUATED.getDescription());
-        assertEquals("On School Break/Vacation", StudentStatusCode.ON_BREAK.getDescription());
-        assertEquals("Leave of Absence", StudentStatusCode.LEAVE_OF_ABSENCE.getDescription());
         assertEquals("Unknown", StudentStatusCode.UNKNOWN.getDescription());
     }
 

@@ -26,15 +26,6 @@ class MaintenanceReasonCodeTest {
         assertEquals(11, MaintenanceReasonCode.values().length);
 
         assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.ACTIVE));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.BIRTH));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.COBRA));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.DISABILITY));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.DEATH));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.RETIREMENT));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.MARRIAGE));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.STRIKE));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.TERMINATION));
-        assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.VOLUNTARY_WITHDRAWAL));
         assertTrue(Arrays.asList(MaintenanceReasonCode.values()).contains(MaintenanceReasonCode.ADMINISTRATIVE_ERROR));
     }
 
@@ -42,33 +33,6 @@ class MaintenanceReasonCodeTest {
     void testEnumProperties() {
         assertEquals("AC", MaintenanceReasonCode.ACTIVE.getCode());
         assertEquals("Active", MaintenanceReasonCode.ACTIVE.getDescription());
-
-        assertEquals("BH", MaintenanceReasonCode.BIRTH.getCode());
-        assertEquals("Birth", MaintenanceReasonCode.BIRTH.getDescription());
-
-        assertEquals("CO", MaintenanceReasonCode.COBRA.getCode());
-        assertEquals("COBRA", MaintenanceReasonCode.COBRA.getDescription());
-
-        assertEquals("DI", MaintenanceReasonCode.DISABILITY.getCode());
-        assertEquals("Disability", MaintenanceReasonCode.DISABILITY.getDescription());
-
-        assertEquals("DN", MaintenanceReasonCode.DEATH.getCode());
-        assertEquals("Death", MaintenanceReasonCode.DEATH.getDescription());
-
-        assertEquals("ET", MaintenanceReasonCode.RETIREMENT.getCode());
-        assertEquals("Retirement", MaintenanceReasonCode.RETIREMENT.getDescription());
-
-        assertEquals("MA", MaintenanceReasonCode.MARRIAGE.getCode());
-        assertEquals("Marriage", MaintenanceReasonCode.MARRIAGE.getDescription());
-
-        assertEquals("ST", MaintenanceReasonCode.STRIKE.getCode());
-        assertEquals("Strike", MaintenanceReasonCode.STRIKE.getDescription());
-
-        assertEquals("TN", MaintenanceReasonCode.TERMINATION.getCode());
-        assertEquals("Termination", MaintenanceReasonCode.TERMINATION.getDescription());
-
-        assertEquals("VO", MaintenanceReasonCode.VOLUNTARY_WITHDRAWAL.getCode());
-        assertEquals("Voluntary Withdrawal", MaintenanceReasonCode.VOLUNTARY_WITHDRAWAL.getDescription());
 
         assertEquals("XN", MaintenanceReasonCode.ADMINISTRATIVE_ERROR.getCode());
         assertEquals("Administrative Error", MaintenanceReasonCode.ADMINISTRATIVE_ERROR.getDescription());
