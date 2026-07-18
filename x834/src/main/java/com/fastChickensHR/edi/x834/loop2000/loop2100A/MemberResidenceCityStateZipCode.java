@@ -33,6 +33,20 @@ public class MemberResidenceCityStateZipCode extends N4Segment {
         if (n403 == null || n403.trim().isEmpty()) {
             throw new ValidationException("Postal Code (N403) is required for Member Residence City State Zip Code");
         }
+        requireLocationQualifierAndIdentifierTogether(n405, n406);
+    }
+
+    /**
+     * Mutual pairing (X12 N4 syntax rule P0506): Location Qualifier (N405) and Location
+     * Identifier (N406) must either both be present or both be absent.
+     */
+    private static void requireLocationQualifierAndIdentifierTogether(String n405, String n406) throws ValidationException {
+        boolean hasQualifier = n405 != null && !n405.trim().isEmpty();
+        boolean hasIdentifier = n406 != null && !n406.trim().isEmpty();
+        if (hasQualifier != hasIdentifier) {
+            throw new ValidationException(
+                    "Location Qualifier (N405) and Location Identifier (N406) must be provided together");
+        }
     }
 
     /**

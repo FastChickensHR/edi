@@ -49,7 +49,8 @@ class MemberNameTest {
 
     @Test
     void testBuilderSetsDefaultValues() throws ValidationException {
-        MemberName memberName = MemberName.builder().build();
+        // A person (default NM102=1) requires a last name (NM103).
+        MemberName memberName = MemberName.builder().setLastName(lastName).build();
 
         assertEquals(MemberName.ENTITY_IDENTIFIER_CODE, memberName.getEntityIdentifierCode());
         assertEquals(MemberName.PERSON_ENTITY_TYPE, memberName.getEntityTypeQualifier());
@@ -58,9 +59,23 @@ class MemberNameTest {
     @Test
     void testOverridingDefaultValues() throws ValidationException {
         String customEntityIdentifierCode = "QD";
-        MemberName memberName = MemberName.builder().setEntityIdentifierCode(customEntityIdentifierCode).setEntityTypeQualifier(entityType).build();
+        MemberName memberName = MemberName.builder().setEntityIdentifierCode(customEntityIdentifierCode).setEntityTypeQualifier(entityType).setLastName(lastName).build();
 
         assertEquals(customEntityIdentifierCode, memberName.getEntityIdentifierCode());
+    }
+
+    @Test
+    void testPersonRequiresLastName() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> MemberName.builder().setFirstName(firstName).build());
+        assertTrue(exception.getMessage().contains("Last Name (NM103)"));
+    }
+
+    @Test
+    void testIdentificationQualifierAndCodeMustBePaired() {
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> MemberName.builder().setLastName(lastName).setIdentificationCodeQualifier("34").build());
+        assertTrue(exception.getMessage().contains("must be provided together"));
     }
 
     @Test
