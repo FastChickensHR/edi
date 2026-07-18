@@ -48,6 +48,18 @@ public final class X834Location {
     public static final String COVERAGE_START_DATE = "coverageStartDate";  // DTP*356
     public static final String COVERAGE_END_DATE = "coverageEndDate";      // DTP*357
 
+    // ---- Member level: Loop 2100A name / demographics / residence address ----
+    public static final String LAST_NAME = "lastName";        // NM103
+    public static final String FIRST_NAME = "firstName";      // NM104
+    public static final String MIDDLE_NAME = "middleName";    // NM105
+    public static final String BIRTH_DATE = "birthDate";      // DMG02 (D8)
+    public static final String GENDER = "gender";             // DMG03
+    public static final String ADDRESS_LINE_1 = "addressLine1"; // N301
+    public static final String ADDRESS_LINE_2 = "addressLine2"; // N302
+    public static final String CITY = "city";                 // N401
+    public static final String STATE = "state";               // N402
+    public static final String ZIP_CODE = "zipCode";          // N403
+
     // ---- Member level: health coverage (HD segment) ----
     public static final String HD_PREFIX = "hd.";
     public static final String HD_MAINTENANCE_TYPE_CODE = "hd.maintenanceTypeCode";        // HD01

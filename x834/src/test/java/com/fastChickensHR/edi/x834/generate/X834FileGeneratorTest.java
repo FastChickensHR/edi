@@ -96,6 +96,50 @@ class X834FileGeneratorTest {
         assertTrue(out.indexOf("REF*ZZ*NORTH") > out.indexOf("INS*Y*01"), "REF extension must render after the members");
     }
 
+    @Test
+    void emitsFullMemberLoopWhenNameDemographicsAndAddressPresent() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "E12345"),
+                emp(X834Location.LAST_NAME, "DOE"),
+                emp(X834Location.FIRST_NAME, "JANE"),
+                emp(X834Location.MIDDLE_NAME, "Q"),
+                emp(X834Location.BIRTH_DATE, "1980-01-15"),
+                emp(X834Location.GENDER, "F"),
+                emp(X834Location.ADDRESS_LINE_1, "123 MAIN ST"),
+                emp(X834Location.ADDRESS_LINE_2, "APT 4"),
+                emp(X834Location.CITY, "SPRINGFIELD"),
+                emp(X834Location.STATE, "IL"),
+                emp(X834Location.ZIP_CODE, "62704")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        contains(out, "INS*Y*18*001**A");
+        contains(out, "NM1*IL*1*DOE*JANE*Q~");
+        contains(out, "N3*123 MAIN ST*APT 4~");
+        contains(out, "N4*SPRINGFIELD*IL*62704~");
+        contains(out, "DMG*D8*19800115*F~");
+        // Loop 2100A order: NM1 -> N3 -> N4 -> DMG, all after the INS.
+        assertTrue(out.indexOf("NM1*IL") > out.indexOf("INS*Y*18"), "NM1 after INS");
+        assertTrue(out.indexOf("N3*123") > out.indexOf("NM1*IL"), "N3 after NM1");
+        assertTrue(out.indexOf("N4*SPRING") > out.indexOf("N3*123"), "N4 after N3");
+        assertTrue(out.indexOf("DMG*D8") > out.indexOf("N4*SPRING"), "DMG after N4");
+    }
+
     private static void contains(String haystack, String needle) {
         assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
     }

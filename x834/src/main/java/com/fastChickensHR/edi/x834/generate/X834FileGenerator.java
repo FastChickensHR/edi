@@ -122,6 +122,19 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.ENROLLMENT_DATE, v -> member.setEnrollmentDate(parseDateTime(v)));
         apply(loc, X834Location.COVERAGE_START_DATE, v -> member.setCoverageStartDate(parseDateTime(v)));
         apply(loc, X834Location.COVERAGE_END_DATE, v -> member.setCoverageEndDate(parseDateTime(v)));
+
+        // Loop 2100A name / demographics / residence address. The writer emits the
+        // matching NM1/DMG/N3/N4 only when these are present, so absent fields change nothing.
+        apply(loc, X834Location.LAST_NAME, member::setLastName);
+        apply(loc, X834Location.FIRST_NAME, member::setFirstName);
+        apply(loc, X834Location.MIDDLE_NAME, member::setMiddleName);
+        apply(loc, X834Location.BIRTH_DATE, v -> member.setBirthDate(parseDateTime(v)));
+        apply(loc, X834Location.GENDER, member::setGender);
+        apply(loc, X834Location.ADDRESS_LINE_1, member::setAddressLine1);
+        apply(loc, X834Location.ADDRESS_LINE_2, member::setAddressLine2);
+        apply(loc, X834Location.CITY, member::setCity);
+        apply(loc, X834Location.STATE, member::setState);
+        apply(loc, X834Location.ZIP_CODE, member::setZipCode);
     }
 
     /** Custom REF extensions: any {@code "ref.<qualifier>"} field becomes a {@code REF} segment. */
