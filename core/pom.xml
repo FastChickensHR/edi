@@ -19,20 +19,11 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>edi-834</artifactId>
-    <name>FastChickensHR EDI 834</name>
-    <description>X12 834 benefit enrollment EDI document generation toolkit</description>
+    <artifactId>core</artifactId>
+    <name>FastChickensHR EDI Core</name>
+    <description>Format-neutral file kernel (FileContent / Record / Field / Location) and the generate/parse seam</description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.fastchickenshr</groupId>
-            <artifactId>edi-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
