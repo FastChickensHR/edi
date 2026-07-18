@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The CSV implementation of the {@link FileGenerator} seam (ADR-0313): writes a format-neutral
+ * The CSV implementation of the {@link FileGenerator} seam: writes a format-neutral
  * {@link FileContent} out as a flat, header-row CSV. The inverse of {@link CsvFileParser}.
  *
  * <p>Each {@link Record} becomes a row and each {@link Field} a cell under its column (the field's

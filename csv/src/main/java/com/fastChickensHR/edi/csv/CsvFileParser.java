@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The CSV implementation of the {@link FileParser} seam (ADR-0313): reads a flat, header-row CSV into a
+ * The CSV implementation of the {@link FileParser} seam: reads a flat, header-row CSV into a
  * format-neutral {@link FileContent}. A CSV is the degenerate <em>Flat</em> delimited file — one line
  * per record — so each data row becomes one {@link Record} and each non-empty cell becomes a
  * {@link Field} whose {@link Location} location is the column name.

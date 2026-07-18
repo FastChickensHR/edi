@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * The 834 implementation of the {@link FileGenerator} seam (ADR-0313): serializes a format-neutral
+ * The 834 implementation of the {@link FileGenerator} seam: serializes a format-neutral
  * {@link FileContent} into an X12 834 document. It holds no domain logic — every Value has already
  * been resolved upstream by the app's requirements engine. It only interprets each
  * {@link com.fastChickensHR.edi.core.Location} (via {@link X834Location}) onto the library's own typed
