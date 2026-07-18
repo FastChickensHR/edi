@@ -27,9 +27,13 @@ import lombok.Getter;
 public abstract class IDCSegment extends Segment {
     public static final String SEGMENT_ID = "IDC";
 
+    /** IDC01 — plan coverage description (required, max 50 characters). */
     protected final String idc01;
+    /** IDC02 — identification card type code (required). */
     protected final String idc02;
+    /** IDC03 — identification card action code (required). */
     protected final String idc03;
+    /** IDC04 — identification card count; when present must be a non-negative number (optional). */
     protected final String idc04;
 
     protected IDCSegment(AbstractBuilder<?> builder) throws ValidationException {
@@ -115,42 +119,57 @@ public abstract class IDCSegment extends Segment {
         protected String idc03;
         protected String idc04;
 
+        /** @return this builder cast to the concrete type. */
         protected abstract T self();
 
+        /**
+         * Builds and validates the IDC segment.
+         *
+         * @return a new {@link IDCSegment} instance
+         * @throws ValidationException if validation fails
+         */
         public abstract IDCSegment build() throws ValidationException;
 
+        /** Sets IDC01 (plan coverage description). */
         public T setPlanCoverageDescription(String value) {
             this.idc01 = value;
             return self();
         }
 
+        /** Sets IDC02 (identification card type code). */
         public T setIdentificationCardTypeCode(String value) {
             this.idc02 = value;
             return self();
         }
 
+        /** Sets IDC03 (identification card action code). */
         public T setIdentificationCardActionCode(String value) {
             this.idc03 = value;
             return self();
         }
 
+        /** Sets IDC04 (identification card count). */
         public T setIdentificationCardCount(String value) {
             this.idc04 = value;
             return self();
         }
 
+        /** Element alias for {@link #setPlanCoverageDescription(String)}. */
         public T setIdc01(String value) {
             return setPlanCoverageDescription(value);
         }
 
+        /** Element alias for {@link #setIdentificationCardTypeCode(String)}. */
         public T setIdc02(String value) {
             return setIdentificationCardTypeCode(value);
         }
 
+        /** Element alias for {@link #setIdentificationCardActionCode(String)}. */
         public T setIdc03(String value) {
             return setIdentificationCardActionCode(value);
         }
 
+        /** Element alias for {@link #setIdentificationCardCount(String)}. */
         public T setIdc04(String value) {
             return setIdentificationCardCount(value);
         }

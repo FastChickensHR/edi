@@ -14,8 +14,13 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Authorization Information Qualifiers used in the ISA01 field
- * of the EDI Interchange Control Header (ISA) segment.
+ * Code values for the Authorization Information Qualifier (ISA01, X12 data element I01) in
+ * the Interchange Control Header (ISA) of an X12 834 interchange (005010X220A1). Qualifies
+ * the type of authorization information carried in ISA02.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum AuthorizationInformationQualifier implements EdiCodeEnum {
@@ -69,6 +74,10 @@ public enum AuthorizationInformationQualifier implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

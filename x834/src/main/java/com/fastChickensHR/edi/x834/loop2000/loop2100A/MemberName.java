@@ -17,7 +17,9 @@ import lombok.experimental.Accessors;
  * name and identification details.
  */
 public class MemberName extends NM1Segment {
+    /** NM101 entity identifier {@code IL} — Insured or Subscriber; the fixed default for the member NM1. */
     public static final String ENTITY_IDENTIFIER_CODE = "IL";
+    /** NM102 entity type qualifier {@code 1} — Person; the fixed default for the member NM1. */
     public static final String PERSON_ENTITY_TYPE = "1";
 
     protected MemberName(Builder builder) throws ValidationException {

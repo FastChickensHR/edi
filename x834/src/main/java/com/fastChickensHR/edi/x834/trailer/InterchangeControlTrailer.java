@@ -21,6 +21,7 @@ import lombok.experimental.Accessors;
  */
 @Getter
 public class InterchangeControlTrailer extends IEASegment {
+    /** Default IEA01 — number of functional groups in the interchange; always {@code "1"} for an 834. */
     public static final String DEFAULT_NUMBER_OF_INCLUDED_GROUPS = "1";
 
     private InterchangeControlTrailer(Builder builder) throws ValidationException {
@@ -48,6 +49,12 @@ public class InterchangeControlTrailer extends IEASegment {
             return this;
         }
 
+        /**
+         * Builds a new InterchangeControlTrailer instance.
+         *
+         * @return A new InterchangeControlTrailer instance
+         * @throws ValidationException if validation fails
+         */
         @Override
         public InterchangeControlTrailer build() throws ValidationException {
             return new InterchangeControlTrailer(this);

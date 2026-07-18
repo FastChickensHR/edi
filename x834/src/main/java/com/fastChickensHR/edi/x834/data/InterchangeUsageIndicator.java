@@ -14,8 +14,13 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Interchange Usage Indicators used in EDI transactions,
- * specifically in the ISA15 segment of the interchange control header.
+ * Code values for the Interchange Usage Indicator (ISA15, X12 data element I14) in the
+ * Interchange Control Header (ISA) of an X12 834 interchange (005010X220A1). Marks whether
+ * the interchange carries production, test, or informational data.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum InterchangeUsageIndicator implements EdiCodeEnum {
@@ -73,6 +78,10 @@ public enum InterchangeUsageIndicator implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

@@ -12,8 +12,8 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**
- * Represents a Member Residence Street Address segment in X834 EDI format
- * Implements address line 1 (N301) and address line 2 (N302)
+ * Member residence street address as an N3 segment in Loop 2100A of the X12 834.
+ * Implements address line 1 (N301) and address line 2 (N302).
  */
 @Getter
 public class MemberResidenceStreetAddress extends N3Segment {

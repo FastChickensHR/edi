@@ -11,8 +11,19 @@ import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Setter;
 
 /**
- * Base class for all EDI segments.
- * Now context-aware to reduce direct dependency on X834Document.
+ * Base class for all X12 EDI segments (e.g. ISA, GS, ST, NM1) in the 834
+ * Benefit Enrollment and Maintenance transaction.
+ * <p>
+ * A segment is an ordered list of data elements sharing a two- or three-character
+ * segment identifier. Concrete subclasses supply that identifier via
+ * {@link #getSegmentIdentifier()} and the ordered element values via
+ * {@link #getElementValues()}; this base class handles rendering those values into
+ * a delimited EDI segment string using the separators and terminators carried on the
+ * {@link X834Context}.
+ * <p>
+ * Segments are context-aware to reduce direct dependency on {@code X834Document}: the
+ * {@link X834Context} must be set (see the generated setter) before {@link #render()}
+ * is called.
  */
 @Setter
 public abstract class Segment {

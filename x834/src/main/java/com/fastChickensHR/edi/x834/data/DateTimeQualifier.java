@@ -14,8 +14,14 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Date/Time Qualifiers used in EDI transactions.
- * These codes indicate the purpose or context of a date or date/time element.
+ * Code values for the X12 Date/Time Qualifier (data element 374), which states the meaning
+ * of an accompanying date, time, or date/time period. In the X12 834 (005010X220A1) it
+ * appears in DTP segments (DTP01) that carry dates such as coverage, eligibility, and
+ * employment periods.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum DateTimeQualifier implements EdiCodeEnum {
@@ -477,6 +483,10 @@ public enum DateTimeQualifier implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

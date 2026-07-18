@@ -26,8 +26,11 @@ import lombok.Getter;
 public abstract class AMTSegment extends Segment {
     public static final String SEGMENT_ID = "AMT";
 
+    /** AMT01 — amount qualifier code (required). */
     protected final String amt01;
+    /** AMT02 — monetary amount (required). */
     protected final String amt02;
+    /** AMT03 — credit/debit flag code; when present must be "C" or "D" (optional). */
     protected final String amt03;
 
     protected AMTSegment(AbstractBuilder<?> builder) throws ValidationException {
@@ -91,33 +94,46 @@ public abstract class AMTSegment extends Segment {
         protected String amt02;
         protected String amt03;
 
+        /** @return this builder cast to the concrete type. */
         protected abstract T self();
 
+        /**
+         * Builds and validates the AMT segment.
+         *
+         * @return a new {@link AMTSegment} instance
+         * @throws ValidationException if validation fails
+         */
         public abstract AMTSegment build() throws ValidationException;
 
+        /** Sets AMT01 (amount qualifier code). */
         public T setAmountQualifierCode(String value) {
             this.amt01 = value;
             return self();
         }
 
+        /** Sets AMT02 (monetary amount). */
         public T setMonetaryAmount(String value) {
             this.amt02 = value;
             return self();
         }
 
+        /** Sets AMT03 (credit/debit flag code); when present must be "C" or "D". */
         public T setCreditDebitFlagCode(String value) {
             this.amt03 = value;
             return self();
         }
 
+        /** Element alias for {@link #setAmountQualifierCode(String)}. */
         public T setAmt01(String value) {
             return setAmountQualifierCode(value);
         }
 
+        /** Element alias for {@link #setMonetaryAmount(String)}. */
         public T setAmt02(String value) {
             return setMonetaryAmount(value);
         }
 
+        /** Element alias for {@link #setCreditDebitFlagCode(String)}. */
         public T setAmt03(String value) {
             return setCreditDebitFlagCode(value);
         }

@@ -11,7 +11,14 @@ import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.experimental.Accessors;
 
+/**
+ * Member identification number carried as a REF segment in Loop 2000 of the X12 834.
+ * <p>
+ * Renders {@code REF*DX*<identification number>}: REF01 is fixed to the qualifier
+ * {@code DX} and REF02 carries the member's identification number.
+ */
 public class MemberIdentificationNumber extends RefSegment {
+    /** REF01 qualifier {@code DX} — the fixed default reference qualifier for this member-identification REF segment. */
     public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "DX";
 
     private MemberIdentificationNumber(MemberIdentificationNumber.Builder builder) throws ValidationException {

@@ -13,8 +13,28 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Represents the HD segment in X12 834 format.
- * This segment is used for health coverage information.
+ * Represents the HD (Health Coverage) segment in the X12 834
+ * (005010X220A1) Benefit Enrollment and Maintenance transaction (Loop 2300).
+ * <p>
+ * This segment describes a member's health coverage — the maintenance action being
+ * applied, the insurance line, and related coverage attributes.
+ * <p>
+ * Element/position map (meanings derived from the accessor names on this class):
+ * <ul>
+ *     <li>HD01 = maintenance type code (required)</li>
+ *     <li>HD02 = maintenance reason code</li>
+ *     <li>HD03 = insurance line code (required)</li>
+ *     <li>HD04 = plan coverage description</li>
+ *     <li>HD05 = coverage level code</li>
+ *     <li>HD06 = medicare plan code</li>
+ *     <li>HD07 = medicare eligibility reason code</li>
+ *     <li>HD08 = COBRA qualifying event code</li>
+ *     <li>HD09 = employment status code</li>
+ *     <li>HD10 = student status code</li>
+ *     <li>HD11 = handicap indicator (Y/N)</li>
+ *     <li>HD12 = date qualifier</li>
+ *     <li>HD13 = birth date</li>
+ * </ul>
  */
 @Getter
 public abstract class HDSegment extends Segment {

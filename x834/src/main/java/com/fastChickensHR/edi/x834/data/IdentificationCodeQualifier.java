@@ -14,8 +14,14 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Identification Code Qualifiers used in EDI transactions.
- * Contains codes and descriptions for various types of identification numbers.
+ * Code values for the X12 Identification Code Qualifier (data element 66), which designates
+ * the system or authority behind an accompanying identification code. In the X12 834
+ * (005010X220A1) it appears as NM108 and N103/N104 to qualify identifiers such as tax IDs,
+ * SSNs, and payer/plan identifiers.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum IdentificationCodeQualifier implements EdiCodeEnum {
@@ -317,6 +323,10 @@ public enum IdentificationCodeQualifier implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

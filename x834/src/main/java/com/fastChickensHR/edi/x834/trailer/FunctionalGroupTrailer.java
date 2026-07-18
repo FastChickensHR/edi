@@ -45,6 +45,12 @@ public class FunctionalGroupTrailer extends GESegment {
             return this;
         }
 
+        /**
+         * Builds a new FunctionalGroupTrailer instance.
+         *
+         * @return A new FunctionalGroupTrailer instance
+         * @throws ValidationException if validation fails
+         */
         @Override
         public FunctionalGroupTrailer build() throws ValidationException {
             return new FunctionalGroupTrailer(this);

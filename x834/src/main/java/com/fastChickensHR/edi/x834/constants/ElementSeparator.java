@@ -9,10 +9,17 @@ package com.fastChickensHR.edi.x834.constants;
 
 import lombok.Getter;
 
+/**
+ * Data element separator characters used between elements within an X12 segment.
+ * {@code X834Context} defaults to {@link #ASTERISK} ('*'), the conventional 834 element separator.
+ */
 @Getter
 public enum ElementSeparator {
+    /** Asterisk '*' — the conventional X12 element separator (default). */
     ASTERISK('*'),
+    /** Caret '^'. */
     CARET('^'),
+    /** Pipe '|'. */
     PIPE('|');
 
     private final char value;

@@ -14,8 +14,14 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Version Codes used in EDI transactions,
- * specifically in the GS08 segment element of the Functional Group Header.
+ * Code values for the Version / Release / Industry Identifier Code (GS08, X12 data element
+ * 480) in the Functional Group Header (GS). States the standard version and, for HIPAA
+ * transactions, the implementation guide; the X12 834 Benefit Enrollment and Maintenance
+ * guide is {@link #VERSION_005010X220A1} ("005010X220A1").
+ *
+ * <p>No default value is defined for this element. Its lookup registers no synonyms, so
+ * {@link #fromString(String)} matches only a code, enum name, or description and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum VersionCode implements EdiCodeEnum {
@@ -103,6 +109,10 @@ public enum VersionCode implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

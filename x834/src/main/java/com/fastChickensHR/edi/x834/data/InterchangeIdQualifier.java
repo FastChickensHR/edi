@@ -14,8 +14,13 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Interchange ID Qualifiers used in the ISA05 and ISA07 fields
- * of the EDI 834 Interchange Control Header (ISA) segment.
+ * Code values for the Interchange ID Qualifier (ISA05 and ISA07, X12 data element I05) in
+ * the Interchange Control Header (ISA) of an X12 834 interchange (005010X220A1). Qualifies
+ * the kind of sender ID (ISA06) and receiver ID (ISA08) that follows.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum InterchangeIdQualifier implements EdiCodeEnum {
@@ -210,6 +215,10 @@ public enum InterchangeIdQualifier implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

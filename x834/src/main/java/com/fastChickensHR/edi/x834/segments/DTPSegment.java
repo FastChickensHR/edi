@@ -15,12 +15,29 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents the DTP (Date or Time or Period) segment in the X12 834
+ * (005010X220A1) Benefit Enrollment and Maintenance transaction.
+ * <p>
+ * This segment expresses a date, time, or period together with a qualifier that
+ * states what the date means and a format code that states how it is encoded.
+ * <p>
+ * Element/position map:
+ * <ul>
+ *     <li>DTP01 = date/time qualifier — what the date represents (required)</li>
+ *     <li>DTP02 = date/time format qualifier — how DTP03 is formatted (required)</li>
+ *     <li>DTP03 = date/time period value, max 35 characters (required)</li>
+ * </ul>
+ */
 @Getter
 public abstract class DTPSegment extends Segment {
     public static final String SEGMENT_ID = "DTP";
 
+    /** DTP01 — date/time qualifier stating what the date represents (required). */
     protected final DateTimeQualifier dtp01;
+    /** DTP02 — date/time format qualifier stating how DTP03 is encoded (required). */
     protected final DateFormat dtp02;
+    /** DTP03 — the date/time period value, max 35 characters (required). */
     protected final String dtp03;
 
     protected DTPSegment(AbstractBuilder<?> builder) throws ValidationException {
@@ -56,18 +73,26 @@ public abstract class DTPSegment extends Segment {
         return new String[]{dtp01.getCode(), dtp02.getFormat(), dtp03};
     }
 
+    /** @return DTP01 — the date/time qualifier. */
     public DateTimeQualifier getDateTimeQualifier() {
         return getDtp01();
     }
 
+    /** @return DTP02 — the date/time format qualifier. */
     public DateFormat getDateTimeFormat() {
         return getDtp02();
     }
 
+    /** @return DTP03 — the date/time period value. */
     public String getDateTimePeriod() {
         return getDtp03();
     }
 
+    /**
+     * Abstract builder for DTP segments.
+     *
+     * @param <T> the concrete builder type for method chaining
+     */
     public abstract static class AbstractBuilder<T extends AbstractBuilder<T>> {
         protected DateTimeQualifier dtp01;
         protected DateFormat dtp02;
@@ -77,51 +102,68 @@ public abstract class DTPSegment extends Segment {
             // No default initialization
         }
 
+        /** @return this builder cast to the concrete type. */
         protected abstract T self();
 
+        /**
+         * Builds and validates the DTP segment.
+         *
+         * @return a new {@link DTPSegment} instance
+         * @throws ValidationException if validation fails
+         */
         public abstract DTPSegment build() throws ValidationException;
 
+        /** Sets DTP01 (date/time qualifier) from its string code. */
         public T setDateTimeQualifier(String value) {
             this.dtp01 = DateTimeQualifier.fromString(value);
             return self();
         }
 
+        /** Sets DTP01 (date/time qualifier). */
         public T setDateTimeQualifier(DateTimeQualifier value) {
             this.dtp01 = value;
             return self();
         }
 
+        /** Sets DTP02 (date/time format qualifier). */
         public T setDateTimeFormat(DateFormat value) {
             this.dtp02 = value;
             return self();
         }
 
+        /** Sets DTP03 (date/time period), formatting the value with the previously set DTP02 format. */
         public T setDateTimePeriod(LocalDateTime value) {
             this.dtp03 = DateFormatter.formatDate(this.dtp02, value);
             return self();
         }
 
+        /** Sets DTP03 (date/time period), formatting the value with the supplied format. */
         public T setDateTimePeriod(LocalDateTime value, DateFormat format) {
             this.dtp03 = DateFormatter.formatDate(format, value);
             return self();
         }
 
+        /** Element alias for {@link #setDateTimeQualifier(String)}. */
         public T setDtp01(String value) {
             return setDateTimeQualifier(value);
         }
 
+        /** Element alias for {@link #setDateTimeQualifier(DateTimeQualifier)}. */
         public T setDtp01(DateTimeQualifier value) {
             return setDateTimeQualifier(value);
         }
 
+        /** Element alias for {@link #setDateTimeFormat(DateFormat)}. */
         public T setDtp02(DateFormat value) {
             return setDateTimeFormat(value);
         }
 
+        /** Element alias for {@link #setDateTimePeriod(LocalDateTime)}. */
         public T setDtp03(LocalDateTime value) {
             return setDateTimePeriod(value);
         }
 
+        /** Element alias for {@link #setDateTimePeriod(LocalDateTime, DateFormat)}. */
         public T setDtp03(LocalDateTime value, DateFormat format) {
             return setDateTimePeriod(value, format);
         }

@@ -14,8 +14,14 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Entity Identifier Codes used in EDI transactions.
- * These codes identify organizational entities, functional groups, or areas of interest.
+ * Code values for the X12 Entity Identifier Code (data element 98), which identifies the
+ * organizational entity, physical location, property, or individual described by a name
+ * loop. In the X12 834 (005010X220A1) it appears as NM101 (and N101) to label parties such
+ * as the sponsor, payer, and insured.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum EntityIdentifierCode implements EdiCodeEnum {
@@ -216,6 +222,10 @@ public enum EntityIdentifierCode implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

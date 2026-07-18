@@ -13,8 +13,26 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Represents the DMG segment in X12 834 format.
- * This segment is used for demographic information such as birth date, gender, etc.
+ * Represents the DMG (Demographic Information) segment in the X12 834
+ * (005010X220A1) Benefit Enrollment and Maintenance transaction.
+ * <p>
+ * This segment carries demographic information about a member — birth date,
+ * gender, marital status, and related codes.
+ * <p>
+ * Element/position map (meanings derived from the accessor names on this class):
+ * <ul>
+ *     <li>DMG01 = date/time period format qualifier</li>
+ *     <li>DMG02 = birth date (formatted per DMG01)</li>
+ *     <li>DMG03 = gender code (commonly M = Male, F = Female)</li>
+ *     <li>DMG04 = marital status code</li>
+ *     <li>DMG05 = race or ethnicity code</li>
+ *     <li>DMG06 = citizenship status code</li>
+ *     <li>DMG07 = country code</li>
+ *     <li>DMG08 = basis of verification code</li>
+ *     <li>DMG09 = quantity</li>
+ *     <li>DMG10 = code list qualifier code</li>
+ *     <li>DMG11 = industry code</li>
+ * </ul>
  */
 @Getter
 public abstract class DMGSegment extends Segment {

@@ -12,11 +12,12 @@ import com.fastChickensHR.edi.x834.segments.RefSegment;
 import lombok.Getter;
 
 /**
- * Represents a policy number reference segment in an X834 transaction set.
- * This segment uses the REF segment format with a specific qualifier for policy numbers.
+ * Master policy number reference (REF*38) in the header portion of the X12 834 (005010X220A1).
+ * This segment uses the REF segment format with the {@code "38"} qualifier for the master policy number.
  */
 @Getter
 public class TransactionSetPolicyNumber extends RefSegment {
+    /** Default REF01 reference identification qualifier {@code "38"} (Master Policy Number). */
     private final static String DEFAULT_REFERENCE_IDENTIFICATION_QUALIFIER = "38";
 
     protected TransactionSetPolicyNumber(Builder builder) throws ValidationException {
@@ -24,14 +25,16 @@ public class TransactionSetPolicyNumber extends RefSegment {
     }
 
     /**
-     * Domain-specific accessor method
+     * Domain-specific accessor for the master policy number (REF02).
+     *
+     * @return the master policy number
      */
     public String getMasterPolicyNumber() {
         return getRef02();
     }
 
     /**
-     * Builder for the TransactionSetPolicyNumber.
+     * Builder for the TransactionSetPolicyNumber. Seeds the master-policy-number qualifier (REF01=38).
      */
     public static class Builder extends RefSegment.AbstractBuilder<TransactionSetPolicyNumber.Builder> {
 
@@ -46,7 +49,10 @@ public class TransactionSetPolicyNumber extends RefSegment {
         }
 
         /**
-         * Domain-specific setter
+         * Domain-specific setter for the master policy number (REF02).
+         *
+         * @param value the master policy number
+         * @return this builder instance
          */
         public Builder setMasterPolicyNumber(String value) {
             return setRef02(value);

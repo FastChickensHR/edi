@@ -14,8 +14,14 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Transaction Set Identifier Codes used in EDI formats.
- * These codes identify the transaction set type in the ST segment (ST01 element).
+ * Code values for the Transaction Set Identifier Code (ST01, X12 data element 143) in the
+ * Transaction Set Header (ST). Names the transaction set that follows; the X12 834
+ * transaction uses {@link #BENEFIT_ENROLLMENT_AND_MAINTENANCE} ("834") under implementation
+ * guide 005010X220A1.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum TransactionSetIdentifierCode implements EdiCodeEnum {
@@ -125,6 +131,10 @@ public enum TransactionSetIdentifierCode implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

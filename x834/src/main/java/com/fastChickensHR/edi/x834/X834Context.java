@@ -48,12 +48,18 @@ public class X834Context {
     private String formattedDocumentTime;
 
     // Constants
+    /** Interchange control version (ISA12) for the 5010 release: {@code "00501"}. */
     private static final String EDI_VERSION = "00501";
+    /** Transaction set identifier for benefit enrollment and maintenance: {@code "834"} (ST01). */
     private static final String TRANSACTION_SET_ID = "834";
+    /** Implementation convention reference identifying the 834 guide 005010X220A1 (ST03 / GS08). */
     private static final String IMPLEMENTATION_CONVENTION_REFERENCE = "005010X220A1";
 
     /**
-     * Creates a new X834Context with default values.
+     * Creates a new X834Context with default values: current timestamp as the document
+     * date, {@link DateFormat#DATE}/{@link TimeFormat#TIME} formats, the conventional 834
+     * delimiters ('*' element, '~' segment, '&gt;' sub-element) and LF line terminator,
+     * and a transaction set control number of {@code "0001"}.
      */
     public X834Context() {
         this.documentDate = LocalDateTime.now();
@@ -85,34 +91,61 @@ public class X834Context {
         }
     }
 
+    /**
+     * @return the element separator character (the character value, not the enum)
+     */
     public char getElementSeparator() {
         return elementSeparator.getValue();
     }
 
+    /**
+     * @return the sub-element (component) separator character
+     */
     public char getSubElementSeparator() {
         return subElementSeparator.getValue();
     }
 
+    /**
+     * @return the segment terminator character
+     */
     public char getSegmentTerminator() {
         return segmentTerminator.getValue();
     }
 
+    /**
+     * @return the line terminator string appended after each rendered segment
+     */
     public String getLineTerminator() {
         return lineTerminator.getValue();
     }
 
+    /**
+     * @return the interchange control version number {@value #EDI_VERSION} (ISA12)
+     */
     public String getEdiVersion() {
         return EDI_VERSION;
     }
 
+    /**
+     * @return the transaction set identifier {@value #TRANSACTION_SET_ID}
+     */
     public String getTransactionSetId() {
         return TRANSACTION_SET_ID;
     }
 
+    /**
+     * @return the implementation convention reference {@value #IMPLEMENTATION_CONVENTION_REFERENCE}
+     */
     public String getImplementationConventionReference() {
         return IMPLEMENTATION_CONVENTION_REFERENCE;
     }
 
+    /**
+     * Sets the document date and refreshes the cached formatted document date.
+     *
+     * @param date the document date/time
+     * @return this context instance for chaining
+     */
     public X834Context setDocumentDate(LocalDateTime date) {
         this.documentDate = date;
         this.formattedDocumentDate = formatDate(date);

@@ -14,8 +14,14 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Reference Identification Qualifier codes used in the EDI
- * transactions, specifically in REF segments to indicate the type of reference.
+ * Code values for the X12 Reference Identification Qualifier (data element 128), which
+ * states the meaning of an accompanying reference identifier. In the X12 834
+ * (005010X220A1) it appears as REF01 to type reference numbers such as subscriber,
+ * group/policy, and member identifiers.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum ReferenceIdentificationQualifier implements EdiCodeEnum {
@@ -148,6 +154,10 @@ public enum ReferenceIdentificationQualifier implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;
