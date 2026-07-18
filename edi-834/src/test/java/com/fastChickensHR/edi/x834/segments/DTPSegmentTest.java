@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DTPSegmentTest {
-    x834Context context = new x834Context();
+    X834Context context = new X834Context();
 
     @Test
     void testSegmentIdentifier() throws ValidationException {

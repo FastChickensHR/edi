@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.loop2000.loop3000;
 
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.HealthCoverageDateQualifier;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HealthCoverageDatesTest {
-    x834Context context = new x834Context();
+    X834Context context = new X834Context();
 
     @Test
     void testEffectiveDate() throws ValidationException {

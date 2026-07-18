@@ -10,7 +10,7 @@ package com.fastChickensHR.edi.x834.header;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
 import com.fastChickensHR.edi.x834.data.ResponsibleAgencyCode;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionalGroupHeaderTest {
-    private x834Context context;
+    private X834Context context;
     private LocalDateTime testDateTime;
     private String formattedDate;
     private String formattedTime;
@@ -29,7 +29,7 @@ class FunctionalGroupHeaderTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
         testDateTime = LocalDateTime.of(2023, 11, 15, 12, 30, 0);
         formattedDate = "20231115";
         formattedTime = "1230";

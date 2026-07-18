@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class N4SegmentTest {
 
-    private x834Context context;
+    private X834Context context;
     private final String cityName = "SEATTLE";
     private final String stateOrProvinceCode = "WA";
     private final String postalCode = "98101";
@@ -57,7 +57,7 @@ class N4SegmentTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
     }
 
     @Test

@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.data.InterchangeUsageIndicator;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -26,7 +26,7 @@ class InterchangeControlHeaderTest {
     String interchangeControlNumber = "FakeControlNumber";
     @Test
     void testDefaultValues() throws ValidationException {
-        x834Context context = new x834Context();
+        X834Context context = new X834Context();
         context.setSenderID("SENDER123");
         context.setReceiverID("RECEIVER456");
         context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
@@ -54,7 +54,7 @@ class InterchangeControlHeaderTest {
 
     @Test
     void testPaddingOfSenderID() throws ValidationException {
-        x834Context context = new x834Context();
+        X834Context context = new X834Context();
         context.setSenderID("ABC");
         context.setReceiverID("RECEIVER456");
         context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
@@ -66,7 +66,7 @@ class InterchangeControlHeaderTest {
 
     @Test
     void testContextAccess() throws ValidationException {
-        x834Context context = new x834Context();
+        X834Context context = new X834Context();
         context.setSenderID("SENDER123");
         context.setReceiverID("RECEIVER456");
 
@@ -77,7 +77,7 @@ class InterchangeControlHeaderTest {
 
     @Test
     void testCustomValuesOverrideDefaults() throws ValidationException {
-        x834Context context = new x834Context();
+        X834Context context = new X834Context();
         context.setSenderID("SENDER123");
         context.setReceiverID("RECEIVER456");
         context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));

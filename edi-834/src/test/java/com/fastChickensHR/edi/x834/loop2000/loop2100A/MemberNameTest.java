@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.loop2000.loop2100A;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemberNameTest {
 
-    private x834Context context;
+    private X834Context context;
     private final String lastName = "DOE";
     private final String firstName = "JOHN";
     private final String middleName = "Q";
@@ -28,7 +28,7 @@ class MemberNameTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
     }
 
     @Test

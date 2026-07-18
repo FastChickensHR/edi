@@ -5,15 +5,15 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.emit;
+package com.fastChickensHR.edi.x834.generate;
 
 /**
- * The 834 dialect's {@code Position.location} vocabulary — the contract between the app (which builds
- * a {@link com.fastChickensHR.edi.core.PlannedFile}) and {@link X834FileEmitter} (which serializes it).
- * Each constant names <em>where</em> a resolved Value goes; the emitter maps it onto the library's
+ * The 834 dialect's {@code Location.location} vocabulary — the contract between the app (which builds
+ * a {@link com.fastChickensHR.edi.core.FileContent}) and {@link X834FileGenerator} (which serializes it).
+ * Each constant names <em>where</em> a resolved value goes; the generator maps it onto the library's
  * typed builders so the wire output is identical to the legacy converter path.
  *
- * <p>File-level keys feed the envelope/header ({@code filePlacements}); member-level keys feed each
+ * <p>File-level keys feed the envelope/header ({@code fileFields}); member-level keys feed each
  * subscriber/dependent Record. Custom REF extensions use the {@link #REF_EXTENSION_PREFIX} + qualifier
  * (e.g. {@code "ref.ZZ"}); HD (coverage) keys are {@code "hd."}-prefixed.
  */
@@ -21,7 +21,7 @@ public final class X834Location {
     private X834Location() {
     }
 
-    // ---- File level: envelope + control numbers (x834Context) ----
+    // ---- File level: envelope + control numbers (X834Context) ----
     public static final String SENDER_ID = "senderId";
     public static final String RECEIVER_ID = "receiverId";
     public static final String INTERCHANGE_CONTROL_NUMBER = "interchangeControlNumber";

@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.Segment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 
@@ -26,13 +26,13 @@ import java.util.List;
  * domain objects themselves.
  */
 public class X834MemberWriter {
-    private final x834Context context;
+    private final X834Context context;
 
     /**
      * @param context The 834 context to use when emitting segments.
      * @throws IllegalArgumentException if {@code context} is null
      */
-    public X834MemberWriter(x834Context context) {
+    public X834MemberWriter(X834Context context) {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }

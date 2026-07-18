@@ -21,7 +21,7 @@
 
     <artifactId>edi-csv</artifactId>
     <name>FastChickensHR EDI CSV</name>
-    <description>CSV (flat delimited file) support — parses into and emits from the edi-core file kernel</description>
+    <description>CSV (flat delimited file) support — parses into and generates from the edi-core file kernel</description>
 
     <dependencies>
         <dependency>

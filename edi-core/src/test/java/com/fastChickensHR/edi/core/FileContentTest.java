@@ -15,33 +15,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PlannedFileTest {
+class FileContentTest {
 
     @Test
     void buildsAnOrderedTreeAndDefendsItsCollections() {
-        Placement ssn = new Placement(new Position(FileLevel.EMPLOYEE, "REF*34"), "123456789");
-        Placement depName = new Placement(new Position(FileLevel.DEPENDENT, "NM1*03"), "Doe");
-        PlannedRecord dependent = PlannedRecord.of(List.of(depName));
-        PlannedRecord subscriber = new PlannedRecord(List.of(ssn), List.of(dependent));
-        PlannedFile file = new PlannedFile(Direction.OUTBOUND, List.of(), List.of(subscriber));
+        Field ssn = new Field(new Location(RecordLevel.RECORD, "REF*34"), "123456789");
+        Field depName = new Field(new Location(RecordLevel.SUBRECORD, "NM1*03"), "Doe");
+        Record dependent = Record.of(List.of(depName));
+        Record subscriber = new Record(List.of(ssn), List.of(dependent));
+        FileContent file = new FileContent(Direction.OUTBOUND, List.of(), List.of(subscriber));
 
         assertEquals(Direction.OUTBOUND, file.direction());
         assertEquals(1, file.records().size());
         assertEquals(1, file.records().get(0).children().size());
         assertThrows(UnsupportedOperationException.class,
-                () -> file.records().get(0).placements().add(ssn));
+                () -> file.records().get(0).fields().add(ssn));
     }
 
     @Test
     void nullValueMeansOmit() {
-        Placement omit = new Placement(new Position(FileLevel.EMPLOYEE, "REF*1L"), null);
+        Field omit = new Field(new Location(RecordLevel.RECORD, "REF*1L"), null);
         assertTrue(omit.isOmitted());
         assertTrue(omit.valueIfPresent().isEmpty());
     }
 
     @Test
     void positionRequiresLevelAndLocation() {
-        assertThrows(IllegalArgumentException.class, () -> new Position(null, "x"));
-        assertThrows(IllegalArgumentException.class, () -> new Position(FileLevel.FILE, "  "));
+        assertThrows(IllegalArgumentException.class, () -> new Location(null, "x"));
+        assertThrows(IllegalArgumentException.class, () -> new Location(RecordLevel.FILE, "  "));
     }
 }

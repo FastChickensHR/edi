@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.ConfidentialityCode;
 import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
@@ -22,7 +22,7 @@ class INSSegmentTest {
     String confidentialityCode = ConfidentialityCode.LOW.toString();
     @Test
     void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        x834Context context = new x834Context();
+        X834Context context = new X834Context();
         INSSegment segment = new INSSegment.Builder()
                 .setMemberIndicator("Y")
                 .setIndividualRelationshipCode("18")

@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.trailer;
 
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TrailerTest {
 
-    private x834Context context;
+    private X834Context context;
 
     @BeforeEach
     void setUp() {
-        context = new x834Context()
+        context = new X834Context()
                 .setInterchangeControlNumber("000000001")
                 .setGroupControlNumber("1");
     }

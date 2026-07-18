@@ -8,13 +8,13 @@
 package com.fastChickensHR.edi.x834.loop1000C;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TPATest {
-    x834Context context = new x834Context();
+    X834Context context = new X834Context();
     String entityIdentifierCode = "TP";
     String tpaName = "TPA Organization Name";
     String identificationCodeQualifier = "PI";

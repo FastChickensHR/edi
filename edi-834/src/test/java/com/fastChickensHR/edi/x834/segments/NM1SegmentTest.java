@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NM1SegmentTest {
 
-    private x834Context context;
+    private X834Context context;
     private final String entityIdentifierCode = "IL";
     private final String entityTypeQualifier = "1";
     private final String lastNameOrOrg = "DOE";
@@ -60,7 +60,7 @@ class NM1SegmentTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
     }
 
     @Test

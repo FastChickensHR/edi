@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +21,7 @@ class TransactionSetPolicyNumberTest {
                 .setRef02("asdf")
                 .build();
 
-        segment.setContext(new x834Context());
+        segment.setContext(new X834Context());
 
         assertEquals("REF", segment.getSegmentIdentifier(), "Expected segment identifier should be 'REF'");
         assertEquals("REF*ZZ*asdf~", segment.render().trim(), "The segment is not formatted correctly.");

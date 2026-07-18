@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -125,7 +125,7 @@ class N1SegmentTest {
                 .setSponsorIdentifier("123456")
                 .build();
 
-        segment.setContext(new x834Context());
+        segment.setContext(new X834Context());
         assertEquals("N1*01*Test Name*PB*123456~", segment.render().trim(), "Render should properly format the segment");
     }
 }

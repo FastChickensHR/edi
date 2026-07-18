@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemberLevelDatesTest {
 
-    private x834Context context;
+    private X834Context context;
     private final String dateQualifierCode = MemberDateQualifier.BIRTH.getCode();
     private final DateFormat dateFormatQualifier = DateFormat.DATE;
     private final LocalDateTime dateValue = LocalDateTime.of(2025, 1, 1, 0, 0);
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
         context.setDateFormat(DateFormat.DATE);
     }
 

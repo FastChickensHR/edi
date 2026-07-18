@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Setter;
 
 /**
@@ -16,12 +16,12 @@ import lombok.Setter;
  */
 @Setter
 public abstract class Segment {
-    protected x834Context context;
+    protected X834Context context;
 
     /**
-     * @return The x834Context for this segment
+     * @return The X834Context for this segment
      */
-    protected x834Context getContext() {
+    protected X834Context getContext() {
         return context;
     }
 

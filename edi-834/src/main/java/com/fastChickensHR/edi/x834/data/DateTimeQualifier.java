@@ -348,7 +348,7 @@ public enum DateTimeQualifier implements EdiCodeEnum {
     TERMINATED("329", "Terminated"),
     REFERRAL_DATE("330", "Referral Date"),
     EVALUATION_DATE("331", "Evaluation Date"),
-    PLACEMENT_DATE("332", "Placement Date"),
+    PLACEMENT_DATE("332", "Field Date"),
     INDIVIDUAL_EDUCATION_PLAN("333", "Individual Education Plan (IEP)"),
     RE_EVALUATION_DATE("334", "Re-evaluation Date"),
     DISMISSAL_DATE("335", "Dismissal Date"),

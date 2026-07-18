@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.loop2000.loop3000;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.DTPSegment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 /**
@@ -49,7 +49,7 @@ public class HealthCoverageDates extends DTPSegment {
      */
     public static class Builder extends AbstractBuilder<Builder> {
 
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
         }
 
@@ -83,7 +83,7 @@ public class HealthCoverageDates extends DTPSegment {
      * @param context the X834 context
      * @return a new Builder with the specified context
      */
-    public static Builder builder(x834Context context) {
+    public static Builder builder(X834Context context) {
         return new Builder(context);
     }
 }

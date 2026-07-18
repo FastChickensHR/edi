@@ -10,17 +10,17 @@ package com.fastChickensHR.edi.core;
 import java.util.Optional;
 
 /**
- * One resolved Value at a {@link Position}. A {@code null} value means <b>OMIT</b> — the position is
- * described, but nothing is emitted for this subject (e.g. a situational REF with no value).
+ * One resolved value at a {@link Location}. A {@code null} value means <b>OMIT</b> — the location is
+ * described, but nothing is generated for this subject (e.g. a situational REF with no value).
  */
-public record Placement(Position position, String value) {
-    public Placement {
-        if (position == null) {
-            throw new IllegalArgumentException("position is required");
+public record Field(Location location, String value) {
+    public Field {
+        if (location == null) {
+            throw new IllegalArgumentException("location is required");
         }
     }
 
-    /** {@code true} when this placement emits nothing (OMIT). */
+    /** {@code true} when this field generates nothing (OMIT). */
     public boolean isOmitted() {
         return value == null;
     }

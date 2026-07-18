@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class x834DocumentTest {
 
-    private x834Context context;
+    private X834Context context;
 
     @BeforeEach
     void setUp() {
-        context = new x834Context()
+        context = new X834Context()
                 .setSenderID("SENDER01")
                 .setReceiverID("RECEIVER1")
                 .setDocumentDate(LocalDateTime.of(2024, 1, 1, 0, 0))
@@ -110,7 +110,7 @@ class x834DocumentTest {
         // Minimal member generates 1 segment: INS
         // SE itself counts as 1 (+1)
         // Expected SE01 = (8 - 2) + 1 + 1 = 8
-        x834Document doc = new x834Document.Builder(context)
+        X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
                 .addMember(buildMinimalMember())
@@ -125,13 +125,13 @@ class x834DocumentTest {
 
     @Test
     void testMultipleMembersProduceHigherSe01ThanSingleMember() throws ValidationException {
-        x834Document singleMemberDoc = new x834Document.Builder(context)
+        X834Document singleMemberDoc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
                 .addMember(buildMinimalMember())
                 .build();
 
-        x834Document tenMemberDoc = new x834Document.Builder(context)
+        X834Document tenMemberDoc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
                 .addMember(buildMinimalMember())
@@ -159,7 +159,7 @@ class x834DocumentTest {
 
     @Test
     void testGe01AndIea01AreAlwaysOne() throws ValidationException {
-        x834Document doc = new x834Document.Builder(context)
+        X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
                 .addMember(buildMinimalMember())
@@ -175,7 +175,7 @@ class x834DocumentTest {
 
     @Test
     void testDocumentRequiresTrailerBuilder() {
-        x834Document doc = new x834Document.Builder(context)
+        X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .addMember(buildMinimalMember())
                 .build();

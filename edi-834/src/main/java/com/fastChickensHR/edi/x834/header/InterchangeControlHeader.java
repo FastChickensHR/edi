@@ -11,7 +11,7 @@ import com.fastChickensHR.edi.x834.util.TextUtils;
 import com.fastChickensHR.edi.x834.data.*;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.ISASegment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 /**
@@ -20,7 +20,7 @@ import lombok.Getter;
  */
 @Getter
 public class InterchangeControlHeader extends ISASegment {
-    private final x834Context context;
+    private final X834Context context;
     public static final AuthorizationInformationQualifier DEFAULT_AUTHORIZATION_INFO_QUALIFIER = AuthorizationInformationQualifier.fromString("00");
     public static final String DEFAULT_AUTHORIZATION_INFO = TextUtils.spaces(10);
     public static final SecurityInformationQualifier DEFAULT_SECURITY_INFO_QUALIFIER = SecurityInformationQualifier.fromString("00");
@@ -42,14 +42,14 @@ public class InterchangeControlHeader extends ISASegment {
      * Builder for the InterchangeControlHeader.
      */
     public static class Builder extends ISASegment.AbstractBuilder<Builder> {
-        protected x834Context context;
+        protected X834Context context;
 
         /**
          * Constructor that initializes the builder with context information
          *
          * @param context The X834 context containing document-level information
          */
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
             this.context = context;
             this.isa01 = DEFAULT_AUTHORIZATION_INFO_QUALIFIER;

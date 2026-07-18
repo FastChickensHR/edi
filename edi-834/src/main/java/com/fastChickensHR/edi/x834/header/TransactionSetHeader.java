@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.STSegment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 /**
@@ -32,7 +32,7 @@ public class TransactionSetHeader extends STSegment {
      * Builder for the FunctionalGroupHeader.
      */
     public static class Builder extends STSegment.AbstractBuilder<TransactionSetHeader.Builder> {
-        protected x834Context context;
+        protected X834Context context;
 
         public Builder() {
             super();
@@ -41,7 +41,7 @@ public class TransactionSetHeader extends STSegment {
             this.setSt03(DEFAULT_CONVENTION_REFERENCE);
         }
 
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
             this.context = context;
             this.setSt01(DEFAULT_TRANSACTION_SET_ID);

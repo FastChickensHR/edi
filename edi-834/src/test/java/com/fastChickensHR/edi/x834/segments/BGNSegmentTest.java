@@ -10,7 +10,7 @@ package com.fastChickensHR.edi.x834.segments;
 import com.fastChickensHR.edi.x834.data.TimeCode;
 import com.fastChickensHR.edi.x834.data.TransactionSetPurposeCode;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BGNSegmentTest {
-    x834Context context = new x834Context();
+    X834Context context = new X834Context();
     String transactionType = "T1";
     String actionCode = "A1";
     String securityLevel = "ZZ";

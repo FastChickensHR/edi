@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.DTPSegment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.experimental.Accessors;
 
 public class FileEffectiveDate extends DTPSegment {
@@ -19,14 +19,14 @@ public class FileEffectiveDate extends DTPSegment {
         super(builder);
     }
 
-    public static FileEffectiveDate.Builder builder(x834Context context) {
+    public static FileEffectiveDate.Builder builder(X834Context context) {
         return new FileEffectiveDate.Builder(context);
     }
 
     @Accessors(chain = true)
     public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
 
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
             this.setDtp01(DEFAULT_DATE_TIME_QUALIFIER);
             this.setDtp02(context.getDateFormat());

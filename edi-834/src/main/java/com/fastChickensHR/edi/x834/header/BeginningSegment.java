@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.BGNSegment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 /**
@@ -29,7 +29,7 @@ public class BeginningSegment extends BGNSegment {
      */
     public static class Builder extends BGNSegment.AbstractBuilder<BeginningSegment.Builder> {
 
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
             this.setTransactionSetPurposeCode(DEFAULT_TRANSACTION_SET_PURPOSE_CODE);
             this.setBgn03(context.getFormattedDocumentDate());

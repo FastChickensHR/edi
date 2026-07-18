@@ -8,13 +8,13 @@
 package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemberIdentificationNumberTest {
-    x834Context context = new x834Context();
+    X834Context context = new X834Context();
     String referenceIdentification = "MEM987654321";
 
     @Test

@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.core;
 
-/** Whether a {@link PlannedFile} flows into fastChickens (parsed) or out to a vendor (emitted). */
+/** Whether a {@link FileContent} flows into fastChickens (parsed) or out to a vendor (emitted). */
 public enum Direction {
     INBOUND,
     OUTBOUND

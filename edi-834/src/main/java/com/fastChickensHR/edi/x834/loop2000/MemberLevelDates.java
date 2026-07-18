@@ -11,7 +11,7 @@ import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.DTPSegment;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 
 /**
  * Represents a Member Level Date segment in the 834 EDI format.
@@ -24,7 +24,7 @@ public class MemberLevelDates extends DTPSegment {
     }
 
     public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
             setDtp02(context.getDateFormat());
             setDtp03(context.getDocumentDate());

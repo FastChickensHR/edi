@@ -5,12 +5,12 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.emit;
+package com.fastChickensHR.edi.x834.generate;
 
-import com.fastChickensHR.edi.core.FileEmitter;
-import com.fastChickensHR.edi.core.Placement;
-import com.fastChickensHR.edi.core.PlannedFile;
-import com.fastChickensHR.edi.core.PlannedRecord;
+import com.fastChickensHR.edi.core.FileGenerator;
+import com.fastChickensHR.edi.core.Field;
+import com.fastChickensHR.edi.core.FileContent;
+import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.BaseMember;
@@ -23,8 +23,8 @@ import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
-import com.fastChickensHR.edi.x834.x834Context;
-import com.fastChickensHR.edi.x834.x834Document;
+import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.X834Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,49 +35,49 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * The 834 implementation of the {@link FileEmitter} seam (ADR-0313): serializes a format-neutral
- * {@link PlannedFile} into an X12 834 document. It holds no domain logic — every Value has already
+ * The 834 implementation of the {@link FileGenerator} seam (ADR-0313): serializes a format-neutral
+ * {@link FileContent} into an X12 834 document. It holds no domain logic — every Value has already
  * been resolved upstream by the app's requirements engine. It only interprets each
- * {@link com.fastChickensHR.edi.core.Position} (via {@link X834Location}) onto the library's own typed
- * builders (`x834Context`, `Header`, `Member`, `HealthCoverage`, `RefSegment`), so the emitted bytes
+ * {@link com.fastChickensHR.edi.core.Location} (via {@link X834Location}) onto the library's own typed
+ * builders (`X834Context`, `Header`, `Member`, `HealthCoverage`, `RefSegment`), so the emitted bytes
  * match the legacy converter path by construction.
  *
- * <p>Structure produced: the header/envelope (from file placements), then one {@link Member} per
+ * <p>Structure produced: the header/envelope (from file fields), then one {@link Member} per
  * Record (dependents attached as child members), then — after all members, in Record order — each
  * Record's custom REF extensions followed by its HD coverage segment, then the trailer. Control
  * numbers, segment counts and SE/GE/IEA are generated internally by the library.
  */
-public final class X834FileEmitter implements FileEmitter {
+public final class X834FileGenerator implements FileGenerator {
 
     @Override
-    public String emit(PlannedFile file) {
+    public String generate(FileContent file) {
         try {
-            Map<String, String> fileLoc = byLocation(file.filePlacements());
-            x834Context context = buildContext(fileLoc);
+            Map<String, String> fileLoc = byLocation(file.fileFields());
+            X834Context context = buildContext(fileLoc);
             Header header = buildHeader(fileLoc, context);
 
-            x834Document.Builder document = new x834Document.Builder(context)
+            X834Document.Builder document = new X834Document.Builder(context)
                     .withHeader(header)
                     .withTrailer(new Trailer.Builder(context));
 
-            for (PlannedRecord record : file.records()) {
+            for (Record record : file.records()) {
                 document.addMember(buildMember(record));
                 // After the members, in Record order: this Record's REF extensions, then its HD.
-                for (Segment ref : refExtensions(record.placements())) {
+                for (Segment ref : refExtensions(record.fields())) {
                     document.addSegment(ref);
                 }
-                healthCoverage(record.placements()).ifPresent(document::addSegment);
+                healthCoverage(record.fields()).ifPresent(document::addSegment);
             }
 
             return document.build().generateDocument().orElseThrow(() ->
                     new IllegalStateException("834 generation produced no document (validation failed)"));
         } catch (ValidationException e) {
-            throw new IllegalStateException("Failed to emit 834: " + e.getMessage(), e);
+            throw new IllegalStateException("Failed to generate 834: " + e.getMessage(), e);
         }
     }
 
-    private x834Context buildContext(Map<String, String> file) {
-        x834Context context = new x834Context();
+    private X834Context buildContext(Map<String, String> file) {
+        X834Context context = new X834Context();
         apply(file, X834Location.SENDER_ID, context::setSenderID);
         apply(file, X834Location.RECEIVER_ID, context::setReceiverID);
         apply(file, X834Location.INTERCHANGE_CONTROL_NUMBER, context::setInterchangeControlNumber);
@@ -87,7 +87,7 @@ public final class X834FileEmitter implements FileEmitter {
         return context;
     }
 
-    private Header buildHeader(Map<String, String> file, x834Context context) {
+    private Header buildHeader(Map<String, String> file, X834Context context) {
         Header.Builder header = new Header.Builder(context);
         apply(file, X834Location.TRANSACTION_SET_ID, header::setTransactionSetIdentifierCode);
         apply(file, X834Location.REFERENCE_IDENTIFICATION, header::setReferenceIdentification);
@@ -98,12 +98,12 @@ public final class X834FileEmitter implements FileEmitter {
     }
 
     /** Build the subscriber {@link Member} for a Record, attaching each child Record as a dependent. */
-    private Member buildMember(PlannedRecord record) {
+    private Member buildMember(Record record) {
         Member member = new Member();
-        populate(member, byLocation(record.placements()));
-        for (PlannedRecord child : record.children()) {
+        populate(member, byLocation(record.fields()));
+        for (Record child : record.children()) {
             DependentMember dependent = new DependentMember();
-            populate(dependent, byLocation(child.placements()));
+            populate(dependent, byLocation(child.fields()));
             dependent.setPrimaryMember(member);
             member.addDependent(dependent);
         }
@@ -124,26 +124,26 @@ public final class X834FileEmitter implements FileEmitter {
         apply(loc, X834Location.COVERAGE_END_DATE, v -> member.setCoverageEndDate(parseDateTime(v)));
     }
 
-    /** Custom REF extensions: any {@code "ref.<qualifier>"} placement becomes a {@code REF} segment. */
-    private List<Segment> refExtensions(List<Placement> placements) throws ValidationException {
+    /** Custom REF extensions: any {@code "ref.<qualifier>"} field becomes a {@code REF} segment. */
+    private List<Segment> refExtensions(List<Field> fields) throws ValidationException {
         List<Segment> refs = new java.util.ArrayList<>();
-        for (Placement placement : placements) {
-            String location = placement.position().location();
-            if (placement.isOmitted() || !location.startsWith(X834Location.REF_EXTENSION_PREFIX)) {
+        for (Field field : fields) {
+            String location = field.location().name();
+            if (field.isOmitted() || !location.startsWith(X834Location.REF_EXTENSION_PREFIX)) {
                 continue;
             }
             String qualifier = location.substring(X834Location.REF_EXTENSION_PREFIX.length());
             refs.add(new RefSegment.Builder()
                     .setReferenceIdentificationQualifier(qualifier)
-                    .setReferenceIdentification(placement.value())
+                    .setReferenceIdentification(field.value())
                     .build());
         }
         return refs;
     }
 
-    /** Build the HD coverage segment when the Record carries any {@code "hd."} placement. */
-    private Optional<Segment> healthCoverage(List<Placement> placements) throws ValidationException {
-        Map<String, String> loc = byLocation(placements);
+    /** Build the HD coverage segment when the Record carries any {@code "hd."} field. */
+    private Optional<Segment> healthCoverage(List<Field> fields) throws ValidationException {
+        Map<String, String> loc = byLocation(fields);
         boolean anyHd = loc.keySet().stream().anyMatch(k -> k.startsWith(X834Location.HD_PREFIX));
         if (!anyHd) {
             return Optional.empty();
@@ -158,12 +158,12 @@ public final class X834FileEmitter implements FileEmitter {
         return Optional.of(hd.build());
     }
 
-    /** Index a Record's non-omitted placements by their location (a built-in position is unique). */
-    private static Map<String, String> byLocation(List<Placement> placements) {
+    /** Index a Record's non-omitted fields by their location (a built-in position is unique). */
+    private static Map<String, String> byLocation(List<Field> fields) {
         Map<String, String> map = new LinkedHashMap<>();
-        for (Placement placement : placements) {
-            if (!placement.isOmitted()) {
-                map.put(placement.position().location(), placement.value());
+        for (Field field : fields) {
+            if (!field.isOmitted()) {
+                map.put(field.location().name(), field.value());
             }
         }
         return map;

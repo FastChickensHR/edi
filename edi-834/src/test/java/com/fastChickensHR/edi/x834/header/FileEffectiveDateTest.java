@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileEffectiveDateTest {
-    x834Context context = new x834Context();
+    X834Context context = new X834Context();
      LocalDateTime localDateTime = LocalDateTime.of(2025, 3,13,0,0,0);
 
     @Test

@@ -5,14 +5,14 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.emit;
+package com.fastChickensHR.edi.x834.generate;
 
 import com.fastChickensHR.edi.core.Direction;
-import com.fastChickensHR.edi.core.FileLevel;
-import com.fastChickensHR.edi.core.Placement;
-import com.fastChickensHR.edi.core.PlannedFile;
-import com.fastChickensHR.edi.core.PlannedRecord;
-import com.fastChickensHR.edi.core.Position;
+import com.fastChickensHR.edi.core.RecordLevel;
+import com.fastChickensHR.edi.core.Field;
+import com.fastChickensHR.edi.core.FileContent;
+import com.fastChickensHR.edi.core.Record;
+import com.fastChickensHR.edi.core.Location;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,13 +20,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class X834FileEmitterTest {
+class X834FileGeneratorTest {
 
-    private final X834FileEmitter emitter = new X834FileEmitter();
+    private final X834FileGenerator generator = new X834FileGenerator();
 
     @Test
     void emitsAWellFormed834FromAPlannedFile() {
-        List<Placement> envelope = List.of(
+        List<Field> envelope = List.of(
                 file(X834Location.SENDER_ID, "SENDER123"),
                 file(X834Location.RECEIVER_ID, "RECV456"),
                 file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
@@ -38,7 +38,7 @@ class X834FileEmitterTest {
                 file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
                 file(X834Location.PAYER_NAME, "BLUE CROSS"));
 
-        PlannedRecord dependent = PlannedRecord.of(List.of(
+        Record dependent = Record.of(List.of(
                 dep(X834Location.MEMBER_INDICATOR, "Y"),
                 dep(X834Location.RELATIONSHIP_CODE, "01"),
                 dep(X834Location.MAINTENANCE_TYPE_CODE, "001"),
@@ -46,7 +46,7 @@ class X834FileEmitterTest {
                 dep(X834Location.MEMBER_ID_QUALIFIER, "0F"),
                 dep(X834Location.ENROLLMENT_DATE, "2026-01-01")));
 
-        PlannedRecord subscriber = new PlannedRecord(List.of(
+        Record subscriber = new Record(List.of(
                 emp(X834Location.MEMBER_INDICATOR, "Y"),
                 emp(X834Location.RELATIONSHIP_CODE, "20"),
                 emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
@@ -65,7 +65,7 @@ class X834FileEmitterTest {
                 emp(X834Location.REF_EXTENSION_PREFIX + "ZZ", "NORTH")),
                 List.of(dependent));
 
-        String out = emitter.emit(new PlannedFile(Direction.OUTBOUND, envelope, List.of(subscriber)));
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
         assertFalse(out == null || out.isBlank(), "expected a rendered 834");
         // Envelope + header
@@ -100,15 +100,15 @@ class X834FileEmitterTest {
         assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
     }
 
-    private static Placement file(String location, String value) {
-        return new Placement(new Position(FileLevel.FILE, location), value);
+    private static Field file(String location, String value) {
+        return new Field(new Location(RecordLevel.FILE, location), value);
     }
 
-    private static Placement emp(String location, String value) {
-        return new Placement(new Position(FileLevel.EMPLOYEE, location), value);
+    private static Field emp(String location, String value) {
+        return new Field(new Location(RecordLevel.RECORD, location), value);
     }
 
-    private static Placement dep(String location, String value) {
-        return new Placement(new Position(FileLevel.DEPENDENT, location), value);
+    private static Field dep(String location, String value) {
+        return new Field(new Location(RecordLevel.SUBRECORD, location), value);
     }
 }

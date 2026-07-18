@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.trailer;
 
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Getter
 public class Trailer {
-    private final x834Context context;
+    private final X834Context context;
 
     // Component trailers
     private final TransactionSetTrailer transactionSetTrailer;
@@ -106,7 +106,7 @@ public class Trailer {
      */
     public static class Builder {
         @Getter
-        private final x834Context context;
+        private final X834Context context;
 
         private String transactionSetControlNumber;
         private String numberOfIncludedSegments = "10";
@@ -127,7 +127,7 @@ public class Trailer {
          * @param context The 834 context to use for this trailer
          * @throws IllegalArgumentException if context is null
          */
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             if (context == null) {
                 throw new IllegalArgumentException("Context cannot be null");
             }

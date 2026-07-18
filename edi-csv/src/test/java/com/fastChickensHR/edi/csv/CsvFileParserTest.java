@@ -8,9 +8,9 @@
 package com.fastChickensHR.edi.csv;
 
 import com.fastChickensHR.edi.core.Direction;
-import com.fastChickensHR.edi.core.Placement;
-import com.fastChickensHR.edi.core.PlannedFile;
-import com.fastChickensHR.edi.core.PlannedRecord;
+import com.fastChickensHR.edi.core.Field;
+import com.fastChickensHR.edi.core.FileContent;
+import com.fastChickensHR.edi.core.Record;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
@@ -28,10 +28,10 @@ class CsvFileParserTest {
     void parsesFlatCsvIntoRecordsOfColumnPlacements() {
         String csv = "employeeId,firstName,lastName\nE1,Jane,Doe\nE2,John,\n";
 
-        PlannedFile file = parser.parse(csv);
+        FileContent file = parser.parse(csv);
 
         assertEquals(Direction.INBOUND, file.direction());
-        assertTrue(file.filePlacements().isEmpty());
+        assertTrue(file.fileFields().isEmpty());
         assertEquals(2, file.records().size());
 
         Map<String, String> row1 = byColumn(file.records().get(0));
@@ -39,7 +39,7 @@ class CsvFileParserTest {
         assertEquals("Jane", row1.get("firstName"));
         assertEquals("Doe", row1.get("lastName"));
 
-        // An empty cell yields no placement (absence, not a blank value).
+        // An empty cell yields no field (absence, not a blank value).
         Map<String, String> row2 = byColumn(file.records().get(1));
         assertEquals("John", row2.get("firstName"));
         assertFalse(row2.containsKey("lastName"));
@@ -49,7 +49,7 @@ class CsvFileParserTest {
     void honorsCsvQuotingOfEmbeddedDelimiters() {
         String csv = "id,name,city\n1,\"Doe, Jane\",\"Springfield\"\n";
 
-        PlannedFile file = parser.parse(csv);
+        FileContent file = parser.parse(csv);
 
         Map<String, String> row = byColumn(file.records().get(0));
         assertEquals("Doe, Jane", row.get("name"));
@@ -61,10 +61,10 @@ class CsvFileParserTest {
         assertEquals(0, parser.parse("").records().size());
     }
 
-    private static Map<String, String> byColumn(PlannedRecord record) {
+    private static Map<String, String> byColumn(Record record) {
         Map<String, String> map = new LinkedHashMap<>();
-        for (Placement placement : record.placements()) {
-            map.put(placement.position().location(), placement.value());
+        for (Field field : record.fields()) {
+            map.put(field.location().name(), field.value());
         }
         return map;
     }

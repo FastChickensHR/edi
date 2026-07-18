@@ -21,7 +21,7 @@
 
     <artifactId>edi-core</artifactId>
     <name>FastChickensHR EDI Core</name>
-    <description>Format-neutral file kernel (File / Record / Line / Position / Value) and the emit/parse seam</description>
+    <description>Format-neutral file kernel (FileContent / Record / Field / Location) and the generate/parse seam</description>
 
     <dependencies>
         <dependency>

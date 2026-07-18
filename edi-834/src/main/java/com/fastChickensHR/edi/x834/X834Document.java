@@ -24,13 +24,13 @@ import java.util.Optional;
  * This class handles document structure, formatting, and validation.
  */
 @Getter
-public class x834Document {
+public class X834Document {
     private final Header header;
     private final List<Member> members;
     private final List<Segment> additionalSegments;
     private final List<String> buildErrors;
     private final boolean isValid;
-    private final x834Context context;
+    private final X834Context context;
     private final Trailer.Builder trailerBuilder;
 
     /**
@@ -38,7 +38,7 @@ public class x834Document {
      *
      * @param builder The builder containing configuration
      */
-    private x834Document(Builder builder) {
+    private X834Document(Builder builder) {
         this.context = builder.context;
         this.header = builder.header;
         this.members = builder.members;
@@ -116,7 +116,7 @@ public class x834Document {
     }
 
     /**
-     * Builder class for constructing an x834Document
+     * Builder class for constructing an X834Document
      */
     public static class Builder {
         private Header header;
@@ -127,7 +127,7 @@ public class x834Document {
         private boolean isValid = true;
 
         @Getter
-        private final x834Context context;
+        private final X834Context context;
 
         /**
          * Creates a new Builder with the specified context.
@@ -136,7 +136,7 @@ public class x834Document {
          * @param context The context to use for this document and its components
          * @throws IllegalArgumentException if context is null
          */
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             if (context == null) {
                 throw new IllegalArgumentException("Context cannot be null");
             }
@@ -211,11 +211,11 @@ public class x834Document {
         }
 
         /**
-         * Builds the final x834Document
+         * Builds the final X834Document
          *
-         * @return The configured x834Document
+         * @return The configured X834Document
          */
-        public x834Document build() {
+        public X834Document build() {
             // Validate required components
             if (header == null) {
                 buildErrors.add("Header is required");
@@ -252,7 +252,7 @@ public class x834Document {
                 isValid = false;
             }
 
-            return new x834Document(this);
+            return new X834Document(this);
         }
     }
 }

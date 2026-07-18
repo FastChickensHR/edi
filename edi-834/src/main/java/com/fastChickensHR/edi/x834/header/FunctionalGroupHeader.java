@@ -12,7 +12,7 @@ import com.fastChickensHR.edi.x834.data.ResponsibleAgencyCode;
 import com.fastChickensHR.edi.x834.data.VersionCode;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.GSSegment;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 /**
@@ -25,7 +25,7 @@ public class FunctionalGroupHeader extends GSSegment {
     private static final ResponsibleAgencyCode DEFAULT_RESPONSIBLE_AGENCY_CODE = ResponsibleAgencyCode.ASC_X12;
     private static final VersionCode DEFAULT_VERSION_CODE = VersionCode.fromString("005010X220A1");
 
-    private final x834Context context;
+    private final X834Context context;
 
     protected FunctionalGroupHeader(Builder builder) throws ValidationException {
         super(builder);
@@ -36,14 +36,14 @@ public class FunctionalGroupHeader extends GSSegment {
      * Builder for the FunctionalGroupHeader.
      */
     public static class Builder extends GSSegment.AbstractBuilder<Builder> {
-        protected x834Context context;
+        protected X834Context context;
 
         /**
          * Constructor that initializes the builder with context information
          *
          * @param context The X834 context containing document-level information
          */
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             super();
             this.context = context;
             this.gs01 = DEFAULT_FUNCTIONAL_ID_CODE;

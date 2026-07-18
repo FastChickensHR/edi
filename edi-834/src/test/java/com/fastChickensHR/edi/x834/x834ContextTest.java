@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class x834ContextTest {
 
-    private x834Context validContext() {
-        return new x834Context()
+    private X834Context validContext() {
+        return new X834Context()
                 .setInterchangeControlNumber("000000001")
                 .setGroupControlNumber("1");
     }
@@ -27,46 +27,46 @@ class x834ContextTest {
 
     @Test
     void testNullInterchangeControlNumberThrows() {
-        x834Context ctx = validContext().setInterchangeControlNumber(null);
+        X834Context ctx = validContext().setInterchangeControlNumber(null);
         assertThrows(ValidationException.class, ctx::validate);
     }
 
     @Test
     void testEmptyInterchangeControlNumberThrows() {
-        x834Context ctx = validContext().setInterchangeControlNumber("");
+        X834Context ctx = validContext().setInterchangeControlNumber("");
         assertThrows(ValidationException.class, ctx::validate);
     }
 
     @Test
     void testShortInterchangeControlNumberThrows() {
-        x834Context ctx = validContext().setInterchangeControlNumber("123");
+        X834Context ctx = validContext().setInterchangeControlNumber("123");
         ValidationException ex = assertThrows(ValidationException.class, ctx::validate);
         assertTrue(ex.getMessage().contains("9 numeric digits"));
     }
 
     @Test
     void testNonNumericInterchangeControlNumberThrows() {
-        x834Context ctx = validContext().setInterchangeControlNumber("ABC123456");
+        X834Context ctx = validContext().setInterchangeControlNumber("ABC123456");
         ValidationException ex = assertThrows(ValidationException.class, ctx::validate);
         assertTrue(ex.getMessage().contains("9 numeric digits"));
     }
 
     @Test
     void testTenDigitInterchangeControlNumberThrows() {
-        x834Context ctx = validContext().setInterchangeControlNumber("0000000001");
+        X834Context ctx = validContext().setInterchangeControlNumber("0000000001");
         ValidationException ex = assertThrows(ValidationException.class, ctx::validate);
         assertTrue(ex.getMessage().contains("9 numeric digits"));
     }
 
     @Test
     void testNullGroupControlNumberThrows() {
-        x834Context ctx = validContext().setGroupControlNumber(null);
+        X834Context ctx = validContext().setGroupControlNumber(null);
         assertThrows(ValidationException.class, ctx::validate);
     }
 
     @Test
     void testEmptyGroupControlNumberThrows() {
-        x834Context ctx = validContext().setGroupControlNumber("");
+        X834Context ctx = validContext().setGroupControlNumber("");
         assertThrows(ValidationException.class, ctx::validate);
     }
 }

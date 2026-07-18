@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.trailer;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,7 +59,7 @@ class TransactionSetTrailerTest {
                 .setTransactionSegmentCount("15")
                 .setSetControlNumber("5678")
                 .build();
-        trailer.setContext(new x834Context());
+        trailer.setContext(new X834Context());
 
         String segment = trailer.render().trim();
 

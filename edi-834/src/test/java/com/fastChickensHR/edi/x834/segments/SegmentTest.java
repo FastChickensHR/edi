@@ -7,7 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SegmentTest {
 
-    private x834Context context;
+    private X834Context context;
 
     private static class TestSegment extends Segment {
         private final String segmentId;
@@ -41,7 +41,7 @@ class SegmentTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
     }
 
     @Test

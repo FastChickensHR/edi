@@ -8,7 +8,7 @@
 package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class HDSegmentTest {
 
-    private x834Context context;
+    private X834Context context;
 
     // Concrete implementation of HDSegment for testing
     private static class TestHDSegment extends HDSegment {
@@ -45,7 +45,7 @@ class HDSegmentTest {
 
     @BeforeEach
     void setUp() {
-        context = new x834Context();
+        context = new X834Context();
     }
 
     @Test

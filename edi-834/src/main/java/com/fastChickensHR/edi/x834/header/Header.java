@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.x834Context;
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
 import com.fastChickensHR.edi.x834.loop1000B.Payer;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Header {
-    private final x834Context context;
+    private final X834Context context;
 
     // Default fields for simple configuration
     private String transactionSetIdentifierCode;
@@ -53,7 +53,7 @@ public class Header {
      *
      * @param context The 834 context to use for this header
      */
-    public Header(x834Context context) {
+    public Header(X834Context context) {
         this.context = context;
     }
 
@@ -139,7 +139,7 @@ public class Header {
      * Builder for Header class
      */
     public static class Builder {
-        private final x834Context context;
+        private final X834Context context;
 
         private String transactionSetIdentifierCode = "834";
         private String referenceIdentification;
@@ -163,7 +163,7 @@ public class Header {
          *
          * @param context The 834 context to use for this header
          */
-        public Builder(x834Context context) {
+        public Builder(X834Context context) {
             this.context = context;
         }
 

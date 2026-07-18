@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class x834Context {
+public class X834Context {
     // Document formatting
     private ElementSeparator elementSeparator;
     private SubElementSeparator subElementSeparator;
@@ -55,7 +55,7 @@ public class x834Context {
     /**
      * Creates a new X834Context with default values.
      */
-    public x834Context() {
+    public X834Context() {
         this.documentDate = LocalDateTime.now();
         this.dateFormat = DateFormat.DATE;
         this.timeFormat = TimeFormat.TIME;
@@ -75,13 +75,13 @@ public class x834Context {
      */
     public void validate() throws ValidationException {
         if (interchangeControlNumber == null || interchangeControlNumber.isEmpty()) {
-            throw new ValidationException("Interchange Control Number is required on x834Context");
+            throw new ValidationException("Interchange Control Number is required on X834Context");
         }
         if (!interchangeControlNumber.matches("\\d{9}")) {
             throw new ValidationException("Interchange Control Number must be exactly 9 numeric digits");
         }
         if (groupControlNumber == null || groupControlNumber.isEmpty()) {
-            throw new ValidationException("Group Control Number is required on x834Context");
+            throw new ValidationException("Group Control Number is required on X834Context");
         }
     }
 
@@ -113,7 +113,7 @@ public class x834Context {
         return IMPLEMENTATION_CONVENTION_REFERENCE;
     }
 
-    public x834Context setDocumentDate(LocalDateTime date) {
+    public X834Context setDocumentDate(LocalDateTime date) {
         this.documentDate = date;
         this.formattedDocumentDate = formatDate(date);
         return this;

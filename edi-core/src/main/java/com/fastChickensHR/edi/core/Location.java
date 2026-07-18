@@ -9,17 +9,17 @@ package com.fastChickensHR.edi.core;
 
 /**
  * A spec-anchored token address on a File. The format spec owns the <b>structural</b> tokens (segment
- * identifier, delimiters) and they are never overridable; {@code location} carries only the
+ * identifier, delimiters) and they are never overridable; {@code name} carries only the
  * <b>configurable</b> token(s) — an 834 REF qualifier, a CSV column — interpreted by the format's own
  * dialect below the kernel. {@code level} is the tree depth the address sits at.
  */
-public record Position(FileLevel level, String location) {
-    public Position {
+public record Location(RecordLevel level, String name) {
+    public Location {
         if (level == null) {
             throw new IllegalArgumentException("level is required");
         }
-        if (location == null || location.isBlank()) {
-            throw new IllegalArgumentException("location is required");
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("name is required");
         }
     }
 }
