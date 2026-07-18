@@ -226,6 +226,40 @@ class X834FileGeneratorTest {
                 "mailing 2100C must render after residence 2100A");
     }
 
+    @Test
+    void emitsCoverageDateDtpsInsideTheHdLoop2300() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "E12345"),
+                emp(X834Location.HD_MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.HD_INSURANCE_LINE_CODE, "HLT"),
+                emp(X834Location.HD_BENEFIT_BEGIN_DATE, "2026-01-01"),
+                emp(X834Location.HD_BENEFIT_END_DATE, "2026-12-31")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        contains(out, "HD*001");
+        contains(out, "DTP*348*D8*20260101~");   // Loop 2300 coverage begin
+        contains(out, "DTP*349*D8*20261231~");   // Loop 2300 coverage end
+        // The coverage-date DTPs render after the HD segment, inside the same 2300 loop.
+        assertTrue(out.indexOf("DTP*348") > out.indexOf("HD*001"), "begin DTP must follow HD");
+        assertTrue(out.indexOf("DTP*349") > out.indexOf("DTP*348"), "end DTP must follow begin DTP");
+    }
+
     private static void contains(String haystack, String needle) {
         assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
     }

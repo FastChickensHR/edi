@@ -21,7 +21,10 @@ import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.loop2000.data.HealthCoverageDateQualifier;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
+import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverageDates;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
@@ -69,7 +72,9 @@ public final class X834FileGenerator implements FileGenerator {
                 for (Segment ref : refExtensions(record.fields())) {
                     member.addSegment(ref);
                 }
-                healthCoverage(record.fields()).ifPresent(member::addSegment);
+                for (Segment coverage : healthCoverage(record.fields())) {
+                    member.addSegment(coverage);
+                }
                 document.addMember(member);
             }
 
@@ -174,11 +179,11 @@ public final class X834FileGenerator implements FileGenerator {
     }
 
     /** Build the HD coverage segment when the Record carries any {@code "hd."} field. */
-    private Optional<Segment> healthCoverage(List<Field> fields) throws ValidationException {
+    private List<Segment> healthCoverage(List<Field> fields) throws ValidationException {
         Map<String, String> loc = byLocation(fields);
         boolean anyHd = loc.keySet().stream().anyMatch(k -> k.startsWith(X834Location.HD_PREFIX));
         if (!anyHd) {
-            return Optional.empty();
+            return List.of();
         }
         HealthCoverage.Builder hd = HealthCoverage.builder();
         apply(loc, X834Location.HD_MAINTENANCE_TYPE_CODE, hd::setMaintenanceTypeCode);
@@ -187,7 +192,29 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.HD_PLAN_COVERAGE_DESCRIPTION, hd::setPlanCoverageDescription);
         apply(loc, X834Location.HD_COVERAGE_LEVEL_CODE, hd::setCoverageLevelCode);
         apply(loc, X834Location.HD_EMPLOYMENT_STATUS_CODE, hd::setEmploymentStatusCode);
-        return Optional.of(hd.build());
+
+        // Loop 2300: the HD segment, followed by its coverage-date DTP segments (begin/end).
+        List<Segment> coverage = new java.util.ArrayList<>();
+        coverage.add(hd.build());
+        coverageDate(loc, X834Location.HD_BENEFIT_BEGIN_DATE, HealthCoverageDateQualifier.EFFECTIVE_DATE)
+                .ifPresent(coverage::add);
+        coverageDate(loc, X834Location.HD_BENEFIT_END_DATE, HealthCoverageDateQualifier.EXPIRATION_DATE)
+                .ifPresent(coverage::add);
+        return coverage;
+    }
+
+    /** Build a Loop 2300 coverage-date DTP (D8) for {@code key} when present, using {@code qualifier}. */
+    private static Optional<Segment> coverageDate(Map<String, String> loc, String key,
+                                                  HealthCoverageDateQualifier qualifier) throws ValidationException {
+        String value = loc.get(key);
+        if (value == null || value.isBlank()) {
+            return Optional.empty();
+        }
+        return Optional.of(HealthCoverageDates.builder()
+                .setDateTimeQualifier(qualifier.getCode())
+                .setDateTimeFormat(DateFormat.D8)
+                .setDateTimePeriod(parseDateTime(value))
+                .build());
     }
 
     /** Index a Record's non-omitted fields by their location (a built-in position is unique). */
