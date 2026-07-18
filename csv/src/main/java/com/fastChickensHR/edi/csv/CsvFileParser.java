@@ -28,11 +28,12 @@ import java.util.List;
  * per record — so each data row becomes one {@link Record} and each non-empty cell becomes a
  * {@link Field} whose {@link Location} location is the column name.
  *
- * <p>The parser is intentionally dumb: it knows columns and cells, not domain meaning. A flat CSV row's
- * cells carry no inherent tree depth, so every {@code Location} is emitted at {@link RecordLevel#RECORD}
- * as a neutral placeholder — the inbound Field Map assigns each column's data element (and thus its real
- * level and whether a row is an employee or a dependent) downstream. Empty cells produce no field
- * (absence, not a blank value).
+ * <p>The parser is intentionally dumb: it knows columns and cells, not domain meaning. In a plain flat
+ * CSV every row is a top-level {@link Record} whose fields sit at {@link RecordLevel#RECORD} — the
+ * inbound Field Map assigns each column's data element downstream. When the reserved
+ * {@link Csv#RECORD_LEVEL_COLUMN} is present, the parser reconstructs nesting: {@code SUBRECORD} rows
+ * attach as children of the {@code RECORD} row they follow, inverting {@link CsvFileGenerator}. Empty
+ * cells produce no field (absence, not a blank value).
  */
 public final class CsvFileParser implements FileParser {
 
@@ -45,25 +46,59 @@ public final class CsvFileParser implements FileParser {
     public FileContent parse(String raw) {
         try (CSVParser parser = CSVParser.parse(raw == null ? "" : raw, FORMAT)) {
             List<String> headers = parser.getHeaderNames();
-            List<Record> records = new ArrayList<>();
-            for (CSVRecord row : parser) {
-                records.add(Record.of(rowPlacements(row, headers)));
-            }
+            boolean nested = headers.contains(Csv.RECORD_LEVEL_COLUMN);
+            List<Record> records = nested ? parseNested(parser, headers) : parseFlat(parser, headers);
             return new FileContent(Direction.INBOUND, List.of(), records);
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to parse CSV: " + e.getMessage(), e);
         }
     }
 
-    private static List<Field> rowPlacements(CSVRecord row, List<String> headers) {
+    private static List<Record> parseFlat(CSVParser parser, List<String> headers) {
+        List<Record> records = new ArrayList<>();
+        for (CSVRecord row : parser) {
+            records.add(Record.of(rowFields(row, headers, RecordLevel.RECORD)));
+        }
+        return records;
+    }
+
+    private static List<Record> parseNested(CSVParser parser, List<String> headers) {
+        List<Record> records = new ArrayList<>();
+        List<Field> openFields = null;
+        List<Record> openChildren = null;
+        for (CSVRecord row : parser) {
+            String level = row.isMapped(Csv.RECORD_LEVEL_COLUMN) ? row.get(Csv.RECORD_LEVEL_COLUMN) : "";
+            if (RecordLevel.SUBRECORD.name().equals(level)) {
+                if (openChildren == null) {
+                    throw new IllegalArgumentException("SUBRECORD row has no preceding RECORD row");
+                }
+                openChildren.add(Record.of(rowFields(row, headers, RecordLevel.SUBRECORD)));
+            } else if (RecordLevel.RECORD.name().equals(level)) {
+                if (openFields != null) {
+                    records.add(new Record(openFields, openChildren));
+                }
+                openFields = rowFields(row, headers, RecordLevel.RECORD);
+                openChildren = new ArrayList<>();
+            } else {
+                throw new IllegalArgumentException(
+                        "unknown " + Csv.RECORD_LEVEL_COLUMN + " value: '" + level + "'");
+            }
+        }
+        if (openFields != null) {
+            records.add(new Record(openFields, openChildren));
+        }
+        return records;
+    }
+
+    private static List<Field> rowFields(CSVRecord row, List<String> headers, RecordLevel level) {
         List<Field> fields = new ArrayList<>();
         for (String column : headers) {
-            if (!row.isMapped(column)) {
+            if (column.equals(Csv.RECORD_LEVEL_COLUMN) || !row.isMapped(column)) {
                 continue;
             }
             String value = row.get(column);
             if (value != null && !value.isEmpty()) {
-                fields.add(new Field(new Location(RecordLevel.RECORD, column), value));
+                fields.add(new Field(new Location(level, column), value));
             }
         }
         return fields;
