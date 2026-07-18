@@ -21,6 +21,23 @@
 
     <artifactId>edi-csv</artifactId>
     <name>FastChickensHR EDI CSV</name>
-    <description>CSV EDI format support (placeholder — implementation forthcoming)</description>
+    <description>CSV (flat delimited file) support — parses into and emits from the edi-core file kernel</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fastchickenshr</groupId>
+            <artifactId>edi-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
