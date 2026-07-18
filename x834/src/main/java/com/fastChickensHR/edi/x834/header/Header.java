@@ -171,72 +171,156 @@ public class Header {
         }
 
         // Simple setters
+        /**
+         * Sets the transaction set identifier code (ST01); defaults to "834".
+         *
+         * @param transactionSetIdentifierCode the transaction set identifier code
+         * @return this builder instance
+         */
         public Builder setTransactionSetIdentifierCode(String transactionSetIdentifierCode) {
             this.transactionSetIdentifierCode = transactionSetIdentifierCode;
             return this;
         }
 
+        /**
+         * Sets the reference identification used by the Beginning Segment (BGN02).
+         *
+         * @param referenceIdentification the reference identification
+         * @return this builder instance
+         */
         public Builder setReferenceIdentification(String referenceIdentification) {
             this.referenceIdentification = referenceIdentification;
             return this;
         }
 
+        /**
+         * Sets the master policy number (REF*38).
+         *
+         * @param masterPolicyNumber the master policy number
+         * @return this builder instance
+         */
         public Builder setMasterPolicyNumber(String masterPolicyNumber) {
             this.masterPolicyNumber = masterPolicyNumber;
             return this;
         }
 
+        /**
+         * Sets the plan sponsor name (Loop 1000A, N1*P5).
+         *
+         * @param planSponsorName the plan sponsor name
+         * @return this builder instance
+         */
         public Builder setPlanSponsorName(String planSponsorName) {
             this.planSponsorName = planSponsorName;
             return this;
         }
 
+        /**
+         * Sets the payer name (Loop 1000B, N1*IN).
+         *
+         * @param payerName the payer name
+         * @return this builder instance
+         */
         public Builder setPayerName(String payerName) {
             this.payerName = payerName;
             return this;
         }
 
+        /**
+         * Sets the payer identification (Loop 1000B, N104).
+         *
+         * @param payerIdentification the payer identification
+         * @return this builder instance
+         */
         public Builder setPayerIdentification(String payerIdentification) {
             this.payerIdentification = payerIdentification;
             return this;
         }
 
         // Custom builder setters
+        /**
+         * Supplies a custom Interchange Control Header (ISA) builder, overriding the default.
+         *
+         * @param builder the custom ISA builder
+         * @return this builder instance
+         */
         public Builder setInterchangeControlHeaderBuilder(InterchangeControlHeader.Builder builder) {
             this.customInterchangeBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom Functional Group Header (GS) builder, overriding the default.
+         *
+         * @param builder the custom GS builder
+         * @return this builder instance
+         */
         public Builder setFunctionalGroupHeaderBuilder(FunctionalGroupHeader.Builder builder) {
             this.customFunctionalBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom Transaction Set Header (ST) builder, overriding the default.
+         *
+         * @param builder the custom ST builder
+         * @return this builder instance
+         */
         public Builder setTransactionSetHeaderBuilder(TransactionSetHeader.Builder builder) {
             this.customTransactionSetBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom Beginning Segment (BGN) builder, overriding the default.
+         *
+         * @param builder the custom BGN builder
+         * @return this builder instance
+         */
         public Builder setBeginningSegmentBuilder(BeginningSegment.Builder builder) {
             this.customBeginningSegmentBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom File Effective Date (DTP*007) builder, overriding the default.
+         *
+         * @param builder the custom DTP builder
+         * @return this builder instance
+         */
         public Builder setFileEffectiveDateBuilder(FileEffectiveDate.Builder builder) {
             this.customFileEffectiveDateBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom Transaction Set Policy Number (REF*38) builder, overriding the default.
+         *
+         * @param builder the custom REF builder
+         * @return this builder instance
+         */
         public Builder setTransactionSetPolicyNumberBuilder(TransactionSetPolicyNumber.Builder builder) {
             this.customPolicyNumberBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom Sponsor Name (Loop 1000A, N1*P5) builder, overriding the default.
+         *
+         * @param builder the custom sponsor builder
+         * @return this builder instance
+         */
         public Builder setSponsorNameBuilder(SponsorName.Builder builder) {
             this.customSponsorBuilder = builder;
             return this;
         }
 
+        /**
+         * Supplies a custom Payer (Loop 1000B, N1*IN) builder, overriding the default.
+         *
+         * @param builder the custom payer builder
+         * @return this builder instance
+         */
         public Builder setPayerBuilder(Payer.Builder builder) {
             this.customPayerBuilder = builder;
             return this;

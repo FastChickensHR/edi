@@ -12,17 +12,20 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**
- * Represents a Member Residence Street Address segment in X834 EDI format
- * Currently implementing only the 01 and 02 elements
+ * Member mailing address as an NM1 segment in Loop 2100C of the X12 834.
+ * <p>
+ * NM101 defaults to the entity identifier {@code 31} (Postal Mailing Address).
+ * Currently implements only the NM101 and NM102 elements.
  */
 @Getter
 public class MemberMailingAddress extends NM1Segment {
 
     /**
-     * Entity Identifier Code (NM101) values for Member Residence Street Address
+     * Entity Identifier Code (NM101) values for the member mailing address.
      */
     @Getter
     public enum EntityIdentifierCode {
+        /** NM101 {@code 31} — Postal Mailing Address; the default for this segment. */
         POSTAL_MAILING_ADDRESS("31", "Postal Mailing Address");
 
         private final String code;
@@ -40,7 +43,7 @@ public class MemberMailingAddress extends NM1Segment {
     }
 
     /**
-     * Builder for MemberResidenceStreetAddress
+     * Builder for MemberMailingAddress.
      */
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {

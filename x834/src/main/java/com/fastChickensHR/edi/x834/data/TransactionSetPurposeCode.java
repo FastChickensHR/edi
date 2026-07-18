@@ -14,8 +14,13 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Transaction Set Purpose Codes used in the EDI transactions,
- * specifically in BGN01 segment.
+ * Code values for the Transaction Set Purpose Code (BGN01, X12 data element 353) in the
+ * Beginning Segment (BGN). In the X12 834 (005010X220A1) it states the intent of the
+ * transmission, for example an original ("00") or a change ("04") file.
+ *
+ * <p>No default value is defined for this element. {@link #fromString(String)} resolves a
+ * value from its code, enum name, description, or a common synonym, and throws
+ * {@link IllegalArgumentException} when the input matches none.
  */
 @Getter
 public enum TransactionSetPurposeCode implements EdiCodeEnum {
@@ -171,6 +176,10 @@ public enum TransactionSetPurposeCode implements EdiCodeEnum {
         return LOOKUP.fromString(input);
     }
 
+    /**
+     * Returns the raw X12 code value for this constant (not the enum name), so the enum
+     * renders directly into an EDI element.
+     */
     @Override
     public String toString() {
         return code;

@@ -12,7 +12,10 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**
- * Represents Member Demographics information in X834 EDI format
+ * Member demographics as a DMG segment in Loop 2100A of the X12 834.
+ * <p>
+ * Carries the member's demographic detail — the date format qualifier (DMG01)
+ * and birth date (DMG02) are required; gender and related elements follow.
  */
 @Getter
 public class MemberDemographics extends DMGSegment {

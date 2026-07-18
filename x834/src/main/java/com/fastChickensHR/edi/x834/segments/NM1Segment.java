@@ -23,14 +23,23 @@ import lombok.Getter;
 public abstract class NM1Segment extends Segment {
     public static final String SEGMENT_ID = "NM1";
 
+    /** NM101 — entity identifier code (the party's role). */
     protected final String nm101;
+    /** NM102 — entity type qualifier (1 = person, 2 = non-person / organization). */
     protected final String nm102;
+    /** NM103 — last name or organization name. */
     protected final String nm103;
+    /** NM104 — first name. */
     protected final String nm104;
+    /** NM105 — middle name. */
     protected final String nm105;
+    /** NM106 — name prefix. */
     protected final String nm106;
+    /** NM107 — name suffix. */
     protected final String nm107;
+    /** NM108 — identification code qualifier (what NM109 is). */
     protected final String nm108;
+    /** NM109 — identification code value. */
     protected final String nm109;
 
     protected NM1Segment(AbstractBuilder<?> builder) throws ValidationException {

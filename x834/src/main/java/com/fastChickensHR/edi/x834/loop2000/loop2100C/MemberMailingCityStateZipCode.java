@@ -31,7 +31,7 @@ public class MemberMailingCityStateZipCode extends N4Segment {
     }
 
     /**
-     * Builder for MemberResidenceCityStateZipCode
+     * Builder for MemberMailingCityStateZipCode.
      */
     public static class Builder extends AbstractBuilder<Builder> {
         @Override

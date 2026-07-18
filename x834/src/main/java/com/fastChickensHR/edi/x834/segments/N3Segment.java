@@ -11,8 +11,17 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**
- * Represents the N3 segment in X12 834 format.
- * This segment is used for address information.
+ * Represents the N3 (Party Location / Address) segment in the X12 834
+ * (005010X220A1) Benefit Enrollment and Maintenance transaction.
+ * <p>
+ * This segment carries the street address lines for the party named in the
+ * enclosing loop.
+ * <p>
+ * Element/position map:
+ * <ul>
+ *     <li>N301 = address line 1</li>
+ *     <li>N302 = address line 2</li>
+ * </ul>
  */
 @Getter
 public abstract class N3Segment extends Segment {

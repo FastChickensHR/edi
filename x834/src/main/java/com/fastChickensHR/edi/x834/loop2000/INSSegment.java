@@ -22,6 +22,7 @@ import lombok.experimental.Accessors;
  */
 @Getter
 public abstract class INSSegment extends Segment {
+    /** X12 segment identifier for the Loop 2000 member-level detail segment: {@code INS}. */
     public static final String SEGMENT_ID = "INS";
 
     private final MemberIndicator ins01;

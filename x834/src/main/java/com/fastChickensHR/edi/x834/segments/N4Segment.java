@@ -11,8 +11,22 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**
- * Represents the N4 segment in X12 834 format.
- * This segment is used for geographic location information.
+ * Represents the N4 (Geographic Location) segment in the X12 834
+ * (005010X220A1) Benefit Enrollment and Maintenance transaction.
+ * <p>
+ * This segment carries the city/state/postal geographic information for the party
+ * named in the enclosing loop.
+ * <p>
+ * Element/position map (meanings derived from the accessor names on this class):
+ * <ul>
+ *     <li>N401 = city name</li>
+ *     <li>N402 = state or province code</li>
+ *     <li>N403 = postal code</li>
+ *     <li>N404 = country code</li>
+ *     <li>N405 = location qualifier</li>
+ *     <li>N406 = location identifier</li>
+ *     <li>N407 = country subdivision code</li>
+ * </ul>
  */
 @Getter
 public abstract class N4Segment extends Segment {

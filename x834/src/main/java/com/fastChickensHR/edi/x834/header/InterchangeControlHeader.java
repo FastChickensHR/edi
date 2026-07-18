@@ -15,22 +15,34 @@ import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 
 /**
- * Represents the Interchange Control Header segment specific to the X834 format.
- * This extends the generic ISA segment with X834-specific functionality.
+ * Represents the Interchange Control Header (ISA) segment specific to the X834 format
+ * (005010X220A1). The ISA is the outermost segment of the interchange envelope and is
+ * paired with the closing IEA. Extends the generic ISA segment with X834-specific defaults.
  */
 @Getter
 public class InterchangeControlHeader extends ISASegment {
     private final X834Context context;
+    /** Default ISA01 authorization information qualifier {@code "00"} (No authorization information present). */
     public static final AuthorizationInformationQualifier DEFAULT_AUTHORIZATION_INFO_QUALIFIER = AuthorizationInformationQualifier.fromString("00");
+    /** Default ISA02 authorization information: 10 spaces (fixed-width, no data). */
     public static final String DEFAULT_AUTHORIZATION_INFO = TextUtils.spaces(10);
+    /** Default ISA03 security information qualifier {@code "00"} (No security information present). */
     public static final SecurityInformationQualifier DEFAULT_SECURITY_INFO_QUALIFIER = SecurityInformationQualifier.fromString("00");
+    /** Default ISA04 security information: 10 spaces (fixed-width, no data). */
     public static final String DEFAULT_SECURITY_INFO = TextUtils.spaces(10);
+    /** Default ISA05 interchange sender ID qualifier {@code "30"} (U.S. Federal Tax Identification Number). */
     public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_SENDER_QUALIFIER = InterchangeIdQualifier.fromString("30");
+    /** Default ISA07 interchange receiver ID qualifier {@code "ZZ"} (Mutually Defined). */
     public static final InterchangeIdQualifier DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER = InterchangeIdQualifier.fromString("ZZ");
+    /** Default ISA11 repetition separator {@code "^"}. */
     public static final String DEFAULT_REPETITION_SEPARATOR = "^";
+    /** Default ISA12 interchange control version number {@code "00501"} (5010). */
     public static final InterchangeControlVersionNumber DEFAULT_INTERCHANGE_CONTROL_VERSION = InterchangeControlVersionNumber.fromString("00501");
+    /** Default ISA14 acknowledgment requested flag {@code "0"} (No interchange acknowledgment requested). */
     public static final AcknowledgmentRequested DEFAULT_ACKNOWLEDGMENT_REQUESTED = AcknowledgmentRequested.fromString("0");
+    /** Default ISA15 usage indicator {@code "T"} (Test). */
     public static final InterchangeUsageIndicator DEFAULT_USAGE_INDICATOR = InterchangeUsageIndicator.fromString("T");
+    /** Default ISA16 component element separator {@code ":"}. */
     public static final String DEFAULT_COMPONENT_ELEMENT_SEPARATOR = ":";
 
     protected InterchangeControlHeader(Builder builder) throws ValidationException {
@@ -75,6 +87,12 @@ public class InterchangeControlHeader extends ISASegment {
             return this;
         }
 
+        /**
+         * Builds a new InterchangeControlHeader instance.
+         *
+         * @return A new InterchangeControlHeader instance
+         * @throws ValidationException if validation fails
+         */
         @Override
         public InterchangeControlHeader build() throws ValidationException {
             return new InterchangeControlHeader(this);

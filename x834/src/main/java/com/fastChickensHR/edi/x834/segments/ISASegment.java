@@ -14,27 +14,61 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 /**
- * Represents the ISA (Interchange Control Header) segment in EDI formats.
- * This segment initiates and identifies an interchange of electronic data.
+ * Represents the ISA (Interchange Control Header) segment in the X12 834
+ * (005010X220A1) format.
+ * <p>
+ * This segment opens the interchange envelope and identifies the interchange of
+ * electronic data. It is a fixed-width segment: several elements have exact required
+ * lengths (ISA02 and ISA04 are 10 characters, ISA06 and ISA08 are 15 characters,
+ * ISA16 is 1 character). It is closed by a matching {@link IEASegment}.
+ * <p>
+ * Element/position map:
+ * <ul>
+ *     <li>ISA01 = authorization information qualifier</li>
+ *     <li>ISA02 = authorization information (exactly 10 characters)</li>
+ *     <li>ISA03 = security information qualifier</li>
+ *     <li>ISA04 = security information (exactly 10 characters)</li>
+ *     <li>ISA05 = interchange sender ID qualifier</li>
+ *     <li>ISA06 = interchange sender ID (exactly 15 characters; right-padded by the builder)</li>
+ *     <li>ISA07 = interchange receiver ID qualifier</li>
+ *     <li>ISA08 = interchange receiver ID (right-padded to 15 characters by the builder)</li>
+ *     <li>ISA09 = interchange date (YYMMDD)</li>
+ *     <li>ISA10 = interchange time (HHMM)</li>
+ *     <li>ISA11 = repetition / interchange control standards separator</li>
+ *     <li>ISA12 = interchange control version number</li>
+ *     <li>ISA13 = interchange control number (matched by IEA02)</li>
+ *     <li>ISA14 = acknowledgment requested flag</li>
+ *     <li>ISA15 = interchange usage indicator (e.g. test vs production)</li>
+ *     <li>ISA16 = component element separator (exactly 1 character)</li>
+ * </ul>
  */
 @Getter
 abstract public class ISASegment extends Segment {
     public static final String SEGMENT_ID = "ISA";
 
+    /** ISA01 — authorization information qualifier. */
     protected final AuthorizationInformationQualifier isa01;
+    /** ISA02 — authorization information (exactly 10 characters). */
     protected final String isa02;
+    /** ISA03 — security information qualifier. */
     protected final SecurityInformationQualifier isa03;
+    /** ISA04 — security information (exactly 10 characters). */
     protected final String isa04;
+    /** ISA05 — interchange sender ID qualifier. */
     protected final InterchangeIdQualifier isa05;
     protected final String isa06; // Interchange Sender ID
+    /** ISA07 — interchange receiver ID qualifier. */
     protected final InterchangeIdQualifier isa07;
     protected final String isa08; // Interchange Receiver ID
     protected final String isa09; // Interchange Date (YYMMDD)
     protected final String isa10; // Interchange Time (HHMM)
     protected final String isa11; // Repetition Separator
+    /** ISA12 — interchange control version number. */
     protected final InterchangeControlVersionNumber isa12;
     protected final String isa13; // Interchange Control Number
+    /** ISA14 — acknowledgment requested flag. */
     protected final AcknowledgmentRequested isa14;
+    /** ISA15 — interchange usage indicator (e.g. test vs production). */
     protected final InterchangeUsageIndicator isa15;
     protected final String isa16; // Component Element Separator
 
@@ -135,66 +169,82 @@ abstract public class ISASegment extends Segment {
         };
     }
 
+    /** @return ISA01 — authorization information qualifier. */
     public AuthorizationInformationQualifier getAuthorizationInformationQualifier() {
         return isa01;
     }
 
+    /** @return ISA02 — authorization information. */
     public String getAuthorizationInformation() {
         return isa02;
     }
 
+    /** @return ISA03 — security information qualifier. */
     public SecurityInformationQualifier getSecurityInformationQualifier() {
         return isa03;
     }
 
+    /** @return ISA04 — security information. */
     public String getSecurityInformation() {
         return isa04;
     }
 
+    /** @return ISA05 — interchange sender ID qualifier. */
     public InterchangeIdQualifier getInterchangeSenderQualifier() {
         return isa05;
     }
 
+    /** @return ISA06 — interchange sender ID. */
     public String getInterchangeSenderID() {
         return isa06;
     }
 
+    /** @return ISA07 — interchange receiver ID qualifier. */
     public InterchangeIdQualifier getInterchangeReceiverQualifier() {
         return isa07;
     }
 
+    /** @return ISA08 — interchange receiver ID. */
     public String getInterchangeReceiverID() {
         return isa08;
     }
 
+    /** @return ISA09 — interchange date (YYMMDD). */
     public String getInterchangeDate() {
         return isa09;
     }
 
+    /** @return ISA10 — interchange time (HHMM). */
     public String getInterchangeTime() {
         return isa10;
     }
 
+    /** @return ISA11 — repetition / interchange control standards separator. */
     public String getInterchangeControlStandardsIdentifier() {
         return isa11;
     }
 
+    /** @return ISA12 — interchange control version number. */
     public InterchangeControlVersionNumber getInterchangeControlVersionNumber() {
         return isa12;
     }
 
+    /** @return ISA13 — interchange control number. */
     public String getInterchangeControlNumber() {
         return isa13;
     }
 
+    /** @return ISA14 — acknowledgment requested flag. */
     public AcknowledgmentRequested getAcknowledgmentRequested() {
         return isa14;
     }
 
+    /** @return ISA15 — interchange usage indicator. */
     public InterchangeUsageIndicator getUsageIndicator() {
         return isa15;
     }
 
+    /** @return ISA16 — component element separator. */
     public String getComponentElementSeparator() {
         return isa16;
     }
@@ -226,146 +276,178 @@ abstract public class ISASegment extends Segment {
         public AbstractBuilder() {
         }
 
+        /** Sets ISA01 (authorization information qualifier) from its string code. */
         public T setIsa01(String value) {
             this.isa01 = AuthorizationInformationQualifier.fromString(value);
             return self();
         }
 
+        /** Sets ISA02 (authorization information; must be exactly 10 characters). */
         public T setIsa02(String isa02) {
             this.isa02 = isa02;
             return self();
         }
 
+        /** Sets ISA03 (security information qualifier) from its string code. */
         public T setIsa03(String value) {
             this.isa03 = SecurityInformationQualifier.fromString(value);
             return self();
         }
 
+        /** Sets ISA04 (security information; must be exactly 10 characters). */
         public T setIsa04(String isa04) {
             this.isa04 = isa04;
             return self();
         }
 
+        /** Sets ISA05 (interchange sender ID qualifier) from its string code. */
         public T setIsa05(String value) {
             this.isa05 = InterchangeIdQualifier.fromString(value);
             return self();
         }
 
+        /** Sets ISA06 (interchange sender ID), right-padding it to the fixed 15-character width. */
         public T setIsa06(String isa06) {
             this.isa06 = TextUtils.padRight(isa06, 15);
             return self();
         }
 
+        /** Sets ISA07 (interchange receiver ID qualifier) from its string code. */
         public T setIsa07(String value) {
             this.isa07 = InterchangeIdQualifier.fromString(value);
             return self();
         }
 
+        /** Sets ISA08 (interchange receiver ID), right-padding it to the fixed 15-character width. */
         public T setIsa08(String isa08) {
             this.isa08 = TextUtils.padRight(isa08, 15);
             return self();
         }
 
+        /** Sets ISA09 (interchange date, YYMMDD). */
         public T setIsa09(String isa09) {
             this.isa09 = isa09;
             return self();
         }
 
+        /** Sets ISA10 (interchange time, HHMM). */
         public T setIsa10(String isa10) {
             this.isa10 = isa10;
             return self();
         }
 
+        /** Sets ISA11 (repetition / interchange control standards separator). */
         public T setIsa11(String isa11) {
             this.isa11 = isa11;
             return self();
         }
 
+        /** Sets ISA12 (interchange control version number) from its string code. */
         public T setIsa12(String value) {
             this.isa12 = InterchangeControlVersionNumber.fromString(value);
             return self();
         }
 
+        /** Sets ISA13 (interchange control number). */
         public T setIsa13(String isa13) {
             this.isa13 = isa13;
             return self();
         }
 
+        /** Sets ISA14 (acknowledgment requested flag) from its string code. */
         public T setIsa14(String value) {
             this.isa14 = AcknowledgmentRequested.fromString(value);
             return self();
         }
 
+        /** Sets ISA15 (interchange usage indicator) from its string code. */
         public T setIsa15(String value) {
             this.isa15 = InterchangeUsageIndicator.fromString(value);
             return self();
         }
 
+        /** Sets ISA16 (component element separator; must be exactly 1 character). */
         public T setIsa16(String isa16) {
             this.isa16 = isa16;
             return self();
         }
 
+        /** Domain alias for {@link #setIsa01(String)}. */
         public T setAuthorizationInformationQualifier(String value) {
             return setIsa01(value);
         }
 
+        /** Domain alias for {@link #setIsa02(String)}. */
         public T setAuthorizationInformation(String info) {
             return setIsa02(info);
         }
 
+        /** Domain alias for {@link #setIsa03(String)}. */
         public T setSecurityInformationQualifier(String qualifier) {
             return setIsa03(qualifier);
         }
 
+        /** Domain alias for {@link #setIsa04(String)}. */
         public T setSecurityInformation(String info) {
             return setIsa04(info);
         }
 
+        /** Domain alias for {@link #setIsa05(String)}. */
         public T setInterchangeSenderQualifier(String qualifier) {
             return setIsa05(qualifier);
         }
 
+        /** Domain alias for {@link #setIsa06(String)} (value is right-padded to 15 characters). */
         public T setInterchangeSenderID(String id) {
             return setIsa06(id);
         }
 
+        /** Domain alias for {@link #setIsa07(String)}. */
         public T setInterchangeReceiverQualifier(String qualifier) {
             return setIsa07(qualifier);
         }
 
+        /** Domain alias for {@link #setIsa08(String)} (value is right-padded to 15 characters). */
         public T setInterchangeReceiverID(String id) {
             return setIsa08(id);
         }
 
+        /** Domain alias for {@link #setIsa09(String)}. */
         public T setInterchangeDate(String date) {
             return setIsa09(date);
         }
 
+        /** Domain alias for {@link #setIsa10(String)}. */
         public T setInterchangeTime(String time) {
             return setIsa10(time);
         }
 
+        /** Domain alias for {@link #setIsa11(String)}. */
         public T setInterchangeControlStandardsIdentifier(String identifier) {
             return setIsa11(identifier);
         }
 
+        /** Domain alias for {@link #setIsa12(String)}. */
         public T setInterchangeControlVersionNumber(String version) {
             return setIsa12(version);
         }
 
+        /** Domain alias for {@link #setIsa13(String)}. */
         public T setInterchangeControlNumber(String number) {
             return setIsa13(number);
         }
 
+        /** Domain alias for {@link #setIsa14(String)}. */
         public T setAcknowledgmentRequested(String ack) {
             return setIsa14(ack);
         }
 
+        /** Domain alias for {@link #setIsa15(String)}. */
         public T setUsageIndicator(String indicator) {
             return setIsa15(indicator);
         }
 
+        /** Domain alias for {@link #setIsa16(String)}. */
         public T setComponentElementSeparator(String separator) {
             return setIsa16(separator);
         }

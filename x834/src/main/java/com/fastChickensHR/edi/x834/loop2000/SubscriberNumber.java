@@ -11,7 +11,14 @@ import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.experimental.Accessors;
 
+/**
+ * Subscriber number carried as a REF segment in Loop 2000 of the X12 834.
+ * <p>
+ * Renders {@code REF*OF*<subscriber number>}: REF01 is fixed to the qualifier
+ * {@code OF} (Subscriber Number) and REF02 carries the subscriber's number.
+ */
 public class SubscriberNumber extends RefSegment {
+    /** REF01 qualifier {@code OF} — Subscriber Number; the fixed default for this REF segment. */
     public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "OF";
 
     private SubscriberNumber(SubscriberNumber.Builder builder) throws ValidationException {

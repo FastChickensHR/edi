@@ -45,6 +45,12 @@ public class TransactionSetTrailer extends SESegment {
             return this;
         }
 
+        /**
+         * Builds a new TransactionSetTrailer instance.
+         *
+         * @return A new TransactionSetTrailer instance
+         * @throws ValidationException if validation fails
+         */
         @Override
         public TransactionSetTrailer build() throws ValidationException {
             return new TransactionSetTrailer(this);

@@ -75,6 +75,10 @@ public final class X834Location {
     public static final String HD_PLAN_COVERAGE_DESCRIPTION = "hd.planCoverageDescription"; // HD04
     public static final String HD_COVERAGE_LEVEL_CODE = "hd.coverageLevelCode";            // HD05
     public static final String HD_EMPLOYMENT_STATUS_CODE = "hd.employmentStatusCode";      // HD09
+    /** Loop 2300 coverage begin date — DTP*348 (D8). */
+    public static final String HD_BENEFIT_BEGIN_DATE = "hd.benefitBeginDate";
+    /** Loop 2300 coverage end date — DTP*349 (D8). */
+    public static final String HD_BENEFIT_END_DATE = "hd.benefitEndDate";
 
     /** Custom REF extension: location is {@code "ref." + qualifier}, e.g. {@code "ref.ZZ"}. */
     public static final String REF_EXTENSION_PREFIX = "ref.";

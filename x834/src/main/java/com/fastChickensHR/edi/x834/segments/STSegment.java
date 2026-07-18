@@ -13,9 +13,19 @@ import com.fastChickensHR.edi.x834.header.TransactionSetHeader;
 import lombok.Getter;
 
 /**
- * Represents the ST (Transaction Set Header) segment in the EDI format.
- * This segment defines the beginning of a transaction set and provides
- * the transaction set identifier, control number, and implementation convention reference.
+ * Represents the ST (Transaction Set Header) segment in the X12 834
+ * (005010X220A1) format.
+ * <p>
+ * This segment opens a transaction set, naming the transaction type, a control
+ * number, and the implementation convention it conforms to. It is closed by a
+ * matching {@link SESegment}.
+ * <p>
+ * Element/position map:
+ * <ul>
+ *     <li>ST01 = transaction set identifier code (e.g. "834")</li>
+ *     <li>ST02 = transaction set control number (4–9 characters; matched by SE02)</li>
+ *     <li>ST03 = implementation convention reference (optional, max 35 characters)</li>
+ * </ul>
  */
 @Getter
 abstract public class STSegment extends Segment {
@@ -67,50 +77,71 @@ abstract public class STSegment extends Segment {
         return new String[]{this.st01.getCode(), this.st02, this.st03};
     }
 
+    /** @return ST01 — transaction set identifier code. */
     public TransactionSetIdentifierCode getTransactionSetIdentifierCode() {
         return getSt01();
     }
 
+    /** @return ST02 — transaction set control number. */
     public String getTransactionSetControlNumber() {
         return getSt02();
     }
 
+    /** @return ST03 — implementation convention reference. */
     public String getImplementationConventionReference() {
         return getSt03();
     }
 
+    /**
+     * Abstract builder for ST segments.
+     *
+     * @param <T> the concrete builder type for method chaining
+     */
     public abstract static class AbstractBuilder<T extends STSegment.AbstractBuilder<T>> {
         private TransactionSetIdentifierCode st01;
         private String st02;
         private String st03;
 
+        /** @return this builder cast to the concrete type. */
         protected abstract T self();
 
+        /**
+         * Builds and validates the ST segment.
+         *
+         * @return a new {@link STSegment} instance
+         * @throws ValidationException if validation fails
+         */
         public abstract STSegment build() throws ValidationException;
 
+        /** Sets ST01 (transaction set identifier code) from its string code. */
         public T setSt01(String value) {
             this.st01 = TransactionSetIdentifierCode.fromString(value);
             return self();
         }
 
+        /** Domain alias for {@link #setSt01(String)}. */
         public T setTransactionSetIdentifierCode(String value) {
             return setSt01(value);
         }
 
+        /** Sets ST02 (transaction set control number). */
         public T setSt02(String value) {
             this.st02 = value;
             return self();
         }
 
+        /** Domain alias for {@link #setSt02(String)}. */
         public T setTransactionSetControlNumber(String value) {
             return setSt02(value);
         }
 
+        /** Sets ST03 (implementation convention reference). */
         public T setSt03(String value) {
             this.st03 = value;
             return self();
         }
 
+        /** Domain alias for {@link #setSt03(String)}. */
         public T setImplementationConventionReference(String value) {
             return setSt03(value);
         }
