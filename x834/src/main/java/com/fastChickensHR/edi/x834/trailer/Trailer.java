@@ -105,12 +105,20 @@ public class Trailer {
      * Builder for the Trailer class
      */
     public static class Builder {
+        /**
+         * Fallback SE01 segment count used only if the document never sets a computed count.
+         * In normal generation {@code X834Document} overwrites this with the real count.
+         */
+        private static final String DEFAULT_NUMBER_OF_INCLUDED_SEGMENTS = "10";
+        /** Default GE01 — number of transaction sets in the functional group. */
+        private static final String DEFAULT_NUMBER_OF_TRANSACTION_SETS = "1";
+
         @Getter
         private final X834Context context;
 
         private String transactionSetControlNumber;
-        private String numberOfIncludedSegments = "10";
-        private String numberOfTransactionSetsIncluded = "1";
+        private String numberOfIncludedSegments = DEFAULT_NUMBER_OF_INCLUDED_SEGMENTS;
+        private String numberOfTransactionSetsIncluded = DEFAULT_NUMBER_OF_TRANSACTION_SETS;
         private String groupControlNumber;
         private String numberOfIncludedFunctionalGroups = InterchangeControlTrailer.DEFAULT_NUMBER_OF_INCLUDED_GROUPS;
         private String interchangeControlNumber;

@@ -10,6 +10,15 @@ package com.fastChickensHR.edi.x834.segments;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
+/**
+ * Represents the NM1 (Individual or Organizational Name) segment in the X12 834 (005010X220A1).
+ * <p>
+ * Element positions: NM101 entity identifier code, NM102 entity type qualifier
+ * (1 = person, 2 = non-person), NM103 last name / organization name, NM104 first name,
+ * NM105 middle name, NM106 name prefix, NM107 name suffix, NM108 identification code
+ * qualifier, NM109 identification code. Concrete subclasses (e.g. member/sponsor/payer name)
+ * fix the qualifier elements and supply the loop-specific defaults.
+ */
 @Getter
 public abstract class NM1Segment extends Segment {
     public static final String SEGMENT_ID = "NM1";
