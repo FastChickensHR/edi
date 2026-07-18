@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class x834ContextTest {
+class X834ContextTest {
 
     private X834Context validContext() {
         return new X834Context()

@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class x834DocumentTest {
+class X834DocumentTest {
 
     private X834Context context;
 
