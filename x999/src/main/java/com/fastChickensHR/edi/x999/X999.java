@@ -30,6 +30,12 @@ public final class X999 {
     /** AK901 — functional group acknowledgment code (see {@link #ACCEPTED} et al). */
     public static final String GROUP_STATUS = "groupAckStatus";
 
+    // ---- File level: TA1 interchange acknowledgment (may stand alone or accompany a 999) ----
+    /** TA101 — interchange control number (the original ISA13) the TA1 acknowledges. */
+    public static final String ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER = "acknowledgedInterchangeControlNumber";
+    /** TA104 — interchange acknowledgment code (A accepted, E accepted-with-errors, R rejected). */
+    public static final String INTERCHANGE_ACK_STATUS = "interchangeAckStatus";
+
     // ---- Record level: one per acknowledged transaction set ----
     /** AK202 — transaction set control number (the original ST02) being acknowledged. */
     public static final String TRANSACTION_SET_CONTROL_NUMBER = "transactionSetControlNumber";
