@@ -63,6 +63,10 @@ public final class X999FileParser implements FileParser {
             String[] e = segment.split(java.util.regex.Pattern.quote(String.valueOf(elementSeparator)), -1);
             switch (e[0]) {
                 case "ISA" -> addField(fileFields, RecordLevel.FILE, X999.INTERCHANGE_CONTROL_NUMBER, at(e, 13));
+                case "TA1" -> {
+                    addField(fileFields, RecordLevel.FILE, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER, at(e, 1));
+                    addField(fileFields, RecordLevel.FILE, X999.INTERCHANGE_ACK_STATUS, at(e, 4));
+                }
                 case "AK1" -> {
                     addField(fileFields, RecordLevel.FILE, X999.FUNCTIONAL_ID_CODE, at(e, 1));
                     addField(fileFields, RecordLevel.FILE, X999.GROUP_CONTROL_NUMBER, at(e, 2));

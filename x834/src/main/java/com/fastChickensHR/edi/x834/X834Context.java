@@ -41,6 +41,8 @@ public class X834Context {
     private String groupControlNumber;
     private String senderID;
     private String receiverID;
+    /** ISA14 — Interchange Acknowledgment Requested ("1" to request a TA1/999). Null defaults to "0". */
+    private String acknowledgmentRequested;
     private LocalDateTime documentDate;
     private DateFormat dateFormat;
     private TimeFormat timeFormat;

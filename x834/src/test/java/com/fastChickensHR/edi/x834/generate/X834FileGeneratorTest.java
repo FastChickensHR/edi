@@ -288,6 +288,32 @@ class X834FileGeneratorTest {
         contains(out, "NM1*IL*1*DOE*JANE****34*123456789~");
     }
 
+    @Test
+    void isa14RequestsAnAcknowledgmentWhenTheKeyIsSet() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"),
+                file(X834Location.ACKNOWLEDGMENT_REQUESTED, "1"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        // ISA13 (control number) then ISA14 = 1 (Acknowledgment Requested).
+        contains(out, "000000001*1*");
+    }
+
     private static void contains(String haystack, String needle) {
         assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
     }

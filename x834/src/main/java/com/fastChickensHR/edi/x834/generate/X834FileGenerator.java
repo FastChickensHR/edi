@@ -93,6 +93,7 @@ public final class X834FileGenerator implements FileGenerator {
         apply(file, X834Location.GROUP_CONTROL_NUMBER, context::setGroupControlNumber);
         apply(file, X834Location.TRANSACTION_SET_CONTROL_NUMBER, context::setTransactionSetControlNumber);
         apply(file, X834Location.DOCUMENT_DATE, v -> context.setDocumentDate(parseDateTime(v)));
+        apply(file, X834Location.ACKNOWLEDGMENT_REQUESTED, context::setAcknowledgmentRequested);
         return context;
     }
 

@@ -101,6 +101,26 @@ class X999FileParserTest {
     }
 
     @Test
+    void parsesAStandaloneTa1InterchangeAcknowledgment() {
+        String ack = ISA + "TA1*000000123*260119*1200*A*000~";
+
+        FileContent out = parser.parse(ack);
+
+        assertEquals("000000123", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER)); // TA101
+        assertEquals("A", file(out, X999.INTERCHANGE_ACK_STATUS));                           // TA104
+    }
+
+    @Test
+    void parsesARejectingTa1() {
+        String ack = ISA + "TA1*000000777*260119*1200*R*022~";
+
+        FileContent out = parser.parse(ack);
+
+        assertEquals("000000777", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER));
+        assertEquals("R", file(out, X999.INTERCHANGE_ACK_STATUS));
+    }
+
+    @Test
     void blankInputProducesAnEmptyFileContent() {
         FileContent out = parser.parse("   ");
         assertTrue(out.fileFields().isEmpty());

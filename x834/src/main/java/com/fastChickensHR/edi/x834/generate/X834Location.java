@@ -28,6 +28,7 @@ public final class X834Location {
     public static final String GROUP_CONTROL_NUMBER = "groupControlNumber";
     public static final String TRANSACTION_SET_CONTROL_NUMBER = "transactionSetControlNumber";
     public static final String DOCUMENT_DATE = "documentDate";
+    public static final String ACKNOWLEDGMENT_REQUESTED = "acknowledgmentRequested"; // ISA14 ("1" requests a TA1/999)
 
     // ---- File level: header data (Header.Builder) ----
     public static final String TRANSACTION_SET_ID = "transactionSetId";
