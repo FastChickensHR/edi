@@ -37,6 +37,16 @@ public abstract class BaseMember {
     protected String firstName;
     protected String lastName;
     protected String middleName;
+    /**
+     * NM108 — identification code qualifier carried in the member name segment (Loop 2100A NM1),
+     * e.g. {@code 34} for a Social Security Number. Must be paired with {@link #nameId}.
+     */
+    protected String nameIdQualifier;
+    /**
+     * NM109 — identification code carried in the member name segment (Loop 2100A NM1), e.g. the
+     * member's SSN when {@link #nameIdQualifier} is {@code 34}. Must be paired with the qualifier.
+     */
+    protected String nameId;
     protected LocalDateTime birthDate;
     protected String gender;
     protected MemberIndicator memberIndicator;

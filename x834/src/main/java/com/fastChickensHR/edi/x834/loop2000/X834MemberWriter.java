@@ -122,11 +122,17 @@ public class X834MemberWriter {
         if (isBlank(member.getLastName())) {
             return;
         }
-        segments.add(MemberName.builder()
+        MemberName.Builder name = MemberName.builder()
                 .setLastName(member.getLastName())
                 .setFirstName(emptyToNull(member.getFirstName()))
-                .setMiddleName(emptyToNull(member.getMiddleName()))
-                .build());
+                .setMiddleName(emptyToNull(member.getMiddleName()));
+        // NM108/NM109 (e.g. 34 + SSN) — set together or not at all (MemberName enforces the pairing).
+        String idQualifier = emptyToNull(member.getNameIdQualifier());
+        String id = emptyToNull(member.getNameId());
+        if (idQualifier != null && id != null) {
+            name.setIdentificationCodeQualifier(idQualifier).setIdentificationCode(id);
+        }
+        segments.add(name.build());
     }
 
     /**

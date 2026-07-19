@@ -60,6 +60,32 @@ class X834MemberWriterTest {
     }
 
     @Test
+    void emitsMemberNameWithIdentificationCodeWhenNM108AndNM109Present() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.setFirstName("JANE");
+        member.setNameIdQualifier("34"); // SSN
+        member.setNameId("123456789");
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("NM1*IL*1*DOE*JANE****34*123456789~"),
+                () -> "expected member NM1 with NM108/NM109 (SSN); got:\n" + out);
+    }
+
+    @Test
+    void omitsIdentificationCodeWhenNM108AndNM109NotBothPresent() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.setNameIdQualifier("34"); // qualifier only, no code
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("NM1*IL*1*DOE~"),
+                () -> "unpaired NM108 must be dropped (no NM1 id elements); got:\n" + out);
+    }
+
+    @Test
     void emitsDemographicsDMGWhenBirthDatePresent() throws ValidationException {
         Member member = baseSubscriber();
         member.setLastName("DOE");

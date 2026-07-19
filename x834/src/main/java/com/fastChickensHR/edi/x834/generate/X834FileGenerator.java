@@ -137,6 +137,8 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.LAST_NAME, member::setLastName);
         apply(loc, X834Location.FIRST_NAME, member::setFirstName);
         apply(loc, X834Location.MIDDLE_NAME, member::setMiddleName);
+        apply(loc, X834Location.NAME_ID_QUALIFIER, member::setNameIdQualifier);
+        apply(loc, X834Location.NAME_ID, member::setNameId);
         apply(loc, X834Location.BIRTH_DATE, v -> member.setBirthDate(parseDateTime(v)));
         apply(loc, X834Location.GENDER, member::setGender);
         apply(loc, X834Location.ADDRESS_LINE_1, member::setAddressLine1);

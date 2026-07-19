@@ -52,6 +52,8 @@ public final class X834Location {
     public static final String LAST_NAME = "lastName";        // NM103
     public static final String FIRST_NAME = "firstName";      // NM104
     public static final String MIDDLE_NAME = "middleName";    // NM105
+    public static final String NAME_ID_QUALIFIER = "nameIdQualifier"; // NM108 (e.g. 34 = SSN)
+    public static final String NAME_ID = "nameId";                    // NM109 (e.g. the SSN)
     public static final String BIRTH_DATE = "birthDate";      // DMG02 (D8)
     public static final String GENDER = "gender";             // DMG03
     public static final String ADDRESS_LINE_1 = "addressLine1"; // N301
