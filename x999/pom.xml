@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2025 FastChickensHR <contact@fastchickenshr.com>
+
+    This file is part of the FastChickensHR project.
+
+    For license information see the LICENSE file in the root of this project.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.fastchickenshr</groupId>
+        <artifactId>edi</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>x999</artifactId>
+    <name>FastChickensHR EDI 999</name>
+    <description>X12 999 / 997 acknowledgment support — parses into the core file kernel</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fastchickenshr</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
