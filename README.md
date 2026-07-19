@@ -9,6 +9,7 @@ A Java toolkit for benefit-enrollment EDI: generate X12 834 files and CSV, and p
 | `core` | Format-neutral file kernel: the `FileContent` model and the `parse` / `generate` seam. |
 | `x834` | X12 834 benefit-enrollment file generator. |
 | `csv`  | CSV parser and generator. |
+| `x999` | X12 999 / 997 acknowledgment parser. |
 
 ## Install
 
