@@ -260,6 +260,34 @@ class X834FileGeneratorTest {
         assertTrue(out.indexOf("DTP*349") > out.indexOf("DTP*348"), "end DTP must follow begin DTP");
     }
 
+    @Test
+    void emitsMemberNM1WithSsnFromNameIdKernelFields() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LAST_NAME, "DOE"),
+                emp(X834Location.FIRST_NAME, "JANE"),
+                emp(X834Location.NAME_ID_QUALIFIER, "34"),
+                emp(X834Location.NAME_ID, "123456789")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        contains(out, "NM1*IL*1*DOE*JANE****34*123456789~");
+    }
+
     private static void contains(String haystack, String needle) {
         assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
     }
