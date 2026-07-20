@@ -14,7 +14,6 @@ import com.fastChickensHR.edi.core.Field;
 import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.Location;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
@@ -37,14 +36,21 @@ import java.util.List;
  */
 public final class CsvFileParser implements FileParser {
 
-    private static final CSVFormat FORMAT = CSVFormat.DEFAULT.builder()
-            .setHeader()
-            .setSkipHeaderRecord(true)
-            .build();
+    private final DelimitedFormat format;
+
+    /** Reads plain flat CSV ({@link DelimitedFormat#csv()}). */
+    public CsvFileParser() {
+        this(DelimitedFormat.csv());
+    }
+
+    /** Reads a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
+    public CsvFileParser(DelimitedFormat format) {
+        this.format = format;
+    }
 
     @Override
     public FileContent parse(String raw) {
-        try (CSVParser parser = CSVParser.parse(raw == null ? "" : raw, FORMAT)) {
+        try (CSVParser parser = CSVParser.parse(raw == null ? "" : raw, format.parseFormat())) {
             List<String> headers = parser.getHeaderNames();
             boolean nested = headers.contains(Csv.RECORD_LEVEL_COLUMN);
             List<Record> records = nested ? parseNested(parser, headers) : parseFlat(parser, headers);
