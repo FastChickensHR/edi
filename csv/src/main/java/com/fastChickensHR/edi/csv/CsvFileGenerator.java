@@ -12,7 +12,6 @@ import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.FileGenerator;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.RecordLevel;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
@@ -35,9 +34,17 @@ import java.util.Map;
  */
 public final class CsvFileGenerator implements FileGenerator {
 
-    private static final CSVFormat FORMAT = CSVFormat.DEFAULT.builder()
-            .setRecordSeparator("\n")
-            .build();
+    private final DelimitedFormat format;
+
+    /** Writes plain flat CSV ({@link DelimitedFormat#csv()}). */
+    public CsvFileGenerator() {
+        this(DelimitedFormat.csv());
+    }
+
+    /** Writes a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
+    public CsvFileGenerator(DelimitedFormat format) {
+        this.format = format;
+    }
 
     @Override
     public String generate(FileContent file) {
@@ -63,8 +70,10 @@ public final class CsvFileGenerator implements FileGenerator {
         header.addAll(columns);
 
         StringWriter out = new StringWriter();
-        try (CSVPrinter printer = new CSVPrinter(out, FORMAT)) {
-            printer.printRecord(header);
+        try (CSVPrinter printer = new CSVPrinter(out, format.generateFormat())) {
+            if (format.hasHeader()) {
+                printer.printRecord(header);
+            }
             for (Record record : file.records()) {
                 printRow(printer, header, record, RecordLevel.RECORD);
                 for (Record child : record.children()) {
