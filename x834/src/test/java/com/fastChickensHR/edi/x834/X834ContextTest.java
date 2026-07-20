@@ -7,8 +7,11 @@
  */
 package com.fastChickensHR.edi.x834;
 
+import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,5 +71,47 @@ class X834ContextTest {
     void testEmptyGroupControlNumberThrows() {
         X834Context ctx = validContext().setGroupControlNumber("");
         assertThrows(ValidationException.class, ctx::validate);
+    }
+
+    @Test
+    void testFormattedDateAndTimeBothFollowSetDocumentDate() {
+        X834Context ctx = new X834Context()
+                .setDocumentDate(LocalDateTime.of(2024, 1, 1, 0, 0));
+
+        assertEquals("20240101", ctx.getFormattedDocumentDate(),
+                "ISA09/GS04 date should come from the configured document date");
+        assertEquals("0000", ctx.getFormattedDocumentTime(),
+                "ISA10/GS05 time should come from the configured document date, not construction wall-clock");
+    }
+
+    @Test
+    void testFormattedTimeIsNotFrozenAtConstruction() {
+        X834Context ctx = new X834Context()
+                .setDocumentDate(LocalDateTime.of(2023, 11, 15, 12, 30, 45));
+
+        assertEquals("20231115", ctx.getFormattedDocumentDate());
+        assertEquals("1230", ctx.getFormattedDocumentTime());
+
+        ctx.setDocumentDate(LocalDateTime.of(2025, 6, 30, 23, 59, 0));
+        assertEquals("20250630", ctx.getFormattedDocumentDate());
+        assertEquals("2359", ctx.getFormattedDocumentTime());
+    }
+
+    @Test
+    void testFormatChangesAfterConstructionAreReflectedOnRead() {
+        X834Context ctx = new X834Context()
+                .setDocumentDate(LocalDateTime.of(2023, 11, 15, 12, 30, 0));
+
+        ctx.setDateFormat(DateFormat.D6);
+        assertEquals("231115", ctx.getFormattedDocumentDate(),
+                "changing the date format after construction should be reflected in the formatted date");
+    }
+
+    @Test
+    void testDefaultDocumentDateStillDrivesFormattedValues() {
+        X834Context ctx = new X834Context();
+
+        assertEquals(ctx.formatDate(ctx.getDocumentDate()), ctx.getFormattedDocumentDate());
+        assertEquals(ctx.formatTime(ctx.getDocumentDate()), ctx.getFormattedDocumentTime());
     }
 }

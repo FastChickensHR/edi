@@ -40,8 +40,6 @@ class FunctionalGroupHeaderTest {
         context.setDocumentDate(testDateTime)
                 .setSenderID(senderID)
                 .setReceiverID(receiverID)
-                .setFormattedDocumentDate(formattedDate)
-                .setFormattedDocumentTime(formattedTime)
                 .setGroupControlNumber(groupControlNumber);
     }
 

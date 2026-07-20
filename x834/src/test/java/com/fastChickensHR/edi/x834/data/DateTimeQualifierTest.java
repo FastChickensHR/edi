@@ -67,6 +67,19 @@ class DateTimeQualifierTest {
         assertThrows(IllegalArgumentException.class, () -> DateTimeQualifier.fromString(null));
     }
 
+    /**
+     * Qualifier 332's official X12 description is "Placement Date". A mechanical rename
+     * once corrupted this domain literal to "Field Date", which broke description-based
+     * lookup; this pins the correct wording.
+     */
+    @Test
+    void testPlacementDateDescriptionLookup() {
+        assertEquals("Placement Date", DateTimeQualifier.PLACEMENT_DATE.getDescription());
+        assertEquals(DateTimeQualifier.PLACEMENT_DATE, DateTimeQualifier.fromString("Placement Date"));
+        assertEquals(DateTimeQualifier.PLACEMENT_DATE, DateTimeQualifier.fromString("332"));
+        assertThrows(IllegalArgumentException.class, () -> DateTimeQualifier.fromString("Field Date"));
+    }
+
     @ParameterizedTest
     @MethodSource("provideLookupValues")
     void testAllLookupValues(String input, DateTimeQualifier expected) throws Exception {
