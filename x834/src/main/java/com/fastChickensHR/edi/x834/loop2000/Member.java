@@ -41,12 +41,26 @@ public class Member extends BaseMember {
     }
 
     /**
-     * Validates this member has the minimum required fields.
+     * Validates this member has the minimum required fields: the INS-segment trio
+     * (member indicator, relationship code, maintenance type code) that
+     * {@link X834MemberWriter} dereferences unconditionally, plus each dependent's
+     * own validation.
      *
      * @throws ValidationException If validation fails
      */
     @Override
     public void validate() throws ValidationException {
-        // Implementation omitted for shortness
+        if (memberIndicator == null) {
+            throw new ValidationException("Member must have a member indicator (INS01)");
+        }
+        if (relationshipCode == null) {
+            throw new ValidationException("Member must have a relationship code (INS02)");
+        }
+        if (maintenanceTypeCode == null) {
+            throw new ValidationException("Member must have a maintenance type code (INS03)");
+        }
+        for (DependentMember dependent : dependents) {
+            dependent.validate();
+        }
     }
 }

@@ -46,8 +46,6 @@ public class X834Context {
     private LocalDateTime documentDate;
     private DateFormat dateFormat;
     private TimeFormat timeFormat;
-    private String formattedDocumentDate;
-    private String formattedDocumentTime;
 
     // Constants
     /** Interchange control version (ISA12) for the 5010 release: {@code "00501"}. */
@@ -67,8 +65,6 @@ public class X834Context {
         this.documentDate = LocalDateTime.now();
         this.dateFormat = DateFormat.DATE;
         this.timeFormat = TimeFormat.TIME;
-        this.formattedDocumentDate = formatDate(documentDate);
-        this.formattedDocumentTime = formatTime(documentDate);
         this.elementSeparator = ElementSeparator.ASTERISK;
         this.segmentTerminator = SegmentTerminator.TILDE;
         this.subElementSeparator = SubElementSeparator.GREATER_THAN;
@@ -143,15 +139,22 @@ public class X834Context {
     }
 
     /**
-     * Sets the document date and refreshes the cached formatted document date.
-     *
-     * @param date the document date/time
-     * @return this context instance for chaining
+     * @return the document date formatted with the current {@link #getDateFormat() date format}.
+     * Rendered into ISA09 (interchange date), GS04 (group date), BGN03 and the file effective DTP.
+     * Always derived from {@link #getDocumentDate()} on read, so it can never go stale.
      */
-    public X834Context setDocumentDate(LocalDateTime date) {
-        this.documentDate = date;
-        this.formattedDocumentDate = formatDate(date);
-        return this;
+    public String getFormattedDocumentDate() {
+        return formatDate(documentDate);
+    }
+
+    /**
+     * @return the document time formatted with the current {@link #getTimeFormat() time format}.
+     * Rendered into ISA10 (interchange time) and GS05 (group time). Always derived from
+     * {@link #getDocumentDate()} on read, so it follows {@link #setDocumentDate} consistently
+     * with the formatted date.
+     */
+    public String getFormattedDocumentTime() {
+        return formatTime(documentDate);
     }
 
     /**
