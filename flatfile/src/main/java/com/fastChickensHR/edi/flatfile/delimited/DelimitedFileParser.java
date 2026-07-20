@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.csv;
+package com.fastChickensHR.edi.flatfile.delimited;
 
 import com.fastChickensHR.edi.core.Direction;
 import com.fastChickensHR.edi.core.RecordLevel;
@@ -14,6 +14,7 @@ import com.fastChickensHR.edi.core.Field;
 import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.Location;
+import com.fastChickensHR.edi.flatfile.LinkedRows;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
@@ -22,29 +23,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The CSV implementation of the {@link FileParser} seam: reads a flat, header-row CSV into a
- * format-neutral {@link FileContent}. A CSV is the degenerate <em>Flat</em> delimited file — one line
- * per record — so each data row becomes one {@link Record} and each non-empty cell becomes a
- * {@link Field} whose {@link Location} location is the column name.
+ * The delimited flat-file implementation of the {@link FileParser} seam: reads a header-row delimited
+ * file (CSV by default, or any {@link DelimitedFormat}) into a format-neutral {@link FileContent}. A
+ * delimited file is the <em>Flat</em> shape — one line per record — so each data row becomes one
+ * {@link Record} and each non-empty cell becomes a {@link Field} whose {@link Location} location is the
+ * column name.
  *
  * <p>The parser is intentionally dumb: it knows columns and cells, not domain meaning. In a plain flat
- * CSV every row is a top-level {@link Record} whose fields sit at {@link RecordLevel#RECORD} — the
+ * file every row is a top-level {@link Record} whose fields sit at {@link RecordLevel#RECORD} — the
  * inbound Field Map assigns each column's data element downstream. When the reserved
- * {@link Csv#RECORD_LEVEL_COLUMN} is present, the parser reconstructs nesting: {@code SUBRECORD} rows
- * attach as children of the {@code RECORD} row they follow, inverting {@link CsvFileGenerator}. Empty
- * cells produce no field (absence, not a blank value).
+ * {@link LinkedRows#RECORD_LEVEL_COLUMN} is present, the parser reconstructs nesting: {@code SUBRECORD}
+ * rows attach as children of the {@code RECORD} row they follow, inverting {@link DelimitedFileGenerator}.
+ * Empty cells produce no field (absence, not a blank value).
  */
-public final class CsvFileParser implements FileParser {
+public final class DelimitedFileParser implements FileParser {
 
     private final DelimitedFormat format;
 
     /** Reads plain flat CSV ({@link DelimitedFormat#csv()}). */
-    public CsvFileParser() {
+    public DelimitedFileParser() {
         this(DelimitedFormat.csv());
     }
 
     /** Reads a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
-    public CsvFileParser(DelimitedFormat format) {
+    public DelimitedFileParser(DelimitedFormat format) {
         this.format = format;
     }
 
@@ -52,11 +54,11 @@ public final class CsvFileParser implements FileParser {
     public FileContent parse(String raw) {
         try (CSVParser parser = CSVParser.parse(raw == null ? "" : raw, format.parseFormat())) {
             List<String> headers = parser.getHeaderNames();
-            boolean nested = headers.contains(Csv.RECORD_LEVEL_COLUMN);
+            boolean nested = headers.contains(LinkedRows.RECORD_LEVEL_COLUMN);
             List<Record> records = nested ? parseNested(parser, headers) : parseFlat(parser, headers);
             return new FileContent(Direction.INBOUND, List.of(), records);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to parse CSV: " + e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to parse delimited file: " + e.getMessage(), e);
         }
     }
 
@@ -73,7 +75,7 @@ public final class CsvFileParser implements FileParser {
         List<Field> openFields = null;
         List<Record> openChildren = null;
         for (CSVRecord row : parser) {
-            String level = row.isMapped(Csv.RECORD_LEVEL_COLUMN) ? row.get(Csv.RECORD_LEVEL_COLUMN) : "";
+            String level = row.isMapped(LinkedRows.RECORD_LEVEL_COLUMN) ? row.get(LinkedRows.RECORD_LEVEL_COLUMN) : "";
             if (RecordLevel.SUBRECORD.name().equals(level)) {
                 if (openChildren == null) {
                     throw new IllegalArgumentException("SUBRECORD row has no preceding RECORD row");
@@ -87,7 +89,7 @@ public final class CsvFileParser implements FileParser {
                 openChildren = new ArrayList<>();
             } else {
                 throw new IllegalArgumentException(
-                        "unknown " + Csv.RECORD_LEVEL_COLUMN + " value: '" + level + "'");
+                        "unknown " + LinkedRows.RECORD_LEVEL_COLUMN + " value: '" + level + "'");
             }
         }
         if (openFields != null) {
@@ -99,7 +101,7 @@ public final class CsvFileParser implements FileParser {
     private static List<Field> rowFields(CSVRecord row, List<String> headers, RecordLevel level) {
         List<Field> fields = new ArrayList<>();
         for (String column : headers) {
-            if (column.equals(Csv.RECORD_LEVEL_COLUMN) || !row.isMapped(column)) {
+            if (column.equals(LinkedRows.RECORD_LEVEL_COLUMN) || !row.isMapped(column)) {
                 continue;
             }
             String value = row.get(column);

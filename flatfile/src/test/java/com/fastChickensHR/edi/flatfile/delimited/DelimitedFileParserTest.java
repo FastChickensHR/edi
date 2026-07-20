@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.csv;
+package com.fastChickensHR.edi.flatfile.delimited;
 
 import com.fastChickensHR.edi.core.Direction;
 import com.fastChickensHR.edi.core.Field;
@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CsvFileParserTest {
+class DelimitedFileParserTest {
 
-    private final CsvFileParser parser = new CsvFileParser();
+    private final DelimitedFileParser parser = new DelimitedFileParser();
 
     @Test
     void parsesFlatCsvIntoRecordsOfColumnPlacements() {

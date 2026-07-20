@@ -5,13 +5,14 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.csv;
+package com.fastChickensHR.edi.flatfile.delimited;
 
 import com.fastChickensHR.edi.core.Field;
 import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.FileGenerator;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.RecordLevel;
+import com.fastChickensHR.edi.flatfile.LinkedRows;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
@@ -23,26 +24,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The CSV implementation of the {@link FileGenerator} seam: writes a format-neutral
- * {@link FileContent} out as a flat, header-row CSV. The inverse of {@link CsvFileParser}.
+ * The delimited flat-file implementation of the {@link FileGenerator} seam: writes a format-neutral
+ * {@link FileContent} out as a header-row delimited file (CSV by default, or any {@link DelimitedFormat}).
+ * The inverse of {@link DelimitedFileParser}.
  *
  * <p>Each {@link Record} becomes a row and each {@link Field} a cell under its column (the field's
  * {@link com.fastChickensHR.edi.core.Location} name); an omitted field is an empty cell. Nesting —
- * which flat CSV cannot express directly — is flattened into <em>linked rows</em>: a parent row
- * followed by its child rows, each tagged in a reserved {@link Csv#RECORD_LEVEL_COLUMN}. When nothing
- * nests, that column is omitted and the output is a plain flat CSV that round-trips through the parser.
+ * which a flat file cannot express directly — is flattened into <em>linked rows</em>: a parent row
+ * followed by its child rows, each tagged in a reserved {@link LinkedRows#RECORD_LEVEL_COLUMN}. When
+ * nothing nests, that column is omitted and the output is a plain flat file that round-trips through
+ * the parser.
  */
-public final class CsvFileGenerator implements FileGenerator {
+public final class DelimitedFileGenerator implements FileGenerator {
 
     private final DelimitedFormat format;
 
     /** Writes plain flat CSV ({@link DelimitedFormat#csv()}). */
-    public CsvFileGenerator() {
+    public DelimitedFileGenerator() {
         this(DelimitedFormat.csv());
     }
 
     /** Writes a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
-    public CsvFileGenerator(DelimitedFormat format) {
+    public DelimitedFileGenerator(DelimitedFormat format) {
         this.format = format;
     }
 
@@ -50,7 +53,7 @@ public final class CsvFileGenerator implements FileGenerator {
     public String generate(FileContent file) {
         if (!file.fileFields().isEmpty()) {
             throw new IllegalArgumentException(
-                    "CSV has no file-level row; FileContent.fileFields must be empty");
+                    "a delimited file has no file-level row; FileContent.fileFields must be empty");
         }
         if (file.records().isEmpty()) {
             return "";
@@ -65,7 +68,7 @@ public final class CsvFileGenerator implements FileGenerator {
 
         List<String> header = new ArrayList<>();
         if (nested) {
-            header.add(Csv.RECORD_LEVEL_COLUMN);
+            header.add(LinkedRows.RECORD_LEVEL_COLUMN);
         }
         header.addAll(columns);
 
@@ -79,13 +82,13 @@ public final class CsvFileGenerator implements FileGenerator {
                 for (Record child : record.children()) {
                     if (!child.children().isEmpty()) {
                         throw new IllegalArgumentException(
-                                "CSV supports one level of nesting; a SUBRECORD cannot have children");
+                                "a delimited file supports one level of nesting; a SUBRECORD cannot have children");
                     }
                     printRow(printer, header, child, RecordLevel.SUBRECORD);
                 }
             }
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to generate CSV: " + e.getMessage(), e);
+            throw new IllegalStateException("Failed to generate delimited file: " + e.getMessage(), e);
         }
         return out.toString();
     }
@@ -106,7 +109,7 @@ public final class CsvFileGenerator implements FileGenerator {
         Map<String, String> values = fieldValues(record);
         List<String> cells = new ArrayList<>(header.size());
         for (String column : header) {
-            if (column.equals(Csv.RECORD_LEVEL_COLUMN)) {
+            if (column.equals(LinkedRows.RECORD_LEVEL_COLUMN)) {
                 cells.add(level.name());
             } else {
                 cells.add(values.getOrDefault(column, ""));

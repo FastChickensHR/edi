@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.csv;
+package com.fastChickensHR.edi.flatfile.delimited;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.QuoteMode;

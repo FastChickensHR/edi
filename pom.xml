@@ -24,7 +24,7 @@
     <modules>
         <module>core</module>
         <module>x834</module>
-        <module>csv</module>
+        <module>flatfile</module>
         <module>x999</module>
     </modules>
 

@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.csv;
+package com.fastChickensHR.edi.flatfile.delimited;
 
 import com.fastChickensHR.edi.core.Direction;
 import com.fastChickensHR.edi.core.Field;
@@ -42,27 +42,27 @@ class DelimitedFormatTest {
     void pipeDelimitedFormatUsesThePipeSeparatorAndRoundTrips() {
         DelimitedFormat pipe = DelimitedFormat.builder().delimiter('|').build();
 
-        String out = new CsvFileGenerator(pipe).generate(content());
+        String out = new DelimitedFileGenerator(pipe).generate(content());
 
         assertEquals("id|name\n1|Jane\n2|John\n", out);
-        assertEquals(records, new CsvFileParser(pipe).parse(out).records());
+        assertEquals(records, new DelimitedFileParser(pipe).parse(out).records());
     }
 
     @Test
     void tabDelimitedFormatRoundTrips() {
         DelimitedFormat tab = DelimitedFormat.builder().delimiter('\t').build();
 
-        String out = new CsvFileGenerator(tab).generate(content());
+        String out = new DelimitedFileGenerator(tab).generate(content());
 
         assertEquals("id\tname\n1\tJane\n2\tJohn\n", out);
-        assertEquals(records, new CsvFileParser(tab).parse(out).records());
+        assertEquals(records, new DelimitedFileParser(tab).parse(out).records());
     }
 
     @Test
     void headerlessFormatOmitsTheHeaderRow() {
         DelimitedFormat noHeader = DelimitedFormat.builder().header(false).build();
 
-        String out = new CsvFileGenerator(noHeader).generate(content());
+        String out = new DelimitedFileGenerator(noHeader).generate(content());
 
         assertEquals("1,Jane\n2,John\n", out);
     }
