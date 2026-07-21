@@ -13,7 +13,6 @@ import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Location;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.RecordLevel;
-import com.fastChickensHR.edi.flatfile.LinkedRows;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

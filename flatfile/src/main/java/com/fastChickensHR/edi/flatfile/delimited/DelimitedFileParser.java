@@ -14,7 +14,6 @@ import com.fastChickensHR.edi.core.Field;
 import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.Location;
-import com.fastChickensHR.edi.flatfile.LinkedRows;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
