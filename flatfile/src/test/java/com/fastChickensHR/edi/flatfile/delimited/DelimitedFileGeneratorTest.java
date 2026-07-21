@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.csv;
+package com.fastChickensHR.edi.flatfile.delimited;
 
 import com.fastChickensHR.edi.core.Direction;
 import com.fastChickensHR.edi.core.Field;
@@ -13,6 +13,7 @@ import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Location;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.RecordLevel;
+import com.fastChickensHR.edi.flatfile.LinkedRows;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,10 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class CsvFileGeneratorTest {
+class DelimitedFileGeneratorTest {
 
-    private final CsvFileGenerator generator = new CsvFileGenerator();
-    private final CsvFileParser parser = new CsvFileParser();
+    private final DelimitedFileGenerator generator = new DelimitedFileGenerator();
+    private final DelimitedFileParser parser = new DelimitedFileParser();
 
     private static Field f(RecordLevel level, String name, String value) {
         return new Field(new Location(level, name), value);
@@ -41,7 +42,7 @@ class CsvFileGeneratorTest {
         String csv = generator.generate(file);
 
         assertEquals("employeeId,firstName\nE1,Jane\nE2,John\n", csv);
-        assertFalse(csv.contains(Csv.RECORD_LEVEL_COLUMN));
+        assertFalse(csv.contains(LinkedRows.RECORD_LEVEL_COLUMN));
     }
 
     @Test

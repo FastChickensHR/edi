@@ -19,9 +19,9 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>csv</artifactId>
-    <name>FastChickensHR EDI CSV</name>
-    <description>CSV (flat delimited file) support — parses into and generates from the core file kernel</description>
+    <artifactId>flatfile</artifactId>
+    <name>FastChickensHR EDI Flat File</name>
+    <description>Flat-file support (delimited today, fixed-width reserved) — parses into and generates from the core file kernel</description>
 
     <dependencies>
         <dependency>
