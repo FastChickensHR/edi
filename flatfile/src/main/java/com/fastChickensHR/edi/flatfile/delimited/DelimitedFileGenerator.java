@@ -12,7 +12,6 @@ import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.FileGenerator;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.RecordLevel;
-import com.fastChickensHR.edi.flatfile.LinkedRows;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.IOException;
