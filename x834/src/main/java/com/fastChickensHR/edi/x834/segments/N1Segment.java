@@ -70,7 +70,10 @@ public abstract class N1Segment extends Segment {
 
     @Override
     public String[] getElementValues() {
-        return new String[]{n101.getCode(), n102, n103.getCode(), n104};
+        // N103 is optional (an N1 may name a party by free-form N102 alone, e.g. the 2750
+        // reporting-category party which carries only N101=75 + N102=<category name>). Guard the
+        // dereference so a null qualifier renders as an empty trailing element rather than an NPE.
+        return new String[]{n101.getCode(), n102, n103 == null ? null : n103.getCode(), n104};
     }
 
     /** @return N101 — entity identifier code. */

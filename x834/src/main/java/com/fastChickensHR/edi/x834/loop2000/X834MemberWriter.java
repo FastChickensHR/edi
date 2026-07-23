@@ -10,6 +10,11 @@ package com.fastChickensHR.edi.x834.loop2000;
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.segments.DTPSegment;
+import com.fastChickensHR.edi.x834.segments.LESegment;
+import com.fastChickensHR.edi.x834.segments.LSSegment;
+import com.fastChickensHR.edi.x834.segments.LXSegment;
+import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
@@ -21,6 +26,8 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddre
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingAddress;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2700.MemberReportingCategoryName;
+import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -115,7 +122,47 @@ public class X834MemberWriter {
         // Emitting them here keeps a member's coverage nested inside its own loop, before any
         // dependent's loop begins.
         segments.addAll(member.getAdditionalSegments());
+
+        // Loop 2700/2710/2750 (member reporting categories), emitted after the 2300 block.
+        appendReportingCategories(segments, member);
     }
+
+    /**
+     * Loop 2700/2710/2750 (member reporting categories): an {@code LS*2700} … {@code LE*2700}
+     * block wrapping one {@code LX}/{@code N1*75}/{@code REF}(/{@code DTP}) occurrence per
+     * {@link ReportingCategory}. The whole block is suppressed when the member carries none, and
+     * the {@code LX} assigned number is counted over the emitted occurrences (1-based).
+     */
+    private void appendReportingCategories(List<Segment> segments, BaseMember member)
+            throws ValidationException {
+        List<ReportingCategory> categories = member.getReportingCategories();
+        if (categories.isEmpty()) {
+            return;
+        }
+        segments.add(LSSegment.builder().setLoopIdentifierCode(REPORTING_CATEGORY_LOOP_ID).build());
+        int assignedNumber = 1;
+        for (ReportingCategory category : categories) {
+            segments.add(LXSegment.builder().setAssignedNumber(assignedNumber++).build());
+            segments.add(MemberReportingCategoryName.builder()
+                    .setReportingCategoryName(category.getName())
+                    .build());
+            segments.add(new RefSegment.Builder()
+                    .setReferenceIdentificationQualifier(category.getReferenceQualifier())
+                    .setReferenceIdentification(category.getValue())
+                    .build());
+            if (category.getDate() != null && category.getDateQualifier() != null) {
+                segments.add(new DTPSegment.Builder()
+                        .setDateTimeQualifier(category.getDateQualifier())
+                        .setDateTimeFormat(DateFormat.D8)
+                        .setDateTimePeriod(category.getDate(), DateFormat.D8)
+                        .build());
+            }
+        }
+        segments.add(LESegment.builder().setLoopIdentifierCode(REPORTING_CATEGORY_LOOP_ID).build());
+    }
+
+    /** LS01/LE01 loop identifier for the Member Reporting Categories loop (2700). */
+    private static final String REPORTING_CATEGORY_LOOP_ID = "2700";
 
     /** Loop 2100A NM1 (member name). Emitted when a last name is present. */
     private void appendMemberName(List<Segment> segments, BaseMember member) throws ValidationException {

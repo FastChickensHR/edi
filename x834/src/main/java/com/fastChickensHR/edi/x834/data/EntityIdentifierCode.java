@@ -181,7 +181,8 @@ public enum EntityIdentifierCode implements EdiCodeEnum {
     INSURER("IN", "Insurer"),
     TERMINAL_LOCATION("T3", "Terminal Location"),
     PLAN_SPONSOR("P5", "Plan Sponsor"),
-    PRIMARY_TAX_PAYER("TP", "Primary Taxpayer");
+    PRIMARY_TAX_PAYER("TP", "Primary Taxpayer"),
+    PARTICIPANT("75", "Participant");
 
     private final String code;
     private final String description;

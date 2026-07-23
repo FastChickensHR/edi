@@ -11,6 +11,7 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,6 +129,26 @@ public abstract class BaseMember {
      */
     public void addSegment(Segment segment) {
         additionalSegments.add(segment);
+    }
+
+    /**
+     * This member's reporting categories (Loop 2700/2710/2750). Emitted by
+     * {@link X834MemberWriter} as an {@code LS*2700} … {@code LE*2700} block after the
+     * member's 2300 segments, one {@code LX}/{@code N1*75}/{@code REF} occurrence per entry.
+     * Empty for a member that carries none, in which case no block is emitted.
+     */
+    private final List<ReportingCategory> reportingCategories = new ArrayList<>();
+
+    /**
+     * Adds a reporting category (one Loop 2710/2750 occurrence) to this member. Order is
+     * preserved; the {@code LX} assigned number is set at render time over the emitted occurrences.
+     *
+     * @param category the reporting category to emit (ignored if null)
+     */
+    public void addReportingCategory(ReportingCategory category) {
+        if (category != null) {
+            reportingCategories.add(category);
+        }
     }
 
     /**

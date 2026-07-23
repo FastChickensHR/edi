@@ -12,6 +12,7 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import org.junit.jupiter.api.Test;
 
@@ -250,5 +251,75 @@ class X834MemberWriterTest {
         assertTrue(out.contains("NM1*IL*1*DOE*JOHN~"), () -> "dependent name; got:\n" + out);
         assertEquals(out.indexOf("JANE") < out.indexOf("JOHN"), true,
                 "subscriber loop must precede dependent loop");
+    }
+
+    @Test
+    void emitsNoReportingCategoryBlockWhenMemberHasNone() throws ValidationException {
+        Member member = baseSubscriber();
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("LS*2700"), () -> "no LS when there are no categories; got:\n" + out);
+        assertFalse(out.contains("LE*2700"), () -> "no LE when there are no categories; got:\n" + out);
+    }
+
+    @Test
+    void emitsReportingCategoryLoopMatchingTheBcbsmExample() throws ValidationException {
+        // BCBSM companion guide (pp. 11-12) example: two 2750 occurrences under one LS/LE block.
+        Member member = baseSubscriber();
+        member.addReportingCategory(new ReportingCategory("INDIVIDUALREPNAME", "JOHN DOE"));
+        member.addReportingCategory(new ReportingCategory("RELATIONSHIP", "4"));
+
+        String flat = render(writer.toSegments(member)).replace("\n", "");
+
+        assertTrue(flat.contains(
+                        "LS*2700~"
+                        + "LX*1~"
+                        + "N1*75*INDIVIDUALREPNAME~"
+                        + "REF*ZZ*JOHN DOE~"
+                        + "LX*2~"
+                        + "N1*75*RELATIONSHIP~"
+                        + "REF*ZZ*4~"
+                        + "LE*2700~"),
+                () -> "expected the BCBSM 2700/2750 block; got:\n" + flat);
+    }
+
+    @Test
+    void emitsReportingCategoryBlockAfterTheMemberCoverageSegments() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.addReportingCategory(new ReportingCategory("RELATIONSHIP", "4"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("NM1*IL") < out.indexOf("LS*2700"),
+                () -> "reporting-category block must follow the 2100 member segments; got:\n" + out);
+    }
+
+    @Test
+    void emitsReportingCategoryDateWhenPresent() throws ValidationException {
+        Member member = baseSubscriber();
+        ReportingCategory category = new ReportingCategory("APPLICATIONDATE", "X");
+        category.setDate(LocalDateTime.of(2026, 3, 1, 0, 0));
+        category.setDateQualifier("007"); // application/effective date qualifier
+        member.addReportingCategory(category);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("DTP*007*D8*20260301~"),
+                () -> "expected a 2750 DTP when a category carries a date; got:\n" + out);
+    }
+
+    @Test
+    void honorsACustomReferenceQualifier() throws ValidationException {
+        Member member = baseSubscriber();
+        ReportingCategory category = new ReportingCategory("SUBGROUP", "0042");
+        category.setReferenceQualifier("DX"); // BCN carries sub-group under REF*DX rather than ZZ
+        member.addReportingCategory(category);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("REF*DX*0042~"),
+                () -> "expected the REF to use the category's own qualifier; got:\n" + out);
     }
 }
