@@ -422,7 +422,9 @@ public enum DateTimeQualifier implements EdiCodeEnum {
     VALUATION("397", "Valuation"),
     VESTING_SERVICE("398", "Vesting Service"),
     VESTING_SERVICE_BEGIN("399", "Vesting Service Begin"),
-    VESTING_SERVICE_END("400", "Vesting Service End");
+    VESTING_SERVICE_END("400", "Vesting Service End"),
+    LAST_PREMIUM_PAID_DATE("543", "Last Premium Paid Date"),
+    PREVIOUS_PERIOD("695", "Previous Period");
 
     private final String code;
     private final String description;

@@ -14,12 +14,12 @@ import lombok.experimental.Accessors;
 /**
  * Subscriber number carried as a REF segment in Loop 2000 of the X12 834.
  * <p>
- * Renders {@code REF*OF*<subscriber number>}: REF01 is fixed to the qualifier
- * {@code OF} (Subscriber Number) and REF02 carries the subscriber's number.
+ * Renders {@code REF*0F*<subscriber number>}: REF01 is fixed to the qualifier
+ * {@code 0F} (zero-F, Subscriber Number) and REF02 carries the subscriber's number.
  */
 public class SubscriberNumber extends RefSegment {
-    /** REF01 qualifier {@code OF} — Subscriber Number; the fixed default for this REF segment. */
-    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "OF";
+    /** REF01 qualifier {@code 0F} (zero-F) — Subscriber Number; the fixed default for this REF segment. */
+    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "0F";
 
     private SubscriberNumber(SubscriberNumber.Builder builder) throws ValidationException {
         super(builder);

@@ -27,8 +27,6 @@ public enum TransactionTypeCode implements EdiCodeEnum {
     LOCATION_ADDRESS("01", "Location Address Message"),
     UNIQUE_TRACKING_CONTROL("1A", "Unique Item Tracking Control Report"),
     UNIQUE_TRACKING_RECONCILIATION("1B", "Unique Item Tracking Report Reconciliation"),
-    UNIQUE_TRACKING_DATA_CHANGE("1C", "Unique Item Tracking Item Data Change"),
-    NEW_GROUP_ENROLLMENT("1E", "New Group Initial Enrollment"),
     LOCATION_RELATION("02", "Location Relation Information"),
     REPORT_MESSAGE("03", "Report Message"),
     SUPPORTING_INFORMATION("3M", "Supporting Information"),
@@ -75,12 +73,6 @@ public enum TransactionTypeCode implements EdiCodeEnum {
 
                         Map.entry("tracking reconciliation", UNIQUE_TRACKING_RECONCILIATION),
                         Map.entry("report reconciliation", UNIQUE_TRACKING_RECONCILIATION),
-
-                        Map.entry("data change", UNIQUE_TRACKING_DATA_CHANGE),
-                        Map.entry("item data change", UNIQUE_TRACKING_DATA_CHANGE),
-
-                        Map.entry("new enrollment", NEW_GROUP_ENROLLMENT),
-                        Map.entry("initial enrollment", NEW_GROUP_ENROLLMENT),
 
                         Map.entry("location relation", LOCATION_RELATION),
                         Map.entry("relation information", LOCATION_RELATION),

@@ -14,32 +14,33 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Confidentiality Codes used in the EDI 834
- * Health Insurance Enrollment transaction.
+ * Enumeration representing Confidentiality Codes (X12 element 1165) emitted at the
+ * INS13 field of the EDI 834 transaction.
+ *
+ * <p>Element 1165 defines exactly three codes: {@code O}, {@code R}, {@code U}. The
+ * former list carried six invented codes ({@code C}, {@code V}, {@code N}, {@code L},
+ * {@code M}, {@code H}) and was missing {@code O}; both have been corrected.
  */
 @Getter
 public enum ConfidentialityCode implements EdiCodeEnum {
-    UNRESTRICTED("U", "Unrestricted"),
-    RESTRICTED("R", "Restricted"),
-    CONFIDENTIAL("C", "Confidential"),
-    VERY_RESTRICTED("V", "Very Restricted"),
-    NORMAL("N", "Normal"),
-    LOW("L", "Low"),
-    MEDIUM("M", "Medium"),
-    HIGH("H", "High");
+    OTHER_RESTRICTIONS("O", "Other Restrictions"),
+    RESTRICTED("R", "Restricted Access"),
+    UNRESTRICTED("U", "Unrestricted Access");
 
     private final String code;
     private final String description;
     private static final EdiEnumLookup<ConfidentialityCode> LOOKUP;
 
     static {
-        // Include additional synonyms and related terms
+        // Colloquial aliases; codes, enum names and descriptions are matched automatically.
         LOOKUP = new EdiEnumLookup<>(
                 ConfidentialityCode.class,
                 "Confidentiality Code",
                 Map.ofEntries(
                         Map.entry("open", UNRESTRICTED),
-                        Map.entry("standard", NORMAL)
+                        Map.entry("unrestricted", UNRESTRICTED),
+                        Map.entry("restricted", RESTRICTED),
+                        Map.entry("other", OTHER_RESTRICTIONS)
                 )
         );
     }

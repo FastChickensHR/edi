@@ -14,79 +14,52 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Medicare Plan Codes used in the EDI 834
- * Health Insurance Enrollment transaction.
+ * Enumeration representing Medicare Plan Codes (X12 element 1218) emitted at the
+ * INS06 (composite C052-01) field of the EDI 834 transaction.
+ *
+ * <p>The full element 1218 list. The former list carried two invented codes
+ * ({@code F} Medigap, {@code N} No Medicare) and attached invented "Part C / Part D"
+ * meanings to {@code D} and {@code E}: in element 1218 {@code D} is the general Medicare
+ * program code and {@code E} is "No Medicare" (the declined/none code carriers default
+ * to).
  */
 @Getter
 public enum MedicarePlanCode implements EdiCodeEnum {
-    HOSPITAL_ONLY("A", "Hospital Only (Part A)"),
-    MEDICAL_ONLY("B", "Medical Only (Part B)"),
-    HOSPITAL_AND_MEDICAL("C", "Hospital and Medical (Parts A and B)"),
-    MEDICARE_ADVANTAGE("D", "Medicare Advantage (Part C)"),
-    PRESCRIPTION_DRUG("E", "Prescription Drug (Part D)"),
-    MEDIGAP("F", "Medigap (Medicare Supplement)"),
-    NO_MEDICARE("N", "No Medicare Coverage");
+    PART_A("A", "Medicare Part A"),
+    PART_B("B", "Medicare Part B"),
+    PART_A_AND_B("C", "Medicare Part A and B"),
+    MEDICARE("D", "Medicare"),
+    NO_MEDICARE("E", "No Medicare");
 
     private final String code;
     private final String description;
     private static final EdiEnumLookup<MedicarePlanCode> LOOKUP;
 
     static {
-        // Include additional common terms and phrases users might search for
+        // Colloquial aliases; codes, enum names and descriptions are matched automatically.
         LOOKUP = new EdiEnumLookup<>(
                 MedicarePlanCode.class,
                 "Medicare Plan Code",
                 Map.ofEntries(
-                        Map.entry("part a", HOSPITAL_ONLY),
-                        Map.entry("hospital insurance", HOSPITAL_ONLY),
-                        Map.entry("inpatient", HOSPITAL_ONLY),
-                        Map.entry("hospital care", HOSPITAL_ONLY),
-                        Map.entry("skilled nursing", HOSPITAL_ONLY),
+                        Map.entry("part a", PART_A),
+                        Map.entry("hospital insurance", PART_A),
+                        Map.entry("inpatient", PART_A),
 
-                        Map.entry("part b", MEDICAL_ONLY),
-                        Map.entry("medical insurance", MEDICAL_ONLY),
-                        Map.entry("outpatient", MEDICAL_ONLY),
-                        Map.entry("doctor visits", MEDICAL_ONLY),
-                        Map.entry("physician services", MEDICAL_ONLY),
-                        Map.entry("preventive services", MEDICAL_ONLY),
+                        Map.entry("part b", PART_B),
+                        Map.entry("medical insurance", PART_B),
+                        Map.entry("outpatient", PART_B),
 
-                        Map.entry("parts a and b", HOSPITAL_AND_MEDICAL),
-                        Map.entry("ab", HOSPITAL_AND_MEDICAL),
-                        Map.entry("a and b", HOSPITAL_AND_MEDICAL),
-                        Map.entry("a & b", HOSPITAL_AND_MEDICAL),
-                        Map.entry("hospital and medical", HOSPITAL_AND_MEDICAL),
-                        Map.entry("original medicare", HOSPITAL_AND_MEDICAL),
-                        Map.entry("traditional medicare", HOSPITAL_AND_MEDICAL),
+                        Map.entry("parts a and b", PART_A_AND_B),
+                        Map.entry("a and b", PART_A_AND_B),
+                        Map.entry("original medicare", PART_A_AND_B),
 
-                        Map.entry("part c", MEDICARE_ADVANTAGE),
-                        Map.entry("advantage", MEDICARE_ADVANTAGE),
-                        Map.entry("ma", MEDICARE_ADVANTAGE),
-                        Map.entry("managed care", MEDICARE_ADVANTAGE),
-                        Map.entry("medicare health plan", MEDICARE_ADVANTAGE),
-                        Map.entry("hmo", MEDICARE_ADVANTAGE),
-                        Map.entry("ppo", MEDICARE_ADVANTAGE),
-
-                        Map.entry("part d", PRESCRIPTION_DRUG),
-                        Map.entry("drug coverage", PRESCRIPTION_DRUG),
-                        Map.entry("prescription coverage", PRESCRIPTION_DRUG),
-                        Map.entry("rx", PRESCRIPTION_DRUG),
-                        Map.entry("medication", PRESCRIPTION_DRUG),
-                        Map.entry("pdp", PRESCRIPTION_DRUG),
-                        Map.entry("pharmacy", PRESCRIPTION_DRUG),
-
-                        Map.entry("supplement", MEDIGAP),
-                        Map.entry("supplemental", MEDIGAP),
-                        Map.entry("gap coverage", MEDIGAP),
-                        Map.entry("med supp", MEDIGAP),
-                        Map.entry("supplementary", MEDIGAP),
-                        Map.entry("secondary insurance", MEDIGAP),
-                        Map.entry("gap insurance", MEDIGAP),
+                        Map.entry("has medicare", MEDICARE),
+                        Map.entry("medicare eligible", MEDICARE),
 
                         Map.entry("no coverage", NO_MEDICARE),
                         Map.entry("not enrolled", NO_MEDICARE),
                         Map.entry("without medicare", NO_MEDICARE),
                         Map.entry("non-medicare", NO_MEDICARE),
-                        Map.entry("no enrollment", NO_MEDICARE),
                         Map.entry("not eligible", NO_MEDICARE)
                 )
         );

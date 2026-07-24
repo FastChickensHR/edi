@@ -184,7 +184,7 @@ class X834MemberWriterTest {
         String out = render(writer.toSegments(member));
 
         assertTrue(out.contains("INS*"), "INS should always be present");
-        assertTrue(out.contains("REF*OF*E12345~"), "subscriber number REF should be present");
+        assertTrue(out.contains("REF*0F*E12345~"), "subscriber number REF should be present");
         assertFalse(out.contains("NM1"), () -> "no NM1 without a name; got:\n" + out);
         assertFalse(out.contains("N3"), () -> "no N3 without an address; got:\n" + out);
         assertFalse(out.contains("N4"), () -> "no N4 without an address; got:\n" + out);
