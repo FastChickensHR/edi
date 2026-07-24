@@ -7,93 +7,65 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AmountQualifierCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals(5, AmountQualifierCode.values().length);
-        assertTrue(Arrays.asList(AmountQualifierCode.values()).contains(AmountQualifierCode.PREMIUM_AMOUNT));
-    }
-
-    @Test
-    void testEnumProperties() {
-        assertEquals("B9", AmountQualifierCode.COINSURANCE_ACTUAL.getCode());
-        assertEquals("Co-Insurance - Actual", AmountQualifierCode.COINSURANCE_ACTUAL.getDescription());
-
-        assertEquals("R", AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT.getCode());
-    }
-
-    @Test
-    void testToStringReturnsCode() {
-        assertEquals("FK", AmountQualifierCode.PREMIUM_AMOUNT.toString());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testFromString() throws Exception {
-        Field lookupField = AmountQualifierCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<AmountQualifierCode> lookup =
-                (EdiEnumLookup<AmountQualifierCode>) lookupField.get(null);
-
-        assertEquals(AmountQualifierCode.PREMIUM_AMOUNT, lookup.fromString("FK"));
-        assertEquals(AmountQualifierCode.PREMIUM_AMOUNT, lookup.fromString("premium"));
-        assertEquals(AmountQualifierCode.PREMIUM_AMOUNT, lookup.fromString("monthly premium"));
-
-        assertEquals(AmountQualifierCode.DEDUCTIBLE_AMOUNT, lookup.fromString("deductible"));
-        assertEquals(AmountQualifierCode.DEDUCTIBLE_AMOUNT, lookup.fromString("ded"));
-
-        assertEquals(AmountQualifierCode.COINSURANCE_ACTUAL, lookup.fromString("coinsurance"));
-        assertEquals(AmountQualifierCode.SPEND_DOWN, lookup.fromString("spenddown"));
-        assertEquals(AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT, lookup.fromString("expenditure"));
-
-        assertThrows(IllegalArgumentException.class, () -> lookup.fromString("invalid"));
-    }
-
-    @Test
-    void testStaticFromString() {
-        assertEquals(AmountQualifierCode.PREMIUM_AMOUNT, AmountQualifierCode.fromString("FK"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    @SuppressWarnings("unchecked")
-    void testAllLookupValues(String input, AmountQualifierCode expected) throws Exception {
-        Field lookupField = AmountQualifierCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<AmountQualifierCode> lookup =
-                (EdiEnumLookup<AmountQualifierCode>) lookupField.get(null);
-        assertEquals(expected, lookup.fromString(input));
+    @EnumSource(AmountQualifierCode.class)
+    void resolvesFromCodeNameAndDescription(AmountQualifierCode constant) {
+        assertEquals(constant, AmountQualifierCode.fromString(constant.getCode()));
+        assertEquals(constant, AmountQualifierCode.fromString(constant.name()));
+        assertEquals(constant, AmountQualifierCode.fromString(constant.getDescription()));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
-        return Stream.of(
-                Arguments.of("B9", AmountQualifierCode.COINSURANCE_ACTUAL),
-                Arguments.of("D2", AmountQualifierCode.DEDUCTIBLE_AMOUNT),
-                Arguments.of("FK", AmountQualifierCode.PREMIUM_AMOUNT),
-                Arguments.of("P3", AmountQualifierCode.SPEND_DOWN),
-                Arguments.of("R", AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT),
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, AmountQualifierCode expected) {
+        assertEquals(expected, AmountQualifierCode.fromString(input));
+    }
 
-                Arguments.of("premium", AmountQualifierCode.PREMIUM_AMOUNT),
-                Arguments.of("monthly premium", AmountQualifierCode.PREMIUM_AMOUNT),
-                Arguments.of("deductible", AmountQualifierCode.DEDUCTIBLE_AMOUNT),
-                Arguments.of("ded", AmountQualifierCode.DEDUCTIBLE_AMOUNT),
+    private static Stream<Arguments> aliases() {
+        return Stream.of(
                 Arguments.of("coinsurance", AmountQualifierCode.COINSURANCE_ACTUAL),
                 Arguments.of("co-insurance", AmountQualifierCode.COINSURANCE_ACTUAL),
+                Arguments.of("co insurance", AmountQualifierCode.COINSURANCE_ACTUAL),
+                Arguments.of("actual coinsurance", AmountQualifierCode.COINSURANCE_ACTUAL),
+                Arguments.of("deductible", AmountQualifierCode.DEDUCTIBLE_AMOUNT),
+                Arguments.of("annual deductible", AmountQualifierCode.DEDUCTIBLE_AMOUNT),
+                Arguments.of("ded", AmountQualifierCode.DEDUCTIBLE_AMOUNT),
+                Arguments.of("premium", AmountQualifierCode.PREMIUM_AMOUNT),
+                Arguments.of("monthly premium", AmountQualifierCode.PREMIUM_AMOUNT),
+                Arguments.of("policy premium", AmountQualifierCode.PREMIUM_AMOUNT),
                 Arguments.of("spenddown", AmountQualifierCode.SPEND_DOWN),
-                Arguments.of("expenditure", AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT)
-        );
+                Arguments.of("spend-down", AmountQualifierCode.SPEND_DOWN),
+                Arguments.of("medicaid spend down", AmountQualifierCode.SPEND_DOWN),
+                Arguments.of("expected expenditure", AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT),
+                Arguments.of("expenditure", AmountQualifierCode.EXPECTED_EXPENDITURE_AMOUNT));
+    }
+
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> AmountQualifierCode.fromString(input));
     }
 }

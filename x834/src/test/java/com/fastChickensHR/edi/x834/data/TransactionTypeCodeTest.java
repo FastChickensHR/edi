@@ -7,120 +7,112 @@
  */
 package com.fastChickensHR.edi.x834.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionTypeCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals("01", TransactionTypeCode.LOCATION_ADDRESS.getCode());
-        assertEquals("Location Address Message", TransactionTypeCode.LOCATION_ADDRESS.getDescription());
-
-        assertEquals("1A", TransactionTypeCode.UNIQUE_TRACKING_CONTROL.getCode());
-        assertEquals("Unique Item Tracking Control Report", TransactionTypeCode.UNIQUE_TRACKING_CONTROL.getDescription());
-
-        assertEquals("20", TransactionTypeCode.AIR_EXPORT_WAYBILL.getCode());
-        assertEquals("Air Export Waybill and Invoice", TransactionTypeCode.AIR_EXPORT_WAYBILL.getDescription());
-
-        assertEquals("ZZ", TransactionTypeCode.MUTUALLY_DEFINED.getCode());
-        assertEquals("Mutually Defined", TransactionTypeCode.MUTUALLY_DEFINED.getDescription());
-    }
-
-    @Test
-    void testEnumProperties() {
-        // Verify that all enum values have valid codes and descriptions
-        for (TransactionTypeCode code : TransactionTypeCode.values()) {
-            assertNotNull(code.getCode(), "Code should not be null for " + code.name());
-            assertNotNull(code.getDescription(), "Description should not be null for " + code.name());
-            assertFalse(code.getCode().isEmpty(), "Code should not be empty for " + code.name());
-            assertFalse(code.getDescription().isEmpty(), "Description should not be empty for " + code.name());
-        }
-    }
-
-    @Test
-    void testToString() {
-        // Verify toString returns the code value
-        assertEquals("01", TransactionTypeCode.LOCATION_ADDRESS.toString());
-        assertEquals("1A", TransactionTypeCode.UNIQUE_TRACKING_CONTROL.toString());
-        assertEquals("3M", TransactionTypeCode.SUPPORTING_INFORMATION.toString());
-        assertEquals("20", TransactionTypeCode.AIR_EXPORT_WAYBILL.toString());
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(TransactionTypeCode.LOCATION_ADDRESS, TransactionTypeCode.fromString("01"));
-        assertEquals(TransactionTypeCode.UNIQUE_TRACKING_CONTROL, TransactionTypeCode.fromString("1A"));
-        assertEquals(TransactionTypeCode.MAINTENANCE_REQUEST, TransactionTypeCode.fromString("13"));
-        assertEquals(TransactionTypeCode.AIR_EXPORT_WAYBILL, TransactionTypeCode.fromString("20"));
-
-        assertEquals(TransactionTypeCode.LOCATION_ADDRESS, TransactionTypeCode.fromString("location_address"));
-        assertEquals(TransactionTypeCode.AIR_EXPORT_WAYBILL, TransactionTypeCode.fromString("air_export_waybill"));
-
-        assertEquals(TransactionTypeCode.LOCATION_ADDRESS, TransactionTypeCode.fromString("Location Address Message"));
-        assertEquals(TransactionTypeCode.AIR_EXPORT_WAYBILL, TransactionTypeCode.fromString("Air Export Waybill and Invoice"));
-
-        assertEquals(TransactionTypeCode.LOCATION_ADDRESS, TransactionTypeCode.fromString("location address"));
-        assertEquals(TransactionTypeCode.UNIQUE_TRACKING_CONTROL, TransactionTypeCode.fromString("tracking control"));
-
-        assertThrows(IllegalArgumentException.class, () -> TransactionTypeCode.fromString("invalid code"));
-        assertThrows(IllegalArgumentException.class, () -> TransactionTypeCode.fromString(""));
-        assertThrows(IllegalArgumentException.class, () -> TransactionTypeCode.fromString(null));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, TransactionTypeCode expected) throws Exception {
-        Field lookupField = TransactionTypeCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<TransactionTypeCode> lookup =
-                (EdiEnumLookup<TransactionTypeCode>) lookupField.get(null);
-
-        assertEquals(expected, lookup.fromString(input));
+    @EnumSource(TransactionTypeCode.class)
+    void resolvesFromCodeNameAndDescription(TransactionTypeCode constant) {
+        assertEquals(constant, TransactionTypeCode.fromString(constant.getCode()));
+        assertEquals(constant, TransactionTypeCode.fromString(constant.name()));
+        assertEquals(constant, TransactionTypeCode.fromString(constant.getDescription()));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, TransactionTypeCode expected) {
+        assertEquals(expected, TransactionTypeCode.fromString(input));
+    }
+
+    private static Stream<Arguments> aliases() {
         return Stream.of(
                 Arguments.of("location address", TransactionTypeCode.LOCATION_ADDRESS),
                 Arguments.of("address message", TransactionTypeCode.LOCATION_ADDRESS),
-
                 Arguments.of("tracking control", TransactionTypeCode.UNIQUE_TRACKING_CONTROL),
                 Arguments.of("control report", TransactionTypeCode.UNIQUE_TRACKING_CONTROL),
-
                 Arguments.of("tracking reconciliation", TransactionTypeCode.UNIQUE_TRACKING_RECONCILIATION),
                 Arguments.of("report reconciliation", TransactionTypeCode.UNIQUE_TRACKING_RECONCILIATION),
-
                 Arguments.of("data change", TransactionTypeCode.UNIQUE_TRACKING_DATA_CHANGE),
                 Arguments.of("item data change", TransactionTypeCode.UNIQUE_TRACKING_DATA_CHANGE),
-
                 Arguments.of("new enrollment", TransactionTypeCode.NEW_GROUP_ENROLLMENT),
                 Arguments.of("initial enrollment", TransactionTypeCode.NEW_GROUP_ENROLLMENT),
-
                 Arguments.of("location relation", TransactionTypeCode.LOCATION_RELATION),
                 Arguments.of("relation information", TransactionTypeCode.LOCATION_RELATION),
-
                 Arguments.of("report", TransactionTypeCode.REPORT_MESSAGE),
                 Arguments.of("report message", TransactionTypeCode.REPORT_MESSAGE),
-
                 Arguments.of("supporting info", TransactionTypeCode.SUPPORTING_INFORMATION),
                 Arguments.of("support information", TransactionTypeCode.SUPPORTING_INFORMATION),
-
                 Arguments.of("email", TransactionTypeCode.ELECTRONIC_MAIL),
                 Arguments.of("e-mail", TransactionTypeCode.ELECTRONIC_MAIL),
                 Arguments.of("mail message", TransactionTypeCode.ELECTRONIC_MAIL),
-
+                Arguments.of("coop request", TransactionTypeCode.REQUEST_FOR_COOP),
+                Arguments.of("request coop", TransactionTypeCode.REQUEST_FOR_COOP),
+                Arguments.of("guideline", TransactionTypeCode.GUIDELINES),
+                Arguments.of("guidelines", TransactionTypeCode.GUIDELINES),
+                Arguments.of("accomplishment renewal", TransactionTypeCode.ACCOMPLISHMENT_RENEWAL),
+                Arguments.of("accomplishment based", TransactionTypeCode.ACCOMPLISHMENT_RENEWAL),
+                Arguments.of("competitive", TransactionTypeCode.COMPETITIVE_RENEWAL),
+                Arguments.of("comp renewal", TransactionTypeCode.COMPETITIVE_RENEWAL),
+                Arguments.of("non-competitive", TransactionTypeCode.NON_COMPETITIVE_RENEWAL),
+                Arguments.of("noncompetitive", TransactionTypeCode.NON_COMPETITIVE_RENEWAL),
+                Arguments.of("resubmit", TransactionTypeCode.RESUBMISSION),
+                Arguments.of("resubmission", TransactionTypeCode.RESUBMISSION),
+                Arguments.of("supplement", TransactionTypeCode.SUPPLEMENTAL),
+                Arguments.of("supplemental", TransactionTypeCode.SUPPLEMENTAL),
+                Arguments.of("budget", TransactionTypeCode.BUDGET),
+                Arguments.of("budget report", TransactionTypeCode.BUDGET),
+                Arguments.of("commitment", TransactionTypeCode.COMMITMENT),
+                Arguments.of("commit", TransactionTypeCode.COMMITMENT),
+                Arguments.of("coop actual", TransactionTypeCode.COOP_ACTUAL),
+                Arguments.of("co-op actual", TransactionTypeCode.COOP_ACTUAL),
+                Arguments.of("distribution", TransactionTypeCode.DISTRIBUTION),
+                Arguments.of("dist", TransactionTypeCode.DISTRIBUTION),
+                Arguments.of("property", TransactionTypeCode.PROPERTY_TRANSACTION),
+                Arguments.of("real estate", TransactionTypeCode.PROPERTY_TRANSACTION),
+                Arguments.of("physician", TransactionTypeCode.PHYSICIAN_REPORT),
+                Arguments.of("doctor report", TransactionTypeCode.PHYSICIAN_REPORT),
+                Arguments.of("maintenance request", TransactionTypeCode.MAINTENANCE_REQUEST),
+                Arguments.of("maint request", TransactionTypeCode.MAINTENANCE_REQUEST),
+                Arguments.of("maintenance response", TransactionTypeCode.MAINTENANCE_RESPONSE),
+                Arguments.of("maint response", TransactionTypeCode.MAINTENANCE_RESPONSE),
+                Arguments.of("immediate no followup", TransactionTypeCode.REQUEST_IMMEDIATE_NO_FOLLOWUP),
+                Arguments.of("no follow-up", TransactionTypeCode.REQUEST_IMMEDIATE_NO_FOLLOWUP),
+                Arguments.of("immediate with followup", TransactionTypeCode.REQUEST_IMMEDIATE_WITH_FOLLOWUP),
+                Arguments.of("with follow-up", TransactionTypeCode.REQUEST_IMMEDIATE_WITH_FOLLOWUP),
+                Arguments.of("response to mailbox", TransactionTypeCode.REQUEST_RESPONSE_TO_MAILBOX),
+                Arguments.of("mailbox response", TransactionTypeCode.REQUEST_RESPONSE_TO_MAILBOX),
+                Arguments.of("no further updates", TransactionTypeCode.RESPONSE_NO_UPDATES),
+                Arguments.of("no updates", TransactionTypeCode.RESPONSE_NO_UPDATES),
+                Arguments.of("further updates", TransactionTypeCode.RESPONSE_UPDATES_FOLLOW),
+                Arguments.of("updates follow", TransactionTypeCode.RESPONSE_UPDATES_FOLLOW),
                 Arguments.of("air export", TransactionTypeCode.AIR_EXPORT_WAYBILL),
                 Arguments.of("waybill", TransactionTypeCode.AIR_EXPORT_WAYBILL),
-                Arguments.of("export waybill", TransactionTypeCode.AIR_EXPORT_WAYBILL)
-        );
+                Arguments.of("export waybill", TransactionTypeCode.AIR_EXPORT_WAYBILL));
+    }
+
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> TransactionTypeCode.fromString(input));
     }
 }

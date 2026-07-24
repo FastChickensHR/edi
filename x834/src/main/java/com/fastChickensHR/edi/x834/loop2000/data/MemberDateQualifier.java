@@ -191,4 +191,19 @@ public enum MemberDateQualifier implements EdiCodeEnum {
         );
     }
 
+    /**
+     * Gets a MemberDateQualifier from any input string — its enum name, a member-level synonym, or a
+     * raw X12 code. Matching is case- and separator-insensitive. Note that several member qualifiers
+     * intentionally share one underlying {@link DateTimeQualifier} code (e.g. {@link #EXPIRATION} and
+     * {@link #TERMINATION}), so a bare code resolves to whichever constant registered it last; resolve
+     * by enum name or synonym when the distinction matters.
+     *
+     * @param input the string to look up
+     * @return the matching MemberDateQualifier
+     * @throws IllegalArgumentException if no match is found
+     */
+    public static MemberDateQualifier fromString(String input) {
+        return LOOKUP.fromString(input);
+    }
+
 }

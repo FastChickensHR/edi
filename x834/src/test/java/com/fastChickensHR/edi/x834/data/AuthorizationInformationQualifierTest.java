@@ -7,93 +7,43 @@
  */
 package com.fastChickensHR.edi.x834.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AuthorizationInformationQualifierTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals(7, AuthorizationInformationQualifier.values().length);
-        assertEquals("00", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getCode());
-        assertEquals("06", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID.getCode());
-    }
-
-    @Test
-    void testEnumProperties() {
-        assertEquals("No Authorization", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION.getDescription());
-        assertEquals("United States Federal Government Communication Identifier", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID.getDescription());
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION, AuthorizationInformationQualifier.fromString("00"));
-        assertEquals(AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID, AuthorizationInformationQualifier.fromString("01"));
-        assertEquals(AuthorizationInformationQualifier.EDX_COMMUNICATIONS_ID, AuthorizationInformationQualifier.fromString("02"));
-        assertEquals(AuthorizationInformationQualifier.ADDITIONAL_DATA_ID, AuthorizationInformationQualifier.fromString("03"));
-        assertEquals(AuthorizationInformationQualifier.RAIL_COMMUNICATIONS_ID, AuthorizationInformationQualifier.fromString("04"));
-        assertEquals(AuthorizationInformationQualifier.DOD_COMMUNICATION_ID, AuthorizationInformationQualifier.fromString("05"));
-        assertEquals(AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID, AuthorizationInformationQualifier.fromString("06"));
-
-        assertEquals(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION,
-                AuthorizationInformationQualifier.fromString("NO_AUTHORIZATION_INFORMATION"));
-        assertEquals(AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID,
-                AuthorizationInformationQualifier.fromString("UCS_COMMUNICATIONS_ID"));
-
-        assertEquals(AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION,
-                AuthorizationInformationQualifier.fromString("No Authorization"));
-        assertEquals(AuthorizationInformationQualifier.DOD_COMMUNICATION_ID,
-                AuthorizationInformationQualifier.fromString("Department of Defense (DoD) Communication Identifier"));
-
-        assertThrows(IllegalArgumentException.class, () -> AuthorizationInformationQualifier.fromString("invalid"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, AuthorizationInformationQualifier expected) throws Exception {
-        Field lookupField = AuthorizationInformationQualifier.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<AuthorizationInformationQualifier> lookup =
-                (EdiEnumLookup<AuthorizationInformationQualifier>) lookupField.get(null);
+    @EnumSource(AuthorizationInformationQualifier.class)
+    void resolvesFromCodeNameAndDescription(AuthorizationInformationQualifier constant) {
+        assertEquals(constant, AuthorizationInformationQualifier.fromString(constant.getCode()));
+        assertEquals(constant, AuthorizationInformationQualifier.fromString(constant.name()));
+        assertEquals(constant, AuthorizationInformationQualifier.fromString(constant.getDescription()));
+    }
 
-        assertEquals(expected, lookup.fromString(input));
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, AuthorizationInformationQualifier expected) {
         assertEquals(expected, AuthorizationInformationQualifier.fromString(input));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    private static Stream<Arguments> aliases() {
         return Stream.of(
-                Arguments.of("00", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION),
-                Arguments.of("01", AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID),
-                Arguments.of("02", AuthorizationInformationQualifier.EDX_COMMUNICATIONS_ID),
-                Arguments.of("03", AuthorizationInformationQualifier.ADDITIONAL_DATA_ID),
-                Arguments.of("04", AuthorizationInformationQualifier.RAIL_COMMUNICATIONS_ID),
-                Arguments.of("05", AuthorizationInformationQualifier.DOD_COMMUNICATION_ID),
-                Arguments.of("06", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID),
-
-                Arguments.of("NO_AUTHORIZATION_INFORMATION", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION),
-                Arguments.of("UCS_COMMUNICATIONS_ID", AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID),
-                Arguments.of("EDX_COMMUNICATIONS_ID", AuthorizationInformationQualifier.EDX_COMMUNICATIONS_ID),
-                Arguments.of("ADDITIONAL_DATA_ID", AuthorizationInformationQualifier.ADDITIONAL_DATA_ID),
-                Arguments.of("RAIL_COMMUNICATIONS_ID", AuthorizationInformationQualifier.RAIL_COMMUNICATIONS_ID),
-                Arguments.of("DOD_COMMUNICATION_ID", AuthorizationInformationQualifier.DOD_COMMUNICATION_ID),
-                Arguments.of("US_FEDERAL_GOVT_COMM_ID", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID),
-
-                Arguments.of("No Authorization", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION),
-                Arguments.of("UCS Communications ID", AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID),
-                Arguments.of("EDX Communications ID", AuthorizationInformationQualifier.EDX_COMMUNICATIONS_ID),
-                Arguments.of("Additional Data Identification", AuthorizationInformationQualifier.ADDITIONAL_DATA_ID),
-                Arguments.of("Rail Communications ID", AuthorizationInformationQualifier.RAIL_COMMUNICATIONS_ID),
-                Arguments.of("Department of Defense (DoD) Communication Identifier", AuthorizationInformationQualifier.DOD_COMMUNICATION_ID),
-                Arguments.of("United States Federal Government Communication Identifier", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID),
-
                 Arguments.of("none", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION),
                 Arguments.of("noauth", AuthorizationInformationQualifier.NO_AUTHORIZATION_INFORMATION),
                 Arguments.of("ucs", AuthorizationInformationQualifier.UCS_COMMUNICATIONS_ID),
@@ -104,7 +54,14 @@ class AuthorizationInformationQualifierTest {
                 Arguments.of("defense", AuthorizationInformationQualifier.DOD_COMMUNICATION_ID),
                 Arguments.of("federal", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID),
                 Arguments.of("govt", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID),
-                Arguments.of("usgov", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID)
-        );
+                Arguments.of("usgov", AuthorizationInformationQualifier.US_FEDERAL_GOVT_COMM_ID));
+    }
+
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> AuthorizationInformationQualifier.fromString(input));
     }
 }

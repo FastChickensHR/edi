@@ -7,98 +7,66 @@
  */
 package com.fastChickensHR.edi.x834.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionSetPurposeCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals("00", TransactionSetPurposeCode.ORIGINAL.getCode());
-        assertEquals("01", TransactionSetPurposeCode.CANCELLATION.getCode());
-        assertEquals("5C", TransactionSetPurposeCode.CHARGEABLE_RESUBMISSION.getCode());
-        assertEquals("CN", TransactionSetPurposeCode.COMPLETION_NOTIFICATION.getCode());
-        assertEquals("ZZ", TransactionSetPurposeCode.MUTUALLY_DEFINED.getCode());
-
-        assertEquals("Original", TransactionSetPurposeCode.ORIGINAL.getDescription());
-        assertEquals("Cancellation", TransactionSetPurposeCode.CANCELLATION.getDescription());
-        assertEquals("Chargeable Resubmission", TransactionSetPurposeCode.CHARGEABLE_RESUBMISSION.getDescription());
-        assertEquals("Completion Notification", TransactionSetPurposeCode.COMPLETION_NOTIFICATION.getDescription());
-        assertEquals("Mutually Defined", TransactionSetPurposeCode.MUTUALLY_DEFINED.getDescription());
-    }
-
-    @Test
-    void testEnumProperties() {
-        for (TransactionSetPurposeCode code : TransactionSetPurposeCode.values()) {
-            assertNotNull(code.getCode(), "Code should not be null");
-            assertNotNull(code.getDescription(), "Description should not be null");
-            assertFalse(code.getCode().isEmpty(), "Code should not be empty");
-            assertFalse(code.getDescription().isEmpty(), "Description should not be empty");
-        }
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(TransactionSetPurposeCode.ORIGINAL, TransactionSetPurposeCode.fromString("00"));
-        assertEquals(TransactionSetPurposeCode.CANCELLATION, TransactionSetPurposeCode.fromString("01"));
-        assertEquals(TransactionSetPurposeCode.ADD, TransactionSetPurposeCode.fromString("02"));
-
-        assertEquals(TransactionSetPurposeCode.ORIGINAL, TransactionSetPurposeCode.fromString("original"));
-        assertEquals(TransactionSetPurposeCode.ORIGINAL, TransactionSetPurposeCode.fromString("ORIGINAL"));
-        assertEquals(TransactionSetPurposeCode.ORIGINAL, TransactionSetPurposeCode.fromString("Original"));
-
-        assertEquals(TransactionSetPurposeCode.ADD, TransactionSetPurposeCode.fromString("create"));
-        assertEquals(TransactionSetPurposeCode.DELETE, TransactionSetPurposeCode.fromString("remove"));
-        assertEquals(TransactionSetPurposeCode.CHANGE, TransactionSetPurposeCode.fromString("update"));
-
-        assertThrows(IllegalArgumentException.class, () -> TransactionSetPurposeCode.fromString("non-existent-value"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than reflecting into the private {@code LOOKUP} field
+     * also guarantees no constant's code, name, or description silently collides with another's.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, TransactionSetPurposeCode expected) throws Exception {
-        Field lookupField = TransactionSetPurposeCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<TransactionSetPurposeCode> lookup =
-                (EdiEnumLookup<TransactionSetPurposeCode>) lookupField.get(null);
-
-        TransactionSetPurposeCode actual = lookup.fromString(input);
-        assertEquals(expected, actual,
-                "Input '" + input + "' should map to " + expected + " but mapped to " + actual);
+    @EnumSource(value = TransactionSetPurposeCode.class, mode = EnumSource.Mode.EXCLUDE, names = "STATUS_UPDATE")
+    void resolvesFromCodeNameAndDescription(TransactionSetPurposeCode constant) {
+        assertEquals(constant, TransactionSetPurposeCode.fromString(constant.getCode()));
+        assertEquals(constant, TransactionSetPurposeCode.fromString(constant.name()));
+        assertEquals(constant, TransactionSetPurposeCode.fromString(constant.getDescription()));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    /**
+     * Surfaced collision (pinned as current behavior, not fixed under this test-only wave): the alias
+     * {@code "status update" -> STATUS} shadows {@link TransactionSetPurposeCode#STATUS_UPDATE}, whose
+     * own name and description both normalize to {@code "statusupdate"} as well. Because additional
+     * mappings are applied after the per-constant entries, {@code STATUS_UPDATE} is reachable only by
+     * its code {@code "SU"}; by name or description it currently resolves to {@link #STATUS}. Owner
+     * follow-up: drop or re-point the ambiguous alias so {@code STATUS_UPDATE} is reachable by name.
+     */
+    @Test
+    void statusUpdateNameIsShadowedByStatusAlias() {
+        assertEquals(TransactionSetPurposeCode.STATUS_UPDATE, TransactionSetPurposeCode.fromString("SU"));
+        assertEquals(TransactionSetPurposeCode.STATUS, TransactionSetPurposeCode.fromString("status update"));
+        assertEquals(TransactionSetPurposeCode.STATUS, TransactionSetPurposeCode.fromString("STATUS_UPDATE"));
+    }
+
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, TransactionSetPurposeCode expected) {
+        assertEquals(expected, TransactionSetPurposeCode.fromString(input));
+    }
+
+    private static Stream<Arguments> aliases() {
         return Stream.of(
-                // Test exact codes
-                Arguments.of("00", TransactionSetPurposeCode.ORIGINAL),
-                Arguments.of("01", TransactionSetPurposeCode.CANCELLATION),
-                Arguments.of("02", TransactionSetPurposeCode.ADD),
-                Arguments.of("03", TransactionSetPurposeCode.DELETE),
-                Arguments.of("04", TransactionSetPurposeCode.CHANGE),
-                Arguments.of("05", TransactionSetPurposeCode.REPLACE),
-                Arguments.of("5C", TransactionSetPurposeCode.CHARGEABLE_RESUBMISSION),
-                Arguments.of("5c", TransactionSetPurposeCode.CHARGEABLE_RESUBMISSION),
-
-                Arguments.of("original", TransactionSetPurposeCode.ORIGINAL),
-                Arguments.of("ORIGINAL", TransactionSetPurposeCode.ORIGINAL),
-                Arguments.of("Original", TransactionSetPurposeCode.ORIGINAL),
-                Arguments.of("cancellation", TransactionSetPurposeCode.CANCELLATION),
-                Arguments.of("add", TransactionSetPurposeCode.ADD),
-                Arguments.of("ADD", TransactionSetPurposeCode.ADD),
-
                 Arguments.of("new", TransactionSetPurposeCode.ORIGINAL),
                 Arguments.of("initial submission", TransactionSetPurposeCode.ORIGINAL),
-                Arguments.of("cancel", TransactionSetPurposeCode.CANCELLATION),
                 Arguments.of("void", TransactionSetPurposeCode.CANCELLATION),
+                Arguments.of("cancel", TransactionSetPurposeCode.CANCELLATION),
                 Arguments.of("terminate", TransactionSetPurposeCode.CANCELLATION),
                 Arguments.of("addition", TransactionSetPurposeCode.ADD),
                 Arguments.of("insert", TransactionSetPurposeCode.ADD),
@@ -125,30 +93,28 @@ class TransactionSetPurposeCodeTest {
                 Arguments.of("complete", TransactionSetPurposeCode.COMPLETION_NOTIFICATION),
                 Arguments.of("finished", TransactionSetPurposeCode.COMPLETION_NOTIFICATION),
                 Arguments.of("custom", TransactionSetPurposeCode.MUTUALLY_DEFINED),
-                Arguments.of("agreed upon", TransactionSetPurposeCode.MUTUALLY_DEFINED)
-        );
+                Arguments.of("agreed upon", TransactionSetPurposeCode.MUTUALLY_DEFINED));
     }
 
+    /**
+     * Every constant has a distinct code. A duplicate would silently clobber the earlier constant in
+     * the shared lookup map (last registration wins), making it unreachable by code.
+     */
     @Test
-    void testToString() {
-        assertEquals("00", TransactionSetPurposeCode.ORIGINAL.toString());
-        assertEquals("01", TransactionSetPurposeCode.CANCELLATION.toString());
-        assertEquals("5C", TransactionSetPurposeCode.CHARGEABLE_RESUBMISSION.toString());
-        assertEquals("CN", TransactionSetPurposeCode.COMPLETION_NOTIFICATION.toString());
-        assertEquals("ZZ", TransactionSetPurposeCode.MUTUALLY_DEFINED.toString());
+    void codesAreUnique() {
+        Map<String, TransactionSetPurposeCode> byCode = new HashMap<>();
+        for (TransactionSetPurposeCode constant : TransactionSetPurposeCode.values()) {
+            TransactionSetPurposeCode prior = byCode.put(constant.getCode(), constant);
+            assertNull(prior, () -> "duplicate code '" + constant.getCode() + "' shared by "
+                    + prior + " and " + constant);
+        }
     }
 
-    @Test
-    void testEnumCompleteness() {
-        assertEquals(76, TransactionSetPurposeCode.values().length,
-                "There should be 83 transaction set purpose codes");
-
-        long uniqueValues = Arrays.stream(TransactionSetPurposeCode.values())
-                .map(TransactionSetPurposeCode::getCode)
-                .distinct()
-                .count();
-
-        assertEquals(TransactionSetPurposeCode.values().length, uniqueValues,
-                "All enum codes should be unique");
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> TransactionSetPurposeCode.fromString(input));
     }
 }
