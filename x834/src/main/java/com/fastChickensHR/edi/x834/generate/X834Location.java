@@ -45,8 +45,8 @@ public final class X834Location {
     public static final String MEMBER_ID = "memberId";                     // REF*<qual>
     public static final String MEMBER_ID_QUALIFIER = "memberIdQualifier";  // that REF's qualifier
     public static final String SUBSCRIBER_NUMBER = "subscriberNumber";     // REF*OF
-    public static final String ENROLLMENT_DATE = "enrollmentDate";         // DTP*356
-    public static final String COVERAGE_START_DATE = "coverageStartDate";  // DTP*356
+    public static final String ENROLLMENT_DATE = "enrollmentDate";         // DTP*300 (Enrollment Signature Date)
+    public static final String COVERAGE_START_DATE = "coverageStartDate";  // DTP*356 (Eligibility Begin)
     public static final String COVERAGE_END_DATE = "coverageEndDate";      // DTP*357
 
     // ---- Member level: Loop 2100A name / demographics / residence address ----

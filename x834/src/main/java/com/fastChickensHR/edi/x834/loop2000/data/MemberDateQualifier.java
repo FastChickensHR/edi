@@ -28,7 +28,11 @@ public enum MemberDateQualifier implements EdiCodeEnum {
     EFFECTIVE(DateTimeQualifier.MAINTENANCE_EFFECTIVE),
     ELIGIBILITY_BEGIN(DateTimeQualifier.EMPLOYMENT_BEGIN),
     ELIGIBILITY_END(DateTimeQualifier.EMPLOYMENT_END),
-    ENROLLMENT(DateTimeQualifier.ENROLLMENT),
+    // 300 "Enrollment Signature Date" — the member-level (Loop 2000) enrollment date the 834
+    // 005010X220A1 TR3 permits. The generic 382 "Enrollment" is NOT an allowed member-level DTP01
+    // code, so this maps to 300 rather than 382 (grounded in edi #167). Distinct from
+    // COVERAGE_BEGIN's 356 (Eligibility Begin), which carries coverageStartDate.
+    ENROLLMENT(DateTimeQualifier.ENROLLMENT_SIGNATURE_DATE),
     EXPIRATION(DateTimeQualifier.EXPIRATION_DATE),
     HIRE(DateTimeQualifier.EMPLOYMENT_OR_HIRE),
     MAINTENANCE_EFFECTIVE(DateTimeQualifier.MAINTENANCE_EFFECTIVE),
@@ -118,7 +122,6 @@ public enum MemberDateQualifier implements EdiCodeEnum {
                         Map.entry("eligible until", ELIGIBILITY_END),
                         Map.entry("eligibility termination", ELIGIBILITY_END),
 
-                        Map.entry("338", ENROLLMENT),
                         Map.entry("enrolled", ENROLLMENT),
                         Map.entry("enrollment date", ENROLLMENT),
                         Map.entry("date enrolled", ENROLLMENT),
