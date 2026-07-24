@@ -103,7 +103,10 @@ public class X834MemberWriter {
         }
 
         // Emit one DTP segment per non-null date so each date is preserved.
-        addDateSegment(segments, MemberDateQualifier.COVERAGE_BEGIN, member.getEnrollmentDate());
+        // enrollmentDate is intentionally NOT emitted yet: it was mislabeled as
+        // COVERAGE_BEGIN (DTP*356), duplicating coverageStartDate. Its correct
+        // member-level DTP01 is being grounded in the 834 TR3 (see edi #167); the
+        // emission is re-enabled there under the right qualifier rather than shipped wrong.
         addDateSegment(segments, MemberDateQualifier.COVERAGE_BEGIN, member.getCoverageStartDate());
         addDateSegment(segments, MemberDateQualifier.COVERAGE_END, member.getCoverageEndDate());
 

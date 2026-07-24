@@ -57,13 +57,13 @@ public class X834Context {
 
     /**
      * Creates a new X834Context with default values: current timestamp as the document
-     * date, {@link DateFormat#DATE}/{@link TimeFormat#TIME} formats, the conventional 834
+     * date, {@link DateFormat#D8}/{@link TimeFormat#TIME} formats, the conventional 834
      * delimiters ('*' element, '~' segment, '&gt;' sub-element) and LF line terminator,
      * and a transaction set control number of {@code "0001"}.
      */
     public X834Context() {
         this.documentDate = LocalDateTime.now();
-        this.dateFormat = DateFormat.DATE;
+        this.dateFormat = DateFormat.D8;
         this.timeFormat = TimeFormat.TIME;
         this.elementSeparator = ElementSeparator.ASTERISK;
         this.segmentTerminator = SegmentTerminator.TILDE;

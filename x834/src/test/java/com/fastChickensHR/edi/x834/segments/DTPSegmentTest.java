@@ -66,7 +66,7 @@ class DTPSegmentTest {
     @Test
     void testBuilderWithSpecNamesSetters() throws ValidationException {
         String qualifier = "001";
-        DateFormat format = DateFormat.DATE;
+        DateFormat format = DateFormat.D8;
         LocalDateTime date = LocalDateTime.of(2025, 12, 31, 0, 0);
 
         DTPSegment segment = new DTPSegment.Builder()
@@ -81,7 +81,7 @@ class DTPSegmentTest {
     @Test
     void testBuilderWithDomainNameSetters() throws ValidationException {
         String qualifier = "001";
-        DateFormat format = DateFormat.DATE;
+        DateFormat format = DateFormat.D8;
         LocalDateTime date = LocalDateTime.of(2025, 12, 31, 0, 0);
 
         DTPSegment segment = new DTPSegment.Builder()

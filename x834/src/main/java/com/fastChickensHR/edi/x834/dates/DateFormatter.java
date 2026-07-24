@@ -23,13 +23,8 @@ public class DateFormatter {
      */
     public static String formatDate(DateFormat format, LocalDateTime date) {
         switch (format) {
-            case DATE:
             case D8:
                 return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            case CENTURY_YEAR:
-                return Integer.toString(date.getYear());
-            case MONTH_DAY:
-                return date.format(DateTimeFormatter.ofPattern("MMdd"));
             case CC:
                 return date.format(DateTimeFormatter.ofPattern("yy"));
             case CD:
