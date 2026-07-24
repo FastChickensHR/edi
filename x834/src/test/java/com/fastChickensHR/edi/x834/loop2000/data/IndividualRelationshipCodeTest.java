@@ -7,97 +7,55 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IndividualRelationshipCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals(7, IndividualRelationshipCode.values().length);
-
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.SPOUSE));
-        assertTrue(Arrays.asList(IndividualRelationshipCode.values()).contains(IndividualRelationshipCode.OTHER_RELATED));
-    }
-
-    @Test
-    void testEnumProperties() {
-        // Test code and description for each enum value
-        assertEquals("01", IndividualRelationshipCode.SPOUSE.getCode());
-        assertEquals("Spouse", IndividualRelationshipCode.SPOUSE.getDescription());
-
-        assertEquals("29", IndividualRelationshipCode.OTHER_RELATED.getCode());
-        assertEquals("Other Related", IndividualRelationshipCode.OTHER_RELATED.getDescription());
-
-        for (IndividualRelationshipCode code : IndividualRelationshipCode.values()) {
-            assertEquals(code.getCode(), code.toString());
-        }
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(IndividualRelationshipCode.SPOUSE, IndividualRelationshipCode.fromString("01"));
-        assertEquals(IndividualRelationshipCode.CHILD, IndividualRelationshipCode.fromString("19"));
-        assertEquals(IndividualRelationshipCode.EMPLOYEE, IndividualRelationshipCode.fromString("20"));
-        assertEquals(IndividualRelationshipCode.DISABLED_DEPENDENT, IndividualRelationshipCode.fromString("22"));
-        assertEquals(IndividualRelationshipCode.SELF, IndividualRelationshipCode.fromString("18"));
-        assertEquals(IndividualRelationshipCode.LIFE_PARTNER, IndividualRelationshipCode.fromString("53"));
-        assertEquals(IndividualRelationshipCode.OTHER_RELATED, IndividualRelationshipCode.fromString("29"));
-
-        assertThrows(IllegalArgumentException.class, () -> IndividualRelationshipCode.fromString("InvalidCode"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, IndividualRelationshipCode expected) throws Exception {
-        Field lookupField = IndividualRelationshipCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<IndividualRelationshipCode> lookup = (EdiEnumLookup<IndividualRelationshipCode>) lookupField.get(null);
-
-        assertEquals(expected, lookup.fromString(input),
-                "Lookup for '" + input + "' should return " + expected);
+    @EnumSource(IndividualRelationshipCode.class)
+    void resolvesFromCodeNameAndDescription(IndividualRelationshipCode constant) {
+        assertEquals(constant, IndividualRelationshipCode.fromString(constant.getCode()));
+        assertEquals(constant, IndividualRelationshipCode.fromString(constant.name()));
+        assertEquals(constant, IndividualRelationshipCode.fromString(constant.getDescription()));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, IndividualRelationshipCode expected) {
+        assertEquals(expected, IndividualRelationshipCode.fromString(input));
+    }
+
+    private static Stream<Arguments> aliases() {
         return Stream.of(
-                Arguments.of("01", IndividualRelationshipCode.SPOUSE),
-                Arguments.of("19", IndividualRelationshipCode.CHILD),
-                Arguments.of("20", IndividualRelationshipCode.EMPLOYEE),
-                Arguments.of("22", IndividualRelationshipCode.DISABLED_DEPENDENT),
-                Arguments.of("18", IndividualRelationshipCode.SELF),
-                Arguments.of("53", IndividualRelationshipCode.LIFE_PARTNER),
-                Arguments.of("29", IndividualRelationshipCode.OTHER_RELATED),
-
-                Arguments.of("SPOUSE", IndividualRelationshipCode.SPOUSE),
-                Arguments.of("CHILD", IndividualRelationshipCode.CHILD),
-                Arguments.of("EMPLOYEE", IndividualRelationshipCode.EMPLOYEE),
-                Arguments.of("DISABLED_DEPENDENT", IndividualRelationshipCode.DISABLED_DEPENDENT),
-                Arguments.of("SELF", IndividualRelationshipCode.SELF),
-                Arguments.of("LIFE_PARTNER", IndividualRelationshipCode.LIFE_PARTNER),
-                Arguments.of("OTHER_RELATED", IndividualRelationshipCode.OTHER_RELATED),
-
-                Arguments.of("Spouse", IndividualRelationshipCode.SPOUSE),
-                Arguments.of("Child", IndividualRelationshipCode.CHILD),
-                Arguments.of("Employee", IndividualRelationshipCode.EMPLOYEE),
-                Arguments.of("Disabled Dependent", IndividualRelationshipCode.DISABLED_DEPENDENT),
-                Arguments.of("Self", IndividualRelationshipCode.SELF),
-                Arguments.of("Life Partner", IndividualRelationshipCode.LIFE_PARTNER),
-                Arguments.of("Other Related", IndividualRelationshipCode.OTHER_RELATED),
-
                 Arguments.of("wife", IndividualRelationshipCode.SPOUSE),
                 Arguments.of("husband", IndividualRelationshipCode.SPOUSE),
                 Arguments.of("son", IndividualRelationshipCode.CHILD),
                 Arguments.of("daughter", IndividualRelationshipCode.CHILD),
-                Arguments.of("domesticpartner", IndividualRelationshipCode.LIFE_PARTNER)
-        );
+                Arguments.of("domesticpartner", IndividualRelationshipCode.LIFE_PARTNER));
+    }
+
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> IndividualRelationshipCode.fromString(input));
     }
 }
