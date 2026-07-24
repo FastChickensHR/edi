@@ -38,14 +38,18 @@ public class SponsorName extends N1Segment {
     }
 
     /**
-     * Builder for SponsorName. Pre-seeds the plan-sponsor entity code (N101=P5) and
-     * identification qualifier (N103=FI) defaults.
+     * Builder for SponsorName. Pre-seeds only the plan-sponsor entity code (N101=P5).
+     * <p>
+     * The identification qualifier (N103={@value #DEFAULT_IDENTIFICATION_CODE_QUALIFIER}) is
+     * <em>not</em> pre-seeded: under X12 rule P0304 the qualifier and the identifier (N104) must
+     * travel together, so a caller that supplies a sponsor identifier is responsible for supplying
+     * the matching qualifier alongside it. A name-only sponsor (the common case — the header never
+     * assigns the sponsor an id) therefore emits {@code N1*P5*<name>} with no dangling qualifier.
      */
     @Accessors(chain = true)
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
             this.setN101(DEFAULT_ENTITY_IDENTIFIER_CODE);
-            this.setN103(DEFAULT_IDENTIFICATION_CODE_QUALIFIER);
         }
 
         @Override
