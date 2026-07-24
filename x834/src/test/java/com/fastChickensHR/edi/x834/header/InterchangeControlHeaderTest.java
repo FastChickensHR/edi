@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Test class for InterchangeControlHeader.
@@ -64,15 +63,33 @@ class InterchangeControlHeaderTest {
         assertEquals("ABC            ", header.getInterchangeSenderID());
     }
 
+    /**
+     * Render golden for the ISA segment assembled from context defaults. Whole-string equality pins the
+     * defaults ({@code 00}/{@code 00}/{@code 30}/{@code ZZ}/{@code ^}/{@code 00501}/{@code 0}/{@code T}/{@code :}),
+     * the sender ID right-padded to 15 characters, and the date/time formatted from the pinned context
+     * document date — the fixed-width layout the getter assertions never render.
+     * <p>
+     * The golden also documents two quirks of the current builder that only a whole-payload assertion
+     * surfaces: ISA08 (receiver ID) is <em>not</em> padded to the fixed 15-character width the way ISA06
+     * is, and ISA09 is emitted as the 8-digit {@code CCYYMMDD} context date rather than the ISA-native
+     * 6-digit {@code YYMMDD}. These are pinned as-is here (this ticket adds the regression net); they are
+     * reported as follow-up findings on the wave, not fixed under it.
+     */
     @Test
-    void testContextAccess() throws ValidationException {
+    void rendersIsaSegmentFromContextDefaults() throws ValidationException {
         X834Context context = new X834Context();
         context.setSenderID("SENDER123");
         context.setReceiverID("RECEIVER456");
+        context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
 
-        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context).setInterchangeControlNumber(interchangeControlNumber).build();
+        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context)
+                .setInterchangeControlNumber("000000001")
+                .build();
+        header.setContext(context);
 
-        assertSame(context, header.getContext());
+        assertEquals(
+                "ISA*00*          *00*          *30*SENDER123      *ZZ*RECEIVER456*20230630*0000*^*00501*000000001*0*T*:~\n",
+                header.render());
     }
 
     @Test

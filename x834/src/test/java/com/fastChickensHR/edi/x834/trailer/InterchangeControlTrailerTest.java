@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.segments.IEASegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -14,22 +15,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InterchangeControlTrailerTest {
-
-    @Test
-    void testInheritance() {
-        InterchangeControlTrailer trailer = null;
-        try {
-            trailer = InterchangeControlTrailer.builder()
-                    .setNumberOfIncludedGroups("3")
-                    .setInterchangeControlNumber("000012345")
-                    .build();
-        } catch (ValidationException e) {
-            fail("Failed to build InterchangeControlTrailer: " + e.getMessage());
-        }
-
-        assertNotNull(trailer);
-        assertTrue(trailer instanceof IEASegment);
-    }
 
     @Test
     void testBuilderCreation() {
@@ -50,19 +35,21 @@ class InterchangeControlTrailerTest {
         assertEquals("000098765", ieaSegment.getInterchangeControlNumber());
     }
 
+    /**
+     * Render golden: the Interchange Control Trailer renders as its underlying IEA segment,
+     * {@code IEA*<groupCount>*<interchangeControlNumber>~}. Whole-string equality pins the segment id,
+     * element order, and terminator that the getter/{@code getElementValues()} echo left unrendered.
+     * Delimiters come from the default {@link X834Context}.
+     */
     @Test
-    void testSegmentComposition() throws ValidationException {
+    void rendersAsIeaSegment() throws ValidationException {
         InterchangeControlTrailer trailer = InterchangeControlTrailer.builder()
                 .setNumberOfIncludedGroups("7")
                 .setInterchangeControlNumber("000054321")
                 .build();
+        trailer.setContext(new X834Context());
 
-        String[] elements = trailer.getElementValues();
-
-        assertEquals("IEA", trailer.getSegmentIdentifier());
-        assertEquals(2, elements.length);
-        assertEquals("7", elements[0]);
-        assertEquals("000054321", elements[1]);
+        assertEquals("IEA*7*000054321~\n", trailer.render());
     }
 
     @Test

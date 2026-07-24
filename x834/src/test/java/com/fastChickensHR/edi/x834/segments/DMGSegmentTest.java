@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,8 +53,13 @@ class DMGSegmentTest {
         assertEquals("DMG", segment.getSegmentIdentifier());
     }
 
+    /**
+     * Render golden for a fully-populated DMG demographics segment. Whole-string equality pins the
+     * eleven element positions and the terminator that a {@code getElementValues()} array check leaves
+     * unrendered. Delimiters come from the default {@link X834Context}.
+     */
     @Test
-    void testElementValues() throws ValidationException {
+    void rendersFullDmgSegment() throws ValidationException {
         DMGSegment segment = TestDMGSegment.builder()
                 .setDmg01("D8")
                 .setDmg02("19900101")
@@ -67,20 +73,26 @@ class DMGSegmentTest {
                 .setDmg10("AAA")
                 .setDmg11("BBB")
                 .build();
+        segment.setContext(new X834Context());
 
-        String[] elements = segment.getElementValues();
-        assertEquals(11, elements.length);
-        assertEquals("D8", elements[0]);
-        assertEquals("19900101", elements[1]);
-        assertEquals("F", elements[2]);
-        assertEquals("S", elements[3]);
-        assertEquals("7", elements[4]);
-        assertEquals("1", elements[5]);
-        assertEquals("US", elements[6]);
-        assertEquals("A", elements[7]);
-        assertEquals("2", elements[8]);
-        assertEquals("AAA", elements[9]);
-        assertEquals("BBB", elements[10]);
+        assertEquals("DMG*D8*19900101*F*S*7*1*US*A*2*AAA*BBB~\n", segment.render());
+    }
+
+    /**
+     * Render golden proving the shared {@code Segment.render()} trims trailing empty elements: a DMG
+     * carrying only the first two values renders {@code DMG*D8*19900101~} — no eight empty
+     * {@code *} placeholders — which the getter/array-length assertions could not distinguish from a
+     * fully-padded segment.
+     */
+    @Test
+    void rendersDmgSegmentTrimmingTrailingEmptyElements() throws ValidationException {
+        DMGSegment segment = TestDMGSegment.builder()
+                .setDmg01("D8")
+                .setDmg02("19900101")
+                .build();
+        segment.setContext(new X834Context());
+
+        assertEquals("DMG*D8*19900101~\n", segment.render());
     }
 
     @Test

@@ -11,8 +11,7 @@ import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
-import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
-import com.fastChickensHR.edi.x834.loop1000B.Payer;
+import com.fastChickensHR.edi.x834.testsupport.TestFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,67 +45,6 @@ class HeaderTest {
     }
 
     @Test
-    void testHeaderSettersAndGetters() {
-        // Test setters and getters for the header fields
-        Header header = new Header(context);
-
-        String transactionSetIdentifierCode = "834";
-        String referenceIdentification = "REF123";
-        String masterPolicyNumber = "POL123456";
-        String planSponsorName = "FastChickensHR Corp";
-        String payerName = "Insurance Co";
-        String payerIdentification = "PAYERID123";
-
-        header.setTransactionSetIdentifierCode(transactionSetIdentifierCode);
-        header.setReferenceIdentification(referenceIdentification);
-        header.setMasterPolicyNumber(masterPolicyNumber);
-        header.setPlanSponsorName(planSponsorName);
-        header.setPayerName(payerName);
-        header.setPayerIdentification(payerIdentification);
-
-        // Verify all fields were set correctly
-        assertEquals(transactionSetIdentifierCode, header.getTransactionSetIdentifierCode());
-        assertEquals(referenceIdentification, header.getReferenceIdentification());
-        assertEquals(masterPolicyNumber, header.getMasterPolicyNumber());
-        assertEquals(planSponsorName, header.getPlanSponsorName());
-        assertEquals(payerName, header.getPayerName());
-        assertEquals(payerIdentification, header.getPayerIdentification());
-    }
-
-    @Test
-    void testCustomBuilderSettersAndGetters() {
-        Header header = new Header(context);
-
-        InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context);
-        FunctionalGroupHeader.Builder functionalBuilder = new FunctionalGroupHeader.Builder(context);
-        TransactionSetHeader.Builder transactionSetBuilder = new TransactionSetHeader.Builder(context);
-        BeginningSegment.Builder beginningSegmentBuilder = new BeginningSegment.Builder(context);
-        FileEffectiveDate.Builder fileEffectiveDateBuilder = new FileEffectiveDate.Builder(context);
-        TransactionSetPolicyNumber.Builder policyNumberBuilder = new TransactionSetPolicyNumber.Builder();
-        SponsorName.Builder sponsorBuilder = new SponsorName.Builder();
-        Payer.Builder payerBuilder = new Payer.Builder();
-
-        header.setCustomInterchangeBuilder(interchangeBuilder);
-        header.setCustomFunctionalBuilder(functionalBuilder);
-        header.setCustomTransactionSetBuilder(transactionSetBuilder);
-        header.setCustomBeginningSegmentBuilder(beginningSegmentBuilder);
-        header.setCustomFileEffectiveDateBuilder(fileEffectiveDateBuilder);
-        header.setCustomPolicyNumberBuilder(policyNumberBuilder);
-        header.setCustomSponsorBuilder(sponsorBuilder);
-        header.setCustomPayerBuilder(payerBuilder);
-
-        // Verify all builders were set correctly
-        assertEquals(interchangeBuilder, header.getCustomInterchangeBuilder());
-        assertEquals(functionalBuilder, header.getCustomFunctionalBuilder());
-        assertEquals(transactionSetBuilder, header.getCustomTransactionSetBuilder());
-        assertEquals(beginningSegmentBuilder, header.getCustomBeginningSegmentBuilder());
-        assertEquals(fileEffectiveDateBuilder, header.getCustomFileEffectiveDateBuilder());
-        assertEquals(policyNumberBuilder, header.getCustomPolicyNumberBuilder());
-        assertEquals(sponsorBuilder, header.getCustomSponsorBuilder());
-        assertEquals(payerBuilder, header.getCustomPayerBuilder());
-    }
-
-    @Test
     void testGenerateSegments() throws ValidationException {
         Header header = new Header(context);
         header.setReferenceIdentification("REF123");
@@ -126,6 +64,36 @@ class HeaderTest {
         assertEquals("GS", segments.get(1).getSegmentIdentifier());
         assertEquals("ST", segments.get(2).getSegmentIdentifier());
         assertEquals("BGN", segments.get(3).getSegmentIdentifier());
+    }
+
+    /**
+     * Whole-payload golden for the assembled header: every segment {@link Header#generateSegments()}
+     * produces (ISA, GS, ST, BGN, DTP file-effective-date, REF policy number, N1 sponsor, N1 payer),
+     * rendered in order into one string and compared against an on-disk golden. Whole-payload equality
+     * pins segment order, element positions, and each segment's terminator at once — and, because this
+     * {@code context} uses the pipe element separator, proves that separator propagates into every
+     * rendered segment. The document date is pinned via the context, so the golden is deterministic.
+     * <p>
+     * Regenerate after an intentional format change with {@code -Dupdate.goldens=true} (see
+     * {@link TestFixtures}).
+     */
+    @Test
+    void rendersFullHeaderPayload() throws ValidationException {
+        Header header = new Header.Builder(context)
+                .setReferenceIdentification("REF123")
+                .setMasterPolicyNumber("POL123456")
+                .setPlanSponsorName("FastChickensHR Corp")
+                .setPayerName("Insurance Co")
+                .setPayerIdentification("PAYERID123")
+                .build();
+
+        StringBuilder rendered = new StringBuilder();
+        for (Segment segment : header.generateSegments()) {
+            segment.setContext(context);
+            rendered.append(segment.render());
+        }
+
+        TestFixtures.assertMatchesGolden("golden/header-full-envelope.834", rendered.toString());
     }
 
     @Test

@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -80,21 +81,20 @@ class IEASegmentTest {
         assertEquals(IEASegment.SEGMENT_ID, segment.getSegmentIdentifier());
     }
 
+    /**
+     * Render golden for the IEA interchange trailer: {@code IEA*<groupCount>*<interchangeControlNumber>~}.
+     * Whole-string equality pins the element order and terminator that a {@code getElementValues()}
+     * array check leaves unrendered. Delimiters come from the default {@link X834Context}.
+     */
     @Test
-    void testElementValues() throws ValidationException {
-        String numberOfIncludedGroups = "4";
-        String interchangeControlNumber = "000098765";
-
+    void rendersIeaSegment() throws ValidationException {
         TestIEASegment segment = TestIEASegment.builder()
-                .setNumberOfIncludedGroups(numberOfIncludedGroups)
-                .setInterchangeControlNumber(interchangeControlNumber)
+                .setNumberOfIncludedGroups("4")
+                .setInterchangeControlNumber("000098765")
                 .build();
+        segment.setContext(new X834Context());
 
-        String[] elementValues = segment.getElementValues();
-
-        assertEquals(2, elementValues.length);
-        assertEquals(numberOfIncludedGroups, elementValues[0]);
-        assertEquals(interchangeControlNumber, elementValues[1]);
+        assertEquals("IEA*4*000098765~\n", segment.render());
     }
 
     @Test
