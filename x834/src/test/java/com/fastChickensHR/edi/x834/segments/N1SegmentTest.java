@@ -117,6 +117,38 @@ class N1SegmentTest {
     }
 
     @Test
+    void testDanglingQualifierRejected() {
+        // N103 present, N104 absent → X12 P0304 violation (a dangling "*FI" tail).
+        ValidationException ex = assertThrows(ValidationException.class, () ->
+                new TestN1Segment.Builder()
+                        .setN101(entityCode)
+                        .setN102("Test Name")
+                        .setN103(qualifier)
+                        .build());
+        assertTrue(ex.getMessage().contains("P0304"), "Message should cite the P0304 pairing rule");
+    }
+
+    @Test
+    void testDanglingIdentifierRejected() {
+        // N104 present, N103 absent → the other half of P0304.
+        assertThrows(ValidationException.class, () ->
+                new TestN1Segment.Builder()
+                        .setN101(entityCode)
+                        .setN102("Test Name")
+                        .setN104("123456")
+                        .build());
+    }
+
+    @Test
+    void testBothPresentAndBothAbsentAccepted() throws ValidationException {
+        // Both present: valid.
+        new TestN1Segment.Builder().setN101(entityCode).setN102("Test Name")
+                .setN103(qualifier).setN104("123456").build();
+        // Both absent (name-only party): valid.
+        new TestN1Segment.Builder().setN101(entityCode).setN102("Test Name").build();
+    }
+
+    @Test
     void testRender() throws ValidationException {
         TestN1Segment segment = new TestN1Segment.Builder()
                 .setEntityIdentifierCode(entityCode)

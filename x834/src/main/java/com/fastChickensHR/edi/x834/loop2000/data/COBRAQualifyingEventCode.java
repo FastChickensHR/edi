@@ -14,20 +14,28 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing COBRA Qualifying Event Codes used in the INS07 field
- * of the EDI 834 Member Level Detail (INS) segment.
+ * Enumeration representing COBRA Qualifying Event Codes (X12 element 1219) emitted at the
+ * INS07 field of the EDI 834 Member Level Detail (INS) segment.
+ *
+ * <p>The full element 1219 list. The former list attached the wrong descriptions to
+ * codes {@code 3}-{@code 9} (a "logical" ordering that did not match element 1219's
+ * actual assignments — e.g. code {@code 3} is Medicare, not "Death of Employee") and was
+ * missing {@code 10} and {@code ZZ}; the descriptions are now the verbatim element-1219
+ * text.
  */
 @Getter
 public enum COBRAQualifyingEventCode implements EdiCodeEnum {
     TERMINATION_OF_EMPLOYMENT("1", "Termination of Employment"),
-    REDUCTION_IN_HOURS("2", "Reduction in Hours"),
-    DEATH_OF_EMPLOYEE("3", "Death of Employee"),
-    DIVORCE_LEGAL_SEPARATION("4", "Divorce or Legal Separation"),
-    MEDICARE_ENTITLEMENT("5", "Medicare Entitlement"),
-    DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT("6", "Dependent Child Ceases to be Dependent"),
-    BANKRUPTCY("7", "Bankruptcy (Retirees and Dependents)"),
-    LAYOFF("8", "Layoff"),
-    LEAVE_OF_ABSENCE("9", "Leave of Absence");
+    REDUCTION_OF_WORK_HOURS("2", "Reduction of work hours"),
+    MEDICARE("3", "Medicare"),
+    DEATH("4", "Death"),
+    DIVORCE("5", "Divorce"),
+    SEPARATION("6", "Separation"),
+    INELIGIBLE_CHILD("7", "Ineligible Child"),
+    BANKRUPTCY("8", "Bankruptcy of Retiree's Former Employer (26 U.S.C. 4980B(f)(3)(F))"),
+    LAYOFF("9", "Layoff"),
+    LEAVE_OF_ABSENCE("10", "Leave of Absence"),
+    MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
     private final String code;
     private final String description;
@@ -43,19 +51,18 @@ public enum COBRAQualifyingEventCode implements EdiCodeEnum {
                         Map.entry("quit", TERMINATION_OF_EMPLOYMENT),
                         Map.entry("resignation", TERMINATION_OF_EMPLOYMENT),
 
-                        Map.entry("reduced hours", REDUCTION_IN_HOURS),
-                        Map.entry("parttime", REDUCTION_IN_HOURS),
+                        Map.entry("reduced hours", REDUCTION_OF_WORK_HOURS),
+                        Map.entry("reduction in hours", REDUCTION_OF_WORK_HOURS),
+                        Map.entry("parttime", REDUCTION_OF_WORK_HOURS),
 
-                        Map.entry("deceased", DEATH_OF_EMPLOYEE),
-                        Map.entry("passed away", DEATH_OF_EMPLOYEE),
+                        Map.entry("deceased", DEATH),
+                        Map.entry("passed away", DEATH),
 
-                        Map.entry("divorce", DIVORCE_LEGAL_SEPARATION),
-                        Map.entry("separated", DIVORCE_LEGAL_SEPARATION),
+                        Map.entry("legal separation", SEPARATION),
 
-                        Map.entry("medicare", MEDICARE_ENTITLEMENT),
-
-                        Map.entry("agedout", DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT),
-                        Map.entry("no longer dependent", DEPENDENT_CHILD_CEASES_TO_BE_DEPENDENT),
+                        Map.entry("aged out", INELIGIBLE_CHILD),
+                        Map.entry("no longer dependent", INELIGIBLE_CHILD),
+                        Map.entry("dependent child ceases", INELIGIBLE_CHILD),
 
                         Map.entry("chapter11", BANKRUPTCY),
 

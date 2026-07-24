@@ -14,88 +14,53 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Benefit Status Codes used in the HD05 field
- * of the EDI 834 Health Coverage (HD) segment.
+ * Enumeration representing Benefit Status Codes (X12 element 1216) emitted at the
+ * INS05 field of the EDI 834 Member Level Detail (INS) segment.
+ *
+ * <p>The full element 1216 list. The former list carried two invented codes
+ * ({@code D}, {@code R}), was missing {@code I} and {@code V}, and — most dangerously —
+ * labeled {@code T} as "Terminated" when element 1216 defines {@code T} as TEFRA;
+ * a pick list built on the old descriptions would have led an administrator to file a
+ * member into a TEFRA status while intending to terminate them.
  */
 @Getter
 public enum BenefitStatusCode implements EdiCodeEnum {
     ACTIVE("A", "Active"),
-    COBRA("C", "COBRA"),
-    DISABLED("D", "Disabled"),
-    RETIREE("R", "Retiree"),
+    COBRA("C", "Consolidated Omnibus Budget Reconciliation Act (COBRA)"),
+    INVOLUNTARY("I", "Involuntary"),
     SURVIVING_INSURED("S", "Surviving Insured"),
-    TERMINATED("T", "Terminated");
+    TEFRA("T", "Tax Equity and Fiscal Responsibility Act (TEFRA)"),
+    VOLUNTARY("V", "Voluntary");
 
     private final String code;
     private final String description;
     private static final EdiEnumLookup<BenefitStatusCode> LOOKUP;
 
     static {
-        // Include additional common terms and phrases users might search for
+        // Colloquial aliases; codes, enum names and descriptions are matched automatically.
         LOOKUP = new EdiEnumLookup<>(
                 BenefitStatusCode.class,
                 "Benefit Status Code",
                 Map.ofEntries(
-                        Map.entry("a", ACTIVE),
                         Map.entry("active coverage", ACTIVE),
                         Map.entry("current", ACTIVE),
                         Map.entry("enrolled", ACTIVE),
 
-                        Map.entry("c", COBRA),
+                        Map.entry("cobra", COBRA),
                         Map.entry("cobra coverage", COBRA),
-                        Map.entry("consolidated omnibus budget reconciliation act", COBRA),
                         Map.entry("continuation", COBRA),
                         Map.entry("continuation coverage", COBRA),
-                        Map.entry("continued benefits", COBRA),
-                        Map.entry("extended coverage", COBRA),
-                        Map.entry("cobra eligible", COBRA),
-                        Map.entry("cobra qualified", COBRA),
 
-                        Map.entry("d", DISABLED),
-                        Map.entry("disability", DISABLED),
-                        Map.entry("on disability", DISABLED),
-                        Map.entry("disability benefits", DISABLED),
-                        Map.entry("ltd", DISABLED),
-                        Map.entry("long term disability", DISABLED),
-                        Map.entry("short term disability", DISABLED),
-                        Map.entry("std", DISABLED),
+                        Map.entry("involuntary loss", INVOLUNTARY),
 
-                        Map.entry("r", RETIREE),
-                        Map.entry("retired", RETIREE),
-                        Map.entry("retirement", RETIREE),
-                        Map.entry("retirement benefits", RETIREE),
-                        Map.entry("pension", RETIREE),
-                        Map.entry("pensioner", RETIREE),
-                        Map.entry("former employee", RETIREE),
-                        Map.entry("emeritus", RETIREE),
-                        Map.entry("retired employee", RETIREE),
-
-                        Map.entry("s", SURVIVING_INSURED),
                         Map.entry("survivor", SURVIVING_INSURED),
-                        Map.entry("surviving dependent", SURVIVING_INSURED),
+                        Map.entry("surviving spouse", SURVIVING_INSURED),
                         Map.entry("widow", SURVIVING_INSURED),
                         Map.entry("widower", SURVIVING_INSURED),
-                        Map.entry("bereaved", SURVIVING_INSURED),
-                        Map.entry("surviving spouse", SURVIVING_INSURED),
-                        Map.entry("survivor benefits", SURVIVING_INSURED),
-                        Map.entry("death benefit", SURVIVING_INSURED),
 
-                        Map.entry("t", TERMINATED),
-                        Map.entry("term", TERMINATED),
-                        Map.entry("termed", TERMINATED),
-                        Map.entry("termination", TERMINATED),
-                        Map.entry("cancelled", TERMINATED),
-                        Map.entry("canceled", TERMINATED),
-                        Map.entry("ended", TERMINATED),
-                        Map.entry("expired", TERMINATED),
-                        Map.entry("discontinued", TERMINATED),
-                        Map.entry("no longer active", TERMINATED),
-                        Map.entry("no longer employed", TERMINATED),
-                        Map.entry("separation", TERMINATED),
-                        Map.entry("let go", TERMINATED),
-                        Map.entry("laid off", TERMINATED),
-                        Map.entry("fired", TERMINATED),
-                        Map.entry("inactive", TERMINATED)
+                        Map.entry("tefra", TEFRA),
+
+                        Map.entry("voluntary loss", VOLUNTARY)
                 )
         );
     }

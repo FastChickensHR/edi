@@ -102,11 +102,12 @@ public class X834MemberWriter {
                     .build());
         }
 
-        // Emit one DTP segment per non-null date so each date is preserved.
-        // enrollmentDate is intentionally NOT emitted yet: it was mislabeled as
-        // COVERAGE_BEGIN (DTP*356), duplicating coverageStartDate. Its correct
-        // member-level DTP01 is being grounded in the 834 TR3 (see edi #167); the
-        // emission is re-enabled there under the right qualifier rather than shipped wrong.
+        // Emit one DTP segment per non-null member-level date so each is preserved.
+        // enrollmentDate → DTP*300 (Enrollment Signature Date), the member-level enrollment code
+        // the 834 TR3 permits at Loop 2000 (grounded in edi #167). It is distinct from
+        // coverageStartDate → DTP*356 (Eligibility Begin): the earlier mislabeling emitted both
+        // under 356, so the enrollment DTP was suppressed until the correct qualifier was grounded.
+        addDateSegment(segments, MemberDateQualifier.ENROLLMENT, member.getEnrollmentDate());
         addDateSegment(segments, MemberDateQualifier.COVERAGE_BEGIN, member.getCoverageStartDate());
         addDateSegment(segments, MemberDateQualifier.COVERAGE_END, member.getCoverageEndDate());
 

@@ -82,7 +82,7 @@ class MemberDateQualifierTest {
                 Arguments.of("end of eligibility", MemberDateQualifier.ELIGIBILITY_END),
                 Arguments.of("eligible until", MemberDateQualifier.ELIGIBILITY_END),
                 Arguments.of("eligibility termination", MemberDateQualifier.ELIGIBILITY_END),
-                Arguments.of("338", MemberDateQualifier.ENROLLMENT),
+                Arguments.of("300", MemberDateQualifier.ENROLLMENT),
                 Arguments.of("enrolled", MemberDateQualifier.ENROLLMENT),
                 Arguments.of("enrollment date", MemberDateQualifier.ENROLLMENT),
                 Arguments.of("date enrolled", MemberDateQualifier.ENROLLMENT),

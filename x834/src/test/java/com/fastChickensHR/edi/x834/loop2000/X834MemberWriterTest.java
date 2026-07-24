@@ -48,6 +48,38 @@ class X834MemberWriterTest {
     }
 
     @Test
+    void emitsEnrollmentDateAsDtp300DistinctFromCoverageBeginDtp356() throws ValidationException {
+        // enrollmentDate is the member-level enrollment date: DTP*300 (Enrollment Signature Date),
+        // the code the 834 TR3 permits at Loop 2000. It must NOT collapse onto coverageStartDate's
+        // DTP*356 (Eligibility Begin) — both are emitted, as separate member-level DTP segments.
+        Member member = baseSubscriber();
+        member.setEnrollmentDate(LocalDateTime.of(2026, 2, 1, 0, 0));
+        member.setCoverageStartDate(LocalDateTime.of(2026, 1, 1, 0, 0));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("DTP*300*D8*20260201~"),
+                () -> "expected enrollment DTP*300 (Enrollment Signature Date); got:\n" + out);
+        assertTrue(out.contains("DTP*356*D8*20260101~"),
+                () -> "expected coverage-begin DTP*356 (Eligibility Begin); got:\n" + out);
+        assertFalse(out.contains("DTP*382"),
+                () -> "382 (Enrollment) is not a permitted member-level DTP01; got:\n" + out);
+        assertTrue(out.indexOf("DTP*300") < out.indexOf("DTP*356"),
+                () -> "enrollment DTP should precede the coverage-begin DTP; got:\n" + out);
+    }
+
+    @Test
+    void omitsEnrollmentDtpWhenEnrollmentDateAbsent() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setCoverageStartDate(LocalDateTime.of(2026, 1, 1, 0, 0));
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("DTP*300"),
+                () -> "no enrollment DTP without an enrollmentDate; got:\n" + out);
+    }
+
+    @Test
     void emitsMemberNameNM1WhenLastNamePresent() throws ValidationException {
         Member member = baseSubscriber();
         member.setLastName("DOE");

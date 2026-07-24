@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class INSSegmentTest {
     String maintenanceReasonCode = MaintenanceReasonCode.ACTIVE.toString();
     String employmentStatusCode = EmploymentStatusCode.FULL_TIME.toString();
-    String confidentialityCode = ConfidentialityCode.LOW.toString();
+    String confidentialityCode = ConfidentialityCode.RESTRICTED.toString();
     @Test
     void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
         X834Context context = new X834Context();
@@ -40,8 +40,10 @@ class INSSegmentTest {
         segment.setContext(context);
 
         assertEquals("INS", segment.getSegmentIdentifier(), "Expected segment identifier should be 'INS'");
-        // Death date renders at INS12, preceded by the INS11 date-time format qualifier (D8).
-        assertEquals("INS*Y*18*001*AC*A*D*1*2*F*N*D8*20250101~", segment.render().trim(),
+        // #141 code values (INS04 maintenance-reason ACTIVE, INS08 employment FULL_TIME) in the
+        // #176 structure: the death date renders at INS12, preceded by the INS11 date-time format
+        // qualifier (D8).
+        assertEquals("INS*Y*18*001*20*A*D*1*FT*F*N*D8*20250101~", segment.render().trim(),
                 "The segment is not formatted correctly.");
     }
 

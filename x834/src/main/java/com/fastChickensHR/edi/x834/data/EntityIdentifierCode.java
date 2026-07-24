@@ -182,6 +182,13 @@ public enum EntityIdentifierCode implements EdiCodeEnum {
     TERMINAL_LOCATION("T3", "Terminal Location"),
     PLAN_SPONSOR("P5", "Plan Sponsor"),
     PRIMARY_TAX_PAYER("TP", "Primary Taxpayer"),
+    THIRD_PARTY_ADMINISTRATOR_TPA("TV", "Third Party Administrator (TPA)"),
+    BROKER_OR_SALES_OFFICE("BO", "Broker or Sales Office"),
+    INSURED_OR_SUBSCRIBER("IL", "Insured or Subscriber"),
+    CORRECTED_INSURED("74", "Corrected Insured"),
+    EMPLOYER("36", "Employer"),
+    INFORMATION_SOURCE("ACV", "Information Source"),
+    MANAGED_CARE("QK", "Managed Care"),
     PARTICIPANT("75", "Participant");
 
     private final String code;
