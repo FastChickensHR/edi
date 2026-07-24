@@ -106,4 +106,38 @@ class DelimitedFileGeneratorTest {
         assertThrows(IllegalArgumentException.class,
                 () -> parser.parse("recordLevel,first\nSUBRECORD,Kid\n"));
     }
+
+    @Test
+    void twoLevelNestingIsRejected() {
+        // The linked-row convention flattens exactly one level of nesting (RECORD + its SUBRECORDs);
+        // a SUBRECORD that itself has children has nowhere to go in a flat file.
+        Record grandchild = Record.of(List.of(f(SUBRECORD, "first", "Grand")));
+        Record child = new Record(List.of(f(SUBRECORD, "first", "Kid")), List.of(grandchild));
+        Record subscriber = new Record(List.of(f(RECORD, "first", "Jane")), List.of(child));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> generator.generate(new FileContent(Direction.OUTBOUND, List.of(), List.of(subscriber))));
+    }
+
+    @Test
+    void embeddedQuoteIsDoubledOnGenerateAndRoundTrips() {
+        List<Record> records = List.of(
+                Record.of(List.of(f(RECORD, "id", "1"), f(RECORD, "note", "He said \"hi\""))));
+
+        String csv = generator.generate(new FileContent(Direction.OUTBOUND, List.of(), records));
+
+        assertEquals("id,note\n1,\"He said \"\"hi\"\"\"\n", csv);
+        assertEquals(records, parser.parse(csv).records());
+    }
+
+    @Test
+    void embeddedDelimiterIsQuotedOnGenerateAndRoundTrips() {
+        List<Record> records = List.of(
+                Record.of(List.of(f(RECORD, "id", "1"), f(RECORD, "name", "Doe, Jane"))));
+
+        String csv = generator.generate(new FileContent(Direction.OUTBOUND, List.of(), records));
+
+        assertEquals("id,name\n1,\"Doe, Jane\"\n", csv);
+        assertEquals(records, parser.parse(csv).records());
+    }
 }
