@@ -61,6 +61,16 @@ public abstract class N1Segment extends Segment {
         if (n102 != null && n102.length() > 60) {
             throw new ValidationException("Plan Sponsor Name (N102) must be 60 characters or less");
         }
+        // X12 syntax rule P0304: N103 and N104 are a paired presence — if either the
+        // Identification Code Qualifier (N103) or the Identification Code (N104) is present,
+        // the other is required. A lone qualifier renders as a dangling "*FI" tail (and a lone
+        // identifier as "**id"), both non-conformant. Treat an empty N104 as absent.
+        boolean n103Present = n103 != null;
+        boolean n104Present = n104 != null && !n104.isEmpty();
+        if (n103Present != n104Present) {
+            throw new ValidationException(
+                    "N1 rule P0304: Identification Code Qualifier (N103) and Identification Code (N104) must be present together");
+        }
     }
 
     @Override
