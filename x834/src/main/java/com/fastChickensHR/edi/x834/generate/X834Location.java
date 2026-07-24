@@ -83,6 +83,18 @@ public final class X834Location {
     /** Loop 2300 coverage end date — DTP*349 (D8). */
     public static final String HD_BENEFIT_END_DATE = "hd.benefitEndDate";
 
+    /**
+     * The position name for the {@code index}-th HD (Loop 2300) coverage group of one member — the
+     * indexed form of an {@code HD_*} constant, so a single member Record can carry <em>multiple</em>
+     * HD loops (one per coverage). {@code hd(0, HD_INSURANCE_LINE_CODE)} → {@code "hd.0.insuranceLineCode"};
+     * {@code hd(1, HD_BENEFIT_BEGIN_DATE)} → {@code "hd.1.benefitBeginDate"}. Groups emit in ascending
+     * index order, each with its own begin/end DTPs. The un-indexed {@code HD_*} constants remain a
+     * single implicit group, so existing single-coverage callers are unaffected.
+     */
+    public static String hd(int index, String hdField) {
+        return HD_PREFIX + index + "." + hdField.substring(HD_PREFIX.length());
+    }
+
     /** Custom REF extension: location is {@code "ref." + qualifier}, e.g. {@code "ref.ZZ"}. */
     public static final String REF_EXTENSION_PREFIX = "ref.";
 }

@@ -22,13 +22,13 @@ class MemberLevelDatesTest {
 
     private X834Context context;
     private final String dateQualifierCode = MemberDateQualifier.BIRTH.getCode();
-    private final DateFormat dateFormatQualifier = DateFormat.DATE;
+    private final DateFormat dateFormatQualifier = DateFormat.D8;
     private final LocalDateTime dateValue = LocalDateTime.of(2025, 1, 1, 0, 0);
 
     @BeforeEach
     void setUp() {
         context = new X834Context();
-        context.setDateFormat(DateFormat.DATE);
+        context.setDateFormat(DateFormat.D8);
     }
 
     @Test
@@ -106,7 +106,26 @@ class MemberLevelDatesTest {
         segment.setContext(context);
 
         String rendered = segment.render();
-        assertEquals("DTP*007*CCYYMMDD*20250101~", rendered.trim());
+        assertEquals("DTP*007*D8*20250101~", rendered.trim());
+    }
+
+    /**
+     * Regression for #156.1: DTP02 must carry the X12 date-time-period-format
+     * qualifier code (e.g. {@code D8}), never a human-readable pattern like
+     * {@code CCYYMMDD}. The retired {@code DateFormat.DATE} alias used to leak the
+     * pattern into DTP02.
+     */
+    @Test
+    void testDtp02CarriesX12CodeNotHumanPattern() throws ValidationException {
+        MemberLevelDates segment = new MemberLevelDates.Builder(context)
+                .setDateQualifier(MemberDateQualifier.BIRTH)
+                .setDateTimePeriod(dateValue)
+                .build();
+        segment.setContext(context);
+
+        String rendered = segment.render();
+        assertTrue(rendered.contains("*D8*"), "DTP02 should be the X12 code D8: " + rendered);
+        assertFalse(rendered.contains("CCYYMMDD"), "DTP02 must not carry a human pattern: " + rendered);
     }
 
     @Test
@@ -128,7 +147,7 @@ class MemberLevelDatesTest {
                 .setDtp03(dateValue)
                 .build();
 
-        assertEquals(DateFormat.DATE, dates.getDtp02());
+        assertEquals(DateFormat.D8, dates.getDtp02());
     }
 
     @Test
@@ -156,12 +175,12 @@ class MemberLevelDatesTest {
         // Test that all builder methods can be chained
         MemberLevelDates dates = new MemberLevelDates.Builder(context)
                 .setDateQualifier(MemberDateQualifier.BIRTH)
-                .setDateTimeFormat(DateFormat.DATE)
+                .setDateTimeFormat(DateFormat.D8)
                 .setDateTimePeriod(LocalDateTime.of(2025,1,1,0, 0))
                 .build();
 
         assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
-        assertEquals(DateFormat.DATE, dates.getDtp02());
+        assertEquals(DateFormat.D8, dates.getDtp02());
         assertEquals("20250101", dates.getDtp03());
     }
 }
