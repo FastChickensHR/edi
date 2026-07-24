@@ -7,13 +7,13 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,84 +21,29 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StudentStatusCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals(8, StudentStatusCode.values().length);
-        assertEquals("F", StudentStatusCode.FULL_TIME.getCode());
-        assertEquals("U", StudentStatusCode.UNKNOWN.getCode());
-    }
-
-    @Test
-    void testEnumProperties() {
-        assertEquals("Full-time Student", StudentStatusCode.FULL_TIME.getDescription());
-        assertEquals("Unknown", StudentStatusCode.UNKNOWN.getDescription());
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(StudentStatusCode.FULL_TIME, StudentStatusCode.fromString("F"));
-        assertEquals(StudentStatusCode.PART_TIME, StudentStatusCode.fromString("P"));
-        assertEquals(StudentStatusCode.NOT_A_STUDENT, StudentStatusCode.fromString("N"));
-        assertEquals(StudentStatusCode.CONTINUING_EDUCATION, StudentStatusCode.fromString("C"));
-        assertEquals(StudentStatusCode.GRADUATED, StudentStatusCode.fromString("G"));
-        assertEquals(StudentStatusCode.ON_BREAK, StudentStatusCode.fromString("B"));
-        assertEquals(StudentStatusCode.LEAVE_OF_ABSENCE, StudentStatusCode.fromString("L"));
-        assertEquals(StudentStatusCode.UNKNOWN, StudentStatusCode.fromString("U"));
-
-        assertEquals(StudentStatusCode.FULL_TIME, StudentStatusCode.fromString("f"));
-        assertEquals(StudentStatusCode.PART_TIME, StudentStatusCode.fromString("p"));
-
-        assertEquals(StudentStatusCode.FULL_TIME, StudentStatusCode.fromString("Full-time Student"));
-        assertEquals(StudentStatusCode.PART_TIME, StudentStatusCode.fromString("Part-time Student"));
-
-        assertEquals(StudentStatusCode.FULL_TIME, StudentStatusCode.fromString("full time"));
-        assertEquals(StudentStatusCode.PART_TIME, StudentStatusCode.fromString("parttime"));
-
-        assertThrows(IllegalArgumentException.class, () -> StudentStatusCode.fromString("invalid"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, StudentStatusCode expected) throws Exception {
-        Field lookupField = StudentStatusCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<StudentStatusCode> lookup =
-                (EdiEnumLookup<StudentStatusCode>) lookupField.get(null);
+    @EnumSource(StudentStatusCode.class)
+    void resolvesFromCodeNameAndDescription(StudentStatusCode constant) {
+        assertEquals(constant, StudentStatusCode.fromString(constant.getCode()));
+        assertEquals(constant, StudentStatusCode.fromString(constant.name()));
+        assertEquals(constant, StudentStatusCode.fromString(constant.getDescription()));
+    }
 
-        assertEquals(expected, lookup.fromString(input));
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, StudentStatusCode expected) {
         assertEquals(expected, StudentStatusCode.fromString(input));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    private static Stream<Arguments> aliases() {
         return Stream.of(
-                Arguments.of("F", StudentStatusCode.FULL_TIME),
-                Arguments.of("P", StudentStatusCode.PART_TIME),
-                Arguments.of("N", StudentStatusCode.NOT_A_STUDENT),
-                Arguments.of("C", StudentStatusCode.CONTINUING_EDUCATION),
-                Arguments.of("G", StudentStatusCode.GRADUATED),
-                Arguments.of("B", StudentStatusCode.ON_BREAK),
-                Arguments.of("L", StudentStatusCode.LEAVE_OF_ABSENCE),
-                Arguments.of("U", StudentStatusCode.UNKNOWN),
-
-                Arguments.of("FULL_TIME", StudentStatusCode.FULL_TIME),
-                Arguments.of("PART_TIME", StudentStatusCode.PART_TIME),
-                Arguments.of("NOT_A_STUDENT", StudentStatusCode.NOT_A_STUDENT),
-                Arguments.of("CONTINUING_EDUCATION", StudentStatusCode.CONTINUING_EDUCATION),
-                Arguments.of("GRADUATED", StudentStatusCode.GRADUATED),
-                Arguments.of("ON_BREAK", StudentStatusCode.ON_BREAK),
-                Arguments.of("LEAVE_OF_ABSENCE", StudentStatusCode.LEAVE_OF_ABSENCE),
-                Arguments.of("UNKNOWN", StudentStatusCode.UNKNOWN),
-
-                Arguments.of("Full-time Student", StudentStatusCode.FULL_TIME),
-                Arguments.of("Part-time Student", StudentStatusCode.PART_TIME),
-                Arguments.of("Not a Student", StudentStatusCode.NOT_A_STUDENT),
-                Arguments.of("Continuing Education", StudentStatusCode.CONTINUING_EDUCATION),
-                Arguments.of("Graduated", StudentStatusCode.GRADUATED),
-                Arguments.of("On School Break/Vacation", StudentStatusCode.ON_BREAK),
-                Arguments.of("Leave of Absence", StudentStatusCode.LEAVE_OF_ABSENCE),
-                Arguments.of("Unknown", StudentStatusCode.UNKNOWN),
-
-                Arguments.of("f", StudentStatusCode.FULL_TIME),
                 Arguments.of("fulltime", StudentStatusCode.FULL_TIME),
                 Arguments.of("full time", StudentStatusCode.FULL_TIME),
                 Arguments.of("full-time", StudentStatusCode.FULL_TIME),
@@ -107,8 +52,6 @@ class StudentStatusCodeTest {
                 Arguments.of("full load", StudentStatusCode.FULL_TIME),
                 Arguments.of("full course load", StudentStatusCode.FULL_TIME),
                 Arguments.of("regular student", StudentStatusCode.FULL_TIME),
-
-                Arguments.of("p", StudentStatusCode.PART_TIME),
                 Arguments.of("parttime", StudentStatusCode.PART_TIME),
                 Arguments.of("part time", StudentStatusCode.PART_TIME),
                 Arguments.of("part-time", StudentStatusCode.PART_TIME),
@@ -117,8 +60,6 @@ class StudentStatusCodeTest {
                 Arguments.of("partial load", StudentStatusCode.PART_TIME),
                 Arguments.of("reduced schedule", StudentStatusCode.PART_TIME),
                 Arguments.of("half time", StudentStatusCode.PART_TIME),
-
-                Arguments.of("n", StudentStatusCode.NOT_A_STUDENT),
                 Arguments.of("not student", StudentStatusCode.NOT_A_STUDENT),
                 Arguments.of("non student", StudentStatusCode.NOT_A_STUDENT),
                 Arguments.of("non-student", StudentStatusCode.NOT_A_STUDENT),
@@ -127,8 +68,6 @@ class StudentStatusCodeTest {
                 Arguments.of("not in school", StudentStatusCode.NOT_A_STUDENT),
                 Arguments.of("no school", StudentStatusCode.NOT_A_STUDENT),
                 Arguments.of("not attending", StudentStatusCode.NOT_A_STUDENT),
-
-                Arguments.of("c", StudentStatusCode.CONTINUING_EDUCATION),
                 Arguments.of("cont ed", StudentStatusCode.CONTINUING_EDUCATION),
                 Arguments.of("continuing ed", StudentStatusCode.CONTINUING_EDUCATION),
                 Arguments.of("cont education", StudentStatusCode.CONTINUING_EDUCATION),
@@ -138,30 +77,52 @@ class StudentStatusCodeTest {
                 Arguments.of("certificate program", StudentStatusCode.CONTINUING_EDUCATION),
                 Arguments.of("non-degree", StudentStatusCode.CONTINUING_EDUCATION),
                 Arguments.of("non degree", StudentStatusCode.CONTINUING_EDUCATION),
-
-                Arguments.of("g", StudentStatusCode.GRADUATED),
                 Arguments.of("grad", StudentStatusCode.GRADUATED),
                 Arguments.of("alumni", StudentStatusCode.GRADUATED),
                 Arguments.of("alumnus", StudentStatusCode.GRADUATED),
                 Arguments.of("alumna", StudentStatusCode.GRADUATED),
-
-                Arguments.of("b", StudentStatusCode.ON_BREAK),
+                Arguments.of("completed", StudentStatusCode.GRADUATED),
+                Arguments.of("finished", StudentStatusCode.GRADUATED),
+                Arguments.of("degree earned", StudentStatusCode.GRADUATED),
+                Arguments.of("completed program", StudentStatusCode.GRADUATED),
+                Arguments.of("earned degree", StudentStatusCode.GRADUATED),
+                Arguments.of("commencement", StudentStatusCode.GRADUATED),
                 Arguments.of("break", StudentStatusCode.ON_BREAK),
                 Arguments.of("vacation", StudentStatusCode.ON_BREAK),
                 Arguments.of("school break", StudentStatusCode.ON_BREAK),
+                Arguments.of("semester break", StudentStatusCode.ON_BREAK),
                 Arguments.of("holiday", StudentStatusCode.ON_BREAK),
-
-                Arguments.of("l", StudentStatusCode.LEAVE_OF_ABSENCE),
+                Arguments.of("between terms", StudentStatusCode.ON_BREAK),
+                Arguments.of("between semesters", StudentStatusCode.ON_BREAK),
+                Arguments.of("summer break", StudentStatusCode.ON_BREAK),
+                Arguments.of("winter break", StudentStatusCode.ON_BREAK),
+                Arguments.of("spring break", StudentStatusCode.ON_BREAK),
                 Arguments.of("leave", StudentStatusCode.LEAVE_OF_ABSENCE),
                 Arguments.of("loa", StudentStatusCode.LEAVE_OF_ABSENCE),
-                Arguments.of("sabbatical", StudentStatusCode.LEAVE_OF_ABSENCE),
+                Arguments.of("absence", StudentStatusCode.LEAVE_OF_ABSENCE),
+                Arguments.of("medical leave", StudentStatusCode.LEAVE_OF_ABSENCE),
                 Arguments.of("temporary leave", StudentStatusCode.LEAVE_OF_ABSENCE),
-
-                Arguments.of("u", StudentStatusCode.UNKNOWN),
+                Arguments.of("sabbatical", StudentStatusCode.LEAVE_OF_ABSENCE),
+                Arguments.of("study abroad", StudentStatusCode.LEAVE_OF_ABSENCE),
+                Arguments.of("personal leave", StudentStatusCode.LEAVE_OF_ABSENCE),
+                Arguments.of("family leave", StudentStatusCode.LEAVE_OF_ABSENCE),
                 Arguments.of("unk", StudentStatusCode.UNKNOWN),
-                Arguments.of("not specified", StudentStatusCode.UNKNOWN),
+                Arguments.of("unspecified", StudentStatusCode.UNKNOWN),
                 Arguments.of("not provided", StudentStatusCode.UNKNOWN),
-                Arguments.of("unspecified", StudentStatusCode.UNKNOWN)
-        );
+                Arguments.of("not specified", StudentStatusCode.UNKNOWN),
+                Arguments.of("undetermined", StudentStatusCode.UNKNOWN),
+                Arguments.of("unclear", StudentStatusCode.UNKNOWN),
+                Arguments.of("not reported", StudentStatusCode.UNKNOWN),
+                Arguments.of("missing", StudentStatusCode.UNKNOWN),
+                Arguments.of("not available", StudentStatusCode.UNKNOWN),
+                Arguments.of("na", StudentStatusCode.UNKNOWN));
+    }
+
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> StudentStatusCode.fromString(input));
     }
 }

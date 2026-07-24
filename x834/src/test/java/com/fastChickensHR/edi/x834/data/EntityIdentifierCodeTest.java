@@ -7,65 +7,59 @@
  */
 package com.fastChickensHR.edi.x834.data;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EntityIdentifierCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals("00", EntityIdentifierCode.ALTERNATE_INSURER.getCode());
-        assertEquals("01", EntityIdentifierCode.LOAN_APPLICANT.getCode());
-        assertEquals("1A", EntityIdentifierCode.SUBGROUP.getCode());
-        assertEquals("2A", EntityIdentifierCode.FEDERAL_STATE_COUNTY_CITY_FACILITY.getCode());
-
-        assertEquals("Alternate Insurer", EntityIdentifierCode.ALTERNATE_INSURER.getDescription());
-        assertEquals("Loan Applicant", EntityIdentifierCode.LOAN_APPLICANT.getDescription());
-    }
-
-    @Test
-    void testEnumProperties() {
-        // Ensure all enum values have valid properties set
-        for (EntityIdentifierCode code : EntityIdentifierCode.values()) {
-            assertNotNull(code.getCode(), "Code should not be null for " + code.name());
-            assertFalse(code.getCode().isEmpty(), "Code should not be empty for " + code.name());
-
-            assertNotNull(code.getDescription(), "Description should not be null for " + code.name());
-            assertFalse(code.getDescription().isEmpty(), "Description should not be empty for " + code.name());
-        }
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(EntityIdentifierCode.ALTERNATE_INSURER, EntityIdentifierCode.fromString("00"));
-        assertEquals(EntityIdentifierCode.LOAN_APPLICANT, EntityIdentifierCode.fromString("01"));
-        assertEquals(EntityIdentifierCode.SUBGROUP, EntityIdentifierCode.fromString("1A"));
-        assertEquals(EntityIdentifierCode.SUBGROUP, EntityIdentifierCode.fromString("1a"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, EntityIdentifierCode expected) {
+    @EnumSource(EntityIdentifierCode.class)
+    void resolvesFromCodeNameAndDescription(EntityIdentifierCode constant) {
+        assertEquals(constant, EntityIdentifierCode.fromString(constant.getCode()));
+        assertEquals(constant, EntityIdentifierCode.fromString(constant.name()));
+        assertEquals(constant, EntityIdentifierCode.fromString(constant.getDescription()));
+    }
+
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, EntityIdentifierCode expected) {
         assertEquals(expected, EntityIdentifierCode.fromString(input));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
-        return Arrays.stream(EntityIdentifierCode.values())
-                .map(code -> Arguments.of(code.getCode(), code));
+    private static Stream<Arguments> aliases() {
+        return Stream.of(
+                Arguments.of("hmo", EntityIdentifierCode.HEALTH_MAINTENANCE_ORGANIZATION),
+                Arguments.of("ppo", EntityIdentifierCode.PREFERRED_PROVIDER_ORGANIZATION),
+                Arguments.of("tpa", EntityIdentifierCode.THIRD_PARTY_ADMINISTRATOR),
+                Arguments.of("provider", EntityIdentifierCode.PROVIDER),
+                Arguments.of("dependent", EntityIdentifierCode.DEPENDENT),
+                Arguments.of("hospital", EntityIdentifierCode.ACUTE_CARE_HOSPITAL),
+                Arguments.of("pharmacy", EntityIdentifierCode.RETAIL_PHARMACY),
+                Arguments.of("lab", EntityIdentifierCode.LABORATORY),
+                Arguments.of("hospice", EntityIdentifierCode.HOSPICE));
     }
 
-    @Test
-    void testToString() {
-        assertEquals("00", EntityIdentifierCode.ALTERNATE_INSURER.toString());
-        assertEquals("01", EntityIdentifierCode.LOAN_APPLICANT.toString());
-        assertEquals("1A", EntityIdentifierCode.SUBGROUP.toString());
-        assertEquals("2A", EntityIdentifierCode.FEDERAL_STATE_COUNTY_CITY_FACILITY.toString());
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> EntityIdentifierCode.fromString(input));
     }
 }

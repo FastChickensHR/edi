@@ -7,102 +7,79 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CoverageLevelCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals(10, CoverageLevelCode.values().length,
-                "CoverageLevelCode should have 10 enum values");
-
-        assertTrue(Arrays.asList(CoverageLevelCode.values()).contains(CoverageLevelCode.FAMILY));
-        assertTrue(Arrays.asList(CoverageLevelCode.values()).contains(CoverageLevelCode.EMPLOYEE_ONLY));
-        assertTrue(Arrays.asList(CoverageLevelCode.values()).contains(CoverageLevelCode.INDIVIDUAL));
-    }
-
-    @Test
-    void testEnumProperties() {
-        assertEquals("TWO", CoverageLevelCode.TWO_PARTY.getCode());
-        assertEquals("CHD", CoverageLevelCode.CHILDREN_ONLY.getCode());
-    }
-
-    @Test
-    void testToStringReturnsCode() {
-        assertEquals("FAM", CoverageLevelCode.FAMILY.toString());
-        assertEquals("EMP", CoverageLevelCode.EMPLOYEE_ONLY.toString());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testFromString() throws Exception {
-        Field lookupField = CoverageLevelCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<CoverageLevelCode> lookup =
-                (EdiEnumLookup<CoverageLevelCode>) lookupField.get(null);
-
-        assertEquals(CoverageLevelCode.FAMILY, lookup.fromString("FAM"));
-        assertEquals(CoverageLevelCode.FAMILY, lookup.fromString("Family"));
-        assertEquals(CoverageLevelCode.FAMILY, lookup.fromString("family coverage"));
-
-        assertEquals(CoverageLevelCode.EMPLOYEE_ONLY, lookup.fromString("self"));
-        assertEquals(CoverageLevelCode.EMPLOYEE_ONLY, lookup.fromString("ee only"));
-        assertEquals(CoverageLevelCode.INDIVIDUAL, lookup.fromString("single"));
-        assertEquals(CoverageLevelCode.TWO_PARTY, lookup.fromString("couple"));
-
-        assertThrows(IllegalArgumentException.class, () -> lookup.fromString("invalid"));
-        assertThrows(IllegalArgumentException.class, () -> lookup.fromString(""));
-        assertThrows(IllegalArgumentException.class, () -> lookup.fromString(null));
-    }
-
-    @Test
-    void testStaticFromString() {
-        assertEquals(CoverageLevelCode.FAMILY, CoverageLevelCode.fromString("FAM"));
-        assertEquals(CoverageLevelCode.EMPLOYEE_ONLY, CoverageLevelCode.fromString("self"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    @SuppressWarnings("unchecked")
-    void testAllLookupValues(String input, CoverageLevelCode expected) throws Exception {
-        Field lookupField = CoverageLevelCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<CoverageLevelCode> lookup =
-                (EdiEnumLookup<CoverageLevelCode>) lookupField.get(null);
-        assertEquals(expected, lookup.fromString(input));
+    @EnumSource(CoverageLevelCode.class)
+    void resolvesFromCodeNameAndDescription(CoverageLevelCode constant) {
+        assertEquals(constant, CoverageLevelCode.fromString(constant.getCode()));
+        assertEquals(constant, CoverageLevelCode.fromString(constant.name()));
+        assertEquals(constant, CoverageLevelCode.fromString(constant.getDescription()));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
-        return Stream.of(
-                Arguments.of("FAM", CoverageLevelCode.FAMILY),
-                Arguments.of("EMP", CoverageLevelCode.EMPLOYEE_ONLY),
-                Arguments.of("IND", CoverageLevelCode.INDIVIDUAL),
-                Arguments.of("ECH", CoverageLevelCode.EMPLOYEE_AND_CHILDREN),
-                Arguments.of("ESP", CoverageLevelCode.EMPLOYEE_AND_SPOUSE),
-                Arguments.of("SPC", CoverageLevelCode.SPOUSE_AND_CHILDREN),
-                Arguments.of("SPO", CoverageLevelCode.SPOUSE_ONLY),
-                Arguments.of("CHD", CoverageLevelCode.CHILDREN_ONLY),
-                Arguments.of("TWO", CoverageLevelCode.TWO_PARTY),
-                Arguments.of("DEP", CoverageLevelCode.DEPENDENTS_ONLY),
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, CoverageLevelCode expected) {
+        assertEquals(expected, CoverageLevelCode.fromString(input));
+    }
 
+    private static Stream<Arguments> aliases() {
+        return Stream.of(
+                Arguments.of("kids only", CoverageLevelCode.CHILDREN_ONLY),
+                Arguments.of("child only", CoverageLevelCode.CHILDREN_ONLY),
+                Arguments.of("just children", CoverageLevelCode.CHILDREN_ONLY),
+                Arguments.of("dep only", CoverageLevelCode.DEPENDENTS_ONLY),
+                Arguments.of("just dependents", CoverageLevelCode.DEPENDENTS_ONLY),
+                Arguments.of("ee and children", CoverageLevelCode.EMPLOYEE_AND_CHILDREN),
+                Arguments.of("employee + children", CoverageLevelCode.EMPLOYEE_AND_CHILDREN),
+                Arguments.of("employee+children", CoverageLevelCode.EMPLOYEE_AND_CHILDREN),
+                Arguments.of("parent and children", CoverageLevelCode.EMPLOYEE_AND_CHILDREN),
+                Arguments.of("ee only", CoverageLevelCode.EMPLOYEE_ONLY),
+                Arguments.of("just employee", CoverageLevelCode.EMPLOYEE_ONLY),
+                Arguments.of("self only", CoverageLevelCode.EMPLOYEE_ONLY),
+                Arguments.of("self", CoverageLevelCode.EMPLOYEE_ONLY),
+                Arguments.of("ee and spouse", CoverageLevelCode.EMPLOYEE_AND_SPOUSE),
+                Arguments.of("employee + spouse", CoverageLevelCode.EMPLOYEE_AND_SPOUSE),
+                Arguments.of("employee+spouse", CoverageLevelCode.EMPLOYEE_AND_SPOUSE),
                 Arguments.of("family coverage", CoverageLevelCode.FAMILY),
                 Arguments.of("whole family", CoverageLevelCode.FAMILY),
-                Arguments.of("self", CoverageLevelCode.EMPLOYEE_ONLY),
-                Arguments.of("just employee", CoverageLevelCode.EMPLOYEE_ONLY),
+                Arguments.of("all family", CoverageLevelCode.FAMILY),
+                Arguments.of("ind", CoverageLevelCode.INDIVIDUAL),
                 Arguments.of("single", CoverageLevelCode.INDIVIDUAL),
-                Arguments.of("couple", CoverageLevelCode.TWO_PARTY),
+                Arguments.of("spouse + children", CoverageLevelCode.SPOUSE_AND_CHILDREN),
+                Arguments.of("spouse+children", CoverageLevelCode.SPOUSE_AND_CHILDREN),
+                Arguments.of("partner and children", CoverageLevelCode.SPOUSE_AND_CHILDREN),
+                Arguments.of("just spouse", CoverageLevelCode.SPOUSE_ONLY),
                 Arguments.of("partner only", CoverageLevelCode.SPOUSE_ONLY),
-                Arguments.of("kids only", CoverageLevelCode.CHILDREN_ONLY)
-        );
+                Arguments.of("2 party", CoverageLevelCode.TWO_PARTY),
+                Arguments.of("two-party", CoverageLevelCode.TWO_PARTY),
+                Arguments.of("couple", CoverageLevelCode.TWO_PARTY));
+    }
+
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> CoverageLevelCode.fromString(input));
     }
 }

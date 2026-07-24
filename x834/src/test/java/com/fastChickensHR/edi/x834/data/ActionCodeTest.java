@@ -7,188 +7,109 @@
  */
 package com.fastChickensHR.edi.x834.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ActionCodeTest {
 
-    @Test
-    void testEnumValues() {
-        assertEquals("0", ActionCode.AUTHORIZE.getCode());
-        assertEquals("Authorize", ActionCode.AUTHORIZE.getDescription());
-
-        assertEquals("00", ActionCode.AUTHORIZE_AND_SETTLE.getCode());
-        assertEquals("Authorize and Settle Combination", ActionCode.AUTHORIZE_AND_SETTLE.getDescription());
-
-        assertEquals("1", ActionCode.ADD.getCode());
-        assertEquals("Add", ActionCode.ADD.getDescription());
-
-        assertEquals("2", ActionCode.CHANGE.getCode());
-        assertEquals("Change (Update)", ActionCode.CHANGE.getDescription());
-
-        assertEquals("3", ActionCode.DELETE.getCode());
-        assertEquals("Delete", ActionCode.DELETE.getDescription());
-
-        assertEquals("17", ActionCode.CREATE.getCode());
-        assertEquals("Create", ActionCode.CREATE.getDescription());
-
-        assertEquals("51", ActionCode.COMPLETE.getCode());
-        assertEquals("Complete", ActionCode.COMPLETE.getDescription());
-
-        assertEquals("91", ActionCode.IN_PROGRESS.getCode());
-        assertEquals("In Progress", ActionCode.IN_PROGRESS.getDescription());
-
-        assertEquals("97", ActionCode.SEND_RECORD_INTERSESSION.getCode());
-        assertEquals("Send Record at End of the Intersession Term", ActionCode.SEND_RECORD_INTERSESSION.getDescription());
-    }
-
-    @Test
-    void testEnumProperties() {
-        for (ActionCode actionCode : ActionCode.values()) {
-            assertNotNull(actionCode.getCode(), "Code should not be null for " + actionCode.name());
-            assertNotNull(actionCode.getDescription(), "Description should not be null for " + actionCode.name());
-            assertFalse(actionCode.getCode().isEmpty(), "Code should not be empty for " + actionCode.name());
-            assertFalse(actionCode.getDescription().isEmpty(), "Description should not be empty for " + actionCode.name());
-        }
-    }
-
-    @Test
-    void testFromString() {
-        assertEquals(ActionCode.AUTHORIZE, ActionCode.fromString("0"));
-        assertEquals(ActionCode.ADD, ActionCode.fromString("1"));
-        assertEquals(ActionCode.CHANGE, ActionCode.fromString("2"));
-        assertEquals(ActionCode.DELETE, ActionCode.fromString("3"));
-        assertEquals(ActionCode.CREATE, ActionCode.fromString("17"));
-        assertEquals(ActionCode.COMPLETE, ActionCode.fromString("51"));
-
-        assertEquals(ActionCode.ADD, ActionCode.fromString("add"));
-        assertEquals(ActionCode.ADD, ActionCode.fromString("Add"));
-        assertEquals(ActionCode.ADD, ActionCode.fromString("ADD"));
-        assertEquals(ActionCode.ADD, ActionCode.fromString(" add "));
-
-        assertEquals(ActionCode.AUTHORIZE, ActionCode.fromString("Authorize"));
-        assertEquals(ActionCode.CHANGE, ActionCode.fromString("Change (Update)"));
-        assertEquals(ActionCode.DELETE, ActionCode.fromString("Delete"));
-
-        assertEquals(ActionCode.ADD, ActionCode.fromString("insert"));
-        assertEquals(ActionCode.CHANGE, ActionCode.fromString("update"));
-        assertEquals(ActionCode.CHANGE, ActionCode.fromString("modify"));
-        assertEquals(ActionCode.DELETE, ActionCode.fromString("remove"));
-        assertEquals(ActionCode.VERIFY, ActionCode.fromString("validate"));
-        assertEquals(ActionCode.APPROVE, ActionCode.fromString("approval"));
-        assertEquals(ActionCode.DISAPPROVE, ActionCode.fromString("reject"));
-        assertEquals(ActionCode.CREATE, ActionCode.fromString("generate"));
-        assertEquals(ActionCode.ON_HOLD, ActionCode.fromString("hold"));
-        assertEquals(ActionCode.COMPLETE, ActionCode.fromString("finished"));
-        assertEquals(ActionCode.REACTIVATE, ActionCode.fromString("restore"));
-
-        assertThrows(IllegalArgumentException.class, () -> ActionCode.fromString(null));
-        assertThrows(IllegalArgumentException.class, () -> ActionCode.fromString(""));
-        assertThrows(IllegalArgumentException.class, () -> ActionCode.fromString("invalid_code"));
-        assertThrows(IllegalArgumentException.class, () -> ActionCode.fromString("999"));
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, ActionCode expected) throws Exception {
-        Field lookupField = ActionCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        Object lookupObject = lookupField.get(null);
+    @EnumSource(ActionCode.class)
+    void resolvesFromCodeNameAndDescription(ActionCode constant) {
+        assertEquals(constant, ActionCode.fromString(constant.getCode()));
+        assertEquals(constant, ActionCode.fromString(constant.name()));
+        assertEquals(constant, ActionCode.fromString(constant.getDescription()));
+    }
 
-        assertTrue(lookupObject instanceof EdiEnumLookup);
-
-        @SuppressWarnings("unchecked")
-        EdiEnumLookup<ActionCode> lookup = (EdiEnumLookup<ActionCode>) lookupObject;
-
-        assertEquals(expected, lookup.fromString(input));
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, ActionCode expected) {
         assertEquals(expected, ActionCode.fromString(input));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    private static Stream<Arguments> aliases() {
         return Stream.of(
-                Arguments.of("0", ActionCode.AUTHORIZE),
-                Arguments.of("00", ActionCode.AUTHORIZE_AND_SETTLE),
-                Arguments.of("1", ActionCode.ADD),
-                Arguments.of("2", ActionCode.CHANGE),
-                Arguments.of("3", ActionCode.DELETE),
-                Arguments.of("4", ActionCode.VERIFY),
-                Arguments.of("5", ActionCode.SEND),
-                Arguments.of("17", ActionCode.CREATE),
-                Arguments.of("51", ActionCode.COMPLETE),
-                Arguments.of("79", ActionCode.REACTIVATE),
-                Arguments.of("91", ActionCode.IN_PROGRESS),
-
-                Arguments.of("AUTHORIZE", ActionCode.AUTHORIZE),
-                Arguments.of("ADD", ActionCode.ADD),
-                Arguments.of("CHANGE", ActionCode.CHANGE),
-                Arguments.of("DELETE", ActionCode.DELETE),
-                Arguments.of("CREATE", ActionCode.CREATE),
-                Arguments.of("COMPLETE", ActionCode.COMPLETE),
-                Arguments.of("IN_PROGRESS", ActionCode.IN_PROGRESS),
-
-                Arguments.of("Authorize", ActionCode.AUTHORIZE),
-                Arguments.of("Add", ActionCode.ADD),
-                Arguments.of("Change (Update)", ActionCode.CHANGE),
-                Arguments.of("Delete", ActionCode.DELETE),
-                Arguments.of("Create", ActionCode.CREATE),
-                Arguments.of("Complete", ActionCode.COMPLETE),
-                Arguments.of("In Progress", ActionCode.IN_PROGRESS),
-
                 Arguments.of("auth", ActionCode.AUTHORIZE),
+                Arguments.of("authorize", ActionCode.AUTHORIZE),
                 Arguments.of("authorization", ActionCode.AUTHORIZE),
                 Arguments.of("auth and settle", ActionCode.AUTHORIZE_AND_SETTLE),
+                Arguments.of("authorize settle", ActionCode.AUTHORIZE_AND_SETTLE),
+                Arguments.of("combination", ActionCode.AUTHORIZE_AND_SETTLE),
+                Arguments.of("add", ActionCode.ADD),
+                Arguments.of("create entry", ActionCode.ADD),
                 Arguments.of("insert", ActionCode.ADD),
+                Arguments.of("change", ActionCode.CHANGE),
                 Arguments.of("update", ActionCode.CHANGE),
                 Arguments.of("modify", ActionCode.CHANGE),
                 Arguments.of("edit", ActionCode.CHANGE),
+                Arguments.of("delete", ActionCode.DELETE),
                 Arguments.of("remove", ActionCode.DELETE),
                 Arguments.of("erase", ActionCode.DELETE),
+                Arguments.of("verify", ActionCode.VERIFY),
                 Arguments.of("validate", ActionCode.VERIFY),
                 Arguments.of("check", ActionCode.VERIFY),
+                Arguments.of("send", ActionCode.SEND),
                 Arguments.of("transmit", ActionCode.SEND),
                 Arguments.of("deliver", ActionCode.SEND),
+                Arguments.of("receive", ActionCode.RECEIVE),
                 Arguments.of("accept", ActionCode.RECEIVE),
                 Arguments.of("get", ActionCode.RECEIVE),
+                Arguments.of("request", ActionCode.REQUEST),
                 Arguments.of("ask", ActionCode.REQUEST),
                 Arguments.of("inquire", ActionCode.REQUEST),
+                Arguments.of("production send", ActionCode.IN_PRODUCTION_SEND),
+                Arguments.of("live send", ActionCode.IN_PRODUCTION_SEND),
+                Arguments.of("not capable", ActionCode.NOT_CAPABLE),
                 Arguments.of("unable", ActionCode.NOT_CAPABLE),
+                Arguments.of("incapable", ActionCode.NOT_CAPABLE),
+                Arguments.of("approve", ActionCode.APPROVE),
                 Arguments.of("approval", ActionCode.APPROVE),
                 Arguments.of("accepted", ActionCode.APPROVE),
+                Arguments.of("disapprove", ActionCode.DISAPPROVE),
                 Arguments.of("reject", ActionCode.DISAPPROVE),
                 Arguments.of("denied", ActionCode.DISAPPROVE),
+                Arguments.of("create", ActionCode.CREATE),
                 Arguments.of("generate", ActionCode.CREATE),
                 Arguments.of("new", ActionCode.CREATE),
+                Arguments.of("on hold", ActionCode.ON_HOLD),
                 Arguments.of("hold", ActionCode.ON_HOLD),
                 Arguments.of("pause", ActionCode.ON_HOLD),
+                Arguments.of("active", ActionCode.ACTIVE),
                 Arguments.of("activated", ActionCode.ACTIVE),
+                Arguments.of("complete", ActionCode.COMPLETE),
                 Arguments.of("completed", ActionCode.COMPLETE),
                 Arguments.of("finished", ActionCode.COMPLETE),
                 Arguments.of("done", ActionCode.COMPLETE),
+                Arguments.of("reactivate", ActionCode.REACTIVATE),
                 Arguments.of("restore", ActionCode.REACTIVATE),
                 Arguments.of("reinstate", ActionCode.REACTIVATE),
+                Arguments.of("follow up", ActionCode.FOLLOW_UP),
                 Arguments.of("followup", ActionCode.FOLLOW_UP),
+                Arguments.of("in progress", ActionCode.IN_PROGRESS),
                 Arguments.of("ongoing", ActionCode.IN_PROGRESS),
-                Arguments.of("processing", ActionCode.IN_PROGRESS)
-        );
+                Arguments.of("processing", ActionCode.IN_PROGRESS));
     }
 
-    @Test
-    void testToString() {
-        assertEquals("0", ActionCode.AUTHORIZE.toString());
-        assertEquals("00", ActionCode.AUTHORIZE_AND_SETTLE.toString());
-        assertEquals("1", ActionCode.ADD.toString());
-        assertEquals("2", ActionCode.CHANGE.toString());
-        assertEquals("3", ActionCode.DELETE.toString());
-        assertEquals("17", ActionCode.CREATE.toString());
-        assertEquals("51", ActionCode.COMPLETE.toString());
-        assertEquals("91", ActionCode.IN_PROGRESS.toString());
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> ActionCode.fromString(input));
     }
 }

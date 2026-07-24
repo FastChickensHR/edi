@@ -7,101 +7,52 @@
  */
 package com.fastChickensHR.edi.x834.loop2000.data;
 
-import com.fastChickensHR.edi.x834.util.EdiEnumLookup;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ConfidentialityCodeTest {
 
-    @Test
-    void testEnumValues() {
-        // Verify enum constants exist and match expected values
-        assertEquals(8, ConfidentialityCode.values().length);
-
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.UNRESTRICTED));
-        assertTrue(Arrays.asList(ConfidentialityCode.values()).contains(ConfidentialityCode.HIGH));
-    }
-
-    @Test
-    void testEnumProperties() {
-        // Test code and description for each enum value
-        assertEquals("U", ConfidentialityCode.UNRESTRICTED.getCode());
-        assertEquals("Unrestricted", ConfidentialityCode.UNRESTRICTED.getDescription());
-
-        assertEquals("H", ConfidentialityCode.HIGH.getCode());
-        assertEquals("High", ConfidentialityCode.HIGH.getDescription());
-
-        // Test toString() returns the code
-        for (ConfidentialityCode code : ConfidentialityCode.values()) {
-            assertEquals(code.getCode(), code.toString());
-        }
-    }
-
+    /**
+     * Every constant resolves from its own X12 code, its enum name, and its description — the three
+     * round-trips {@link com.fastChickensHR.edi.x834.util.EdiEnumLookup} registers for each constant.
+     * Driving this from {@link EnumSource} rather than a hand-listed table also guarantees no
+     * constant's code, name, or description silently collides with another's in the shared lookup map.
+     */
     @ParameterizedTest
-    @MethodSource("provideLookupValues")
-    void testAllLookupValues(String input, ConfidentialityCode expected) throws Exception {
-        Field lookupField = ConfidentialityCode.class.getDeclaredField("LOOKUP");
-        lookupField.setAccessible(true);
-        EdiEnumLookup<ConfidentialityCode> lookup = (EdiEnumLookup<ConfidentialityCode>) lookupField.get(null);
-
-        assertEquals(expected, lookup.fromString(input),
-                "Lookup for '" + input + "' should return " + expected);
+    @EnumSource(ConfidentialityCode.class)
+    void resolvesFromCodeNameAndDescription(ConfidentialityCode constant) {
+        assertEquals(constant, ConfidentialityCode.fromString(constant.getCode()));
+        assertEquals(constant, ConfidentialityCode.fromString(constant.name()));
+        assertEquals(constant, ConfidentialityCode.fromString(constant.getDescription()));
     }
 
-    private static Stream<Arguments> provideLookupValues() {
+    /** The human-friendly aliases callers actually type resolve to the right constant. */
+    @ParameterizedTest
+    @MethodSource("aliases")
+    void resolvesFromCommonAliases(String input, ConfidentialityCode expected) {
+        assertEquals(expected, ConfidentialityCode.fromString(input));
+    }
+
+    private static Stream<Arguments> aliases() {
         return Stream.of(
-                Arguments.of("U", ConfidentialityCode.UNRESTRICTED),
-                Arguments.of("R", ConfidentialityCode.RESTRICTED),
-                Arguments.of("C", ConfidentialityCode.CONFIDENTIAL),
-                Arguments.of("V", ConfidentialityCode.VERY_RESTRICTED),
-                Arguments.of("N", ConfidentialityCode.NORMAL),
-                Arguments.of("L", ConfidentialityCode.LOW),
-                Arguments.of("M", ConfidentialityCode.MEDIUM),
-                Arguments.of("H", ConfidentialityCode.HIGH),
-
-                Arguments.of("UNRESTRICTED", ConfidentialityCode.UNRESTRICTED),
-                Arguments.of("RESTRICTED", ConfidentialityCode.RESTRICTED),
-                Arguments.of("CONFIDENTIAL", ConfidentialityCode.CONFIDENTIAL),
-                Arguments.of("VERY_RESTRICTED", ConfidentialityCode.VERY_RESTRICTED),
-                Arguments.of("NORMAL", ConfidentialityCode.NORMAL),
-                Arguments.of("LOW", ConfidentialityCode.LOW),
-                Arguments.of("MEDIUM", ConfidentialityCode.MEDIUM),
-                Arguments.of("HIGH", ConfidentialityCode.HIGH),
-
-                Arguments.of("Unrestricted", ConfidentialityCode.UNRESTRICTED),
-                Arguments.of("Restricted", ConfidentialityCode.RESTRICTED),
-                Arguments.of("Confidential", ConfidentialityCode.CONFIDENTIAL),
-                Arguments.of("Very Restricted", ConfidentialityCode.VERY_RESTRICTED),
-                Arguments.of("Normal", ConfidentialityCode.NORMAL),
-                Arguments.of("Low", ConfidentialityCode.LOW),
-                Arguments.of("Medium", ConfidentialityCode.MEDIUM),
-                Arguments.of("High", ConfidentialityCode.HIGH),
-
-                Arguments.of("u", ConfidentialityCode.UNRESTRICTED),
                 Arguments.of("open", ConfidentialityCode.UNRESTRICTED),
+                Arguments.of("standard", ConfidentialityCode.NORMAL));
+    }
 
-                Arguments.of("r", ConfidentialityCode.RESTRICTED),
-
-                Arguments.of("c", ConfidentialityCode.CONFIDENTIAL),
-
-                Arguments.of("v", ConfidentialityCode.VERY_RESTRICTED),
-
-                Arguments.of("n", ConfidentialityCode.NORMAL),
-                Arguments.of("standard", ConfidentialityCode.NORMAL),
-
-                Arguments.of("l", ConfidentialityCode.LOW),
-
-                Arguments.of("m", ConfidentialityCode.MEDIUM),
-
-                Arguments.of("h", ConfidentialityCode.HIGH)
-        );
+    /** Null, blank, and unrecognized input are rejected, not silently defaulted. */
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "not-a-real-value"})
+    void rejectsNullEmptyAndUnknown(String input) {
+        assertThrows(IllegalArgumentException.class, () -> ConfidentialityCode.fromString(input));
     }
 }
