@@ -30,6 +30,8 @@ import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.X834Document;
+import com.fastChickensHR.edi.x834.GenerationError;
+import com.fastChickensHR.edi.x834.GenerationResult;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The 834 implementation of the {@link FileGenerator} seam: serializes a format-neutral
@@ -78,8 +81,15 @@ public final class X834FileGenerator implements FileGenerator {
                 document.addMember(member);
             }
 
-            return document.build().generateDocument().orElseThrow(() ->
-                    new IllegalStateException("834 generation produced no document (validation failed)"));
+            // The FileGenerator seam returns a String, so a failed result surfaces as the seam's
+            // unchecked exception — but carrying every reason, not swallowing them (#123).
+            return switch (document.build().generateDocument()) {
+                case GenerationResult.Success success -> success.document();
+                case GenerationResult.Failure failure -> throw new IllegalStateException(
+                        "Failed to generate 834:\n  - " + failure.errors().stream()
+                                .map(GenerationError::formatted)
+                                .collect(Collectors.joining("\n  - ")));
+            };
         } catch (ValidationException e) {
             throw new IllegalStateException("Failed to generate 834: " + e.getMessage(), e);
         }
