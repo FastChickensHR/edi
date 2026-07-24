@@ -16,7 +16,9 @@ import com.fastChickensHR.edi.x834.trailer.Trailer;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -102,17 +104,80 @@ public class X834Document {
                 .setNumberOfIncludedSegments(String.valueOf(transactionSegmentCount))
                 .build();
 
+        List<Segment> allSegments = new ArrayList<>(bodySegments);
+        allSegments.addAll(trailer.generateSegments());
+
+        // Guarantee delimiter safety over the exact segment list about to be rendered,
+        // reading each segment's element values through the same accessor render() uses
+        // so this pass cannot drift from what is emitted (#160).
+        validateDelimiterSafety(allSegments);
+
         StringBuilder document = new StringBuilder();
-        for (Segment segment : bodySegments) {
-            segment.setContext(context);
-            document.append(segment.render());
-        }
-        for (Segment segment : trailer.generateSegments()) {
+        for (Segment segment : allSegments) {
             segment.setContext(context);
             document.append(segment.render());
         }
 
         return Optional.of(document.toString());
+    }
+
+    /**
+     * Rejects generation if any element value contains a character X12 reserves as a
+     * structural delimiter under the active {@link X834Context}.
+     * <p>
+     * X12 has no in-band escape mechanism (X12 RFI 2611), so a delimiter appearing inside
+     * an element value can only silently corrupt the interchange — {@code render()} would
+     * concatenate it verbatim, splitting one element or terminating a segment early. Rather
+     * than emit a malformed 834, this pass collects <em>every</em> offending value across the
+     * document and fails with one {@link ValidationException} naming each, so the source data
+     * can be fixed in a single round-trip.
+     * <p>
+     * The pass inspects the same {@link Segment#getElementValues()} that {@code render()}
+     * concatenates, so it cannot miss or over-report what will actually be emitted. Note: no
+     * segment currently emits a composite (sub-element-delimited) element; if one is ever added,
+     * this guard must be taught to allow the sub-element separator inside that composite value.
+     *
+     * @param segments the full ordered segment list about to be rendered
+     * @throws ValidationException if one or more element values contain a reserved delimiter
+     */
+    private void validateDelimiterSafety(List<Segment> segments) throws ValidationException {
+        Map<Character, String> reserved = new LinkedHashMap<>();
+        reserved.put(context.getElementSeparator(), "element separator");
+        reserved.put(context.getSegmentTerminator(), "segment terminator");
+        reserved.put(context.getSubElementSeparator(), "sub-element separator");
+        for (char terminatorChar : context.getLineTerminator().toCharArray()) {
+            reserved.putIfAbsent(terminatorChar, "line terminator");
+        }
+
+        List<String> violations = new ArrayList<>();
+        for (Segment segment : segments) {
+            String[] values = segment.getElementValues();
+            if (values == null) {
+                continue;
+            }
+            for (int i = 0; i < values.length; i++) {
+                String value = values[i];
+                if (value == null) {
+                    continue;
+                }
+                for (Map.Entry<Character, String> entry : reserved.entrySet()) {
+                    int position = value.indexOf(entry.getKey());
+                    if (position >= 0) {
+                        violations.add(String.format(
+                                "%s element %02d (\"%s\") contains the %s '%c' at position %d",
+                                segment.getSegmentIdentifier(), i + 1, value,
+                                entry.getValue(), entry.getKey(), position));
+                    }
+                }
+            }
+        }
+
+        if (!violations.isEmpty()) {
+            throw new ValidationException(
+                    "Cannot generate 834: element values contain characters X12 reserves as "
+                            + "delimiters, and X12 has no escape mechanism — fix the source data. "
+                            + "Offending values:\n  - " + String.join("\n  - ", violations));
+        }
     }
 
     /**

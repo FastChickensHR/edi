@@ -96,4 +96,70 @@ class X834DocumentTest {
         assertFalse(doc.isValid(), "Document without trailer should be invalid");
         assertTrue(doc.getErrors().stream().anyMatch(e -> e.contains("Trailer")));
     }
+
+    private Header buildHeaderWithSponsor(String planSponsorName) {
+        return new Header.Builder(context)
+                .setReferenceIdentification("TEST834")
+                .setMasterPolicyNumber("TEST-POL-001")
+                .setPlanSponsorName(planSponsorName)
+                .setPayerName("TEST PAYER")
+                .build();
+    }
+
+    @Test
+    void generateRejectsElementSeparatorInAValue() {
+        // The default element separator is '*'. A sponsor name carrying it would, unescaped,
+        // split one N1 element into two — X12 has no escape mechanism, so generation must reject.
+        X834Document doc = new X834Document.Builder(context)
+                .withHeader(buildHeaderWithSponsor("ACME*CORP"))
+                .withTrailer(new Trailer.Builder(context))
+                .addMember(buildMinimalMember())
+                .build();
+
+        ValidationException ex = assertThrows(ValidationException.class, doc::generateDocument);
+        assertTrue(ex.getMessage().contains("ACME*CORP"), "message should name the offending value");
+        assertTrue(ex.getMessage().contains("element separator"), "message should name the delimiter");
+    }
+
+    @Test
+    void generateRejectsSegmentTerminatorInAValue() {
+        // The default segment terminator is '~'. Embedded in a value it would terminate the
+        // segment early, truncating the interchange.
+        X834Document doc = new X834Document.Builder(context)
+                .withHeader(buildHeaderWithSponsor("ACME~CORP"))
+                .withTrailer(new Trailer.Builder(context))
+                .addMember(buildMinimalMember())
+                .build();
+
+        ValidationException ex = assertThrows(ValidationException.class, doc::generateDocument);
+        assertTrue(ex.getMessage().contains("segment terminator"), "message should name the delimiter");
+    }
+
+    @Test
+    void generateAggregatesEveryDelimiterViolationInOneException() {
+        // The pass collects all offending values across the document, so a single run fixes
+        // them together rather than one failed generation at a time.
+        X834Document doc = new X834Document.Builder(context)
+                .withHeader(buildHeaderWithSponsor("ACME*CORP~LLC"))
+                .withTrailer(new Trailer.Builder(context))
+                .addMember(buildMinimalMember())
+                .build();
+
+        ValidationException ex = assertThrows(ValidationException.class, doc::generateDocument);
+        assertTrue(ex.getMessage().contains("element separator"), "should report the '*' violation");
+        assertTrue(ex.getMessage().contains("segment terminator"), "should report the '~' violation");
+    }
+
+    @Test
+    void generateAcceptsDelimiterFreeValues() {
+        // A document whose values carry no reserved delimiter still generates normally —
+        // the guard rejects only genuine corruption.
+        X834Document doc = new X834Document.Builder(context)
+                .withHeader(buildHeaderWithSponsor("ACME CORP LLC"))
+                .withTrailer(new Trailer.Builder(context))
+                .addMember(buildMinimalMember())
+                .build();
+
+        assertDoesNotThrow(doc::generateDocument);
+    }
 }
