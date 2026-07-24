@@ -181,13 +181,23 @@ public final class X834FileGenerator implements FileGenerator {
         return refs;
     }
 
-    /** Build the HD coverage segment when the Record carries any {@code "hd."} field. */
+    /**
+     * The Record's HD (Loop 2300) coverage segments — one HD loop per coverage group, in ascending
+     * index order. A member can carry multiple coverages: fields addressed with the indexed form
+     * {@link X834Location#hd(int, String)} ({@code "hd.<i>.<suffix>"}) are grouped by {@code <i>}, each
+     * group emitting its own HD segment + begin/end DTPs. Un-indexed {@code "hd.<suffix>"} fields form a
+     * single implicit group (the legacy single-coverage shape), so existing callers are byte-identical.
+     */
     private List<Segment> healthCoverage(List<Field> fields) throws ValidationException {
-        Map<String, String> loc = byLocation(fields);
-        boolean anyHd = loc.keySet().stream().anyMatch(k -> k.startsWith(X834Location.HD_PREFIX));
-        if (!anyHd) {
-            return List.of();
+        List<Segment> segments = new java.util.ArrayList<>();
+        for (Map<String, String> group : hdGroupsByIndex(fields).values()) {
+            segments.addAll(oneHealthCoverage(group));
         }
+        return segments;
+    }
+
+    /** Emit one HD (Loop 2300) segment for a single coverage group, followed by its begin/end DTPs. */
+    private List<Segment> oneHealthCoverage(Map<String, String> loc) throws ValidationException {
         HealthCoverage.Builder hd = HealthCoverage.builder();
         apply(loc, X834Location.HD_MAINTENANCE_TYPE_CODE, hd::setMaintenanceTypeCode);
         apply(loc, X834Location.HD_MAINTENANCE_REASON_CODE, hd::setMaintenanceReasonCode);
@@ -204,6 +214,35 @@ public final class X834FileGenerator implements FileGenerator {
         coverageDate(loc, X834Location.HD_BENEFIT_END_DATE, HealthCoverageDateQualifier.EXPIRATION_DATE)
                 .ifPresent(coverage::add);
         return coverage;
+    }
+
+    /**
+     * Group a Record's HD fields by coverage-loop index, each group keyed by the canonical un-indexed
+     * {@code "hd.<suffix>"} name so {@link #oneHealthCoverage} reads it with the same {@code HD_*}
+     * constants. Un-indexed {@code "hd.<suffix>"} fields collapse into one implicit group (sentinel key
+     * {@code -1}); indexed {@code "hd.<i>.<suffix>"} fields group by {@code <i>}. Insertion order is
+     * preserved and the map is sorted so groups emit in ascending index order. Walks the raw field list
+     * (not the deduped map) so repeated HD groups survive, mirroring {@link #refExtensions}.
+     */
+    private static Map<Integer, Map<String, String>> hdGroupsByIndex(List<Field> fields) {
+        Map<Integer, Map<String, String>> groups = new java.util.TreeMap<>();
+        for (Field field : fields) {
+            String name = field.location().name();
+            if (field.isOmitted() || !name.startsWith(X834Location.HD_PREFIX)) {
+                continue;
+            }
+            String rest = name.substring(X834Location.HD_PREFIX.length());
+            int dot = rest.indexOf('.');
+            int index = -1;
+            String suffix = rest;
+            if (dot > 0 && rest.substring(0, dot).chars().allMatch(Character::isDigit)) {
+                index = Integer.parseInt(rest.substring(0, dot));
+                suffix = rest.substring(dot + 1);
+            }
+            groups.computeIfAbsent(index, k -> new LinkedHashMap<>())
+                    .put(X834Location.HD_PREFIX + suffix, field.value());
+        }
+        return groups;
     }
 
     /** Build a Loop 2300 coverage-date DTP (D8) for {@code key} when present, using {@code qualifier}. */

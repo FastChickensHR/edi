@@ -118,6 +118,48 @@ class X834FileGeneratorTest {
     }
 
     @Test
+    void aMemberCarriesMultipleHdLoopsOnePerCoverage() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        // One subscriber, two coverages → two HD (Loop 2300) loops nested in the same member loop,
+        // each addressed with the indexed HD form and carrying its own begin/end DTPs.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "E12345"),
+                // Coverage 0 — medical, family, begin + end.
+                emp(X834Location.hd(0, X834Location.HD_MAINTENANCE_TYPE_CODE), "001"),
+                emp(X834Location.hd(0, X834Location.HD_INSURANCE_LINE_CODE), "HLT"),
+                emp(X834Location.hd(0, X834Location.HD_PLAN_COVERAGE_DESCRIPTION), "ACME CORP Health"),
+                emp(X834Location.hd(0, X834Location.HD_COVERAGE_LEVEL_CODE), "FAM"),
+                emp(X834Location.hd(0, X834Location.HD_BENEFIT_BEGIN_DATE), "2026-01-01"),
+                emp(X834Location.hd(0, X834Location.HD_BENEFIT_END_DATE), "2026-06-30"),
+                // Coverage 1 — dental, employee-only, open-ended (begin only).
+                emp(X834Location.hd(1, X834Location.HD_MAINTENANCE_TYPE_CODE), "001"),
+                emp(X834Location.hd(1, X834Location.HD_INSURANCE_LINE_CODE), "DEN"),
+                emp(X834Location.hd(1, X834Location.HD_PLAN_COVERAGE_DESCRIPTION), "ACME CORP Dental"),
+                emp(X834Location.hd(1, X834Location.HD_COVERAGE_LEVEL_CODE), "EMP"),
+                emp(X834Location.hd(1, X834Location.HD_BENEFIT_BEGIN_DATE), "2026-01-01")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        // The golden pins both HD loops (HLT then DEN, ascending index) — each with its own DTP dates —
+        // nested inside the one subscriber's member loop.
+        TestFixtures.assertMatchesGolden("golden/member-with-two-hd-loops.834", out);
+    }
+
+    @Test
     void emitsFullMemberLoopWhenNameDemographicsAndAddressPresent() {
         List<Field> envelope = List.of(
                 file(X834Location.SENDER_ID, "SENDER123"),
