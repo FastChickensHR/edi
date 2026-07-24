@@ -152,7 +152,7 @@ class X834MemberWriterTest {
         String out = render(writer.toSegments(member));
 
         assertTrue(out.contains("INS*"), "INS should always be present");
-        assertTrue(out.contains("REF*OF*E12345~"), "subscriber number REF should be present");
+        assertTrue(out.contains("REF*0F*E12345~"), "subscriber number REF should be present");
         assertFalse(out.contains("NM1"), () -> "no NM1 without a name; got:\n" + out);
         assertFalse(out.contains("N3"), () -> "no N3 without an address; got:\n" + out);
         assertFalse(out.contains("N4"), () -> "no N4 without an address; got:\n" + out);
@@ -195,7 +195,7 @@ class X834MemberWriterTest {
 
         String out = render(writer.toSegments(member));
 
-        assertTrue(out.contains("NM1*31~"), () -> "expected 2100C postal-address marker NM1*31; got:\n" + out);
+        assertTrue(out.contains("NM1*31*1~"), () -> "expected 2100C postal-address marker NM1*31*1; got:\n" + out);
         assertTrue(out.contains("N3*PO BOX 99~"), () -> "expected mailing N3; got:\n" + out);
         assertTrue(out.contains("N4*SPRINGFIELD*IL*62705~"), () -> "expected mailing N4; got:\n" + out);
         // 2100C must come after the 2100A residence (N4*...*62704) block.

@@ -22,11 +22,11 @@ import lombok.experimental.Accessors;
  * <h3>X12 834 Reference</h3>
  * <ul>
  *     <li>BGN01 — Transaction Set Purpose Code (M, ID 2/2)</li>
- *     <li>BGN02 — Reference Identification (M, AN 1/80)</li>
+ *     <li>BGN02 — Reference Identification (M, AN 1/50)</li>
  *     <li>BGN03 — Date, CCYYMMDD (M, DT 8/8)</li>
  *     <li>BGN04 — Time, HHMM/HHMMSS/HHMMSSDD (O, TM 4/8)</li>
  *     <li>BGN05 — Time Zone Code (O, ID 2/2)</li>
- *     <li>BGN06 — Original Reference Number (O, AN 1/80)</li>
+ *     <li>BGN06 — Original Reference Number (O, AN 1/50)</li>
  *     <li>BGN07 — Transaction Type Code (O, ID 2/2)</li>
  *     <li>BGN08 — Action Code (O, ID 1/2)</li>
  *     <li>BGN09 — Security Level Code (O, ID 2/2)</li>
@@ -47,16 +47,16 @@ abstract public class BGNSegment extends Segment {
     /** Default Transaction Set Purpose Code ("00" — Original). */
     public static final String DEFAULT_TRANSACTION_SET_PURPOSE_CODE = "00";
 
-    /** Maximum length of BGN02 (Reference Identification). */
-    public static final int BGN02_MAX_LENGTH = 80;
+    /** Maximum length of BGN02 (Reference Identification, X12 element 127: AN 1/50 in 005010). */
+    public static final int BGN02_MAX_LENGTH = 50;
     /** Required length of BGN03 (Date, CCYYMMDD). */
     public static final int BGN03_LENGTH = 8;
     /** Minimum length of BGN04 (Time). */
     public static final int BGN04_MIN_LENGTH = 4;
     /** Maximum length of BGN04 (Time). */
     public static final int BGN04_MAX_LENGTH = 8;
-    /** Maximum length of BGN06 (Original Reference Number). */
-    public static final int BGN06_MAX_LENGTH = 80;
+    /** Maximum length of BGN06 (Original Reference Number, X12 element 127: AN 1/50 in 005010). */
+    public static final int BGN06_MAX_LENGTH = 50;
 
     /** BGN01 — Transaction Set Purpose Code (required). */
     protected final TransactionSetPurposeCode bgn01;
