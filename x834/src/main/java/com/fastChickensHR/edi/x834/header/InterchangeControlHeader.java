@@ -9,6 +9,8 @@ package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.util.TextUtils;
 import com.fastChickensHR.edi.x834.data.*;
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.ISASegment;
 import com.fastChickensHR.edi.x834.X834Context;
@@ -71,8 +73,10 @@ public class InterchangeControlHeader extends ISASegment {
             this.isa05 = DEFAULT_INTERCHANGE_SENDER_QUALIFIER;
             this.setIsa06(context.getSenderID());
             this.isa07 = DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER;
-            this.isa08 = context.getReceiverID();
-            this.isa09 = context.getFormattedDocumentDate();
+            this.setIsa08(context.getReceiverID());
+            // ISA09 is the fixed 6-digit YYMMDD interchange date, independent of the
+            // document's D8 (CCYYMMDD) format used by GS04/BGN03/DTP.
+            this.isa09 = DateFormatter.formatDate(DateFormat.D6, context.getDocumentDate());
             this.isa10 = context.getFormattedDocumentTime();
             this.isa11 = DEFAULT_REPETITION_SEPARATOR;
             this.isa12 = DEFAULT_INTERCHANGE_CONTROL_VERSION;

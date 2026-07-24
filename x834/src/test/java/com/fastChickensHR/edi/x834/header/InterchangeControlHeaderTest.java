@@ -45,8 +45,8 @@ class InterchangeControlHeaderTest {
         assertEquals(InterchangeControlHeader.DEFAULT_COMPONENT_ELEMENT_SEPARATOR, header.getComponentElementSeparator());
 
         assertEquals("SENDER123      ", header.getInterchangeSenderID());
-        assertEquals(context.getReceiverID(), header.getInterchangeReceiverID());
-        assertEquals(context.getFormattedDocumentDate(), header.getInterchangeDate());
+        assertEquals("RECEIVER456    ", header.getInterchangeReceiverID());
+        assertEquals("230630", header.getInterchangeDate());
         assertEquals(context.getFormattedDocumentTime(), header.getInterchangeTime());
         assertEquals(context, header.getContext());
     }
@@ -66,14 +66,9 @@ class InterchangeControlHeaderTest {
     /**
      * Render golden for the ISA segment assembled from context defaults. Whole-string equality pins the
      * defaults ({@code 00}/{@code 00}/{@code 30}/{@code ZZ}/{@code ^}/{@code 00501}/{@code 0}/{@code T}/{@code :}),
-     * the sender ID right-padded to 15 characters, and the date/time formatted from the pinned context
-     * document date — the fixed-width layout the getter assertions never render.
-     * <p>
-     * The golden also documents two quirks of the current builder that only a whole-payload assertion
-     * surfaces: ISA08 (receiver ID) is <em>not</em> padded to the fixed 15-character width the way ISA06
-     * is, and ISA09 is emitted as the 8-digit {@code CCYYMMDD} context date rather than the ISA-native
-     * 6-digit {@code YYMMDD}. These are pinned as-is here (this ticket adds the regression net); they are
-     * reported as follow-up findings on the wave, not fixed under it.
+     * both the sender ID (ISA06) and receiver ID (ISA08) right-padded to 15 characters, and the ISA09
+     * interchange date as the ISA-native 6-digit {@code YYMMDD} — distinct from the 8-digit {@code CCYYMMDD}
+     * that GS04/BGN03/DTP carry — the fixed-width layout the getter assertions never render.
      */
     @Test
     void rendersIsaSegmentFromContextDefaults() throws ValidationException {
@@ -88,7 +83,7 @@ class InterchangeControlHeaderTest {
         header.setContext(context);
 
         assertEquals(
-                "ISA*00*          *00*          *30*SENDER123      *ZZ*RECEIVER456*20230630*0000*^*00501*000000001*0*T*:~\n",
+                "ISA*00*          *00*          *30*SENDER123      *ZZ*RECEIVER456    *230630*0000*^*00501*000000001*0*T*:~\n",
                 header.render());
     }
 
