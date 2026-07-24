@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -80,21 +81,20 @@ class GESegmentTest {
         assertEquals(GESegment.SEGMENT_ID, segment.getSegmentIdentifier());
     }
 
+    /**
+     * Render golden for the GE functional-group trailer: {@code GE*<count>*<groupControlNumber>~}.
+     * Whole-string equality pins the element order and terminator that a {@code getElementValues()}
+     * array check leaves unrendered. Delimiters come from the default {@link X834Context}.
+     */
     @Test
-    void testElementValues() throws ValidationException {
-        String numberOfTransactionSets = "7";
-        String groupControlNumber = "98765";
-
+    void rendersGeSegment() throws ValidationException {
         TestGESegment segment = TestGESegment.builder()
-                .setNumberOfTransactionSets(numberOfTransactionSets)
-                .setGroupControlNumber(groupControlNumber)
+                .setNumberOfTransactionSets("7")
+                .setGroupControlNumber("98765")
                 .build();
+        segment.setContext(new X834Context());
 
-        String[] elementValues = segment.getElementValues();
-
-        assertEquals(2, elementValues.length);
-        assertEquals(numberOfTransactionSets, elementValues[0]);
-        assertEquals(groupControlNumber, elementValues[1]);
+        assertEquals("GE*7*98765~\n", segment.render());
     }
 
     @Test

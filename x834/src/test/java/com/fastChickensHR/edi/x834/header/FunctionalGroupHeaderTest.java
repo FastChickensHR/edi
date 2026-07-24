@@ -79,6 +79,23 @@ class FunctionalGroupHeaderTest {
     }
 
     /**
+     * Render golden for the GS segment assembled from context defaults. Whole-string equality pins
+     * that the {@code BE}/{@code X}/{@code 005010X220A1} defaults and the sender, receiver, formatted
+     * date/time, and group control number pulled from {@link X834Context} all land in the right GS
+     * element positions — a single assertion covering what the per-field getter checks above verify
+     * piecemeal, plus the rendered layout they never touch. The document date is pinned via the
+     * context (never {@code now()}), keeping the golden deterministic.
+     */
+    @Test
+    void rendersGsSegmentFromContextDefaults() throws ValidationException {
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
+        header.setContext(context);
+
+        assertEquals("GS*BE*SENDER123*RECEIVER456*20231115*1230*123456789*X*005010X220A1~\n",
+                header.render());
+    }
+
+    /**
      * Tests that the builder applies default values but allows overriding them.
      */
     @Test

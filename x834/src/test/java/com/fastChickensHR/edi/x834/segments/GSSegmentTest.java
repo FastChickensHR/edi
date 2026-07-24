@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.dates.TimeFormat;
@@ -67,8 +68,14 @@ class GSSegmentTest {
         assertEquals("GS", segment.getSegmentIdentifier());
     }
 
+    /**
+     * Render golden for the GS functional-group header. Whole-string equality pins all eight element
+     * positions — including the {@code CCYYMMDD} date and {@code HHMM} time formatted from the supplied
+     * {@link LocalDateTime} — plus the terminator, which the {@code getElementValues()} array check
+     * leaves unrendered. Delimiters come from the default {@link X834Context}.
+     */
     @Test
-    void testGetElementValues() throws ValidationException {
+    void rendersGsSegment() throws ValidationException {
         TestGSSegment segment = builder
                 .setFunctionalIdentifierCode("BE")
                 .setApplicationSenderCode("SENDER")
@@ -79,18 +86,9 @@ class GSSegmentTest {
                 .setResponsibleAgencyCode("X")
                 .setVersionReleaseIndustryCode("005010X220A1")
                 .build();
+        segment.setContext(new X834Context());
 
-        String[] elements = segment.getElementValues();
-
-        assertEquals(8, elements.length);
-        assertEquals("BE", elements[0]);
-        assertEquals("SENDER", elements[1]);
-        assertEquals("RECEIVER", elements[2]);
-        assertEquals("20231115", elements[3]);
-        assertEquals("1230", elements[4]);
-        assertEquals("12345", elements[5]);
-        assertEquals("X", elements[6]);
-        assertEquals("005010X220A1", elements[7]);
+        assertEquals("GS*BE*SENDER*RECEIVER*20231115*1230*12345*X*005010X220A1~\n", segment.render());
     }
 
     /* Tests for all getters */

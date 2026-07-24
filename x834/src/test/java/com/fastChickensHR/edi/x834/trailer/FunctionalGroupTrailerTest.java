@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.segments.GESegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -14,22 +15,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionalGroupTrailerTest {
-
-    @Test
-    void testInheritance() {
-        FunctionalGroupTrailer trailer = null;
-        try {
-            trailer = FunctionalGroupTrailer.builder()
-                    .setNumberOfTransactionSets("10")
-                    .setGroupControlNumber("1234")
-                    .build();
-        } catch (ValidationException e) {
-            fail("Failed to build FunctionalGroupTrailer: " + e.getMessage());
-        }
-
-        assertNotNull(trailer);
-        assertTrue(trailer instanceof GESegment);
-    }
 
     @Test
     void testBuilderCreation() {
@@ -50,19 +35,21 @@ class FunctionalGroupTrailerTest {
         assertEquals("9876", geSegment.getGroupControlNumber());
     }
 
+    /**
+     * Render golden: the Functional Group Trailer renders as its underlying GE segment,
+     * {@code GE*<count>*<groupControlNumber>~}. Whole-string equality pins the segment id, element
+     * order, and terminator that the getter/{@code getElementValues()} echo left unrendered.
+     * Delimiters come from the default {@link X834Context}.
+     */
     @Test
-    void testSegmentComposition() throws ValidationException {
+    void rendersAsGeSegment() throws ValidationException {
         FunctionalGroupTrailer trailer = FunctionalGroupTrailer.builder()
                 .setNumberOfTransactionSets("15")
                 .setGroupControlNumber("5678")
                 .build();
+        trailer.setContext(new X834Context());
 
-        String[] elements = trailer.getElementValues();
-
-        assertEquals("GE", trailer.getSegmentIdentifier());
-        assertEquals(2, elements.length);
-        assertEquals("15", elements[0]);
-        assertEquals("5678", elements[1]);
+        assertEquals("GE*15*5678~\n", trailer.render());
     }
 
     @Test
