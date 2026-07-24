@@ -28,7 +28,7 @@ public class FileEffectiveDateTest {
         segment.setContext(context);
 
         assertEquals("DTP", segment.getSegmentIdentifier(), "Expected segment identifier should be 'DTP'");
-        assertEquals("DTP*007*CCYYMMDD*20250313~", segment.render().trim(), "The segment is not formatted correctly.");
+        assertEquals("DTP*007*D8*20250313~", segment.render().trim(), "The segment is not formatted correctly.");
     }
 
     /**
@@ -37,7 +37,7 @@ public class FileEffectiveDateTest {
     @Test
     public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
         String dateTimeQualifier = "001";
-        DateFormat dateTimeFormat = DateFormat.DATE;
+        DateFormat dateTimeFormat = DateFormat.D8;
         LocalDateTime dateTimePeriod = context.getDocumentDate();
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
                 .setDtp01(dateTimeQualifier)
@@ -54,7 +54,7 @@ public class FileEffectiveDateTest {
     @Test
     public void testSettingDomainNamesGettingSpecNames() throws ValidationException {
         String dateTimeQualifier = "001";
-        DateFormat dateTimeFormat = DateFormat.DATE;
+        DateFormat dateTimeFormat = DateFormat.D8;
         LocalDateTime dateTimePeriod = context.getDocumentDate();
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
                 .setDateTimeQualifier(dateTimeQualifier)
