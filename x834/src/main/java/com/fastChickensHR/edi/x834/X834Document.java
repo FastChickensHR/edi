@@ -7,31 +7,34 @@
  */
 package com.fastChickensHR.edi.x834;
 
+import com.fastChickensHR.edi.x834.GenerationError.Phase;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.X834MemberWriter;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Represents an EDI 834 document for benefit enrollment and maintenance.
- * This class handles document structure, formatting, and validation.
+ *
+ * <p>Generation reports through exactly one channel: {@link #generateDocument()} returns a
+ * {@link GenerationResult} — {@link GenerationResult.Success} carrying the document, or
+ * {@link GenerationResult.Failure} carrying <em>every</em> reason it could not be produced. There is
+ * no separate {@code isValid()}/{@code getErrors()} accessor and no thrown exception: build-time
+ * (structure/configuration) and render-time (serialization) problems all surface as
+ * {@link GenerationError}s in the {@code Failure}.
  */
-@Getter
 public class X834Document {
     private final Header header;
     private final List<Member> members;
     private final List<Segment> additionalSegments;
-    private final List<String> buildErrors;
-    private final boolean isValid;
+    private final List<GenerationError> buildErrors;
     private final X834Context context;
     private final Trailer.Builder trailerBuilder;
 
@@ -45,53 +48,53 @@ public class X834Document {
         this.header = builder.header;
         this.members = builder.members;
         this.additionalSegments = builder.additionalSegments;
-        this.buildErrors = builder.buildErrors;
-        this.isValid = builder.isValid;
+        this.buildErrors = List.copyOf(builder.buildErrors);
         this.trailerBuilder = builder.trailerBuilder;
     }
 
     /**
-     * Checks if the document is valid
-     *
-     * @return true if the document is valid and can be generated
-     */
-    public boolean isValid() {
-        return isValid;
-    }
-
-    /**
-     * Returns any errors encountered during document building
-     *
-     * @return List of error messages
-     */
-    public List<String> getErrors() {
-        return buildErrors;
-    }
-
-    /**
-     * Generates the complete EDI document string if the document is valid.
+     * Generates the complete EDI 834 document, or reports why it could not be produced.
      * <p>
-     * Segment counts (SE01, GE01, IEA01) are computed automatically from the
-     * rendered document content and injected into the trailer before rendering.
+     * Segment counts (SE01, GE01, IEA01) are computed automatically from the rendered document
+     * content and injected into the trailer before rendering.
+     * <p>
+     * Problems are <em>accumulated, not thrown</em>: build-time structural/configuration failures
+     * (surfaced by {@link Builder#build()}) short-circuit rendering — a document whose structure
+     * never validated cannot be serialized to surface further problems — while within rendering,
+     * each member's assembly and each delimiter-unsafe value is collected independently so a single
+     * call reports every render-time problem at once.
      *
-     * @return An Optional containing the formatted EDI 834 document as a string,
-     * or empty if the document is invalid
+     * @return a {@link GenerationResult.Success} with the formatted 834, or a
+     * {@link GenerationResult.Failure} listing every {@link GenerationError}
      */
-    public Optional<String> generateDocument() throws ValidationException {
-        if (!isValid) {
-            return Optional.empty();
+    public GenerationResult generateDocument() {
+        // Build-time (structure/config) problems short-circuit render: a document whose structure
+        // never validated cannot be serialized to surface further problems.
+        if (!buildErrors.isEmpty()) {
+            return new GenerationResult.Failure(buildErrors);
         }
 
-        // Collect all body segments before the trailer
-        List<Segment> bodySegments = new ArrayList<>();
+        List<GenerationError> errors = new ArrayList<>();
 
+        // Assemble the ordered segment list, collecting — never throwing on — each failure so one
+        // pass reports every problem. Per-member assembly accumulates independently, so a bad
+        // Member[3] and a bad Member[7] both surface from a single generateDocument() call.
+        List<Segment> bodySegments = new ArrayList<>();
         if (header != null) {
-            bodySegments.addAll(header.generateSegments());
+            try {
+                bodySegments.addAll(header.generateSegments());
+            } catch (ValidationException e) {
+                errors.add(new GenerationError(Phase.RENDER, "Header", e.getMessage()));
+            }
         }
 
         X834MemberWriter memberWriter = new X834MemberWriter(context);
-        for (Member member : members) {
-            bodySegments.addAll(memberWriter.toSegments(member));
+        for (int i = 0; i < members.size(); i++) {
+            try {
+                bodySegments.addAll(memberWriter.toSegments(members.get(i)));
+            } catch (ValidationException e) {
+                errors.add(new GenerationError(Phase.RENDER, "Member[" + i + "]", e.getMessage()));
+            }
         }
 
         bodySegments.addAll(additionalSegments);
@@ -100,17 +103,24 @@ public class X834Document {
         // ISA (index 0) and GS (index 1) are outside the ST/SE envelope; +1 for SE itself.
         int transactionSegmentCount = bodySegments.size() - 2 + 1;
 
-        Trailer trailer = trailerBuilder
-                .setNumberOfIncludedSegments(String.valueOf(transactionSegmentCount))
-                .build();
-
         List<Segment> allSegments = new ArrayList<>(bodySegments);
-        allSegments.addAll(trailer.generateSegments());
+        try {
+            Trailer trailer = trailerBuilder
+                    .setNumberOfIncludedSegments(String.valueOf(transactionSegmentCount))
+                    .build();
+            allSegments.addAll(trailer.generateSegments());
+        } catch (ValidationException e) {
+            errors.add(new GenerationError(Phase.RENDER, "Trailer", e.getMessage()));
+        }
 
-        // Guarantee delimiter safety over the exact segment list about to be rendered,
-        // reading each segment's element values through the same accessor render() uses
-        // so this pass cannot drift from what is emitted (#160).
-        validateDelimiterSafety(allSegments);
+        // Guarantee delimiter safety over the exact segment list about to be rendered, reading each
+        // segment's element values through the same accessor render() uses so this pass cannot drift
+        // from what is emitted (#160). Each offending value is collected as its own error.
+        errors.addAll(delimiterViolations(allSegments));
+
+        if (!errors.isEmpty()) {
+            return new GenerationResult.Failure(errors);
+        }
 
         StringBuilder document = new StringBuilder();
         for (Segment segment : allSegments) {
@@ -118,29 +128,28 @@ public class X834Document {
             document.append(segment.render());
         }
 
-        return Optional.of(document.toString());
+        return new GenerationResult.Success(document.toString());
     }
 
     /**
-     * Rejects generation if any element value contains a character X12 reserves as a
-     * structural delimiter under the active {@link X834Context}.
+     * Collects a {@link GenerationError} for every element value that contains a character X12
+     * reserves as a structural delimiter under the active {@link X834Context}.
      * <p>
-     * X12 has no in-band escape mechanism (X12 RFI 2611), so a delimiter appearing inside
-     * an element value can only silently corrupt the interchange — {@code render()} would
-     * concatenate it verbatim, splitting one element or terminating a segment early. Rather
-     * than emit a malformed 834, this pass collects <em>every</em> offending value across the
-     * document and fails with one {@link ValidationException} naming each, so the source data
-     * can be fixed in a single round-trip.
+     * X12 has no in-band escape mechanism (X12 RFI 2611), so a delimiter appearing inside an element
+     * value can only silently corrupt the interchange — {@code render()} would concatenate it
+     * verbatim, splitting one element or terminating a segment early. Rather than emit a malformed
+     * 834, every offending value across the document is reported (each as its own error, located by
+     * segment identifier) so the source data can be fixed in a single round-trip.
      * <p>
-     * The pass inspects the same {@link Segment#getElementValues()} that {@code render()}
-     * concatenates, so it cannot miss or over-report what will actually be emitted. Note: no
-     * segment currently emits a composite (sub-element-delimited) element; if one is ever added,
-     * this guard must be taught to allow the sub-element separator inside that composite value.
+     * The pass inspects the same {@link Segment#getElementValues()} that {@code render()} concatenates,
+     * so it cannot miss or over-report what will actually be emitted. Note: no segment currently emits
+     * a composite (sub-element-delimited) element; if one is ever added, this guard must be taught to
+     * allow the sub-element separator inside that composite value.
      *
      * @param segments the full ordered segment list about to be rendered
-     * @throws ValidationException if one or more element values contain a reserved delimiter
+     * @return one {@link GenerationError} per offending element value, empty if all values are safe
      */
-    private void validateDelimiterSafety(List<Segment> segments) throws ValidationException {
+    private List<GenerationError> delimiterViolations(List<Segment> segments) {
         Map<Character, String> reserved = new LinkedHashMap<>();
         reserved.put(context.getElementSeparator(), "element separator");
         reserved.put(context.getSegmentTerminator(), "segment terminator");
@@ -149,7 +158,7 @@ public class X834Document {
             reserved.putIfAbsent(terminatorChar, "line terminator");
         }
 
-        List<String> violations = new ArrayList<>();
+        List<GenerationError> violations = new ArrayList<>();
         for (Segment segment : segments) {
             String[] values = segment.getElementValues();
             if (values == null) {
@@ -163,21 +172,14 @@ public class X834Document {
                 for (Map.Entry<Character, String> entry : reserved.entrySet()) {
                     int position = value.indexOf(entry.getKey());
                     if (position >= 0) {
-                        violations.add(String.format(
-                                "%s element %02d (\"%s\") contains the %s '%c' at position %d",
-                                segment.getSegmentIdentifier(), i + 1, value,
-                                entry.getValue(), entry.getKey(), position));
+                        violations.add(new GenerationError(Phase.RENDER, segment.getSegmentIdentifier(),
+                                String.format("element %02d (\"%s\") contains the %s '%c' at position %d",
+                                        i + 1, value, entry.getValue(), entry.getKey(), position)));
                     }
                 }
             }
         }
-
-        if (!violations.isEmpty()) {
-            throw new ValidationException(
-                    "Cannot generate 834: element values contain characters X12 reserves as "
-                            + "delimiters, and X12 has no escape mechanism — fix the source data. "
-                            + "Offending values:\n  - " + String.join("\n  - ", violations));
-        }
+        return violations;
     }
 
     /**
@@ -188,10 +190,8 @@ public class X834Document {
         private Trailer.Builder trailerBuilder;
         private final List<Member> members = new ArrayList<>();
         private final List<Segment> additionalSegments = new ArrayList<>();
-        private final List<String> buildErrors = new ArrayList<>();
-        private boolean isValid = true;
+        private final List<GenerationError> buildErrors = new ArrayList<>();
 
-        @Getter
         private final X834Context context;
 
         /**
@@ -276,48 +276,53 @@ public class X834Document {
         }
 
         /**
-         * Builds the final X834Document
+         * Builds the final X834Document, capturing every build-time (structure/configuration)
+         * problem as a {@link Phase#BUILD} {@link GenerationError}. Each component validates
+         * independently so a single {@code build()} surfaces every problem, not just the first to
+         * fail; the errors are then reported through {@link X834Document#generateDocument()}.
          *
          * @return The configured X834Document
          */
         public X834Document build() {
-            // Validate required components
             if (header == null) {
-                buildErrors.add("Header is required");
-                isValid = false;
+                buildErrors.add(new GenerationError(Phase.BUILD, "Header", "Header is required"));
             }
-
             if (trailerBuilder == null) {
-                buildErrors.add("Trailer is required");
-                isValid = false;
+                buildErrors.add(new GenerationError(Phase.BUILD, "Trailer", "Trailer is required"));
             }
-
             if (members.isEmpty()) {
-                buildErrors.add("At least one member is required");
-                isValid = false;
+                buildErrors.add(new GenerationError(Phase.BUILD, "Members", "At least one member is required"));
             }
 
-            // Additional validation
-            try {
-                context.validate();
-
-                if (header != null) {
-                    header.validate();
-                }
-
-                if (trailerBuilder != null) {
-                    trailerBuilder.build().validate();
-                }
-
-                for (Member member : members) {
-                    member.validate();
-                }
-            } catch (ValidationException e) {
-                buildErrors.add("Validation error: " + e.getMessage());
-                isValid = false;
+            // Each component validates independently so a single build() surfaces every
+            // configuration problem, not just the first to throw.
+            validate("Context", context::validate);
+            if (header != null) {
+                validate("Header", header::validate);
+            }
+            if (trailerBuilder != null) {
+                validate("Trailer", () -> trailerBuilder.build().validate());
+            }
+            for (int i = 0; i < members.size(); i++) {
+                validate("Member[" + i + "]", members.get(i)::validate);
             }
 
             return new X834Document(this);
+        }
+
+        /** Run one component's validation, recording any failure as a build-phase error. */
+        private void validate(String location, ValidatingStep step) {
+            try {
+                step.run();
+            } catch (ValidationException e) {
+                buildErrors.add(new GenerationError(Phase.BUILD, location, e.getMessage()));
+            }
+        }
+
+        /** A validation call that may fail with a {@link ValidationException}. */
+        @FunctionalInterface
+        private interface ValidatingStep {
+            void run() throws ValidationException;
         }
     }
 }
