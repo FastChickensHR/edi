@@ -17,23 +17,25 @@ import lombok.experimental.Accessors;
  * (005010X220A1) Benefit Enrollment and Maintenance transaction (Loop 2300).
  * <p>
  * This segment describes a member's health coverage — the maintenance action being
- * applied, the insurance line, and related coverage attributes.
+ * applied, the insurance line, and the plan/coverage-level attributes.
  * <p>
- * Element/position map (meanings derived from the accessor names on this class):
+ * In the 220A1 TR3 the HD segment carries only four data elements — HD01, HD03,
+ * HD04, HD05. <strong>HD02 is Not Used</strong> (maintenance reason rides on INS04,
+ * not here), and <strong>HD06 and everything beyond is Not Used</strong> — the
+ * medicare/COBRA/employment/student/handicap attributes that a base X12 HD once
+ * carried live on the INS segment (Loop 2000) in this transaction, where the library
+ * already models them ({@code INSSegment.ins06}–{@code ins10}). HD02 is still a real
+ * element position, so it is emitted as an empty slot ({@code HD*001**HLT*…}) to keep
+ * HD03+ in their correct positions; it is simply never populated.
+ * <p>
+ * Element/position map:
  * <ul>
  *     <li>HD01 = maintenance type code (required)</li>
- *     <li>HD02 = maintenance reason code</li>
+ *     <li>HD02 = <em>Not Used</em> (structurally empty)</li>
  *     <li>HD03 = insurance line code (required)</li>
- *     <li>HD04 = plan coverage description</li>
- *     <li>HD05 = coverage level code</li>
- *     <li>HD06 = medicare plan code</li>
- *     <li>HD07 = medicare eligibility reason code</li>
- *     <li>HD08 = COBRA qualifying event code</li>
- *     <li>HD09 = employment status code</li>
- *     <li>HD10 = student status code</li>
- *     <li>HD11 = handicap indicator (Y/N)</li>
- *     <li>HD12 = date qualifier</li>
- *     <li>HD13 = birth date</li>
+ *     <li>HD04 = plan coverage description (situational)</li>
+ *     <li>HD05 = coverage level code (situational)</li>
+ *     <li>HD06+ = <em>Not Used</em> — never emitted</li>
  * </ul>
  */
 @Getter
@@ -41,33 +43,15 @@ public abstract class HDSegment extends Segment {
     public static final String SEGMENT_ID = "HD";
 
     protected final String hd01;
-    protected final String hd02;
     protected final String hd03;
     protected final String hd04;
     protected final String hd05;
-    protected final String hd06;
-    protected final String hd07;
-    protected final String hd08;
-    protected final String hd09;
-    protected final String hd10;
-    protected final String hd11;
-    protected final String hd12;
-    protected final String hd13;
 
     protected HDSegment(AbstractBuilder<?> builder) throws ValidationException {
         this.hd01 = builder.hd01;
-        this.hd02 = builder.hd02;
         this.hd03 = builder.hd03;
         this.hd04 = builder.hd04;
         this.hd05 = builder.hd05;
-        this.hd06 = builder.hd06;
-        this.hd07 = builder.hd07;
-        this.hd08 = builder.hd08;
-        this.hd09 = builder.hd09;
-        this.hd10 = builder.hd10;
-        this.hd11 = builder.hd11;
-        this.hd12 = builder.hd12;
-        this.hd13 = builder.hd13;
 
         if (hd01 == null || hd01.trim().isEmpty()) {
             throw new ValidationException("Maintenance Type Code (HD01) is required");
@@ -85,9 +69,9 @@ public abstract class HDSegment extends Segment {
 
     @Override
     public String[] getElementValues() {
-        return new String[]{
-                hd01, hd02, hd03, hd04, hd05, hd06, hd07, hd08, hd09, hd10, hd11, hd12, hd13
-        };
+        // HD02 is Not Used in 220A1 but is a real element position, so it renders as an
+        // empty slot to keep HD03/HD04/HD05 in their correct positions.
+        return new String[]{hd01, null, hd03, hd04, hd05};
     }
 
     /**
@@ -97,15 +81,6 @@ public abstract class HDSegment extends Segment {
      */
     public String getMaintenanceTypeCode() {
         return getHd01();
-    }
-
-    /**
-     * Gets the maintenance reason code.
-     *
-     * @return maintenance reason code
-     */
-    public String getMaintenanceReasonCode() {
-        return getHd02();
     }
 
     /**
@@ -136,78 +111,6 @@ public abstract class HDSegment extends Segment {
     }
 
     /**
-     * Gets the medicare plan code.
-     *
-     * @return medicare plan code
-     */
-    public String getMedicarePlanCode() {
-        return getHd06();
-    }
-
-    /**
-     * Gets the medicare eligibility reason code.
-     *
-     * @return medicare eligibility reason code
-     */
-    public String getMedicareEligibilityReasonCode() {
-        return getHd07();
-    }
-
-    /**
-     * Gets the COBRA qualifying event code.
-     *
-     * @return COBRA qualifying event code
-     */
-    public String getCobraQualifyingEventCode() {
-        return getHd08();
-    }
-
-    /**
-     * Gets the employment status code.
-     *
-     * @return employment status code
-     */
-    public String getEmploymentStatusCode() {
-        return getHd09();
-    }
-
-    /**
-     * Gets the student status code.
-     *
-     * @return student status code
-     */
-    public String getStudentStatusCode() {
-        return getHd10();
-    }
-
-    /**
-     * Gets the handicap indicator.
-     *
-     * @return handicap indicator (Y/N)
-     */
-    public String getHandicapIndicator() {
-        return getHd11();
-    }
-
-    /**
-     * Gets the date qualifier.
-     *
-     * @return date qualifier
-     */
-    public String getDateQualifier() {
-        return getHd12();
-    }
-
-    /**
-     * Gets the birth date.
-     *
-     * @return birth date
-     */
-    public String getBirthDate() {
-        return getHd13();
-    }
-
-    /**
      * Abstract builder for HDSegment.
      *
      * @param <T> the builder type
@@ -216,18 +119,9 @@ public abstract class HDSegment extends Segment {
     @Accessors(chain = true)
     public abstract static class AbstractBuilder<T extends AbstractBuilder<T>> {
         protected String hd01;
-        protected String hd02;
         protected String hd03;
         protected String hd04;
         protected String hd05;
-        protected String hd06;
-        protected String hd07;
-        protected String hd08;
-        protected String hd09;
-        protected String hd10;
-        protected String hd11;
-        protected String hd12;
-        protected String hd13;
 
         /**
          * Returns this builder.
@@ -252,17 +146,6 @@ public abstract class HDSegment extends Segment {
          */
         public T setMaintenanceTypeCode(String value) {
             this.hd01 = value;
-            return self();
-        }
-
-        /**
-         * Sets the maintenance reason code (HD02).
-         *
-         * @param value maintenance reason code
-         * @return this builder
-         */
-        public T setMaintenanceReasonCode(String value) {
-            this.hd02 = value;
             return self();
         }
 
@@ -296,94 +179,6 @@ public abstract class HDSegment extends Segment {
          */
         public T setCoverageLevelCode(String value) {
             this.hd05 = value;
-            return self();
-        }
-
-        /**
-         * Sets the medicare plan code (HD06).
-         *
-         * @param value medicare plan code
-         * @return this builder
-         */
-        public T setMedicarePlanCode(String value) {
-            this.hd06 = value;
-            return self();
-        }
-
-        /**
-         * Sets the medicare eligibility reason code (HD07).
-         *
-         * @param value medicare eligibility reason code
-         * @return this builder
-         */
-        public T setMedicareEligibilityReasonCode(String value) {
-            this.hd07 = value;
-            return self();
-        }
-
-        /**
-         * Sets the COBRA qualifying event code (HD08).
-         *
-         * @param value COBRA qualifying event code
-         * @return this builder
-         */
-        public T setCobraQualifyingEventCode(String value) {
-            this.hd08 = value;
-            return self();
-        }
-
-        /**
-         * Sets the employment status code (HD09).
-         *
-         * @param value employment status code
-         * @return this builder
-         */
-        public T setEmploymentStatusCode(String value) {
-            this.hd09 = value;
-            return self();
-        }
-
-        /**
-         * Sets the student status code (HD10).
-         *
-         * @param value student status code
-         * @return this builder
-         */
-        public T setStudentStatusCode(String value) {
-            this.hd10 = value;
-            return self();
-        }
-
-        /**
-         * Sets the handicap indicator (HD11).
-         *
-         * @param value handicap indicator (Y/N)
-         * @return this builder
-         */
-        public T setHandicapIndicator(String value) {
-            this.hd11 = value;
-            return self();
-        }
-
-        /**
-         * Sets the date qualifier (HD12).
-         *
-         * @param value date qualifier
-         * @return this builder
-         */
-        public T setDateQualifier(String value) {
-            this.hd12 = value;
-            return self();
-        }
-
-        /**
-         * Sets the birth date (HD13).
-         *
-         * @param value birth date
-         * @return this builder
-         */
-        public T setBirthDate(String value) {
-            this.hd13 = value;
             return self();
         }
     }

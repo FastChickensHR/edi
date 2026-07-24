@@ -64,11 +64,9 @@ class X834FileGeneratorTest {
                 emp(X834Location.ENROLLMENT_DATE, "2026-01-01"),
                 emp(X834Location.COVERAGE_START_DATE, "2026-01-01"),
                 emp(X834Location.HD_MAINTENANCE_TYPE_CODE, "001"),
-                emp(X834Location.HD_MAINTENANCE_REASON_CODE, "AC"),
                 emp(X834Location.HD_INSURANCE_LINE_CODE, "HLT"),
                 emp(X834Location.HD_PLAN_COVERAGE_DESCRIPTION, "ACME CORP Health"),
                 emp(X834Location.HD_COVERAGE_LEVEL_CODE, "ESP"),
-                emp(X834Location.HD_EMPLOYMENT_STATUS_CODE, "1"),
                 emp(X834Location.REF_EXTENSION_PREFIX + "ZZ", "NORTH")),
                 List.of(dependent));
 

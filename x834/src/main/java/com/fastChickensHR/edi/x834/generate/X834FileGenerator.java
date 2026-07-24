@@ -209,12 +209,12 @@ public final class X834FileGenerator implements FileGenerator {
     /** Emit one HD (Loop 2300) segment for a single coverage group, followed by its begin/end DTPs. */
     private List<Segment> oneHealthCoverage(Map<String, String> loc) throws ValidationException {
         HealthCoverage.Builder hd = HealthCoverage.builder();
+        // The 220A1 HD segment carries only HD01/HD03/HD04/HD05. HD02 and HD06+ are Not Used —
+        // employment status, in particular, belongs on INS08, never HD (see HDSegment javadoc).
         apply(loc, X834Location.HD_MAINTENANCE_TYPE_CODE, hd::setMaintenanceTypeCode);
-        apply(loc, X834Location.HD_MAINTENANCE_REASON_CODE, hd::setMaintenanceReasonCode);
         apply(loc, X834Location.HD_INSURANCE_LINE_CODE, hd::setInsuranceLineCode);
         apply(loc, X834Location.HD_PLAN_COVERAGE_DESCRIPTION, hd::setPlanCoverageDescription);
         apply(loc, X834Location.HD_COVERAGE_LEVEL_CODE, hd::setCoverageLevelCode);
-        apply(loc, X834Location.HD_EMPLOYMENT_STATUS_CODE, hd::setEmploymentStatusCode);
 
         // Loop 2300: the HD segment, followed by its coverage-date DTP segments (begin/end).
         List<Segment> coverage = new java.util.ArrayList<>();
