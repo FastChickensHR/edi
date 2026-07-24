@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TPATest {
     X834Context context = new X834Context();
-    String entityIdentifierCode = "TP";
+    String entityIdentifierCode = "TV";
     String tpaName = "TPA Organization Name";
     String identificationCodeQualifier = "PI";
     String tpaIdentifier = "12345";
@@ -31,7 +31,19 @@ class TPATest {
         segment.setContext(context);
 
         assertEquals("N1", segment.getSegmentIdentifier(), "Expected segment identifier should be 'N1'");
-        assertEquals("N1*TP*TPA Organization Name*PI*12345~", segment.render().trim(), "The segment is not formatted correctly.");
+        assertEquals("N1*TV*TPA Organization Name*PI*12345~", segment.render().trim(), "The segment is not formatted correctly.");
+    }
+
+    @Test
+    public void testBuilderDefaultsN101ToTV() throws ValidationException {
+        TPA segment = new TPA.Builder()
+                .setN102(tpaName)
+                .setN103(identificationCodeQualifier)
+                .setN104(tpaIdentifier)
+                .build();
+
+        assertEquals("TV", segment.getN101().getCode(),
+                "Loop 1000C TPA must default N101 to TV (Third Party Administrator), not TP (Primary Taxpayer)");
     }
 
     @Test
