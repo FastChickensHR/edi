@@ -22,14 +22,29 @@ class PayerTest {
 
     @Test
     public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
+        // N103 must be supplied alongside N104 (P0304); the builder no longer auto-seeds FI.
         Payer segment = new Payer.Builder()
                 .setN102(planSponsorName)
+                .setN103("FI")
                 .setN104(sponsorIdentifier)
                 .build();
         segment.setContext(context);
 
         assertEquals("N1", segment.getSegmentIdentifier(), "Expected segment identifier should be 'N1'");
         assertEquals("N1*IN*fake plan sponsor name*FI*FPO~", segment.render().trim(), "The segment is not formatted correctly.");
+    }
+
+    @Test
+    public void testNameOnlyPayerEmitsNoDanglingQualifier() throws ValidationException {
+        // A payer with a name but no identification code must emit N1*IN*<name> only —
+        // no dangling "*FI" qualifier (X12 P0304).
+        Payer segment = new Payer.Builder()
+                .setPlanSponsorName(planSponsorName)
+                .build();
+        segment.setContext(context);
+
+        assertEquals("N1*IN*fake plan sponsor name~", segment.render().trim(),
+                "A name-only payer must not carry a dangling identification-code qualifier");
     }
 
     @Test

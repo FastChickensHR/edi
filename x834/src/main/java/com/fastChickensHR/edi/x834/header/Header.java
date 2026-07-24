@@ -130,7 +130,9 @@ public class Header {
             builder.setPlanSponsorName(payerName);
         }
         if (payerIdentification != null) {
-            builder.setSponsorIdentifier(payerIdentification);
+            // Qualifier and identifier are a P0304 pair: emit N103=FI only alongside the id.
+            builder.setIdentificationCodeQualifier(Payer.DEFAULT_IDENTIFICATION_CODE_QUALIFIER)
+                    .setSponsorIdentifier(payerIdentification);
         }
         return builder;
     }

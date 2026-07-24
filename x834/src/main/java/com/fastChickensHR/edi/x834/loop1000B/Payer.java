@@ -37,14 +37,18 @@ public class Payer extends N1Segment {
     }
 
     /**
-     * Builder for Payer. Pre-seeds the insurer entity code (N101=IN) and
-     * identification qualifier (N103=FI) defaults.
+     * Builder for Payer. Pre-seeds only the insurer entity code (N101=IN).
+     * <p>
+     * The identification qualifier (N103={@value #DEFAULT_IDENTIFICATION_CODE_QUALIFIER}) is
+     * <em>not</em> pre-seeded: under X12 rule P0304 the qualifier and the identifier (N104) must
+     * travel together, so it is set only alongside a payer identifier (see
+     * {@code Header.createDefaultPayerBuilder}). A name-only payer therefore emits
+     * {@code N1*IN*<name>} with no dangling qualifier.
      */
     @Accessors(chain = true)
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
             this.setN101(DEFAULT_ENTITY_IDENTIFIER_CODE);
-            this.setN103(DEFAULT_IDENTIFICATION_CODE_QUALIFIER);
         }
 
         @Override
