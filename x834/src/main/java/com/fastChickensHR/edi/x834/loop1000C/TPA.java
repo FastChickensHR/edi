@@ -14,15 +14,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Loop 1000C third-party administrator name (N1*TP) in the X12 834 (005010X220A1).
+ * Loop 1000C third-party administrator name (N1*TV) in the X12 834 (005010X220A1).
  * <p>
  * Produces the N1 segment that identifies the TPA/broker in the header portion of the
  * 834, following the payer (Loop 1000B). Extends the generic {@link N1Segment}.
  */
 @Getter
 public class TPA extends N1Segment {
-    /** Default N101 entity identifier code {@code "TP"} (Third Party Administrator). */
-    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "TP";
+    /** Default N101 entity identifier code {@code "TV"} (Third Party Administrator). */
+    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "TV";
 
     private TPA(Builder builder) throws ValidationException {
         super(builder);
@@ -56,7 +56,7 @@ public class TPA extends N1Segment {
     }
 
     /**
-     * Builder for TPA. Pre-seeds the third-party-administrator entity code (N101=TP) default.
+     * Builder for TPA. Pre-seeds the third-party-administrator entity code (N101=TV) default.
      */
     @Setter
     @Accessors(chain = true)
