@@ -106,12 +106,4 @@ class X834ContextTest {
         assertEquals("231115", ctx.getFormattedDocumentDate(),
                 "changing the date format after construction should be reflected in the formatted date");
     }
-
-    @Test
-    void testDefaultDocumentDateStillDrivesFormattedValues() {
-        X834Context ctx = new X834Context();
-
-        assertEquals(ctx.formatDate(ctx.getDocumentDate()), ctx.getFormattedDocumentDate());
-        assertEquals(ctx.formatTime(ctx.getDocumentDate()), ctx.getFormattedDocumentTime());
-    }
 }

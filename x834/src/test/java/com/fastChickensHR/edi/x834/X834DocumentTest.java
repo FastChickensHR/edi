@@ -13,12 +13,12 @@ import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.testsupport.TestFixtures;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,63 +53,10 @@ class X834DocumentTest {
         return member;
     }
 
-    /**
-     * Extracts the SE01 value (transaction segment count) from the rendered document.
-     * Finds the SE segment and parses the first element as an integer.
-     */
-    private int extractSe01(String document) {
-        // SE segment format: "SE*<count>*<controlNumber>~"
-        int seIndex = document.indexOf("\nSE*");
-        if (seIndex == -1) {
-            seIndex = document.indexOf("SE*");
-        } else {
-            seIndex++; // skip the newline
-        }
-        assertTrue(seIndex >= 0, "SE segment not found in document");
-        int start = seIndex + 3; // skip "SE*"
-        int end = document.indexOf('*', start);
-        return Integer.parseInt(document.substring(start, end));
-    }
-
-    /**
-     * Extracts the GE01 value (number of transaction sets) from the rendered document.
-     */
-    private int extractGe01(String document) {
-        int geIndex = document.indexOf("\nGE*");
-        if (geIndex == -1) {
-            geIndex = document.indexOf("GE*");
-        } else {
-            geIndex++;
-        }
-        assertTrue(geIndex >= 0, "GE segment not found in document");
-        int start = geIndex + 3; // skip "GE*"
-        int end = document.indexOf('*', start);
-        return Integer.parseInt(document.substring(start, end));
-    }
-
-    /**
-     * Extracts the IEA01 value (number of included groups) from the rendered document.
-     */
-    private int extractIea01(String document) {
-        int ieaIndex = document.indexOf("\nIEA*");
-        if (ieaIndex == -1) {
-            ieaIndex = document.indexOf("IEA*");
-        } else {
-            ieaIndex++;
-        }
-        assertTrue(ieaIndex >= 0, "IEA segment not found in document");
-        int start = ieaIndex + 4; // skip "IEA*"
-        int end = document.indexOf('*', start);
-        return Integer.parseInt(document.substring(start, end));
-    }
-
     @Test
-    void testSingleMemberProducesCorrectSe01() throws ValidationException {
-        // Header generates 8 segments: ISA, GS, ST, BGN, DTP, REF, N1(sponsor), N1(payer)
-        // ISA and GS are outside the ST/SE envelope (-2)
-        // Minimal member generates 1 segment: INS
-        // SE itself counts as 1 (+1)
-        // Expected SE01 = (8 - 2) + 1 + 1 = 8
+    void singleMinimalMemberRendersExpected834() throws ValidationException {
+        // The golden pins the whole builder-path document, including the SE01 transaction segment
+        // count (ISA/GS sit outside the ST/SE envelope; header + one INS + SE == 8).
         X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
@@ -117,48 +64,15 @@ class X834DocumentTest {
                 .build();
 
         assertTrue(doc.isValid(), "Document should be valid");
-        Optional<String> output = doc.generateDocument();
-        assertTrue(output.isPresent(), "Document should generate successfully");
+        String output = doc.generateDocument().orElseThrow(() -> new AssertionError("document should generate"));
 
-        assertEquals(8, extractSe01(output.get()));
+        TestFixtures.assertMatchesGolden("golden/builder-single-minimal-member.834", output);
     }
 
     @Test
-    void testMultipleMembersProduceHigherSe01ThanSingleMember() throws ValidationException {
-        X834Document singleMemberDoc = new X834Document.Builder(context)
-                .withHeader(buildHeader())
-                .withTrailer(new Trailer.Builder(context))
-                .addMember(buildMinimalMember())
-                .build();
-
-        X834Document tenMemberDoc = new X834Document.Builder(context)
-                .withHeader(buildHeader())
-                .withTrailer(new Trailer.Builder(context))
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .addMember(buildMinimalMember())
-                .build();
-
-        String singleOutput = singleMemberDoc.generateDocument().orElseThrow();
-        String tenOutput = tenMemberDoc.generateDocument().orElseThrow();
-
-        int singleSe01 = extractSe01(singleOutput);
-        int tenSe01 = extractSe01(tenOutput);
-
-        // Each additional minimal member adds 1 INS segment, so SE01 increases by 1 per member
-        assertEquals(singleSe01 + 9, tenSe01,
-                "Ten-member document should have SE01 nine higher than single-member document");
-    }
-
-    @Test
-    void testGe01AndIea01AreAlwaysOne() throws ValidationException {
+    void multipleMinimalMembersRenderExpected834() throws ValidationException {
+        // The golden pins a three-member document: SE01 grows by exactly one INS per member, while
+        // GE01 and IEA01 stay at 1 — one transaction set inside one functional group inside one interchange.
         X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
@@ -167,10 +81,9 @@ class X834DocumentTest {
                 .addMember(buildMinimalMember())
                 .build();
 
-        String output = doc.generateDocument().orElseThrow();
+        String output = doc.generateDocument().orElseThrow(() -> new AssertionError("document should generate"));
 
-        assertEquals(1, extractGe01(output), "GE01 should always be 1 for an 834 document");
-        assertEquals(1, extractIea01(output), "IEA01 should always be 1 for an 834 document");
+        TestFixtures.assertMatchesGolden("golden/builder-three-minimal-members.834", output);
     }
 
     @Test

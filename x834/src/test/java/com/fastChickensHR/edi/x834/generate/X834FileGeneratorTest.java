@@ -13,13 +13,20 @@ import com.fastChickensHR.edi.core.Field;
 import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.Location;
+import com.fastChickensHR.edi.x834.testsupport.TestFixtures;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+/**
+ * End-to-end goldens for the {@link X834FileGenerator} seam: each test plans a realistic
+ * {@link FileContent} and asserts the <em>entire</em> emitted 834 against an on-disk golden. Whole-payload
+ * equality pins segment order, element positions, terminators, and the internally-generated SE/GE/IEA
+ * counts all at once — catching reordering and dropped segments that the previous scattered
+ * {@code contains(...)} checks could not. The document date is pinned via the {@code DOCUMENT_DATE}
+ * file field, so the generator path is fully deterministic with no production seam. Regenerate goldens
+ * after an intentional format change with {@code -Dupdate.goldens=true} (see {@link TestFixtures}).
+ */
 class X834FileGeneratorTest {
 
     private final X834FileGenerator generator = new X834FileGenerator();
@@ -67,37 +74,9 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
-        assertFalse(out == null || out.isBlank(), "expected a rendered 834");
-        // Envelope + header
-        contains(out, "ISA*00*");
-        contains(out, "SENDER123");
-        contains(out, "RECV456");
-        contains(out, "ST*834*0001*");
-        contains(out, "BGN*00*REFID001*20260115");
-        contains(out, "REF*38*MP-100");
-        contains(out, "N1*P5*ACME CORP*FI");
-        contains(out, "N1*IN*BLUE CROSS*FI");
-        // Subscriber loop
-        contains(out, "INS*Y*20*001**A");
-        contains(out, "REF*1L*POL-9");
-        contains(out, "REF*0F*E12345");
-        contains(out, "REF*OF*E12345");
-        // Dependent loop
-        contains(out, "INS*Y*01*001**A");
-        // Custom REF extension + coverage (HD01-05 exact; trailing empties left to the library)
-        contains(out, "REF*ZZ*NORTH");
-        contains(out, "HD*001*AC*HLT*ACME CORP Health*ESP");
-        // Trailer
-        contains(out, "SE*");
-        contains(out, "GE*1*1");
-        contains(out, "IEA*1*000000001");
-        // HD and REF-extension belong to the subscriber (INS*Y*20) and render inside that
-        // subscriber's own loop (Loop 2300): after its INS, but BEFORE the dependent's loop
-        // (INS*Y*01) begins — not batched after every member.
-        assertTrue(out.indexOf("HD*001") > out.indexOf("INS*Y*20"), "HD must render after its subscriber's INS");
-        assertTrue(out.indexOf("HD*001") < out.indexOf("INS*Y*01"), "HD must render before the dependent loop");
-        assertTrue(out.indexOf("REF*ZZ*NORTH") > out.indexOf("INS*Y*20"), "REF extension renders inside the subscriber loop");
-        assertTrue(out.indexOf("REF*ZZ*NORTH") < out.indexOf("INS*Y*01"), "REF extension renders before the dependent loop");
+        // The golden pins the full envelope + subscriber loop with its nested REF extension and HD
+        // (Loop 2300) coverage, then the dependent loop — segment order and element positions included.
+        TestFixtures.assertMatchesGolden("golden/subscriber-with-dependent.834", out);
     }
 
     @Test
@@ -133,14 +112,9 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(sub1, sub2)));
 
-        // Each subscriber's HD sits between its own REF*OF and the next subscriber's REF*OF —
-        // i.e. HD is nested in its member's loop, not batched at the end of the transaction.
-        int sub1Ref = out.indexOf("REF*OF*SUB1");
-        int sub1Hd = out.indexOf("PLAN-ONE");
-        int sub2Ref = out.indexOf("REF*OF*SUB2");
-        int sub2Hd = out.indexOf("PLAN-TWO");
-        assertTrue(sub1Ref < sub1Hd && sub1Hd < sub2Ref, "subscriber 1's HD must precede subscriber 2's loop");
-        assertTrue(sub2Ref < sub2Hd, "subscriber 2's HD must follow subscriber 2's INS/REF");
+        // The golden pins each subscriber's HD nested inside its own member loop (between that
+        // subscriber's REF*OF and the next subscriber's) — not batched at the end of the transaction.
+        TestFixtures.assertMatchesGolden("golden/two-subscribers-hd-nesting.834", out);
     }
 
     @Test
@@ -175,16 +149,8 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
-        contains(out, "INS*Y*18*001**A");
-        contains(out, "NM1*IL*1*DOE*JANE*Q~");
-        contains(out, "N3*123 MAIN ST*APT 4~");
-        contains(out, "N4*SPRINGFIELD*IL*62704~");
-        contains(out, "DMG*D8*19800115*F~");
-        // Loop 2100A order: NM1 -> N3 -> N4 -> DMG, all after the INS.
-        assertTrue(out.indexOf("NM1*IL") > out.indexOf("INS*Y*18"), "NM1 after INS");
-        assertTrue(out.indexOf("N3*123") > out.indexOf("NM1*IL"), "N3 after NM1");
-        assertTrue(out.indexOf("N4*SPRING") > out.indexOf("N3*123"), "N4 after N3");
-        assertTrue(out.indexOf("DMG*D8") > out.indexOf("N4*SPRING"), "DMG after N4");
+        // The golden pins the full Loop 2100A member loop in order: INS -> NM1 -> N3 -> N4 -> DMG.
+        TestFixtures.assertMatchesGolden("golden/member-full-demographics-address.834", out);
     }
 
     @Test
@@ -217,13 +183,8 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
-        contains(out, "N3*123 MAIN ST~");     // residence 2100A
-        contains(out, "N4*SPRINGFIELD*IL*62704~");
-        contains(out, "NM1*31~");             // mailing 2100C marker
-        contains(out, "N3*PO BOX 99~");
-        contains(out, "N4*SPRINGFIELD*IL*62705~");
-        assertTrue(out.indexOf("NM1*31") > out.indexOf("N4*SPRINGFIELD*IL*62704"),
-                "mailing 2100C must render after residence 2100A");
+        // The golden pins the residence address (2100A) followed by the mailing address (2100C).
+        TestFixtures.assertMatchesGolden("golden/member-with-mailing-address.834", out);
     }
 
     @Test
@@ -252,12 +213,8 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
-        contains(out, "HD*001");
-        contains(out, "DTP*348*D8*20260101~");   // Loop 2300 coverage begin
-        contains(out, "DTP*349*D8*20261231~");   // Loop 2300 coverage end
-        // The coverage-date DTPs render after the HD segment, inside the same 2300 loop.
-        assertTrue(out.indexOf("DTP*348") > out.indexOf("HD*001"), "begin DTP must follow HD");
-        assertTrue(out.indexOf("DTP*349") > out.indexOf("DTP*348"), "end DTP must follow begin DTP");
+        // The golden pins the HD segment followed by its begin/end coverage-date DTPs inside Loop 2300.
+        TestFixtures.assertMatchesGolden("golden/coverage-date-dtps.834", out);
     }
 
     @Test
@@ -285,7 +242,8 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
-        contains(out, "NM1*IL*1*DOE*JANE****34*123456789~");
+        // The golden pins the NM1 carrying the SSN in the name-id (34) positions.
+        TestFixtures.assertMatchesGolden("golden/member-nm1-with-ssn.834", out);
     }
 
     @Test
@@ -310,12 +268,8 @@ class X834FileGeneratorTest {
 
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
-        // ISA13 (control number) then ISA14 = 1 (Acknowledgment Requested).
-        contains(out, "000000001*1*");
-    }
-
-    private static void contains(String haystack, String needle) {
-        assertTrue(haystack.contains(needle), () -> "expected 834 to contain: " + needle + "\n---\n" + haystack);
+        // The golden pins ISA14 = 1 (Acknowledgment Requested) following ISA13, across the whole envelope.
+        TestFixtures.assertMatchesGolden("golden/acknowledgment-requested.834", out);
     }
 
     private static Field file(String location, String value) {
