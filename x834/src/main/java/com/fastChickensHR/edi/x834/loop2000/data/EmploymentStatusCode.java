@@ -14,31 +14,116 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Employment Status Codes used in the EDI 834
- * Health Insurance Enrollment transaction.
+ * Enumeration representing Employment Status Codes (X12 element 584) used in the
+ * INS08 field of the EDI 834 Health Insurance Enrollment transaction.
+ *
+ * <p>Element 584 is a purely alphabetic code list; the codes below are transcribed
+ * verbatim from the X12 005010 base standard so the enum is the widest legal ring at
+ * INS08 (per-carrier/TR3 subsets are narrowed downstream by the requirements ratchet).
+ * The former numeric list ({@code 1}-{@code 24}) matched no X12 element and has been
+ * removed.
  */
 @Getter
 public enum EmploymentStatusCode implements EdiCodeEnum {
-    ACTIVE("1", "Active"),
-    FULL_TIME("2", "Full-time"),
-    PART_TIME("3", "Part-time"),
-    RETIRED("4", "Retired"),
-    TERMINATED("5", "Terminated"),
-    LEAVE_OF_ABSENCE("6", "Leave of absence"),
-    DISABLED("7", "Disabled"),
-    MILITARY_DUTY("9", "Military duty"),
-    COBRA("20", "COBRA"),
-    SURVIVING_INSURED("21", "Surviving insured"),
-    CONTRACT_EMPLOYEE("22", "Contract employee"),
-    ON_CALL_EMPLOYEE("23", "On call employee"),
-    SEASONAL_EMPLOYEE("24", "Seasonal employee");
+    SUBSTITUTE("00", "Substitute"),
+    LEAVE_OF_ABSENCE_WITH_PAY("AA", "Leave of Absence with Pay"),
+    LEAVE_OF_ABSENCE_WITHOUT_PAY("AB", "Leave of Absence without Pay"),
+    ACTIVE("AC", "Active"),
+    APPRENTICESHIP_FULL_TIME("AD", "Apprenticeship Full-time"),
+    ACTIVE_RESERVE("AE", "Active Reserve"),
+    FLEXIBLE_WORK_PLAN("AF", "Flexible Work Plan"),
+    ALERTED("AG", "Alerted"),
+    ASSIGNED("AH", "Assigned"),
+    AFFILIATED_WITH_OUTSIDE_ORGANIZATION("AI", "Affiliated with Outside Organization"),
+    ADJUNCT("AJ", "Adjunct"),
+    ACTIVE_MILITARY_OVERSEAS("AO", "Active Military - Overseas"),
+    APPRENTICESHIP_PART_TIME("AP", "Apprenticeship Part-time"),
+    APPRENTICESHIP("AQ", "Apprenticeship"),
+    ACADEMY_STUDENT("AS", "Academy Student"),
+    PRESIDENTIAL_APPOINTEE("AT", "Presidential Appointee"),
+    ACTIVE_MILITARY_USA("AU", "Active Military - USA"),
+    NON_APPLICABLE_EMPLOYMENT_STATUS_CATEGORY("CA", "Non-applicable Employment Status Category"),
+    CONTRACTOR("CC", "Contractor"),
+    COBRA("CO", "Consolidated Omnibus Budget Reconciliation Act (COBRA)"),
+    CONTINUED("CT", "Continued"),
+    DISCHARGED_OR_TERMINATED_FOR_CAUSE("DC", "Discharged or Terminated for Cause"),
+    DISHONORABLY_DISCHARGED("DD", "Dishonorably Discharged"),
+    DECEASED("DI", "Deceased"),
+    DISQUALIFIED_MEDICAL_OR_PHYSICAL_CONDITION("DQ", "Disqualified: Medical or Physical Condition"),
+    DISQUALIFIED_OTHER("DR", "Disqualified: Other"),
+    DISABLED("DS", "Disabled"),
+    EMPLOYED_BY_OUTSIDE_ORGANIZATION("EO", "Employed by Outside Organization"),
+    FURLOUGHED_JOB_ABOLISHED("FA", "Furloughed: Job Abolished, Force Reduction"),
+    FURLOUGHED_BUMPED_OR_DISPLACED("FB", "Furloughed: Bumped or Displaced"),
+    FURLOUGHED_FACILITY_CLOSED("FC", "Furloughed: Facility Closed"),
+    FURLOUGHED_OTHER("FO", "Furloughed: Other"),
+    FULL_TIME("FT", "Full-time"),
+    HONORABLY_DISCHARGED("HD", "Honorably Discharged"),
+    INACTIVE("IA", "Inactive"),
+    INACTIVE_RESERVES("IR", "Inactive Reserves"),
+    LEAVE_OF_ABSENCE("L1", "Leave of Absence"),
+    ADMINISTRATIVE_LEAVE_OF_ABSENCE("L2", "Administrative Leave of Absence"),
+    ANNUAL_LEAVE_OF_ABSENCE("L3", "Annual Leave of Absence"),
+    BEREAVEMENT_LEAVE_OF_ABSENCE("L4", "Leave of Absence due to Bereavement"),
+    JURY_DUTY("L5", "Jury Duty"),
+    SUSPENSION("L6", "Suspension"),
+    SABBATICAL_LEAVE_OF_ABSENCE("L7", "Sabbatical Leave of Absence"),
+    PERSONAL_LEAVE_OF_ABSENCE("LA", "Leave of Absence: Personal"),
+    EDUCATION_LEAVE_OF_ABSENCE("LE", "Leave of Absence: Education"),
+    FMLA_LEAVE_OF_ABSENCE("LF", "Leave of Absence: Family Medical Leave Act (FMLA)"),
+    MATERNITY_LEAVE_OF_ABSENCE("LM", "Leave of Absence: Maternity"),
+    GOVERNMENT_LEAVE_OF_ABSENCE("LO", "Leave of Absence for Non-Military Government Request Other Than Jury Duty"),
+    SICKNESS_LEAVE_OF_ABSENCE("LS", "Leave of Absence: Sickness"),
+    UNION_LEAVE_OF_ABSENCE("LU", "Leave of Absence: Union"),
+    UNAUTHORIZED_LEAVE_OF_ABSENCE("LW", "Leave of Absence: Without Permission, Unauthorized"),
+    MILITARY_LEAVE_OF_ABSENCE("LX", "Leave of Absence: Military"),
+    NOT_EMPLOYED("NE", "Not Employed"),
+    ON_STRIKE("OS", "On Strike"),
+    OTHER("OT", "Other"),
+    PROMOTED("PA", "Promoted"),
+    PART_TIME_CONTRACTUAL("PC", "Part-time Contractual"),
+    PLAN_TO_ENLIST("PE", "Plan to Enlist"),
+    PERMANENT("PM", "Permanent"),
+    PART_TIME_NONCONTRACTUAL("PN", "Part-time Noncontractual"),
+    PROBATIONARY("PR", "Probationary"),
+    PART_TIME("PT", "Part-time"),
+    PREVIOUS("PV", "Previous"),
+    PIECE_WORKER("PW", "Piece Worker"),
+    RESIGNED_RETIRED("RA", "Resigned: Retired"),
+    RELOCATED("RB", "Relocated"),
+    REASSIGNED("RC", "Reassigned"),
+    RESIGNED_MOVED("RD", "Resigned: Moved"),
+    RECOMMISSIONED("RE", "Recommissioned"),
+    RESIGNED_INJURY("RI", "Resigned: Injury"),
+    RETIRED_MILITARY_OVERSEAS("RM", "Retired Military - Overseas"),
+    RESIGNED_PERSONAL_REASONS("RP", "Resigned: Personal Reasons"),
+    RETIRED_WITHOUT_RECALL("RR", "Retired Without Recall"),
+    RETIRED("RT", "Retired"),
+    RETIRED_MILITARY_USA("RU", "Retired Military - USA"),
+    DUAL_RETIRED_STATUS("RW", "Dual Retired Status"),
+    RESIGNED_SEPARATION_ALLOWANCE("SA", "Resigned: Accepted Separation Allowance"),
+    SEPARATED("SB", "Separated"),
+    SELF_EMPLOYED("SE", "Self-Employed"),
+    SEASONAL("SL", "Seasonal"),
+    SUSPENDED("SU", "Suspended"),
+    TERMINATED("TE", "Terminated"),
+    TEMPORARY_FULL_TIME("TF", "Temporary Full-Time"),
+    TEMPORARY("TM", "Temporary"),
+    TENURED("TN", "Tenured"),
+    TEMPORARY_PART_TIME("TP", "Temporary Part-Time"),
+    TRANSFERRED("TR", "Transferred"),
+    UNKNOWN("UK", "Unknown"),
+    VOLUNTEER("VO", "Volunteer"),
+    EXTRA_DUTIES("XD", "Extra Duties Not Requiring Certification"),
+    MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
     private final String code;
     private final String description;
     private static final EdiEnumLookup<EmploymentStatusCode> LOOKUP;
 
     static {
-        // Include additional common terms and phrases users might search for
+        // A modest set of colloquial aliases; codes, enum names and descriptions are
+        // matched automatically by EdiEnumLookup.
         LOOKUP = new EdiEnumLookup<>(
                 EmploymentStatusCode.class,
                 "Employment Status Code",
@@ -64,37 +149,24 @@ public enum EmploymentStatusCode implements EdiCodeEnum {
                         Map.entry("quit", TERMINATED),
 
                         Map.entry("loa", LEAVE_OF_ABSENCE),
-                        Map.entry("sabbatical", LEAVE_OF_ABSENCE),
-                        Map.entry("fmla", LEAVE_OF_ABSENCE),
-                        Map.entry("medical leave", LEAVE_OF_ABSENCE),
+                        Map.entry("sabbatical", SABBATICAL_LEAVE_OF_ABSENCE),
+                        Map.entry("fmla", FMLA_LEAVE_OF_ABSENCE),
+                        Map.entry("medical leave", SICKNESS_LEAVE_OF_ABSENCE),
+                        Map.entry("maternity", MATERNITY_LEAVE_OF_ABSENCE),
+                        Map.entry("jury", JURY_DUTY),
 
                         Map.entry("disability", DISABLED),
                         Map.entry("ltd", DISABLED),
 
-                        Map.entry("military", MILITARY_DUTY),
-                        Map.entry("army", MILITARY_DUTY),
-                        Map.entry("navy", MILITARY_DUTY),
-                        Map.entry("airforce", MILITARY_DUTY),
-                        Map.entry("marines", MILITARY_DUTY),
-                        Map.entry("reserve", MILITARY_DUTY),
+                        Map.entry("cobra", COBRA),
 
-                        Map.entry("consolidated omnibus budget reconciliation act", COBRA),
+                        Map.entry("contractor", CONTRACTOR),
+                        Map.entry("temp", TEMPORARY),
 
-                        Map.entry("survivor", SURVIVING_INSURED),
-                        Map.entry("widow", SURVIVING_INSURED),
-                        Map.entry("widower", SURVIVING_INSURED),
-
-                        Map.entry("contractor", CONTRACT_EMPLOYEE),
-                        Map.entry("1099", CONTRACT_EMPLOYEE),
-                        Map.entry("temporary", CONTRACT_EMPLOYEE),
-
-                        Map.entry("oncall", ON_CALL_EMPLOYEE),
-                        Map.entry("asneeded", ON_CALL_EMPLOYEE),
-
-                        Map.entry("seasonal", SEASONAL_EMPLOYEE),
-                        Map.entry("summer", SEASONAL_EMPLOYEE),
-                        Map.entry("holiday", SEASONAL_EMPLOYEE),
-                        Map.entry("temp", SEASONAL_EMPLOYEE)
+                        Map.entry("seasonal", SEASONAL),
+                        Map.entry("military", ACTIVE_MILITARY_USA),
+                        Map.entry("deceased", DECEASED),
+                        Map.entry("died", DECEASED)
                 )
         );
     }

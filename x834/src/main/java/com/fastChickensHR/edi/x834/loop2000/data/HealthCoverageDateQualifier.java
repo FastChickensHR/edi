@@ -23,9 +23,9 @@ public enum HealthCoverageDateQualifier implements EdiCodeEnum {
     EXPIRATION_DATE("349", "Plan End Date"),
     ELIGIBILITY_BEGIN("356", "Eligibility Begin Date"),
     ELIGIBILITY_END("357", "Eligibility End Date"),
-    COBRA_BEGIN("343", "COBRA Begin Date"),
-    COBRA_END("344", "COBRA End Date"),
-    PREMIUM_PAID_TO_DATE("309", "Premium Paid To Date");
+    COBRA_BEGIN("340", "COBRA Begin Date"),
+    COBRA_END("341", "COBRA End Date"),
+    PREMIUM_PAID_TO_DATE("289", "Premium Paid To Date");
 
     private final String code;
     private final String description;

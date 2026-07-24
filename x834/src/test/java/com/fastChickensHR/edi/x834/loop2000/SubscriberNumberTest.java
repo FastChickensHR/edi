@@ -25,7 +25,7 @@ class SubscriberNumberTest {
         segment.setContext(context);
 
         assertEquals("REF", segment.getSegmentIdentifier(), "Expected segment identifier should be 'REF'");
-        assertEquals("REF*OF*123456789~", segment.render().trim(), "The segment is not formatted correctly.");
+        assertEquals("REF*0F*123456789~", segment.render().trim(), "The segment is not formatted correctly.");
     }
 
     @Test

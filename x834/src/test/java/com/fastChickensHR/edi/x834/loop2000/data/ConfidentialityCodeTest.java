@@ -45,7 +45,7 @@ class ConfidentialityCodeTest {
     private static Stream<Arguments> aliases() {
         return Stream.of(
                 Arguments.of("open", ConfidentialityCode.UNRESTRICTED),
-                Arguments.of("standard", ConfidentialityCode.NORMAL));
+                Arguments.of("other", ConfidentialityCode.OTHER_RESTRICTIONS));
     }
 
     /** Null, blank, and unrecognized input are rejected, not silently defaulted. */

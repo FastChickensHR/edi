@@ -14,20 +14,21 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Enumeration representing Identification Card Type Codes used in the IDC02 field
- * of the EDI 834 Identification Card (IDC) segment in Loop 2300.
- * <p>
- * Source: HIPAA 005010X220A1 Benefit Enrollment and Maintenance implementation guide.
+ * Enumeration representing Identification Card Type Codes (X12 element 1215) emitted at
+ * the IDC02 field of the EDI 834 Identification Card (IDC) segment in Loop 2300.
+ *
+ * <p>Element 1215 defines exactly five codes: {@code D}, {@code E}, {@code H}, {@code P},
+ * {@code V}. The former list carried three invented codes ({@code G} Drug, {@code L}
+ * Long-Term Care, {@code M} Medical), was missing {@code E} (Hearing Benefit), and
+ * mislabeled {@code P} as "Pharmacy". Descriptions are the verbatim element-1215 text.
  */
 @Getter
 public enum IdentificationCardTypeCode implements EdiCodeEnum {
-    DENTAL("D", "Dental"),
-    DRUG("G", "Drug"),
-    HEALTH("H", "Health"),
-    LONG_TERM_CARE("L", "Long-Term Care"),
-    MEDICAL("M", "Medical"),
-    PHARMACY("P", "Pharmacy"),
-    VISION("V", "Vision");
+    DENTAL("D", "Dental Insurance"),
+    HEARING("E", "Hearing Benefit"),
+    HEALTH("H", "Health Insurance"),
+    PRESCRIPTION_DRUG("P", "Prescription Drug Service Drug Insurance"),
+    VISION("V", "Vision Benefit");
 
     private final String code;
     private final String description;
@@ -41,21 +42,17 @@ public enum IdentificationCardTypeCode implements EdiCodeEnum {
                         Map.entry("dental card", DENTAL),
                         Map.entry("teeth", DENTAL),
 
-                        Map.entry("drug card", DRUG),
-                        Map.entry("rx card", DRUG),
+                        Map.entry("hearing card", HEARING),
+                        Map.entry("hearing aid", HEARING),
 
                         Map.entry("health card", HEALTH),
                         Map.entry("insurance card", HEALTH),
                         Map.entry("medical id card", HEALTH),
 
-                        Map.entry("ltc", LONG_TERM_CARE),
-                        Map.entry("long term care", LONG_TERM_CARE),
-                        Map.entry("nursing card", LONG_TERM_CARE),
-
-                        Map.entry("medical card", MEDICAL),
-
-                        Map.entry("pharmacy card", PHARMACY),
-                        Map.entry("prescription card", PHARMACY),
+                        Map.entry("rx card", PRESCRIPTION_DRUG),
+                        Map.entry("drug card", PRESCRIPTION_DRUG),
+                        Map.entry("pharmacy card", PRESCRIPTION_DRUG),
+                        Map.entry("prescription card", PRESCRIPTION_DRUG),
 
                         Map.entry("vision card", VISION),
                         Map.entry("eye card", VISION),
