@@ -66,4 +66,49 @@ class DelimitedFormatTest {
 
         assertEquals("1,Jane\n2,John\n", out);
     }
+
+    @Test
+    void headerlessParseCurrentlyDropsAllFields() {
+        // KNOWN BUG (FastChickensHR/edi#152): headerless generate works (above), but headerless parse
+        // has no column names, so every cell is dropped and each row becomes an empty Record — a silent
+        // data-loss asymmetry. Pinned as current behavior (a regression net) until the bug is fixed.
+        DelimitedFormat noHeader = DelimitedFormat.builder().header(false).build();
+
+        List<Record> back = new DelimitedFileParser(noHeader).parse("1,Jane\n2,John\n").records();
+
+        assertEquals(List.of(Record.of(List.of()), Record.of(List.of())), back);
+    }
+
+    @Test
+    void escapeCharacterEscapesEmbeddedQuoteInsteadOfDoublingIt() {
+        // With an escape char set, an embedded quote is rendered as \" rather than the CSV default of
+        // doubling it (""). Contrast DelimitedFileGeneratorTest.embeddedQuoteIsDoubledOnGenerateAndRoundTrips.
+        DelimitedFormat escaped = DelimitedFormat.builder().escape('\\').build();
+        List<Record> recs = List.of(
+                Record.of(List.of(f(RECORD, "id", "1"), f(RECORD, "note", "He said \"hi\""))));
+
+        String out = new DelimitedFileGenerator(escaped).generate(new FileContent(Direction.OUTBOUND, List.of(), recs));
+
+        assertEquals("id,note\n1,\"He said \\\"hi\\\"\"\n", out);
+        assertEquals(recs, new DelimitedFileParser(escaped).parse(out).records());
+    }
+
+    @Test
+    void nullQuoteProducesAnUnquotedFormatThatRoundTrips() {
+        DelimitedFormat unquoted = DelimitedFormat.builder().quote(null).build();
+
+        String out = new DelimitedFileGenerator(unquoted).generate(content());
+
+        assertEquals("id,name\n1,Jane\n2,John\n", out);
+        assertEquals(records, new DelimitedFileParser(unquoted).parse(out).records());
+    }
+
+    @Test
+    void customRecordSeparatorIsHonored() {
+        DelimitedFormat crlf = DelimitedFormat.builder().recordSeparator("\r\n").build();
+
+        String out = new DelimitedFileGenerator(crlf).generate(content());
+
+        assertEquals("id,name\r\n1,Jane\r\n2,John\r\n", out);
+    }
 }

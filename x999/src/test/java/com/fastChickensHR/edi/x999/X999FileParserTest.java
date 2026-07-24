@@ -128,6 +128,80 @@ class X999FileParserTest {
         assertEquals(Direction.INBOUND, out.direction());
     }
 
+    // The same well-formed 106-char ISA as ISA above, but with a '|' element separator and a '^'
+    // segment terminator instead of the '*'/'~' that happen to equal the parser's fallback defaults.
+    private static final String ISA_PIPE_CARET =
+            "ISA|00|          |00|          |ZZ|SENDER         |ZZ|RECEIVER       |260119|1200|U|00501|000000123|0|P|:^";
+
+    @Test
+    void readsNonDefaultDelimitersFromTheIsaEnvelope() {
+        // Every other fixture uses '*'/'~', which equal the fallback defaults, so the ISA-reading branch
+        // is indistinguishable from the branch that ignores it. This vendor uses '|' and '^'.
+        String ack = ISA_PIPE_CARET
+                + "AK1|BE|000000042^"
+                + "AK2|834|0001^IK5|A^"
+                + "AK9|A|1|1|1^";
+
+        FileContent out = parser.parse(ack);
+
+        assertEquals("000000123", file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // ISA13, read via '|'
+        assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE));
+        assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER));
+        assertEquals("A", file(out, X999.GROUP_STATUS));
+        assertEquals(1, out.records().size());
+        assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+        assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+    }
+
+    @Test
+    void fallsBackToDefaultsWhenTheIsaIsTruncated() {
+        // Starts with "ISA" but is far shorter than the fixed 106-char envelope, so the parser cannot
+        // read delimiters off it and falls back to '*'/'~' — parsing the rest without crashing, and
+        // simply not surfacing an interchange control number.
+        String ack = "ISA*BAD~AK1*BE*000000042~AK2*834*0001~IK5*A~AK9*A*1*1*1~";
+
+        FileContent out = parser.parse(ack);
+
+        assertNull(file(out, X999.INTERCHANGE_CONTROL_NUMBER));          // truncated ISA yields no ISA13
+        assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER)); // rest still parses on defaults
+        assertEquals("A", file(out, X999.GROUP_STATUS));
+        assertEquals(1, out.records().size());
+        assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+    }
+
+    @Test
+    void parsesATa1AlongsideAnAckGroupInOneInterchange() {
+        // A TA1 interchange acknowledgment and an AK1/AK9 functional-group acknowledgment can ride in
+        // the same interchange; both the TA1 and the group fields must surface.
+        String ack = ISA
+                + "TA1*000000123*260119*1200*A*000~"
+                + "AK1*BE*000000042~"
+                + "AK2*834*0001~IK5*A~"
+                + "AK9*A*1*1*1~";
+
+        FileContent out = parser.parse(ack);
+
+        assertEquals("000000123", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER)); // TA101
+        assertEquals("A", file(out, X999.INTERCHANGE_ACK_STATUS));                           // TA104
+        assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE));                              // AK101
+        assertEquals("A", file(out, X999.GROUP_STATUS));                                     // AK901
+        assertEquals(1, out.records().size());
+        assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+    }
+
+    @Test
+    void parsesAGroupLevelRejection() {
+        String ack = ISA
+                + "AK1*BE*000000042~"
+                + "AK2*834*0001~IK5*R~"
+                + "AK9*R*1*1*0~"; // group rejected
+
+        FileContent out = parser.parse(ack);
+
+        assertEquals("R", file(out, X999.GROUP_STATUS));
+        assertEquals("R", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+    }
+
     private static String file(FileContent fc, String location) {
         return valueAt(fc.fileFields(), location);
     }

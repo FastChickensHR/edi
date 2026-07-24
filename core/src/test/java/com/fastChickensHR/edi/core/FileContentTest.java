@@ -10,8 +10,10 @@ package com.fastChickensHR.edi.core;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,5 +45,34 @@ class FileContentTest {
     void positionRequiresLevelAndLocation() {
         assertThrows(IllegalArgumentException.class, () -> new Location(null, "x"));
         assertThrows(IllegalArgumentException.class, () -> new Location(RecordLevel.FILE, "  "));
+    }
+
+    @Test
+    void rejectsNullDirectionAndNullFieldLocation() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new FileContent(null, List.of(), List.of()));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Field(null, "123456789"));
+    }
+
+    @Test
+    void presentValueIsReportedAndCarriedThrough() {
+        Field ssn = new Field(new Location(RecordLevel.RECORD, "REF*34"), "123456789");
+        assertFalse(ssn.isOmitted());
+        assertEquals(Optional.of("123456789"), ssn.valueIfPresent());
+        assertEquals("123456789", ssn.value());
+    }
+
+    @Test
+    void nullCollectionsCoalesceToEmptyImmutableLists() {
+        FileContent file = new FileContent(Direction.INBOUND, null, null);
+        assertEquals(List.of(), file.fileFields());
+        assertEquals(List.of(), file.records());
+        assertThrows(UnsupportedOperationException.class,
+                () -> file.fileFields().add(new Field(new Location(RecordLevel.FILE, "ISA*13"), "1")));
+
+        Record record = new Record(null, null);
+        assertEquals(List.of(), record.fields());
+        assertEquals(List.of(), record.children());
     }
 }
