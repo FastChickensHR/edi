@@ -72,12 +72,12 @@ public final class X834Location {
 
     // ---- Member level: health coverage (HD segment) ----
     public static final String HD_PREFIX = "hd.";
+    // The 220A1 HD segment carries only HD01/HD03/HD04/HD05; HD02 and HD06+ are Not Used
+    // (employment status lives on INS08, not HD09), so there are no HD_* fields for them.
     public static final String HD_MAINTENANCE_TYPE_CODE = "hd.maintenanceTypeCode";        // HD01
-    public static final String HD_MAINTENANCE_REASON_CODE = "hd.maintenanceReasonCode";    // HD02
     public static final String HD_INSURANCE_LINE_CODE = "hd.insuranceLineCode";            // HD03
     public static final String HD_PLAN_COVERAGE_DESCRIPTION = "hd.planCoverageDescription"; // HD04
     public static final String HD_COVERAGE_LEVEL_CODE = "hd.coverageLevelCode";            // HD05
-    public static final String HD_EMPLOYMENT_STATUS_CODE = "hd.employmentStatusCode";      // HD09
     /** Loop 2300 coverage begin date — DTP*348 (D8). */
     public static final String HD_BENEFIT_BEGIN_DATE = "hd.benefitBeginDate";
     /** Loop 2300 coverage end date — DTP*349 (D8). */
