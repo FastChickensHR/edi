@@ -22,8 +22,8 @@ import lombok.Getter;
  * Element/position map:
  * <ul>
  *     <li>REF01 = reference identification qualifier (what kind of reference)</li>
- *     <li>REF02 = reference identification value (max 80 characters)</li>
- *     <li>REF03 = reference description (max 80 characters)</li>
+ *     <li>REF02 = reference identification value (X12 element 127, max 50 characters)</li>
+ *     <li>REF03 = reference description (X12 element 352, max 80 characters)</li>
  * </ul>
  * At least one of REF02 or REF03 must be supplied.
  */
@@ -31,11 +31,16 @@ import lombok.Getter;
 public abstract class RefSegment extends Segment {
     public static final String SEGMENT_ID = "REF";
 
+    /** Maximum length of REF02 (Reference Identification, X12 element 127: AN 1/50 in 005010). */
+    public static final int REF02_MAX_LENGTH = 50;
+    /** Maximum length of REF03 (Reference Description, X12 element 352: AN 1/80). */
+    public static final int REF03_MAX_LENGTH = 80;
+
     /** REF01 — reference identification qualifier (what kind of reference this is). */
     protected final ReferenceIdentificationQualifier ref01;
-    /** REF02 — reference identification value (max 80 characters). */
+    /** REF02 — reference identification value (element 127, max 50 characters). */
     protected final String ref02;
-    /** REF03 — reference description (max 80 characters). */
+    /** REF03 — reference description (element 352, max 80 characters). */
     protected final String ref03;
 
     protected RefSegment(RefSegment.AbstractBuilder<?> builder) throws ValidationException {
@@ -51,11 +56,11 @@ public abstract class RefSegment extends Segment {
                 (ref03 == null || ref03.trim().isEmpty())) {
             throw new ValidationException("Either Reference Identification (REF02) or Reference Description (REF03) is required");
         }
-        if ( ref02 != null && ref02.length() > 80) {
-            throw new ValidationException("REF02 (Reference Identification) must be 80 characters or less");
+        if ( ref02 != null && ref02.length() > REF02_MAX_LENGTH) {
+            throw new ValidationException("REF02 (Reference Identification) must be " + REF02_MAX_LENGTH + " characters or less");
         }
-        if ( ref03 != null && ref03.length() > 80) {
-            throw new ValidationException("REF03 (Reference Description) must be 80 characters or less");
+        if ( ref03 != null && ref03.length() > REF03_MAX_LENGTH) {
+            throw new ValidationException("REF03 (Reference Description) must be " + REF03_MAX_LENGTH + " characters or less");
         }
     }
 

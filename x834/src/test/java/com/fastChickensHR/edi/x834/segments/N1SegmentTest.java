@@ -160,4 +160,18 @@ class N1SegmentTest {
         segment.setContext(new X834Context());
         assertEquals("N1*01*Test Name*PB*123456~", segment.render().trim(), "Render should properly format the segment");
     }
+
+    @Test
+    void testRenderWithOnlyNameDoesNotNpeOnMissingN103() throws ValidationException {
+        // An N1 may name a party by free-form N102 alone (N103/N104 absent) — e.g. the 2750
+        // reporting-category party (N101=75). Rendering must not dereference a null N103 qualifier.
+        TestN1Segment segment = new TestN1Segment.Builder()
+                .setN101(entityCode)
+                .setN102("Sponsor Only")
+                .build();
+
+        segment.setContext(new X834Context());
+        assertEquals("N1*01*Sponsor Only~", segment.render().trim(),
+                "N1 with only N101/N102 should render without an NPE and drop the trailing empty elements");
+    }
 }

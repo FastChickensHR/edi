@@ -35,8 +35,12 @@ public abstract class INSSegment extends Segment {
     private final EmploymentStatusCode ins08;
     private final StudentStatusCode ins09;
     private final HandicapIndicator ins10;
-    private final String ins11; // Death Date
-    private final ConfidentialityCode ins12;
+    private final String ins11; // Date Time Period Format Qualifier (element 1250) — e.g. "D8"
+    private final String ins12; // Member Individual Death Date (element 1251), in the INS11 format
+    private final ConfidentialityCode ins13; // Confidentiality Code (element 1165)
+
+    /** INS11 date-time period format qualifier used for the death date: {@code D8} (CCYYMMDD). */
+    public static final String DEATH_DATE_FORMAT_QUALIFIER = "D8";
 
     protected INSSegment(Builder builder) throws ValidationException {
         this.ins01 = builder.ins01;
@@ -51,6 +55,7 @@ public abstract class INSSegment extends Segment {
         this.ins10 = builder.ins10;
         this.ins11 = builder.ins11;
         this.ins12 = builder.ins12;
+        this.ins13 = builder.ins13;
 
         validateRequiredFields();
     }
@@ -77,7 +82,7 @@ public abstract class INSSegment extends Segment {
 
     @Override
     public String[] getElementValues() {
-        return new String[]{ins01 != null ? ins01.toString() : null, ins02 != null ? ins02.toString() : null, ins03 != null ? ins03.toString() : null, ins04 != null ? ins04.toString() : null, ins05 != null ? ins05.toString() : null, ins06 != null ? ins06.toString() : null, ins07 != null ? ins07.toString() : null, ins08 != null ? ins08.toString() : null, ins09 != null ? ins09.toString() : null, ins10 != null ? ins10.toString() : null, ins11, ins12 != null ? ins12.toString() : null,};
+        return new String[]{ins01 != null ? ins01.toString() : null, ins02 != null ? ins02.toString() : null, ins03 != null ? ins03.toString() : null, ins04 != null ? ins04.toString() : null, ins05 != null ? ins05.toString() : null, ins06 != null ? ins06.toString() : null, ins07 != null ? ins07.toString() : null, ins08 != null ? ins08.toString() : null, ins09 != null ? ins09.toString() : null, ins10 != null ? ins10.toString() : null, ins11, ins12, ins13 != null ? ins13.toString() : null,};
     }
 
     public String getIns01() {
@@ -160,16 +165,28 @@ public abstract class INSSegment extends Segment {
         return getIns10();
     }
 
-    public String getDeathDate() {
+    public String getIns11() {
+        return ins11;
+    }
+
+    public String getDateTimePeriodFormatQualifier() {
         return getIns11();
     }
 
     public String getIns12() {
-        return ins12.toString();
+        return ins12;
+    }
+
+    public String getDeathDate() {
+        return getIns12();
+    }
+
+    public String getIns13() {
+        return ins13 != null ? ins13.toString() : null;
     }
 
     public String getConfidentialityCode() {
-        return getIns12();
+        return getIns13();
     }
 
     @Setter
@@ -186,7 +203,8 @@ public abstract class INSSegment extends Segment {
         private StudentStatusCode ins09;
         private HandicapIndicator ins10;
         private String ins11;
-        private ConfidentialityCode ins12;
+        private String ins12;
+        private ConfidentialityCode ins13;
 
 
         public Builder setIns01(String value) {
@@ -279,17 +297,40 @@ public abstract class INSSegment extends Segment {
             return setIns10(value);
         }
 
-        public Builder setDeathDate(String date) {
-            return setIns11(date);
+        public Builder setIns11(String value) {
+            this.ins11 = value;
+            return this;
+        }
+
+        public Builder setDateTimePeriodFormatQualifier(String value) {
+            return setIns11(value);
         }
 
         public Builder setIns12(String value) {
-            this.ins12 = ConfidentialityCode.fromString(value);
+            this.ins12 = value;
+            return this;
+        }
+
+        /**
+         * Sets the member's death date (INS12) and, unless a format qualifier (INS11) has already
+         * been set, defaults INS11 to {@code D8} (CCYYMMDD) — INS11 is required whenever INS12 is
+         * present, and this library renders dates as CCYYMMDD.
+         */
+        public Builder setDeathDate(String date) {
+            this.ins12 = date;
+            if (this.ins11 == null) {
+                this.ins11 = DEATH_DATE_FORMAT_QUALIFIER;
+            }
+            return this;
+        }
+
+        public Builder setIns13(String value) {
+            this.ins13 = ConfidentialityCode.fromString(value);
             return this;
         }
 
         public Builder setConfidentialityCode(String value) {
-            return setIns12(value);
+            return setIns13(value);
         }
 
         /**

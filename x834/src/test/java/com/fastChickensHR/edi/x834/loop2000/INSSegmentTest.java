@@ -40,7 +40,10 @@ class INSSegmentTest {
         segment.setContext(context);
 
         assertEquals("INS", segment.getSegmentIdentifier(), "Expected segment identifier should be 'INS'");
-        assertEquals("INS*Y*18*001*20*A*D*1*FT*F*N*20250101~", segment.render().trim(),
+        // #141 code values (INS04 maintenance-reason ACTIVE, INS08 employment FULL_TIME) in the
+        // #176 structure: the death date renders at INS12, preceded by the INS11 date-time format
+        // qualifier (D8).
+        assertEquals("INS*Y*18*001*20*A*D*1*FT*F*N*D8*20250101~", segment.render().trim(),
                 "The segment is not formatted correctly.");
     }
 
@@ -57,8 +60,9 @@ class INSSegmentTest {
                 .setIns08(employmentStatusCode)
                 .setIns09("F")
                 .setIns10("N")
-                .setIns11("20250101")
-                .setIns12(confidentialityCode)
+                .setIns11("D8")
+                .setIns12("20250101")
+                .setIns13(confidentialityCode)
                 .build();
 
         assertEquals("Y", segment.getMemberIndicator(), "MemberIndicator should match INS01");
@@ -71,8 +75,9 @@ class INSSegmentTest {
         assertEquals(employmentStatusCode, segment.getEmploymentStatusCode(), "EmploymentStatusCode should match INS08");
         assertEquals("F", segment.getStudentStatusCode(), "StudentStatusCode should match INS09");
         assertEquals("N", segment.getHandicapIndicator(), "HandicapIndicator should match INS10");
-        assertEquals("20250101", segment.getDeathDate(), "DeathDate should match INS11");
-        assertEquals(confidentialityCode, segment.getConfidentialityCode(), "ConfidentialityCode should match INS12");
+        assertEquals("D8", segment.getDateTimePeriodFormatQualifier(), "Format qualifier should match INS11");
+        assertEquals("20250101", segment.getDeathDate(), "DeathDate should match INS12");
+        assertEquals(confidentialityCode, segment.getConfidentialityCode(), "ConfidentialityCode should match INS13");
     }
 
     @Test
@@ -102,7 +107,8 @@ class INSSegmentTest {
         assertEquals(employmentStatusCode, segment.getIns08(), "EmploymentStatusCode should match INS08");
         assertEquals("F", segment.getIns09(), "StudentStatusCode should match INS09");
         assertEquals("N", segment.getIns10(), "HandicapIndicator should match INS10");
-        assertEquals("20250101", segment.getIns11(), "DeathDate should match INS11");
-        assertEquals(confidentialityCode, segment.getIns12(), "ConfidentialityCode should match INS12");
+        assertEquals("D8", segment.getIns11(), "Format qualifier (defaulted from death date) should match INS11");
+        assertEquals("20250101", segment.getIns12(), "DeathDate should match INS12");
+        assertEquals(confidentialityCode, segment.getIns13(), "ConfidentialityCode should match INS13");
     }
 }

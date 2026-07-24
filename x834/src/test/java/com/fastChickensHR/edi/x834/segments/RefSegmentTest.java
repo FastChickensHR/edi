@@ -79,6 +79,30 @@ class RefSegmentTest {
     }
 
     @Test
+    void testValidation_Ref02OverElement127MaxLength_ShouldThrow() {
+        // REF02 is X12 element 127, AN 1/50 in 005010 — 50 chars is the limit, 51 is too long.
+        String tooLong = "a".repeat(RefSegment.REF02_MAX_LENGTH + 1);
+        RefSegment.Builder builder = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification(tooLong);
+
+        ValidationException exception = assertThrows(ValidationException.class, builder::build);
+        assertTrue(exception.getMessage().contains("REF02"),
+                "Exception should mention REF02: " + exception.getMessage());
+    }
+
+    @Test
+    void testValidation_Ref02AtElement127MaxLength_ShouldPass() throws ValidationException {
+        String atLimit = "a".repeat(RefSegment.REF02_MAX_LENGTH);
+        RefSegment segment = new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("38")
+                .setReferenceIdentification(atLimit)
+                .build();
+
+        assertEquals(atLimit, segment.getReferenceIdentification());
+    }
+
+    @Test
     void testGetElementValues_ShouldReturnCorrectArray() throws ValidationException {
         RefSegment segment = new RefSegment.Builder()
                 .setReferenceIdentificationQualifier("38")

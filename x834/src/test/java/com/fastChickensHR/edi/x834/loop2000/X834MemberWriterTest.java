@@ -227,7 +227,7 @@ class X834MemberWriterTest {
 
         String out = render(writer.toSegments(member));
 
-        assertTrue(out.contains("NM1*31~"), () -> "expected 2100C postal-address marker NM1*31; got:\n" + out);
+        assertTrue(out.contains("NM1*31*1~"), () -> "expected 2100C postal-address marker NM1*31*1; got:\n" + out);
         assertTrue(out.contains("N3*PO BOX 99~"), () -> "expected mailing N3; got:\n" + out);
         assertTrue(out.contains("N4*SPRINGFIELD*IL*62705~"), () -> "expected mailing N4; got:\n" + out);
         // 2100C must come after the 2100A residence (N4*...*62704) block.

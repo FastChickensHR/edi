@@ -14,11 +14,16 @@ import lombok.Getter;
 /**
  * Member mailing address as an NM1 segment in Loop 2100C of the X12 834.
  * <p>
- * NM101 defaults to the entity identifier {@code 31} (Postal Mailing Address).
- * Currently implements only the NM101 and NM102 elements.
+ * NM101 defaults to the entity identifier {@code 31} (Postal Mailing Address) and NM102 to the
+ * entity type qualifier {@code 1} (Person) — the member whose mailing address this is. NM102 is a
+ * mandatory NM1 element (X12 element 1065), so it must be present even though the mailing NM1
+ * carries no name; the segment previously rendered a bare {@code NM1*31~}.
  */
 @Getter
 public class MemberMailingAddress extends NM1Segment {
+
+    /** NM102 entity type qualifier {@code 1} — Person; the fixed default for the mailing NM1. */
+    public static final String PERSON_ENTITY_TYPE = "1";
 
     /**
      * Entity Identifier Code (NM101) values for the member mailing address.
@@ -48,6 +53,7 @@ public class MemberMailingAddress extends NM1Segment {
     public static class Builder extends AbstractBuilder<Builder> {
         public Builder() {
             this.setNm101(EntityIdentifierCode.POSTAL_MAILING_ADDRESS.getCode());
+            this.setNm102(PERSON_ENTITY_TYPE);
         }
 
         @Override
