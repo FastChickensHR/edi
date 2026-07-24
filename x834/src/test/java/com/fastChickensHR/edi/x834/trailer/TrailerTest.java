@@ -60,6 +60,30 @@ class TrailerTest {
         assertEquals("IEA", segments.get(2).getSegmentIdentifier());
     }
 
+    /**
+     * Render golden for the assembled trailer payload: SE then GE then IEA, each terminated, in that
+     * order. Whole-string equality pins the closing-envelope sequence and each segment's element
+     * positions — the SE segment count/control number, the GE transaction-set count/group control
+     * number, and the IEA group count/interchange control number all sourced from the builder and
+     * context — which the per-component getter checks verify only piecemeal and never as rendered
+     * output. Delimiters come from the context ({@code *} element, {@code ~} segment, LF line).
+     */
+    @Test
+    void rendersSeGeIeaTrailerPayload() throws ValidationException {
+        Trailer trailer = new Trailer.Builder(context)
+                .setTransactionSetControlNumber("0001")
+                .setNumberOfIncludedSegments("42")
+                .build();
+
+        StringBuilder rendered = new StringBuilder();
+        for (Segment segment : trailer.generateSegments()) {
+            segment.setContext(context);
+            rendered.append(segment.render());
+        }
+
+        assertEquals("SE*42*0001~\nGE*1*1~\nIEA*1*000000001~\n", rendered.toString());
+    }
+
     @Test
     void testBuilderParameterSetting() throws ValidationException {
         // Test that builder parameters are correctly set

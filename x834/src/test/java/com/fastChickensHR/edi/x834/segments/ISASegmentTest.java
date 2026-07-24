@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.data.*;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -103,65 +104,20 @@ class ISASegmentTest {
         assertEquals("ISA", segment.getSegmentIdentifier());
     }
 
+    /**
+     * Render golden: the fixed-width ISA interchange header. The builder right-pads ISA06/ISA08
+     * to 15 characters (see the trailing spaces after the sender/receiver IDs), so this whole-string
+     * assertion pins the fixed-width layout, element order, and the {@code ~\n} terminator — none of
+     * which the getter assertions this test replaces could catch. Delimiters come from the default
+     * {@link X834Context} ({@code *} element, {@code ~} segment, LF line).
+     */
     @Test
-    void testGetters() throws ValidationException {
+    void rendersFixedWidthIsaSegment() throws ValidationException {
         TestISASegment segment = createValidBuilder().build();
+        segment.setContext(new X834Context());
 
-        assertEquals(VALID_ISA01, segment.getAuthorizationInformationQualifier());
-        assertEquals(VALID_ISA02, segment.getAuthorizationInformation());
-        assertEquals(VALID_ISA03, segment.getSecurityInformationQualifier());
-        assertEquals(VALID_ISA04, segment.getSecurityInformation());
-        assertEquals(VALID_ISA05, segment.getInterchangeSenderQualifier());
-        assertEquals(VALID_ISA06 + "   ", segment.getInterchangeSenderID());
-        assertEquals(VALID_ISA07, segment.getInterchangeReceiverQualifier());
-        assertEquals(VALID_ISA08 + " ", segment.getInterchangeReceiverID());
-        assertEquals(VALID_ISA09, segment.getInterchangeDate());
-        assertEquals(VALID_ISA10, segment.getInterchangeTime());
-        assertEquals(VALID_ISA11, segment.getInterchangeControlStandardsIdentifier());
-        assertEquals(VALID_ISA12, segment.getInterchangeControlVersionNumber());
-        assertEquals(VALID_ISA13, segment.getInterchangeControlNumber());
-        assertEquals(VALID_ISA14, segment.getAcknowledgmentRequested());
-        assertEquals(VALID_ISA15, segment.getUsageIndicator());
-        assertEquals(VALID_ISA16, segment.getComponentElementSeparator());
-    }
-
-    @Test
-    void testBuilderSetters() throws ValidationException {
-        TestISASegment segment = TestISASegment.builder()
-                .setIsa01(VALID_ISA01.getCode())
-                .setIsa02(VALID_ISA02)
-                .setIsa03(VALID_ISA03.getCode())
-                .setIsa04(VALID_ISA04)
-                .setIsa05(VALID_ISA05.getCode())
-                .setIsa06(VALID_ISA06)
-                .setIsa07(VALID_ISA07.getCode())
-                .setIsa08(VALID_ISA08)
-                .setIsa09(VALID_ISA09)
-                .setIsa10(VALID_ISA10)
-                .setIsa11(VALID_ISA11)
-                .setIsa12(VALID_ISA12.getCode())
-                .setIsa13(VALID_ISA13)
-                .setIsa14(VALID_ISA14.getCode())
-                .setIsa15(VALID_ISA15.getCode())
-                .setIsa16(VALID_ISA16)
-                .build();
-
-        assertEquals(VALID_ISA01, segment.getAuthorizationInformationQualifier());
-        assertEquals(VALID_ISA02, segment.getAuthorizationInformation());
-        assertEquals(VALID_ISA03, segment.getSecurityInformationQualifier());
-        assertEquals(VALID_ISA04, segment.getSecurityInformation());
-        assertEquals(VALID_ISA05, segment.getInterchangeSenderQualifier());
-        assertEquals(VALID_ISA06 + "   ", segment.getInterchangeSenderID());
-        assertEquals(VALID_ISA07, segment.getInterchangeReceiverQualifier());
-        assertEquals(VALID_ISA08 + " ", segment.getInterchangeReceiverID());
-        assertEquals(VALID_ISA09, segment.getInterchangeDate());
-        assertEquals(VALID_ISA10, segment.getInterchangeTime());
-        assertEquals(VALID_ISA11, segment.getInterchangeControlStandardsIdentifier());
-        assertEquals(VALID_ISA12, segment.getInterchangeControlVersionNumber());
-        assertEquals(VALID_ISA13, segment.getInterchangeControlNumber());
-        assertEquals(VALID_ISA14, segment.getAcknowledgmentRequested());
-        assertEquals(VALID_ISA15, segment.getUsageIndicator());
-        assertEquals(VALID_ISA16, segment.getComponentElementSeparator());
+        String expected = "ISA*00*          *00*          *30*SENDER123456   *ZZ*RECEIVER123456 *230630*1200*^*00501*000000001*0*P*:~\n";
+        assertEquals(expected, segment.render());
     }
 
     @ParameterizedTest

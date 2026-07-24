@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.segments;
 
+import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -71,17 +72,21 @@ class SESegmentTest {
         assertEquals(SESegment.SEGMENT_ID, segment.getSegmentIdentifier());
     }
 
+    /**
+     * Render golden for the SE transaction-set trailer: {@code SE*<segmentCount>*<setControlNumber>~}.
+     * This is the only per-unit render assertion for SE; whole-string equality pins the element order
+     * and terminator that the {@code getElementValues()} array check leaves unrendered. Delimiters come
+     * from the default {@link X834Context}.
+     */
     @Test
-    void testElementValues() throws ValidationException {
+    void rendersSeSegment() throws ValidationException {
         SESegment segment = TestSESegment.builder()
                 .setSe01("42")
                 .setSe02("5678")
                 .build();
+        segment.setContext(new X834Context());
 
-        String[] elements = segment.getElementValues();
-        assertEquals(2, elements.length);
-        assertEquals("42", elements[0]);
-        assertEquals("5678", elements[1]);
+        assertEquals("SE*42*5678~\n", segment.render());
     }
 
     @Test
