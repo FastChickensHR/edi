@@ -29,35 +29,18 @@ class HealthCoverageTest {
 
     @Test
     void testCompleteHealthCoverage() throws ValidationException {
+        // The 220A1 HD segment carries only HD01/HD03/HD04/HD05.
         HDSegment healthCoverage = HealthCoverage.builder()
                 .setHd01("021")
-                .setHd02("18")
                 .setHd03("HMO")
                 .setHd04("Premium Health Plan")
                 .setHd05("FAM")
-                .setHd06("MA")
-                .setHd07("1")
-                .setHd08("1")
-                .setHd09("FT")
-                .setHd10("F")
-                .setHd11("N")
-                .setHd12("D8")
-                .setHd13("19800101")
                 .build();
 
         assertEquals("021", healthCoverage.getMaintenanceTypeCode());
-        assertEquals("18", healthCoverage.getMaintenanceReasonCode());
         assertEquals("HMO", healthCoverage.getInsuranceLineCode());
         assertEquals("Premium Health Plan", healthCoverage.getPlanCoverageDescription());
         assertEquals("FAM", healthCoverage.getCoverageLevelCode());
-        assertEquals("MA", healthCoverage.getMedicarePlanCode());
-        assertEquals("1", healthCoverage.getMedicareEligibilityReasonCode());
-        assertEquals("1", healthCoverage.getCobraQualifyingEventCode());
-        assertEquals("FT", healthCoverage.getEmploymentStatusCode());
-        assertEquals("F", healthCoverage.getStudentStatusCode());
-        assertEquals("N", healthCoverage.getHandicapIndicator());
-        assertEquals("D8", healthCoverage.getDateQualifier());
-        assertEquals("19800101", healthCoverage.getBirthDate());
     }
 
     @Test
