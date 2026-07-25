@@ -69,6 +69,51 @@ class FunctionalGroupHeaderTest {
     }
 
     /**
+     * GS02/GS03 are the <em>application</em> party codes, independent of the ISA06/ISA08
+     * interchange identifiers: a partner may assign a sender code distinct from the mailbox ID
+     * and mandate a GS03 that is not the interchange receiver ID.
+     */
+    @Test
+    void applicationPartyCodesOverrideTheInterchangeIdentifiers() throws ValidationException {
+        context.setApplicationSenderCode("SNDRCODE9")
+                .setApplicationReceiverCode("RBG005010X220A1");
+
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
+
+        assertEquals("SNDRCODE9", header.getApplicationSenderCode(),
+                "GS02 should be the application sender code, not the ISA06 sender ID");
+        assertEquals("RBG005010X220A1", header.getApplicationReceiverCode(),
+                "GS03 should be the application receiver code, not the ISA08 receiver ID");
+    }
+
+    /** Each side falls back independently — setting one must not drag the other off the ISA id. */
+    @Test
+    void anUnsetApplicationCodeFallsBackWhileTheOtherSideOverrides() throws ValidationException {
+        context.setApplicationReceiverCode("AICK");
+
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
+
+        assertEquals(senderID, header.getApplicationSenderCode(),
+                "GS02 should fall back to the ISA06 sender ID when no application sender code is set");
+        assertEquals("AICK", header.getApplicationReceiverCode(),
+                "GS03 should use the application receiver code that was set");
+    }
+
+    /** A blank code is "unset", matching how the generator treats absent/blank envelope fields. */
+    @Test
+    void blankApplicationCodesFallBackToTheInterchangeIdentifiers() throws ValidationException {
+        context.setApplicationSenderCode("")
+                .setApplicationReceiverCode("   ");
+
+        FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
+
+        assertEquals(senderID, header.getApplicationSenderCode(),
+                "A blank application sender code should fall back to the ISA06 sender ID");
+        assertEquals(receiverID, header.getApplicationReceiverCode(),
+                "A blank application receiver code should fall back to the ISA08 receiver ID");
+    }
+
+    /**
      * Tests that the FunctionalGroupHeader returns the correct segment identifier.
      */
     @Test

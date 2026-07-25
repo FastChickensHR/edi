@@ -22,8 +22,12 @@ public final class X834Location {
     }
 
     // ---- File level: envelope + control numbers (X834Context) ----
-    public static final String SENDER_ID = "senderId";
-    public static final String RECEIVER_ID = "receiverId";
+    public static final String SENDER_ID = "senderId";       // ISA06
+    public static final String RECEIVER_ID = "receiverId";   // ISA08
+    /** GS02 — application sender's code; falls back to {@link #SENDER_ID} when absent. */
+    public static final String APPLICATION_SENDER_CODE = "applicationSenderCode";
+    /** GS03 — application receiver's code; falls back to {@link #RECEIVER_ID} when absent. */
+    public static final String APPLICATION_RECEIVER_CODE = "applicationReceiverCode";
     public static final String INTERCHANGE_CONTROL_NUMBER = "interchangeControlNumber";
     public static final String GROUP_CONTROL_NUMBER = "groupControlNumber";
     public static final String TRANSACTION_SET_CONTROL_NUMBER = "transactionSetControlNumber";

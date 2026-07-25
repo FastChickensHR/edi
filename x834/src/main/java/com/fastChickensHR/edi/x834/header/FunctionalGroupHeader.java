@@ -44,7 +44,14 @@ public class FunctionalGroupHeader extends GSSegment {
         protected X834Context context;
 
         /**
-         * Constructor that initializes the builder with context information
+         * Constructor that initializes the builder with context information.
+         *
+         * <p>GS02/GS03 come from the context's {@link X834Context#getApplicationSenderCode()
+         * applicationSenderCode} / {@link X834Context#getApplicationReceiverCode()
+         * applicationReceiverCode}, each falling back to the corresponding interchange identifier
+         * ({@link X834Context#getSenderID() senderID} / {@link X834Context#getReceiverID()
+         * receiverID}) when unset. GS mirroring ISA is the common case, so callers that never set
+         * the application codes emit exactly what they did before.
          *
          * @param context The X834 context containing document-level information
          */
@@ -52,13 +59,18 @@ public class FunctionalGroupHeader extends GSSegment {
             super();
             this.context = context;
             this.gs01 = DEFAULT_FUNCTIONAL_ID_CODE;
-            this.gs02 = context.getSenderID();
-            this.gs03 = context.getReceiverID();
+            this.gs02 = orFallback(context.getApplicationSenderCode(), context.getSenderID());
+            this.gs03 = orFallback(context.getApplicationReceiverCode(), context.getReceiverID());
             this.gs04 = context.getFormattedDocumentDate();
             this.gs05 = context.getFormattedDocumentTime();
             this.gs06 = context.getGroupControlNumber();
             this.gs07 = DEFAULT_RESPONSIBLE_AGENCY_CODE;
             this.gs08 = DEFAULT_VERSION_CODE;
+        }
+
+        /** @return {@code value} when set (non-null, non-blank), otherwise {@code fallback}. */
+        private static String orFallback(String value, String fallback) {
+            return (value == null || value.isBlank()) ? fallback : value;
         }
 
         @Override
