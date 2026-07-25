@@ -312,6 +312,63 @@ class X834FileGeneratorTest {
         TestFixtures.assertMatchesGolden("golden/acknowledgment-requested.834", out);
     }
 
+    @Test
+    void gsCarriesTheApplicationPartyCodesIndependentlyOfTheIsaIds() {
+        // A partner that assigns a sender code distinct from the interchange mailbox ID and mandates
+        // a GS03 that is not the ISA08 receiver ID — all four envelope party identifiers differ.
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "MAILBOX01"),
+                file(X834Location.RECEIVER_ID, "592015694"),
+                file(X834Location.APPLICATION_SENDER_CODE, "SNDRCODE9"),
+                file(X834Location.APPLICATION_RECEIVER_CODE, "RBG005010X220A1"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        // The golden pins GS02/GS03 as the application party codes while ISA06/ISA08 keep the
+        // interchange IDs — the four identifiers are addressable independently.
+        TestFixtures.assertMatchesGolden("golden/application-party-codes.834", out);
+    }
+
+    @Test
+    void gsFallsBackToTheIsaIdsWhenNoApplicationPartyCodesAreSupplied() {
+        // The common case (GS mirrors ISA): omitting both keys must emit exactly what it did before
+        // the party-ID split existed — hence the shared golden with the ISA14 case's envelope shape.
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"),
+                file(X834Location.ACKNOWLEDGMENT_REQUESTED, "1"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        TestFixtures.assertMatchesGolden("golden/acknowledgment-requested.834", out);
+    }
+
     private static Field file(String location, String value) {
         return new Field(new Location(RecordLevel.FILE, location), value);
     }

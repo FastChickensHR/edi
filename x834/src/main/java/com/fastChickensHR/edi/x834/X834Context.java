@@ -41,6 +41,20 @@ public class X834Context {
     private String groupControlNumber;
     private String senderID;
     private String receiverID;
+    /**
+     * GS02 — Application Sender's Code, the functional-group sender identifier. Distinct from
+     * {@link #senderID} (ISA06): a trading partner may assign a sender code that differs from the
+     * interchange mailbox ID. Null or blank falls back to {@link #senderID}, which is the common
+     * case (GS mirrors ISA); set it only when the partner requires the two to differ.
+     */
+    private String applicationSenderCode;
+    /**
+     * GS03 — Application Receiver's Code, the functional-group receiver identifier. Distinct from
+     * {@link #receiverID} (ISA08); some partners mandate a GS03 that is not the interchange
+     * receiver ID (e.g. an implementation-convention reference). Null or blank falls back to
+     * {@link #receiverID}.
+     */
+    private String applicationReceiverCode;
     /** ISA14 — Interchange Acknowledgment Requested ("1" to request a TA1/999). Null defaults to "0". */
     private String acknowledgmentRequested;
     private LocalDateTime documentDate;
