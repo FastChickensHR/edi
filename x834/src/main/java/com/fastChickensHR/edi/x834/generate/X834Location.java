@@ -195,6 +195,57 @@ public final class X834Location {
         return COB_PREFIX + index + "." + cobField.substring(COB_PREFIX.length());
     }
 
+    // ---- Member level: Loop 2200 (disability) ----
+    public static final String DISABILITY_PREFIX = "disability.";
+    /** 2200 DSB01 — what kind of disability this is. Required; the dates cannot travel without it. */
+    public static final String DISABILITY_TYPE = "disability.type";
+    /** 2200 DSB02 — the associated quantity. */
+    public static final String DISABILITY_QUANTITY = "disability.quantity";
+    /** 2200 DSB03 — the member's occupation. */
+    public static final String DISABILITY_OCCUPATION_CODE = "disability.occupationCode";
+    /** 2200 DSB04 — how intensively the member works. */
+    public static final String DISABILITY_WORK_INTENSITY_CODE = "disability.workIntensityCode";
+    /** 2200 DSB05 — the product option. */
+    public static final String DISABILITY_PRODUCT_OPTION_CODE = "disability.productOptionCode";
+    /** 2200 DSB06 — the associated amount. */
+    public static final String DISABILITY_MONETARY_AMOUNT = "disability.monetaryAmount";
+    /** 2200 {@code DTP*360} — when the disability period began. */
+    public static final String DISABILITY_START_DATE = "disability.startDate";
+    /** 2200 {@code DTP*361} — when it ended. */
+    public static final String DISABILITY_END_DATE = "disability.endDate";
+
+    /**
+     * The position name for the {@code index}-th disability of one member —
+     * {@code disability(1, DISABILITY_START_DATE)} &rarr; {@code "disability.1.startDate"}. The same
+     * indexed convention as {@link #hd(int, String)}.
+     */
+    public static String disability(int index, String disabilityField) {
+        return DISABILITY_PREFIX + index + "." + disabilityField.substring(DISABILITY_PREFIX.length());
+    }
+
+    // ---- Member level: Loops 2700/2750 (member reporting categories) ----
+    public static final String CATEGORY_PREFIX = "category.";
+    /** 2750 {@code N1*75} N102 — the category label, e.g. {@code CLASS}. Required. */
+    public static final String CATEGORY_NAME = "category.name";
+    /** 2750 REF02 — the value reported for that category. Required. */
+    public static final String CATEGORY_VALUE = "category.value";
+    /** 2750 REF01 — the qualifier for {@link #CATEGORY_VALUE}; defaults to {@code ZZ}. */
+    public static final String CATEGORY_REFERENCE_QUALIFIER = "category.referenceQualifier";
+    /** 2750 DTP03 — an optional category date. */
+    public static final String CATEGORY_DATE = "category.date";
+    /** 2750 DTP01 — what {@link #CATEGORY_DATE} means; required when a date is given. */
+    public static final String CATEGORY_DATE_QUALIFIER = "category.dateQualifier";
+
+    /**
+     * The position name for the {@code index}-th reporting category of one member —
+     * {@code category(1, CATEGORY_VALUE)} &rarr; {@code "category.1.value"}. Categories emit in
+     * ascending index order inside a single {@code LS*2700} … {@code LE*2700} block, and the
+     * {@code LX} number is assigned at render time over the emitted occurrences.
+     */
+    public static String category(int index, String categoryField) {
+        return CATEGORY_PREFIX + index + "." + categoryField.substring(CATEGORY_PREFIX.length());
+    }
+
     // ---- Member level: Loop 2100C mailing address ----
     public static final String MAILING_ADDRESS_LINE_1 = "mailingAddressLine1"; // 2100C N301
     public static final String MAILING_ADDRESS_LINE_2 = "mailingAddressLine2"; // 2100C N302

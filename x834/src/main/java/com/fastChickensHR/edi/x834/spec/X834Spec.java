@@ -13,6 +13,7 @@ import com.fastChickensHR.edi.x834.data.AuthorizationInformationQualifier;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.data.CoordinationOfBenefitsCode;
 import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
+import com.fastChickensHR.edi.x834.data.DisabilityTypeCode;
 import com.fastChickensHR.edi.x834.data.EntityIdentifierCode;
 import com.fastChickensHR.edi.x834.data.FrequencyCode;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
@@ -222,10 +223,7 @@ public final class X834Spec {
 
         // ---- 1000A sponsor, 1000B payer, 1000C third-party administrator: the same N1 in three loops.
         for (String loop : List.of("1000A", "1000B", "1000C")) {
-            t.coded(loop + " N101", "98", "Entity Identifier Code", 2, 3, EntityIdentifierCode.class);
-            t.element(loop + " N102", "93", "Name", DataType.AN, 1, 60);
-            t.coded(loop + " N103", "66", "Identification Code Qualifier", 1, 2, IdentificationCodeQualifier.class);
-            t.element(loop + " N104", "67", "Identification Code", DataType.AN, 2, 80);
+            partyIdentification(t, loop);
         }
 
         // ---- 2000 member level detail (INS). INS06 is composite C052; the 834 uses only its first
@@ -304,6 +302,15 @@ public final class X834Spec {
         partyName(t, "2100C");
         address(t, "2100C");
 
+        // ---- 2200 disability. DSB01 is mandatory, so the period dates cannot travel without it.
+        t.coded("2200 DSB01", "1146", "Disability Type Code", 1, 1, DisabilityTypeCode.class);
+        t.element("2200 DSB02", "380", "Quantity", DataType.R, 1, 15);
+        t.element("2200 DSB03", "1149", "Occupation Code", DataType.ID, 4, 6);
+        t.element("2200 DSB04", "1154", "Work Intensity Code", DataType.ID, 1, 1);
+        t.element("2200 DSB05", "1161", "Product Option Code", DataType.ID, 1, 2);
+        t.element("2200 DSB06", "782", "Monetary Amount", DataType.R, 1, 18);
+        dateTimePeriod(t, "2200");
+
         // ---- 2300 health coverage. HD02 is Not Used in the 220A1: the library renders it as an empty
         // slot to keep HD03-HD05 in position, so it publishes nothing.
         t.coded("2300 HD01", "875", "Maintenance Type Code", 3, 3, MaintenanceTypeCode.class);
@@ -333,6 +340,15 @@ public final class X834Spec {
         dateTimePeriod(t, "2320");
         partyName(t, "2330");
 
+        // ---- 2700/2750 member reporting categories. LS and LE bookend the block and LX opens each
+        // occurrence (all 2700); the N1*75 naming the category and its REF/DTP sit in 2750.
+        t.element("2700 LS01", "447", "Loop Identifier Code", DataType.AN, 1, 4);
+        t.element("2700 LX01", "554", "Assigned Number", DataType.N0, 1, 6);
+        t.element("2700 LE01", "447", "Loop Identifier Code", DataType.AN, 1, 4);
+        partyIdentification(t, "2750");
+        reference(t, "2750");
+        dateTimePeriod(t, "2750");
+
         // ---- Trailers.
         t.element("TRAILER SE01", "96", "Number of Included Segments", DataType.N0, 1, 10);
         t.element("TRAILER SE02", "329", "Transaction Set Control Number", DataType.AN, 4, 9);
@@ -356,6 +372,17 @@ public final class X834Spec {
         t.coded(loop + " DTP01", "374", "Date/Time Qualifier", 3, 3, DateTimeQualifier.class);
         t.element(loop + " DTP02", "1250", "Date Time Period Format Qualifier", DataType.ID, 2, 3);
         t.element(loop + " DTP03", "1251", "Date Time Period", DataType.AN, 1, 35);
+    }
+
+    /**
+     * N101–N104 as every loop writes them — the same one-declaration reasoning as
+     * {@link #partyName(Table, String)}, since {@link #atSegment(String, int)} needs the loops to agree.
+     */
+    private static void partyIdentification(Table t, String loop) {
+        t.coded(loop + " N101", "98", "Entity Identifier Code", 2, 3, EntityIdentifierCode.class);
+        t.element(loop + " N102", "93", "Name", DataType.AN, 1, 60);
+        t.coded(loop + " N103", "66", "Identification Code Qualifier", 1, 2, IdentificationCodeQualifier.class);
+        t.element(loop + " N104", "67", "Identification Code", DataType.AN, 2, 80);
     }
 
     /**

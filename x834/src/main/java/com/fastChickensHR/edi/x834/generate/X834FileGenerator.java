@@ -21,6 +21,7 @@ import com.fastChickensHR.edi.x834.loop2000.Member;
 import com.fastChickensHR.edi.x834.data.ActionCode;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.data.CoordinationOfBenefitsCode;
+import com.fastChickensHR.edi.x834.data.DisabilityTypeCode;
 import com.fastChickensHR.edi.x834.data.PayerResponsibilitySequenceCode;
 import com.fastChickensHR.edi.x834.data.FrequencyCode;
 import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
@@ -37,7 +38,9 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
+import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
+import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverageDates;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
@@ -189,6 +192,8 @@ public final class X834FileGenerator implements FileGenerator {
         // Loops 2310 and 2320/2330, one occurrence per indexed group.
         providers(loc).forEach(member::addProvider);
         coordinationOfBenefits(loc).forEach(member::addCoordinationOfBenefits);
+        disabilities(loc).forEach(member::addDisability);
+        reportingCategories(loc).forEach(member::addReportingCategory);
 
         // Loop 2100C mailing address (optional, when the member's mailing address differs).
         mailingAddress(loc).ifPresent(member::addAddress);
@@ -306,6 +311,44 @@ public final class X834FileGenerator implements FileGenerator {
             others.add(cob);
         }
         return others;
+    }
+
+    /** Loop 2200: one disability per {@code disability.<i>.} group, in ascending index order. */
+    private static List<Disability> disabilities(Map<String, String> loc) {
+        List<Disability> disabilities = new ArrayList<>();
+        for (Map<String, String> group : groupsByIndex(loc, X834Location.DISABILITY_PREFIX).values()) {
+            Disability disability = new Disability();
+            set(group, "type", v -> disability.setType(DisabilityTypeCode.fromString(v)));
+            set(group, "quantity", disability::setQuantity);
+            set(group, "occupationCode", disability::setOccupationCode);
+            set(group, "workIntensityCode", disability::setWorkIntensityCode);
+            set(group, "productOptionCode", disability::setProductOptionCode);
+            set(group, "monetaryAmount", disability::setMonetaryAmount);
+            set(group, "startDate", v -> disability.setStartDate(parseDateTime(v)));
+            set(group, "endDate", v -> disability.setEndDate(parseDateTime(v)));
+            disabilities.add(disability);
+        }
+        return disabilities;
+    }
+
+    /**
+     * Loops 2700/2750: one reporting category per {@code category.<i>.} group, in ascending index
+     * order. The writer wraps them in a single {@code LS*2700} … {@code LE*2700} block and assigns
+     * the {@code LX} numbers, so nothing here addresses those positions directly.
+     */
+    private static List<ReportingCategory> reportingCategories(Map<String, String> loc) {
+        List<ReportingCategory> categories = new ArrayList<>();
+        for (Map<String, String> group : groupsByIndex(loc, X834Location.CATEGORY_PREFIX).values()) {
+            ReportingCategory category = new ReportingCategory();
+            set(group, "name", category::setName);
+            set(group, "value", category::setValue);
+            // Left at its ZZ default unless the caller names another qualifier.
+            set(group, "referenceQualifier", category::setReferenceQualifier);
+            set(group, "date", v -> category.setDate(parseDateTime(v)));
+            set(group, "dateQualifier", category::setDateQualifier);
+            categories.add(category);
+        }
+        return categories;
     }
 
     /**
