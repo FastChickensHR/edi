@@ -32,7 +32,7 @@ class TransactionSetPurposeCodeTest {
      * also guarantees no constant's code, name, or description silently collides with another's.
      */
     @ParameterizedTest
-    @EnumSource(value = TransactionSetPurposeCode.class, mode = EnumSource.Mode.EXCLUDE, names = "STATUS_UPDATE")
+    @EnumSource(TransactionSetPurposeCode.class)
     void resolvesFromCodeNameAndDescription(TransactionSetPurposeCode constant) {
         assertEquals(constant, TransactionSetPurposeCode.fromString(constant.getCode()));
         assertEquals(constant, TransactionSetPurposeCode.fromString(constant.name()));
@@ -40,18 +40,18 @@ class TransactionSetPurposeCodeTest {
     }
 
     /**
-     * Surfaced collision (pinned as current behavior, not fixed under this test-only wave): the alias
-     * {@code "status update" -> STATUS} shadows {@link TransactionSetPurposeCode#STATUS_UPDATE}, whose
-     * own name and description both normalize to {@code "statusupdate"} as well. Because additional
-     * mappings are applied after the per-constant entries, {@code STATUS_UPDATE} is reachable only by
-     * its code {@code "SU"}; by name or description it currently resolves to {@link #STATUS}. Owner
-     * follow-up: drop or re-point the ambiguous alias so {@code STATUS_UPDATE} is reachable by name.
+     * Regression for #157: the alias {@code "status update" -> STATUS} used to be applied on top of the
+     * per-constant entries and so claimed {@code "statusupdate"} — exactly what
+     * {@link TransactionSetPurposeCode#STATUS_UPDATE}'s own name and description normalize to — leaving
+     * that constant reachable only by its code {@code "SU"}. Aliases are now registered last and only
+     * onto free keys, so the constant's own identifiers win and the alias (since removed) could not
+     * displace them even if re-added.
      */
     @Test
-    void statusUpdateNameIsShadowedByStatusAlias() {
+    void statusUpdateIsReachableByItsOwnNameNotTheStatusAlias() {
         assertEquals(TransactionSetPurposeCode.STATUS_UPDATE, TransactionSetPurposeCode.fromString("SU"));
-        assertEquals(TransactionSetPurposeCode.STATUS, TransactionSetPurposeCode.fromString("status update"));
-        assertEquals(TransactionSetPurposeCode.STATUS, TransactionSetPurposeCode.fromString("STATUS_UPDATE"));
+        assertEquals(TransactionSetPurposeCode.STATUS_UPDATE, TransactionSetPurposeCode.fromString("STATUS_UPDATE"));
+        assertEquals(TransactionSetPurposeCode.STATUS_UPDATE, TransactionSetPurposeCode.fromString("status update"));
     }
 
     /** The human-friendly aliases callers actually type resolve to the right constant. */
@@ -84,7 +84,6 @@ class TransactionSetPurposeCodeTest {
                 Arguments.of("verified", TransactionSetPurposeCode.CONFIRMATION),
                 Arguments.of("copy", TransactionSetPurposeCode.DUPLICATE),
                 Arguments.of("replicate", TransactionSetPurposeCode.DUPLICATE),
-                Arguments.of("status update", TransactionSetPurposeCode.STATUS),
                 Arguments.of("status check", TransactionSetPurposeCode.STATUS),
                 Arguments.of("inquiry", TransactionSetPurposeCode.REQUEST),
                 Arguments.of("asking", TransactionSetPurposeCode.REQUEST),

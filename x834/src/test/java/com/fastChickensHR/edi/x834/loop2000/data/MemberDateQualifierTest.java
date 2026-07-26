@@ -116,7 +116,7 @@ class MemberDateQualifierTest {
                 Arguments.of("term", MemberDateQualifier.TERMINATION),
                 Arguments.of("terminated", MemberDateQualifier.TERMINATION),
                 Arguments.of("termination date", MemberDateQualifier.TERMINATION),
-                Arguments.of("employment end", MemberDateQualifier.TERMINATION),
+                Arguments.of("employment end", MemberDateQualifier.ELIGIBILITY_END),
                 Arguments.of("separation", MemberDateQualifier.TERMINATION),
                 Arguments.of("qualifying event", MemberDateQualifier.COBRA_QUALIFYING_EVENT),
                 Arguments.of("cobra event", MemberDateQualifier.COBRA_QUALIFYING_EVENT),

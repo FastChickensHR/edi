@@ -131,7 +131,6 @@ public enum TransactionSetPurposeCode implements EdiCodeEnum {
                         Map.entry("copy", DUPLICATE),
                         Map.entry("replicate", DUPLICATE),
 
-                        Map.entry("status update", STATUS),
                         Map.entry("status check", STATUS),
 
                         Map.entry("inquiry", REQUEST),

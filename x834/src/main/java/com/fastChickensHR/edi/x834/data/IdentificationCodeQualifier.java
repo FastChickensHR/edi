@@ -292,7 +292,6 @@ public enum IdentificationCodeQualifier implements EdiCodeEnum {
                         Map.entry("tax id", EIN),
 
                         Map.entry("zip", ZIP_CODE),
-                        Map.entry("postal code", ZIP_CODE),
 
                         Map.entry("npi", CMS_NPI),
                         Map.entry("national provider identifier", CMS_NPI),

@@ -34,7 +34,7 @@ class IdentificationCodeQualifierTest {
      * constant's code, name, or description silently collides with another's in the shared lookup map.
      */
     @ParameterizedTest
-    @EnumSource(value = IdentificationCodeQualifier.class, mode = EnumSource.Mode.EXCLUDE, names = "POSTAL_CODE")
+    @EnumSource(IdentificationCodeQualifier.class)
     void resolvesFromCodeNameAndDescription(IdentificationCodeQualifier constant) {
         assertEquals(constant, IdentificationCodeQualifier.fromString(constant.getCode()));
         assertEquals(constant, IdentificationCodeQualifier.fromString(constant.name()));
@@ -42,20 +42,20 @@ class IdentificationCodeQualifierTest {
     }
 
     /**
-     * Surfaced collision (pinned as current behavior, not fixed under this test-only wave): the alias
-     * {@code "postal code" -> ZIP_CODE} normalizes to {@code "postalcode"}, which is exactly what
-     * {@link IdentificationCodeQualifier#POSTAL_CODE}'s enum name normalizes to. Because additional
-     * mappings are applied after the per-constant entries, {@code POSTAL_CODE} is unreachable by its own
-     * name (it resolves to {@link #ZIP_CODE}); its code {@code "AA"} and description still resolve
-     * correctly. Owner follow-up: drop or re-point the ambiguous alias.
+     * Regression for #157: the alias {@code "postal code" -> ZIP_CODE} normalizes to
+     * {@code "postalcode"}, exactly what {@link IdentificationCodeQualifier#POSTAL_CODE}'s enum name
+     * normalizes to. Applied on top of the per-constant entries it made that constant unreachable by
+     * its own name. Aliases are now registered last and only onto free keys, so the name wins; the
+     * shadowing alias has since been removed as the dead entry it became.
      */
     @Test
-    void postalCodeNameIsShadowedByZipCodeAlias() {
+    void postalCodeIsReachableByItsOwnNameNotTheZipAlias() {
         assertEquals(IdentificationCodeQualifier.POSTAL_CODE, IdentificationCodeQualifier.fromString("AA"));
         assertEquals(IdentificationCodeQualifier.POSTAL_CODE,
                 IdentificationCodeQualifier.fromString(IdentificationCodeQualifier.POSTAL_CODE.getDescription()));
-        assertEquals(IdentificationCodeQualifier.ZIP_CODE, IdentificationCodeQualifier.fromString("postal code"));
-        assertEquals(IdentificationCodeQualifier.ZIP_CODE, IdentificationCodeQualifier.fromString("POSTAL_CODE"));
+        assertEquals(IdentificationCodeQualifier.POSTAL_CODE, IdentificationCodeQualifier.fromString("POSTAL_CODE"));
+        assertEquals(IdentificationCodeQualifier.POSTAL_CODE, IdentificationCodeQualifier.fromString("postal code"));
+        assertEquals(IdentificationCodeQualifier.ZIP_CODE, IdentificationCodeQualifier.fromString("zip"));
     }
 
     /** The human-friendly aliases callers actually type resolve to the right constant. */
@@ -78,7 +78,6 @@ class IdentificationCodeQualifierTest {
                 Arguments.of("employer id", IdentificationCodeQualifier.EIN),
                 Arguments.of("tax id", IdentificationCodeQualifier.EIN),
                 Arguments.of("zip", IdentificationCodeQualifier.ZIP_CODE),
-                Arguments.of("postal code", IdentificationCodeQualifier.ZIP_CODE),
                 Arguments.of("npi", IdentificationCodeQualifier.CMS_NPI),
                 Arguments.of("national provider identifier", IdentificationCodeQualifier.CMS_NPI),
                 Arguments.of("upin", IdentificationCodeQualifier.UPIN),
