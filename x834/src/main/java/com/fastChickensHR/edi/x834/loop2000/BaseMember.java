@@ -8,7 +8,9 @@
 package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
+import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
@@ -52,6 +54,16 @@ public abstract class BaseMember {
     protected String gender;
     protected MemberIndicator memberIndicator;
     protected MaintenanceTypeCode maintenanceTypeCode;
+    /**
+     * INS04 — why this maintenance is happening (element 1203), e.g. termination of benefits. Optional:
+     * the 834 requires a maintenance <em>type</em> on every member, never a reason.
+     */
+    protected MaintenanceReasonCode maintenanceReasonCode;
+    /**
+     * INS08 — the member's employment status (element 584). Optional, and member-level: the 220A1 HD
+     * segment carries no employment status.
+     */
+    protected EmploymentStatusCode employmentStatusCode;
     protected LocalDateTime enrollmentDate;
     protected LocalDateTime coverageStartDate;
     protected LocalDateTime coverageEndDate;
