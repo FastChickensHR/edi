@@ -21,17 +21,23 @@ import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunicationsNumbers;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberHealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberIncome;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberLanguage;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberName;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddress;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingAddress;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
+import com.fastChickensHR.edi.x834.loop2000.loop2200.MemberDisability;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.ProviderChange;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.ProviderName;
@@ -138,10 +144,15 @@ public class X834MemberWriter {
         appendResidenceAddress(segments, member);
         appendDemographics(segments, member);
         appendIncome(segments, member);
+        appendHealthInformation(segments, member);
+        appendLanguages(segments, member);
 
         // Loop 2100C (member mailing address), emitted after the 2100A block when the member
         // carries a distinct mailing address.
         appendMailingAddress(segments, member);
+
+        // Loop 2200 (disability), emitted after the 2100 loops and before the 2300 block.
+        appendDisabilities(segments, member);
 
         // Loop 2300: this member's own trailing segments (health coverage HD, REF extensions).
         // Emitting them here keeps a member's coverage nested inside its own loop, before any
@@ -290,8 +301,8 @@ public class X834MemberWriter {
                         .setReferenceIdentification(other.getGroupNumber())
                         .build());
             }
-            addCobDateSegment(segments, DateTimeQualifier.COORDINATION_OF_BENEFITS_BEGIN, other.getBeginDate());
-            addCobDateSegment(segments, DateTimeQualifier.COORDINATION_OF_BENEFITS_END, other.getEndDate());
+            addQualifiedDate(segments, DateTimeQualifier.COORDINATION_OF_BENEFITS_BEGIN, other.getBeginDate());
+            addQualifiedDate(segments, DateTimeQualifier.COORDINATION_OF_BENEFITS_END, other.getEndDate());
             if (!isBlank(other.getRelatedEntityName())) {
                 segments.add(CoordinationOfBenefitsRelatedEntityName.builder()
                         .setRelatedEntityName(other.getRelatedEntityName())
@@ -300,8 +311,8 @@ public class X834MemberWriter {
         }
     }
 
-    /** A 2320 coordination date, emitted only when present. */
-    private void addCobDateSegment(List<Segment> segments, DateTimeQualifier qualifier, LocalDateTime date)
+    /** A date under an explicit DTP qualifier, emitted only when present. */
+    private void addQualifiedDate(List<Segment> segments, DateTimeQualifier qualifier, LocalDateTime date)
             throws ValidationException {
         if (date == null) {
             return;
@@ -449,6 +460,65 @@ public class X834MemberWriter {
                 .setSalaryGrade(emptyToNull(income.getSalaryGrade()))
                 .setCurrencyCode(emptyToNull(income.getCurrencyCode()))
                 .build());
+    }
+
+    /**
+     * Loop 2100A HLH (member health information), emitted after the ICM when the member carries it.
+     * BCBSM notes the health-related code "may be required for specific employer groups", so
+     * whether to send it is a config-time answer and absence is the normal case.
+     */
+    private void appendHealthInformation(List<Segment> segments, BaseMember member) throws ValidationException {
+        HealthInformation health = member.getHealthInformation();
+        if (health == null) {
+            return;
+        }
+        segments.add(MemberHealthInformation.builder()
+                .setHealthRelatedCode(health.getHealthRelatedCode())
+                .setHeight(emptyToNull(health.getHeight()))
+                .setCurrentWeight(emptyToNull(health.getCurrentWeight()))
+                .setPreviousWeight(emptyToNull(health.getPreviousWeight()))
+                .setDescription(emptyToNull(health.getDescription()))
+                .build());
+    }
+
+    /**
+     * Loop 2100A LUI (member language), emitted after the HLH — one per language the member uses,
+     * in the order added. Suppressed when the member carries none.
+     */
+    private void appendLanguages(List<Segment> segments, BaseMember member) throws ValidationException {
+        for (Language language : member.getLanguages()) {
+            segments.add(MemberLanguage.builder()
+                    .setLanguage(language.getCodeQualifier(), emptyToNull(language.getCode()))
+                    .setDescription(emptyToNull(language.getDescription()))
+                    .build());
+        }
+    }
+
+    /**
+     * Loop 2200 (disability): per disability, a {@code DSB} followed by its {@code DTP*360}/
+     * {@code DTP*361} period dates. Emitted after the 2100 loops and before the 2300 coverage
+     * segments, and suppressed when the member has none.
+     * <p>
+     * BCBSM asks for the period rather than the detail, but DSB01 is mandatory, so the dates cannot
+     * travel alone — a sponsor sending a disability period must also say what kind of disability it
+     * is. The guide itself is wrong on this point, reading "DTP01 … Start / DTP02 … End" when DTP02
+     * is the date-format qualifier; two dates are two DTP segments, which is what this emits.
+     */
+    private void appendDisabilities(List<Segment> segments, BaseMember member) throws ValidationException {
+        for (Disability disability : member.getDisabilities()) {
+            segments.add(MemberDisability.builder()
+                    .setDisabilityTypeCode(disability.getType())
+                    .setQuantity(emptyToNull(disability.getQuantity()))
+                    .setOccupationCode(emptyToNull(disability.getOccupationCode()))
+                    .setWorkIntensityCode(emptyToNull(disability.getWorkIntensityCode()))
+                    .setProductOptionCode(emptyToNull(disability.getProductOptionCode()))
+                    .setMonetaryAmount(emptyToNull(disability.getMonetaryAmount()))
+                    .build());
+            addQualifiedDate(segments, DateTimeQualifier.INITIAL_DISABILITY_PERIOD_START,
+                    disability.getStartDate());
+            addQualifiedDate(segments, DateTimeQualifier.INITIAL_DISABILITY_PERIOD_END,
+                    disability.getEndDate());
+        }
     }
 
     /** Loop 2100A DMG (member demographics). Emitted when a birth date is present. */

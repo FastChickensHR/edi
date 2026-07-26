@@ -14,8 +14,11 @@ import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
+import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
@@ -98,6 +101,12 @@ public abstract class BaseMember {
      * {@code ICM}.
      */
     protected Income income;
+    /**
+     * This member's health-related status (Loop 2100A {@code HLH}) — tobacco and substance use, plus
+     * height and weight. Emitted by {@link X834MemberWriter} after the {@code ICM}, and only when
+     * present. A member has at most one, the 834 permitting a single {@code HLH}.
+     */
+    protected HealthInformation healthInformation;
 
     /**
      * All of this member's postal addresses, keyed by {@link AddressType}. A member may carry a
@@ -216,6 +225,46 @@ public abstract class BaseMember {
      */
     public void addCommunication(CommunicationNumberQualifier qualifier, String number) {
         addCommunication(new MemberCommunication(qualifier, number));
+    }
+
+    /**
+     * The languages this member uses (Loop 2100A {@code LUI}). Emitted by {@link X834MemberWriter}
+     * after the {@code HLH}, one {@code LUI} per entry, in the order added. Empty for a member with
+     * none, in which case nothing is emitted.
+     *
+     * @see #addLanguage(Language)
+     */
+    private final List<Language> languages = new ArrayList<>();
+
+    /**
+     * Adds a language this member uses (Loop 2100A {@code LUI}). Order is preserved.
+     *
+     * @param language the language to emit (ignored if null)
+     */
+    public void addLanguage(Language language) {
+        if (language != null) {
+            languages.add(language);
+        }
+    }
+
+    /**
+     * The disabilities this member has (Loop 2200). Emitted by {@link X834MemberWriter} after the
+     * 2100 loops and before the 2300 coverage segments, one {@code DSB}(/{@code DTP}) block per
+     * entry. Empty for a member with none, in which case nothing is emitted.
+     *
+     * @see #addDisability(Disability)
+     */
+    private final List<Disability> disabilities = new ArrayList<>();
+
+    /**
+     * Adds a disability this member has (Loop 2200). Order is preserved.
+     *
+     * @param disability the disability to emit (ignored if null)
+     */
+    public void addDisability(Disability disability) {
+        if (disability != null) {
+            disabilities.add(disability);
+        }
     }
 
     /**
