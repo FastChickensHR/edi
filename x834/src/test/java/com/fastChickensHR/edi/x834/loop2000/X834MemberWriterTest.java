@@ -19,7 +19,12 @@ import com.fastChickensHR.edi.x834.data.ActionCode;
 import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.data.FrequencyCode;
+import com.fastChickensHR.edi.x834.data.DisabilityTypeCode;
+import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
+import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
@@ -539,6 +544,102 @@ class X834MemberWriterTest {
 
         assertTrue(out.contains("ICM*4*4500~"), () -> "expected the subscriber's ICM; got:\n" + out);
         assertTrue(out.contains("ICM*1*800~"), () -> "expected the dependent's own ICM; got:\n" + out);
+    }
+
+    @Test
+    void emitsThe2100ATailInSpecOrderIcmThenHlhThenLui() throws ValidationException {
+        // 834 Loop 2100A order: NM1, PER, N3, N4, DMG, EC, ICM, AMT, HLH, LUI.
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
+        member.setIncome(new Income(FrequencyCode.MONTHLY, "4500"));
+        member.setHealthInformation(new HealthInformation(HealthRelatedCode.TOBACCO_USE));
+        member.addLanguage(new Language("SPANISH"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("HLH*T~"), () -> "expected the HLH; got:\n" + out);
+        assertTrue(out.contains("LUI***SPANISH~"), () -> "expected the LUI; got:\n" + out);
+        assertTrue(out.indexOf("DMG*") < out.indexOf("ICM*"), () -> "ICM follows DMG; got:\n" + out);
+        assertTrue(out.indexOf("ICM*") < out.indexOf("HLH*"), () -> "HLH follows ICM; got:\n" + out);
+        assertTrue(out.indexOf("HLH*") < out.indexOf("LUI*"), () -> "LUI follows HLH; got:\n" + out);
+    }
+
+    @Test
+    void emitsOneLuiPerLanguageInOrder() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addLanguage(new Language("SPANISH"));
+        member.addLanguage(new Language("VIETNAMESE"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("LUI***SPANISH~") < out.indexOf("LUI***VIETNAMESE~"),
+                () -> "expected both languages, in the order added; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheDisabilityLoopWithItsPeriodDates() throws ValidationException {
+        // BCBSM asks for DTP*360 / DTP*361. The guide reads "DTP01 … Start / DTP02 … End", but
+        // DTP02 is the date-format qualifier, so two dates are two DTP segments.
+        Member member = baseSubscriber();
+        Disability disability = new Disability(DisabilityTypeCode.SHORT_TERM_DISABILITY);
+        disability.setStartDate(LocalDateTime.of(2026, 3, 1, 0, 0));
+        disability.setEndDate(LocalDateTime.of(2026, 6, 30, 0, 0));
+        member.addDisability(disability);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("DSB*1~"), () -> "expected the DSB; got:\n" + out);
+        assertTrue(out.contains("DTP*360*D8*20260301~"), () -> "expected the period start; got:\n" + out);
+        assertTrue(out.contains("DTP*361*D8*20260630~"), () -> "expected the period end; got:\n" + out);
+        assertTrue(out.indexOf("DSB*1~") < out.indexOf("DTP*360"),
+                () -> "the DSB opens the loop, before its dates; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheDisabilityLoopAfterThe2100LoopsAndBeforeTheCoverageSegments() throws ValidationException {
+        // 834 loop order: 2100A/2100C → 2200 → 2300.
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        Address mailing = new Address();
+        mailing.setType(AddressType.MAILING);
+        mailing.setLine1("PO BOX 1");
+        member.addAddress(mailing);
+        member.addDisability(new Disability(DisabilityTypeCode.LONG_TERM_DISABILITY));
+        member.addSegment(new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("1L")
+                .setReferenceIdentification("PLAN9")
+                .build());
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("NM1*31") < out.indexOf("DSB*2~"),
+                () -> "the 2200 loop must follow the 2100C block; got:\n" + out);
+        assertTrue(out.indexOf("DSB*2~") < out.indexOf("REF*1L*PLAN9"),
+                () -> "the 2200 loop must precede the 2300 segments; got:\n" + out);
+    }
+
+    @Test
+    void omitsHlhLuiAndDsbWhenTheMemberCarriesNone() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("HLH"), () -> "no HLH; got:\n" + out);
+        assertFalse(out.contains("LUI"), () -> "no LUI; got:\n" + out);
+        assertFalse(out.contains("DSB"), () -> "no DSB; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheDisabilityDsbEvenWithNoPeriodDates() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addDisability(new Disability(DisabilityTypeCode.PERMANENT_OR_TOTAL_DISABILITY));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("DSB*3~"), () -> "expected the DSB; got:\n" + out);
+        assertFalse(out.contains("DTP*360"), () -> "no period start without a date; got:\n" + out);
     }
 
     @Test
