@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -621,6 +622,100 @@ class X834FileGeneratorTest {
                 () -> generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber))));
 
         assertTrue(thrown.getMessage().contains("PLA03"), thrown.getMessage());
+    }
+
+    @Test
+    void emitsThe2200And2700LoopsFromKernelFields() {
+        // The last two structures #139 added. The golden pins 2200 before the 2300 block and the
+        // 2700 block last, with LS/LE bracketing the categories.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LAST_NAME, "DOE"),
+                emp(X834Location.HD_MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.HD_INSURANCE_LINE_CODE, "HLT"),
+                emp(X834Location.DISABILITY_TYPE, "1"),
+                emp(X834Location.DISABILITY_START_DATE, "2026-03-01"),
+                emp(X834Location.DISABILITY_END_DATE, "2026-06-30"),
+                emp(X834Location.category(0, X834Location.CATEGORY_NAME), "CLASS"),
+                emp(X834Location.category(0, X834Location.CATEGORY_VALUE), "0042"),
+                emp(X834Location.category(1, X834Location.CATEGORY_NAME), "SUBGROUP"),
+                emp(X834Location.category(1, X834Location.CATEGORY_VALUE), "0077"),
+                emp(X834Location.category(1, X834Location.CATEGORY_REFERENCE_QUALIFIER), "DX")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        TestFixtures.assertMatchesGolden("golden/member-2200-2700.834", out);
+    }
+
+    @Test
+    void wrapsEveryReportingCategoryInOneLsLeBlock() {
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.category(0, X834Location.CATEGORY_NAME), "CLASS"),
+                emp(X834Location.category(0, X834Location.CATEGORY_VALUE), "0042"),
+                emp(X834Location.category(1, X834Location.CATEGORY_NAME), "SUBGROUP"),
+                emp(X834Location.category(1, X834Location.CATEGORY_VALUE), "0077")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        // One LS and one LE for the whole block, not one pair per category.
+        assertEquals(1, out.split("LS\\*2700~", -1).length - 1, () -> "exactly one LS; got:\n" + out);
+        assertEquals(1, out.split("LE\\*2700~", -1).length - 1, () -> "exactly one LE; got:\n" + out);
+        assertTrue(out.indexOf("LS*2700~") < out.indexOf("LX*1~"), () -> "LS opens the block; got:\n" + out);
+        assertTrue(out.indexOf("LX*2~") < out.indexOf("LE*2700~"), () -> "LE closes it; got:\n" + out);
+    }
+
+    @Test
+    void honorsACategoryReferenceQualifierWhenGiven() {
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.CATEGORY_NAME, "SUBGROUP"),
+                emp(X834Location.CATEGORY_VALUE, "0042"),
+                emp(X834Location.CATEGORY_REFERENCE_QUALIFIER, "DX")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.contains("REF*DX*0042~"),
+                () -> "expected the caller's qualifier, not the ZZ default; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheDisabilityPeriodAsTwoDtpSegments() {
+        // BCBSM's guide reads "DTP01 … Start / DTP02 … End", but DTP02 is the format qualifier;
+        // two dates are two DTP segments.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.DISABILITY_TYPE, "2"),
+                emp(X834Location.DISABILITY_START_DATE, "2026-03-01"),
+                emp(X834Location.DISABILITY_END_DATE, "2026-06-30")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.contains("DTP*360*D8*20260301~"), () -> "expected the period start; got:\n" + out);
+        assertTrue(out.contains("DTP*361*D8*20260630~"), () -> "expected the period end; got:\n" + out);
+    }
+
+    @Test
+    void failsLoudlyWhenADisabilityPeriodHasNoType() {
+        // DSB01 is mandatory, so a period cannot travel without saying what kind of disability it is.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.DISABILITY_START_DATE, "2026-03-01")));
+
+        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+                () -> generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber))));
+
+        assertTrue(thrown.getMessage().contains("DSB01"), thrown.getMessage());
     }
 
     /** The envelope every member-level test shares. */

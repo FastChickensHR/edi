@@ -65,6 +65,8 @@ class X834SpecTest {
         arity.put("2100C NM1", 9);
         arity.put("2100C N3", 2);
         arity.put("2100C N4", 7);
+        arity.put("2200 DSB", 6);
+        arity.put("2200 DTP", 3);
         arity.put("2300 HD", 5);
         arity.put("2300 DTP", 3);
         arity.put("2310 LX", 1);
@@ -74,6 +76,12 @@ class X834SpecTest {
         arity.put("2320 REF", 3);
         arity.put("2320 DTP", 3);
         arity.put("2330 NM1", 9);
+        arity.put("2700 LS", 1);
+        arity.put("2700 LX", 1);
+        arity.put("2700 LE", 1);
+        arity.put("2750 N1", 4);
+        arity.put("2750 REF", 3);
+        arity.put("2750 DTP", 3);
         arity.put("TRAILER SE", 2);
         arity.put("TRAILER GE", 2);
         arity.put("TRAILER IEA", 2);
@@ -221,7 +229,7 @@ class X834SpecTest {
         assertEquals(first.stream().map(ElementSpec::position).toList(), X834Spec.positions());
 
         List<String> loops = first.stream().map(spec -> spec.position().loop()).distinct().toList();
-        assertEquals(List.of("HEADER", "1000A", "1000B", "1000C", "2000", "2100A", "2100C", "2300", "2310", "2320", "2330", "TRAILER"), loops);
+        assertEquals(List.of("HEADER", "1000A", "1000B", "1000C", "2000", "2100A", "2100C", "2200", "2300", "2310", "2320", "2330", "2700", "2750", "TRAILER"), loops);
     }
 
     @Test
