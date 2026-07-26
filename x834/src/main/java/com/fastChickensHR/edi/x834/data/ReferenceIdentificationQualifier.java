@@ -109,6 +109,7 @@ public enum ReferenceIdentificationQualifier implements EdiCodeEnum {
     CASE_NUMBER("3H", "Case Number"),
     PERSONAL_IDENTIFICATION_NUMBER("4A", "Personal Identification Number (PIN)"),
     CROSS_REFERENCE_NUMBER("6O", "Cross Reference Number"),
+    GROUP_NUMBER("6P", "Group Number"),
     PERSONAL_ID_NUMBER("ABB", "Personal ID Number"),
     NCPDP_PHARMACY_NUMBER("D3", "National Council for Prescription Drug Programs Pharmacy Number"),
     HEALTH_INSURANCE_CLAIM_NUMBER("F6", "Health Insurance Claim (HIC) Number"),
