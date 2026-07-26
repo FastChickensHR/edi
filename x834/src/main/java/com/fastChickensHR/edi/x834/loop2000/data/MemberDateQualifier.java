@@ -162,7 +162,6 @@ public enum MemberDateQualifier implements EdiCodeEnum {
                         Map.entry("term", TERMINATION),
                         Map.entry("terminated", TERMINATION),
                         Map.entry("termination date", TERMINATION),
-                        Map.entry("employment end", TERMINATION),
                         Map.entry("separation", TERMINATION),
 
                         Map.entry("qualifying event", COBRA_QUALIFYING_EVENT),
