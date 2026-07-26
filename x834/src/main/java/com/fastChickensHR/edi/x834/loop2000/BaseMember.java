@@ -15,6 +15,7 @@ import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
+import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.segments.Segment;
@@ -207,6 +208,32 @@ public abstract class BaseMember {
      */
     public void addCommunication(CommunicationNumberQualifier qualifier, String number) {
         addCommunication(new MemberCommunication(qualifier, number));
+    }
+
+    /**
+     * The providers this member is assigned to (Loop 2310) — typically a primary care physician.
+     * Emitted by {@link X834MemberWriter} after the member's 2300 coverage segments and before the
+     * 2320 block, one {@code LX}/{@code NM1}(/{@code PLA}) occurrence per entry. Empty for a member
+     * with no provider assignment, in which case nothing is emitted.
+     *
+     * @see #addProvider(Provider)
+     */
+    private final List<Provider> providers = new ArrayList<>();
+
+    /**
+     * Adds a provider this member is assigned to (Loop 2310).
+     * <p>
+     * Order is preserved, and the {@code LX} assigned number is counted over the emitted
+     * occurrences. The 834 permits at most
+     * {@value com.fastChickensHR.edi.x834.loop2000.X834MemberWriter#MAX_PROVIDERS} per member; a
+     * member carrying more is rejected when written, not silently truncated.
+     *
+     * @param provider the provider to emit (ignored if null)
+     */
+    public void addProvider(Provider provider) {
+        if (provider != null) {
+            providers.add(provider);
+        }
     }
 
     /**

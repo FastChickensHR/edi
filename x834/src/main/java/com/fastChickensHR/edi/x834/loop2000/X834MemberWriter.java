@@ -30,6 +30,9 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddre
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingAddress;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
+import com.fastChickensHR.edi.x834.loop2000.loop2310.ProviderChange;
+import com.fastChickensHR.edi.x834.loop2000.loop2310.ProviderName;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefitsRelatedEntityName;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.MemberCoordinationOfBenefits;
@@ -142,6 +145,9 @@ public class X834MemberWriter {
         // dependent's loop begins.
         segments.addAll(member.getAdditionalSegments());
 
+        // Loop 2310 (provider), emitted after the 2300 block and before 2320.
+        appendProviders(segments, member);
+
         // Loop 2320/2330 (coordination of benefits), emitted after the 2300 block and before 2700.
         appendCoordinationOfBenefits(segments, member);
 
@@ -188,6 +194,65 @@ public class X834MemberWriter {
 
     /** The most Loop 2320 occurrences the 834 permits per member. */
     public static final int MAX_COORDINATION_OF_BENEFITS = 5;
+
+    /** The most Loop 2310 occurrences the 834 permits per member. */
+    public static final int MAX_PROVIDERS = 30;
+
+    /**
+     * Loop 2310 (provider): per provider the member is assigned to, an {@code LX} assigned number,
+     * the {@code NM1} naming them, and — when the assignment is being changed rather than merely
+     * stated — a {@code PLA} saying what is happening. Emitted after the 2300 coverage segments and
+     * before the 2320 block, and suppressed entirely when the member has no provider.
+     * <p>
+     * The {@code LX} counter is assigned at render time over the emitted occurrences (1-based),
+     * matching how the 2700 block numbers its own. Thirty occurrences are permitted; a member
+     * carrying more is rejected rather than truncated.
+     * <p>
+     * The 2310 {@code N3}/{@code N4}/{@code PER} segments are not modelled — no profiled carrier
+     * asks for a provider's address or phone, only their name and identifier.
+     */
+    private void appendProviders(List<Segment> segments, BaseMember member) throws ValidationException {
+        List<Provider> providers = member.getProviders();
+        if (providers.isEmpty()) {
+            return;
+        }
+        if (providers.size() > MAX_PROVIDERS) {
+            throw new ValidationException("A member carries at most " + MAX_PROVIDERS
+                    + " provider loops (2310); got " + providers.size());
+        }
+        int assignedNumber = 1;
+        for (Provider provider : providers) {
+            segments.add(LXSegment.builder().setAssignedNumber(assignedNumber++).build());
+            segments.add(ProviderName.builder()
+                    .setLastName(provider.getLastName())
+                    .setFirstName(emptyToNull(provider.getFirstName()))
+                    .setMiddleName(emptyToNull(provider.getMiddleName()))
+                    .setProviderIdentification(provider.getIdentifierQualifier(),
+                            emptyToNull(provider.getIdentifier()))
+                    .build());
+            appendProviderChange(segments, provider);
+        }
+    }
+
+    /**
+     * The 2310 {@code PLA}, emitted only when the assignment is actually changing. A change with no
+     * effective date is rejected: PLA03 is mandatory, and "this provider changed, at no particular
+     * time" is not something a receiver can apply.
+     */
+    private void appendProviderChange(List<Segment> segments, Provider provider) throws ValidationException {
+        if (provider.getChangeAction() == null) {
+            return;
+        }
+        if (provider.getChangeDate() == null) {
+            throw new ValidationException(
+                    "A provider change (PLA01) requires its effective date (PLA03)");
+        }
+        segments.add(ProviderChange.builder()
+                .setActionCode(provider.getChangeAction())
+                .setDate(DateFormatter.formatDate(DateFormat.D8, provider.getChangeDate()))
+                .setMaintenanceReasonCode(provider.getChangeReason())
+                .build());
+    }
 
     /**
      * Loop 2320/2330 (coordination of benefits): per other plan the member holds, a {@code COB}
