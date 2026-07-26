@@ -8,6 +8,7 @@
 package com.fastChickensHR.edi.x834.loop2000;
 
 import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class X834MemberWriterTest {
@@ -353,5 +355,127 @@ class X834MemberWriterTest {
 
         assertTrue(out.contains("REF*DX*0042~"),
                 () -> "expected the REF to use the category's own qualifier; got:\n" + out);
+    }
+
+    @Test
+    void emitsMemberCommunicationsPerFromExplicitChannels() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addCommunication(CommunicationNumberQualifier.ELECTRONIC_MAIL, "jane@example.com");
+        member.addCommunication(CommunicationNumberQualifier.WORK_PHONE, "5559876543");
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("PER*IP**EM*jane@example.com*WP*5559876543~"),
+                () -> "expected one PER carrying both channels in order; got:\n" + out);
+    }
+
+    @Test
+    void emitsPhoneNumberAndEmailUnderTheirConventionalQualifiers() throws ValidationException {
+        // The phoneNumber/email conveniences finally reach the wire: HP and EM. Before PER support
+        // existed they were settable but never serialized, so the values vanished silently.
+        Member member = baseSubscriber();
+        member.setPhoneNumber("5551234567");
+        member.setEmail("jane@example.com");
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("PER*IP**HP*5551234567*EM*jane@example.com~"),
+                () -> "expected phoneNumber as HP and email as EM; got:\n" + out);
+    }
+
+    @Test
+    void anExplicitChannelTakesPrecedenceOverTheConvenienceField() throws ValidationException {
+        // A caller who says "this number is a work phone" means it; phoneNumber must not also add
+        // the same person's number a second time under HP.
+        Member member = baseSubscriber();
+        member.addCommunication(CommunicationNumberQualifier.HOME_PHONE, "5550001111");
+        member.setPhoneNumber("5551234567");
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("PER*IP**HP*5550001111~"),
+                () -> "expected the explicit HP channel to win; got:\n" + out);
+        assertFalse(out.contains("5551234567"),
+                () -> "the convenience field should not add a second HP; got:\n" + out);
+    }
+
+    @Test
+    void emitsThePerAfterTheNm1AndBeforeTheResidenceAddress() throws ValidationException {
+        // 834 Loop 2100A order: NM1, PER, N3, N4, DMG.
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.setPhoneNumber("5551234567");
+        member.setAddressLine1("1 MAIN ST");
+        member.setCity("ANYTOWN");
+        member.setState("MN");
+        member.setZipCode("55555");
+        member.setBirthDate(LocalDateTime.of(1990, 5, 4, 0, 0));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("NM1*IL") < out.indexOf("PER*IP"),
+                () -> "PER must follow the member NM1; got:\n" + out);
+        assertTrue(out.indexOf("PER*IP") < out.indexOf("N3*"),
+                () -> "PER must precede the residence N3; got:\n" + out);
+        assertTrue(out.indexOf("N4*") < out.indexOf("DMG*"),
+                () -> "N4 must still precede DMG; got:\n" + out);
+    }
+
+    @Test
+    void omitsThePerWhenTheMemberHasNoWayToBeReached() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("PER"),
+                () -> "no PER for a member carrying no communication numbers; got:\n" + out);
+    }
+
+    @Test
+    void ignoresAnIncompleteChannelRatherThanEmittingADanglingQualifier() throws ValidationException {
+        // A qualifier with no number would violate X12 rule P0304; it is skipped, and with nothing
+        // else to say the PER is suppressed entirely rather than rendered empty.
+        Member member = baseSubscriber();
+        member.addCommunication(CommunicationNumberQualifier.HOME_PHONE, "");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("PER"),
+                () -> "an empty number contributes no channel; got:\n" + out);
+    }
+
+    @Test
+    void rejectsAMemberCarryingMoreChannelsThanOnePerCanHold() throws ValidationException {
+        // The 834 permits three. A fourth is a loud failure rather than a silently dropped
+        // contact number — the data-loss class this segment exists to end.
+        Member member = baseSubscriber();
+        member.addCommunication(CommunicationNumberQualifier.ELECTRONIC_MAIL, "jane@example.com");
+        member.addCommunication(CommunicationNumberQualifier.HOME_PHONE, "5551234567");
+        member.addCommunication(CommunicationNumberQualifier.WORK_PHONE, "5559876543");
+        member.addCommunication(CommunicationNumberQualifier.CELLULAR_PHONE, "5550000000");
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(ex.getMessage().contains("at most 3"), ex.getMessage());
+    }
+
+    @Test
+    void emitsAPerForEachDependentThatCarriesOne() throws ValidationException {
+        Member subscriber = baseSubscriber();
+        subscriber.setEmail("jane@example.com");
+        DependentMember dependent = new DependentMember();
+        dependent.setMemberIndicator(MemberIndicator.NOT_INSURED);
+        dependent.setRelationshipCode(IndividualRelationshipCode.CHILD);
+        dependent.setMaintenanceTypeCode(MaintenanceTypeCode.ADDITION);
+        dependent.setPhoneNumber("5552223333");
+        subscriber.addDependent(dependent);
+
+        String out = render(writer.toSegments(subscriber));
+
+        assertTrue(out.contains("PER*IP**EM*jane@example.com~"),
+                () -> "expected the subscriber's PER; got:\n" + out);
+        assertTrue(out.contains("PER*IP**HP*5552223333~"),
+                () -> "expected the dependent's own PER; got:\n" + out);
     }
 }
