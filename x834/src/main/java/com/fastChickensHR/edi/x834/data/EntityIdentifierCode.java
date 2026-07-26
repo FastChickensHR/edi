@@ -189,6 +189,8 @@ public enum EntityIdentifierCode implements EdiCodeEnum {
     EMPLOYER("36", "Employer"),
     INFORMATION_SOURCE("ACV", "Information Source"),
     MANAGED_CARE("QK", "Managed Care"),
+    /** NM101 of the 2100C mailing-address loop — the position this library already emits. */
+    POSTAL_MAILING_ADDRESS("31", "Postal Mailing Address"),
     PARTICIPANT("75", "Participant");
 
     private final String code;

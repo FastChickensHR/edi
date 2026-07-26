@@ -115,6 +115,44 @@ public final class X834Spec {
         return at(ElementPosition.parse(position));
     }
 
+    /**
+     * The spec for an element ordinal of a segment, <em>without</em> knowing which loop the segment sits
+     * in — what a renderer has to work with, since a segment instance carries its identifier and its
+     * element order but no loop identity ({@code N1} serves 1000A, 1000B and 1000C; {@code N3}/{@code N4}
+     * serve 2100A and 2100C).
+     *
+     * <p>Answers only when every loop publishing that segment ordinal agrees on the element — same
+     * number, name, type, lengths and codes — and empty otherwise. Today they always agree, because a
+     * segment's positions are declared once and reused across its loops; a test pins that. Should a
+     * future loop narrow one, this returns empty rather than guessing, and the position simply goes
+     * unchecked until the caller can supply a loop.
+     *
+     * <p>A composite element answers with its first component ({@code INS06} → the spec at
+     * {@code INS06-1}), which is what the segment renders into that slot while the 834 uses only C052-01.
+     */
+    public static Optional<ElementSpec> atSegment(String segment, int ordinal) {
+        List<ElementSpec> candidates = TABLE.values().stream()
+                .filter(spec -> spec.position().segment().equals(segment) && spec.position().ordinal() == ordinal)
+                .toList();
+        if (candidates.isEmpty()) {
+            return Optional.empty();
+        }
+        ElementSpec first = candidates.getFirst();
+        boolean agree = candidates.stream().allMatch(spec -> describes(spec, first));
+        return agree ? Optional.of(first) : Optional.empty();
+    }
+
+    /** Whether two specs say the same thing about their element, ignoring which position they sit at. */
+    private static boolean describes(ElementSpec one, ElementSpec other) {
+        return one.elementId().equals(other.elementId())
+                && one.name().equals(other.name())
+                && one.type() == other.type()
+                && one.minLength() == other.minLength()
+                && one.maxLength() == other.maxLength()
+                && one.codes().equals(other.codes())
+                && one.position().component() == other.position().component();
+    }
+
     /** Every published spec, in transaction-set order: envelope, header, loops, trailer. */
     public static List<ElementSpec> all() {
         return List.copyOf(TABLE.values());
