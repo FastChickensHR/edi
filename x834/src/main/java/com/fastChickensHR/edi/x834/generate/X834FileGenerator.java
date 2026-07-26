@@ -18,7 +18,10 @@ import com.fastChickensHR.edi.x834.loop2000.AddressType;
 import com.fastChickensHR.edi.x834.loop2000.BaseMember;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;
 import com.fastChickensHR.edi.x834.loop2000.Member;
+import com.fastChickensHR.edi.x834.data.ActionCode;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
+import com.fastChickensHR.edi.x834.data.CoordinationOfBenefitsCode;
+import com.fastChickensHR.edi.x834.data.PayerResponsibilitySequenceCode;
 import com.fastChickensHR.edi.x834.data.FrequencyCode;
 import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
 import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
@@ -33,6 +36,8 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
+import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
+import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverageDates;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
@@ -181,6 +186,10 @@ public final class X834FileGenerator implements FileGenerator {
         healthInformation(loc).ifPresent(member::setHealthInformation);
         languages(loc).forEach(member::addLanguage);
 
+        // Loops 2310 and 2320/2330, one occurrence per indexed group.
+        providers(loc).forEach(member::addProvider);
+        coordinationOfBenefits(loc).forEach(member::addCoordinationOfBenefits);
+
         // Loop 2100C mailing address (optional, when the member's mailing address differs).
         mailingAddress(loc).ifPresent(member::addAddress);
     }
@@ -251,6 +260,52 @@ public final class X834FileGenerator implements FileGenerator {
             languages.add(language);
         }
         return languages;
+    }
+
+    /**
+     * Loop 2310: one provider per {@code provider.<i>.} group, in ascending index order.
+     * <p>
+     * A change action with no date, or an identifier with no qualifier, is passed through rather than
+     * quietly repaired — the writer rejects each, which is the honest answer to a half-stated change.
+     */
+    private static List<Provider> providers(Map<String, String> loc) {
+        List<Provider> providers = new ArrayList<>();
+        for (Map<String, String> group : groupsByIndex(loc, X834Location.PROVIDER_PREFIX).values()) {
+            Provider provider = new Provider();
+            set(group, "lastName", provider::setLastName);
+            set(group, "firstName", provider::setFirstName);
+            set(group, "middleName", provider::setMiddleName);
+            set(group, "idQualifier",
+                    v -> provider.setIdentifierQualifier(IdentificationCodeQualifier.fromString(v)));
+            set(group, "id", provider::setIdentifier);
+            set(group, "changeAction", v -> provider.setChangeAction(ActionCode.fromString(v)));
+            set(group, "changeDate", v -> provider.setChangeDate(parseDateTime(v)));
+            set(group, "changeReason",
+                    v -> provider.setChangeReason(MaintenanceReasonCode.fromString(v)));
+            providers.add(provider);
+        }
+        return providers;
+    }
+
+    /** Loops 2320/2330: one other plan per {@code cob.<i>.} group, in ascending index order. */
+    private static List<CoordinationOfBenefits> coordinationOfBenefits(Map<String, String> loc) {
+        List<CoordinationOfBenefits> others = new ArrayList<>();
+        for (Map<String, String> group : groupsByIndex(loc, X834Location.COB_PREFIX).values()) {
+            CoordinationOfBenefits cob = new CoordinationOfBenefits();
+            set(group, "payerResponsibility",
+                    v -> cob.setPayerResponsibility(PayerResponsibilitySequenceCode.fromString(v)));
+            set(group, "policyIdentifier", cob::setPolicyIdentifier);
+            set(group, "benefitsCoordination",
+                    v -> cob.setBenefitsCoordination(CoordinationOfBenefitsCode.fromString(v)));
+            // Left at its 6P default unless the caller names another qualifier.
+            set(group, "groupNumberQualifier", cob::setGroupNumberQualifier);
+            set(group, "groupNumber", cob::setGroupNumber);
+            set(group, "beginDate", v -> cob.setBeginDate(parseDateTime(v)));
+            set(group, "endDate", v -> cob.setEndDate(parseDateTime(v)));
+            set(group, "relatedEntityName", cob::setRelatedEntityName);
+            others.add(cob);
+        }
+        return others;
     }
 
     /**
