@@ -25,12 +25,12 @@ import java.util.List;
  * The delimited flat-file implementation of the {@link FileParser} seam: reads a header-row delimited
  * file (CSV by default, or any {@link DelimitedFormat}) into a format-neutral {@link FileContent}. A
  * delimited file is the <em>Flat</em> shape — one line per record — so each data row becomes one
- * {@link Record} and each non-empty cell becomes a {@link Field} whose {@link Location} location is the
+ * {@link Record} and each non-empty cell becomes a {@link Field} whose {@link Location} name is the
  * column name.
  *
  * <p>The parser is intentionally dumb: it knows columns and cells, not domain meaning. In a plain flat
  * file every row is a top-level {@link Record} whose fields sit at {@link RecordLevel#RECORD} — the
- * inbound Field Map assigns each column's data element downstream. When the reserved
+ * consuming application assigns each column's data element downstream. When the reserved
  * {@link LinkedRows#RECORD_LEVEL_COLUMN} is present, the parser reconstructs nesting: {@code SUBRECORD}
  * rows attach as children of the {@code RECORD} row they follow, inverting {@link DelimitedFileGenerator}.
  * Empty cells produce no field (absence, not a blank value).

@@ -9,7 +9,7 @@ package com.fastChickensHR.edi.x999;
 
 /**
  * The 999 (and 997) acknowledgment dialect's {@code Location.name} vocabulary — the tokens
- * {@link X999FileParser} emits so a consumer (the ack poller) can read the acknowledgment by location,
+ * {@link X999FileParser} emits so a consumer correlating acknowledgments can read one by location,
  * the mirror of how the 834 generator reads its own {@link com.fastChickensHR.edi.core.Location}s.
  *
  * <p>File-level fields describe the acknowledged <em>functional group</em> (the reply is one group per

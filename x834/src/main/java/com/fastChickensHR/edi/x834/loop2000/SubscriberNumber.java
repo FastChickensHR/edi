@@ -33,6 +33,10 @@ public class SubscriberNumber extends RefSegment {
         return new SubscriberNumber.Builder();
     }
 
+    /**
+     * Builds the subscriber-number REF, defaulting REF01 to
+     * {@link SubscriberNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
+     */
     @Accessors(chain = true)
     public static class Builder extends RefSegment.AbstractBuilder<SubscriberNumber.Builder> {
         public Builder() {
