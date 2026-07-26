@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -427,6 +429,114 @@ class X834FileGeneratorTest {
         String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
 
         TestFixtures.assertMatchesGolden("golden/acknowledgment-requested.834", out);
+    }
+
+    @Test
+    void emitsThe2100ATailFromKernelFields() {
+        // PER / ICM / HLH / LUI, the four 2100A structures #139 added, now reachable from the
+        // generate path. The golden pins their order after the DMG as well as their content.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LAST_NAME, "DOE"),
+                emp(X834Location.FIRST_NAME, "JANE"),
+                emp(X834Location.BIRTH_DATE, "1980-01-15"),
+                emp(X834Location.GENDER, "F"),
+                emp(X834Location.COMMUNICATION_PREFIX + "HP", "5551234567"),
+                emp(X834Location.COMMUNICATION_PREFIX + "EM", "jane@example.com"),
+                emp(X834Location.ICM_FREQUENCY, "4"),
+                emp(X834Location.ICM_AMOUNT, "4500"),
+                emp(X834Location.ICM_LOCATION_IDENTIFIER, "DEPT42"),
+                emp(X834Location.HLH_HEALTH_RELATED_CODE, "T"),
+                emp(X834Location.lui(0, X834Location.LUI_DESCRIPTION), "SPANISH"),
+                emp(X834Location.lui(1, X834Location.LUI_DESCRIPTION), "VIETNAMESE")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        TestFixtures.assertMatchesGolden("golden/member-2100a-tail.834", out);
+    }
+
+    @Test
+    void namesEachCommunicationByItsQualifierSuffix() {
+        // "per.<qualifier>" mirrors "ref.<qualifier>": the qualifier is the address, so a member
+        // cannot carry two of a channel and no separate qualifier field is needed.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.COMMUNICATION_PREFIX + "WP", "5559876543")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.contains("PER*IP**WP*5559876543~"),
+                () -> "expected the work phone under WP; got:\n" + out);
+    }
+
+    @Test
+    void treatsUnindexedLanguageFieldsAsASingleLanguage() {
+        // The un-indexed lui.* keys form one implicit language, exactly as un-indexed hd.* fields
+        // form a single coverage group.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LUI_CODE_QUALIFIER, "XX"),
+                emp(X834Location.LUI_CODE, "SPA"),
+                emp(X834Location.LUI_DESCRIPTION, "SPANISH")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.contains("LUI*XX*SPA*SPANISH~"),
+                () -> "expected one LUI from the un-indexed fields; got:\n" + out);
+    }
+
+    @Test
+    void failsLoudlyWhenAnIncomeCarriesOnlyItsDepartmentNumber() {
+        // The BCBS Kansas case: ICM04 alone cannot be emitted, because ICM01/ICM02 are mandatory.
+        // The generator passes the partial income through so the writer rejects it, rather than
+        // dropping the department number the caller did supply.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.ICM_LOCATION_IDENTIFIER, "DEPT42")));
+
+        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+                () -> generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber))));
+
+        assertTrue(thrown.getMessage().contains("ICM01"), thrown.getMessage());
+    }
+
+    @Test
+    void emitsNo2100ATailSegmentsWhenTheRecordCarriesNoneOfThoseFields() {
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LAST_NAME, "DOE")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertFalse(out.contains("PER"), () -> "no PER; got:\n" + out);
+        assertFalse(out.contains("ICM"), () -> "no ICM; got:\n" + out);
+        assertFalse(out.contains("HLH"), () -> "no HLH; got:\n" + out);
+        assertFalse(out.contains("LUI"), () -> "no LUI; got:\n" + out);
+    }
+
+    /** The envelope every member-level test shares. */
+    private static List<Field> envelope() {
+        return List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
     }
 
     private static Field file(String location, String value) {

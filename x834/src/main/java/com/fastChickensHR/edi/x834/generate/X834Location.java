@@ -79,6 +79,64 @@ public final class X834Location {
     public static final String STATE = "state";               // N402
     public static final String ZIP_CODE = "zipCode";          // N403
 
+    // ---- Member level: Loop 2100A PER (communications numbers) ----
+    /**
+     * A member communication number: the location is {@link #COMMUNICATION_PREFIX} + the
+     * communication number qualifier, and the value is the number — {@code "per.HP"} a home phone,
+     * {@code "per.EM"} an email. Same shape as {@link #REF_EXTENSION_PREFIX}, and for the same
+     * reason: the qualifier <em>is</em> the address, so one member cannot carry two of a channel.
+     *
+     * <p>The 834 permits three per member. A fourth is rejected when written rather than dropped.
+     */
+    public static final String COMMUNICATION_PREFIX = "per.";
+
+    // ---- Member level: Loop 2100A ICM (member income) ----
+    /** ICM01 — the period {@link #ICM_AMOUNT} covers, e.g. {@code 4} (monthly). Required with it. */
+    public static final String ICM_FREQUENCY = "icm.frequency";
+    /** ICM02 — what the member earns in that period. Required with {@link #ICM_FREQUENCY}. */
+    public static final String ICM_AMOUNT = "icm.amount";
+    /** ICM03 — hours worked in that period. */
+    public static final String ICM_HOURS = "icm.hours";
+    /** ICM04 — where the member works; BCBS Kansas carries its department number here. */
+    public static final String ICM_LOCATION_IDENTIFIER = "icm.locationIdentifier";
+    /** ICM05 — the member's salary grade. */
+    public static final String ICM_SALARY_GRADE = "icm.salaryGrade";
+    /** ICM06 — the currency {@link #ICM_AMOUNT} is in, e.g. {@code USD}. */
+    public static final String ICM_CURRENCY_CODE = "icm.currencyCode";
+
+    // ---- Member level: Loop 2100A HLH (member health information) ----
+    /** HLH01 — the member's tobacco/substance status. */
+    public static final String HLH_HEALTH_RELATED_CODE = "hlh.healthRelatedCode";
+    /** HLH02 — the member's height. */
+    public static final String HLH_HEIGHT = "hlh.height";
+    /** HLH03 — the member's current weight. */
+    public static final String HLH_CURRENT_WEIGHT = "hlh.currentWeight";
+    /** HLH04 — the member's previous weight. */
+    public static final String HLH_PREVIOUS_WEIGHT = "hlh.previousWeight";
+    /** HLH05 — why the weight changed. */
+    public static final String HLH_DESCRIPTION = "hlh.description";
+
+    // ---- Member level: Loop 2100A LUI (member language) ----
+    public static final String LUI_PREFIX = "lui.";
+    /** LUI01 — what kind of code {@link #LUI_CODE} is. Required with it. */
+    public static final String LUI_CODE_QUALIFIER = "lui.codeQualifier";
+    /** LUI02 — the language code. Required with {@link #LUI_CODE_QUALIFIER}. */
+    public static final String LUI_CODE = "lui.code";
+    /** LUI03 — the language named in words. At least one of this or {@link #LUI_CODE} is required. */
+    public static final String LUI_DESCRIPTION = "lui.description";
+
+    /**
+     * The position name for the {@code index}-th language of one member — the indexed form of a
+     * {@code LUI_*} constant, so a member Record can carry <em>several</em> languages.
+     * {@code lui(0, LUI_CODE)} &rarr; {@code "lui.0.code"}; {@code lui(1, LUI_DESCRIPTION)} &rarr;
+     * {@code "lui.1.description"}. Languages emit in ascending index order, and the un-indexed
+     * {@code LUI_*} constants remain a single implicit language — the same convention
+     * {@link #hd(int, String)} uses for coverage groups.
+     */
+    public static String lui(int index, String luiField) {
+        return LUI_PREFIX + index + "." + luiField.substring(LUI_PREFIX.length());
+    }
+
     // ---- Member level: Loop 2100C mailing address ----
     public static final String MAILING_ADDRESS_LINE_1 = "mailingAddressLine1"; // 2100C N301
     public static final String MAILING_ADDRESS_LINE_2 = "mailingAddressLine2"; // 2100C N302

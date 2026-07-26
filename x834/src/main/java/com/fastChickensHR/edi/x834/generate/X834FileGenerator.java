@@ -18,6 +18,10 @@ import com.fastChickensHR.edi.x834.loop2000.AddressType;
 import com.fastChickensHR.edi.x834.loop2000.BaseMember;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;
 import com.fastChickensHR.edi.x834.loop2000.Member;
+import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
+import com.fastChickensHR.edi.x834.data.FrequencyCode;
+import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
+import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
@@ -25,6 +29,10 @@ import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.loop2000.data.HealthCoverageDateQualifier;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverageDates;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
@@ -37,6 +45,7 @@ import com.fastChickensHR.edi.x834.GenerationResult;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,8 +173,118 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.STATE, member::setState);
         apply(loc, X834Location.ZIP_CODE, member::setZipCode);
 
+        // Loop 2100A PER / ICM / HLH / LUI. Each is built only from the keys actually present, and
+        // the writer emits the matching segment only when the member carries one, so a Record with
+        // none of these renders exactly as before.
+        communications(loc).forEach(member::addCommunication);
+        income(loc).ifPresent(member::setIncome);
+        healthInformation(loc).ifPresent(member::setHealthInformation);
+        languages(loc).forEach(member::addLanguage);
+
         // Loop 2100C mailing address (optional, when the member's mailing address differs).
         mailingAddress(loc).ifPresent(member::addAddress);
+    }
+
+    /**
+     * Loop 2100A PER: one communication per {@code "per.<qualifier>"} field, in the order the Record
+     * lists them. The qualifier is the location's own suffix, so a member cannot carry two of a
+     * channel — the same property {@code "ref.<qualifier>"} has.
+     */
+    private static List<MemberCommunication> communications(Map<String, String> loc) {
+        List<MemberCommunication> channels = new ArrayList<>();
+        for (Map.Entry<String, String> entry : loc.entrySet()) {
+            if (!entry.getKey().startsWith(X834Location.COMMUNICATION_PREFIX) || entry.getValue().isBlank()) {
+                continue;
+            }
+            String qualifier = entry.getKey().substring(X834Location.COMMUNICATION_PREFIX.length());
+            channels.add(new MemberCommunication(
+                    CommunicationNumberQualifier.fromString(qualifier), entry.getValue()));
+        }
+        return channels;
+    }
+
+    /**
+     * Loop 2100A ICM, built when any {@code icm.} field is present.
+     * <p>
+     * A partial income is deliberately passed through rather than dropped: ICM01 and ICM02 are
+     * mandatory, so a Record carrying only {@link X834Location#ICM_LOCATION_IDENTIFIER} — the BCBS
+     * Kansas department-number case — fails loudly when written instead of silently losing the
+     * department number it did supply.
+     */
+    private static Optional<Income> income(Map<String, String> loc) {
+        Income income = new Income();
+        boolean any = false;
+        any |= set(loc, X834Location.ICM_FREQUENCY, v -> income.setFrequency(FrequencyCode.fromString(v)));
+        any |= set(loc, X834Location.ICM_AMOUNT, income::setAmount);
+        any |= set(loc, X834Location.ICM_HOURS, income::setHours);
+        any |= set(loc, X834Location.ICM_LOCATION_IDENTIFIER, income::setLocationIdentifier);
+        any |= set(loc, X834Location.ICM_SALARY_GRADE, income::setSalaryGrade);
+        any |= set(loc, X834Location.ICM_CURRENCY_CODE, income::setCurrencyCode);
+        return any ? Optional.of(income) : Optional.empty();
+    }
+
+    /** Loop 2100A HLH, built when any {@code hlh.} field is present. */
+    private static Optional<HealthInformation> healthInformation(Map<String, String> loc) {
+        HealthInformation health = new HealthInformation();
+        boolean any = false;
+        any |= set(loc, X834Location.HLH_HEALTH_RELATED_CODE,
+                v -> health.setHealthRelatedCode(HealthRelatedCode.fromString(v)));
+        any |= set(loc, X834Location.HLH_HEIGHT, health::setHeight);
+        any |= set(loc, X834Location.HLH_CURRENT_WEIGHT, health::setCurrentWeight);
+        any |= set(loc, X834Location.HLH_PREVIOUS_WEIGHT, health::setPreviousWeight);
+        any |= set(loc, X834Location.HLH_DESCRIPTION, health::setDescription);
+        return any ? Optional.of(health) : Optional.empty();
+    }
+
+    /**
+     * Loop 2100A LUI: one language per {@code lui.<i>.} group, in ascending index order, with
+     * un-indexed {@code lui.} fields forming a single implicit language — mirroring how
+     * {@link X834Location#hd(int, String)} groups coverages.
+     */
+    private static List<Language> languages(Map<String, String> loc) {
+        List<Language> languages = new ArrayList<>();
+        for (Map<String, String> group : groupsByIndex(loc, X834Location.LUI_PREFIX).values()) {
+            Language language = new Language();
+            set(group, "codeQualifier", v -> language.setCodeQualifier(IdentificationCodeQualifier.fromString(v)));
+            set(group, "code", language::setCode);
+            set(group, "description", language::setDescription);
+            languages.add(language);
+        }
+        return languages;
+    }
+
+    /**
+     * Groups {@code <prefix><i>.<suffix>} keys by {@code <i>}, keyed by suffix. Un-indexed
+     * {@code <prefix><suffix>} keys form one group ordered ahead of the numbered ones, so a caller
+     * that never indexes behaves as though it had used index zero.
+     */
+    private static Map<Integer, Map<String, String>> groupsByIndex(Map<String, String> loc, String prefix) {
+        Map<Integer, Map<String, String>> groups = new java.util.TreeMap<>();
+        for (Map.Entry<String, String> entry : loc.entrySet()) {
+            if (!entry.getKey().startsWith(prefix)) {
+                continue;
+            }
+            String rest = entry.getKey().substring(prefix.length());
+            int dot = rest.indexOf('.');
+            int index = -1;
+            String suffix = rest;
+            if (dot > 0 && rest.substring(0, dot).chars().allMatch(Character::isDigit)) {
+                index = Integer.parseInt(rest.substring(0, dot));
+                suffix = rest.substring(dot + 1);
+            }
+            groups.computeIfAbsent(index, k -> new LinkedHashMap<>()).put(suffix, entry.getValue());
+        }
+        return groups;
+    }
+
+    /** Like {@link #apply}, but reports whether the key carried a usable value. */
+    private static boolean set(Map<String, String> source, String key, Consumer<String> setter) {
+        String value = source.get(key);
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+        setter.accept(value);
+        return true;
     }
 
     /** Build the member's {@link AddressType#MAILING} address from the {@code mailing*} fields. */

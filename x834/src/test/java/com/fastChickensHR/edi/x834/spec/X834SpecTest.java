@@ -58,6 +58,10 @@ class X834SpecTest {
         arity.put("2100A DMG", 11);
         arity.put("2100A N3", 2);
         arity.put("2100A N4", 7);
+        arity.put("2100A PER", 8);
+        arity.put("2100A ICM", 6);
+        arity.put("2100A HLH", 5);
+        arity.put("2100A LUI", 3);
         arity.put("2100C N3", 2);
         arity.put("2100C N4", 7);
         arity.put("2300 HD", 5);
