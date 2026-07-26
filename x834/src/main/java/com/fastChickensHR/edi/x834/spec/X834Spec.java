@@ -10,9 +10,12 @@ package com.fastChickensHR.edi.x834.spec;
 import com.fastChickensHR.edi.x834.data.AcknowledgmentRequested;
 import com.fastChickensHR.edi.x834.data.ActionCode;
 import com.fastChickensHR.edi.x834.data.AuthorizationInformationQualifier;
+import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import com.fastChickensHR.edi.x834.data.EntityIdentifierCode;
+import com.fastChickensHR.edi.x834.data.FrequencyCode;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
+import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
 import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
 import com.fastChickensHR.edi.x834.data.InterchangeControlVersionNumber;
 import com.fastChickensHR.edi.x834.data.InterchangeIdQualifier;
@@ -71,9 +74,11 @@ import java.util.Optional;
  *   <li><strong>Positions the 220A1 does not use.</strong> {@code 2300 HD02} is the one hole inside an
  *       emitted segment: the library renders it as a permanently empty slot to keep HD03–HD05 in place, so
  *       there is nothing to constrain there.</li>
- *   <li><strong>Segments the generator never emits</strong> (AMT, IDC, LX/LS/LE, PER) — their classes exist
- *       but nothing writes them, so no position of theirs is reachable. They arrive with the loops that
- *       write them.</li>
+ *   <li><strong>Segments the generator never emits</strong> — AMT and IDC, which no writer produces at
+ *       all, plus the structures reachable today only through the typed builders: COB, PLA, DSB,
+ *       LS/LX/LE and the NM1s of 2310/2330. Their classes exist but the generate path cannot place a
+ *       value in them, so no position of theirs is reachable. They arrive with the loops that write
+ *       them — PER, ICM, HLH and LUI arrived exactly that way.</li>
  *   <li><strong>Element 1250's code list</strong> (the date-time-period format qualifier at
  *       {@code DTP02}, {@code INS11}, {@code DMG01}). Its codes live in
  *       {@link com.fastChickensHR.edi.x834.dates.DateFormat}, which carries a format pattern per code but
@@ -263,6 +268,41 @@ public final class X834Spec {
         t.element("2100A DMG10", "1270", "Code List Qualifier Code", DataType.ID, 1, 3);
         t.element("2100A DMG11", "1271", "Industry Code", DataType.AN, 1, 30);
         address(t, "2100A");
+
+        // ---- 2100A PER (member communications numbers). PER02 is published even though the member
+        // PER never names a contact — the NM1 before it already did — because it is still a rendered
+        // slot a value could be written into.
+        // PER01 publishes uncoded: element 366 has no enum here, the member PER always writing the
+        // fixed IP (Insured Party) from MemberCommunicationsNumbers rather than choosing a code.
+        t.element("2100A PER01", "366", "Contact Function Code", DataType.ID, 2, 2);
+        t.element("2100A PER02", "93", "Name", DataType.AN, 1, 60);
+        for (int pair = 0; pair < 3; pair++) {
+            t.coded("2100A PER%02d".formatted(3 + pair * 2), "365", "Communication Number Qualifier",
+                    2, 2, CommunicationNumberQualifier.class);
+            t.element("2100A PER%02d".formatted(4 + pair * 2), "364", "Communication Number",
+                    DataType.AN, 1, 256);
+        }
+
+        // ---- 2100A ICM (member income). ICM01/ICM02 are mandatory, so the later elements cannot be
+        // sent alone — see the segment's JavaDoc.
+        t.coded("2100A ICM01", "594", "Frequency Code", 1, 1, FrequencyCode.class);
+        t.element("2100A ICM02", "782", "Monetary Amount", DataType.R, 1, 18);
+        t.element("2100A ICM03", "380", "Quantity", DataType.R, 1, 15);
+        t.element("2100A ICM04", "310", "Location Identifier", DataType.AN, 1, 30);
+        t.element("2100A ICM05", "1214", "Salary Grade", DataType.AN, 1, 5);
+        t.element("2100A ICM06", "100", "Currency Code", DataType.ID, 3, 3);
+
+        // ---- 2100A HLH (member health information).
+        t.coded("2100A HLH01", "1212", "Health-Related Code", 1, 1, HealthRelatedCode.class);
+        t.element("2100A HLH02", "65", "Height", DataType.R, 1, 8);
+        t.element("2100A HLH03", "81", "Weight", DataType.R, 1, 10);
+        t.element("2100A HLH04", "81", "Weight", DataType.R, 1, 10);
+        t.element("2100A HLH05", "352", "Description", DataType.AN, 1, 80);
+
+        // ---- 2100A LUI (member language).
+        t.coded("2100A LUI01", "66", "Identification Code Qualifier", 1, 2, IdentificationCodeQualifier.class);
+        t.element("2100A LUI02", "67", "Identification Code", DataType.AN, 2, 80);
+        t.element("2100A LUI03", "352", "Description", DataType.AN, 1, 80);
 
         // ---- 2100C member mailing address (N3/N4 only; the loop's NM1 is not emitted).
         address(t, "2100C");
