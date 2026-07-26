@@ -34,6 +34,12 @@ import java.util.List;
  * {@link LinkedRows#RECORD_LEVEL_COLUMN} is present, the parser reconstructs nesting: {@code SUBRECORD}
  * rows attach as children of the {@code RECORD} row they follow, inverting {@link DelimitedFileGenerator}.
  * Empty cells produce no field (absence, not a blank value).
+ *
+ * <p><b>Headerless formats</b> ({@link DelimitedFormat#hasHeader()} {@code == false}) have no column
+ * names to read, so cells are addressed by <em>position</em>: the first column is {@code "1"}, the
+ * second {@code "2"}, and so on — 1-based, matching the element numbering the rest of this library
+ * speaks. A headerless file carries no {@link LinkedRows#RECORD_LEVEL_COLUMN} to recognise either, so
+ * it always parses flat; reconstructing nesting requires a header row.
  */
 public final class DelimitedFileParser implements FileParser {
 
@@ -52,13 +58,42 @@ public final class DelimitedFileParser implements FileParser {
     @Override
     public FileContent parse(String raw) {
         try (CSVParser parser = CSVParser.parse(raw == null ? "" : raw, format.parseFormat())) {
-            List<String> headers = parser.getHeaderNames();
-            boolean nested = headers.contains(LinkedRows.RECORD_LEVEL_COLUMN);
-            List<Record> records = nested ? parseNested(parser, headers) : parseFlat(parser, headers);
+            List<Record> records;
+            if (format.hasHeader()) {
+                List<String> headers = parser.getHeaderNames();
+                boolean nested = headers.contains(LinkedRows.RECORD_LEVEL_COLUMN);
+                records = nested ? parseNested(parser, headers) : parseFlat(parser, headers);
+            } else {
+                records = parsePositional(parser);
+            }
             return new FileContent(Direction.INBOUND, List.of(), records);
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to parse delimited file: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Reads a headerless file, naming each cell by its 1-based column position. Rows need not be the
+     * same width — each cell is named by where it actually sits.
+     */
+    private static List<Record> parsePositional(CSVParser parser) {
+        List<Record> records = new ArrayList<>();
+        for (CSVRecord row : parser) {
+            List<Field> fields = new ArrayList<>();
+            for (int i = 0; i < row.size(); i++) {
+                String value = row.get(i);
+                if (value != null && !value.isEmpty()) {
+                    fields.add(new Field(new Location(RecordLevel.RECORD, columnName(i)), value));
+                }
+            }
+            records.add(Record.of(fields));
+        }
+        return records;
+    }
+
+    /** The positional column name for a 0-based index: {@code "1"} for the first column. */
+    private static String columnName(int index) {
+        return String.valueOf(index + 1);
     }
 
     private static List<Record> parseFlat(CSVParser parser, List<String> headers) {

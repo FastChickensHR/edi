@@ -68,15 +68,44 @@ class DelimitedFormatTest {
     }
 
     @Test
-    void headerlessParseCurrentlyDropsAllFields() {
-        // KNOWN BUG (FastChickensHR/edi#152): headerless generate works (above), but headerless parse
-        // has no column names, so every cell is dropped and each row becomes an empty Record — a silent
-        // data-loss asymmetry. Pinned as current behavior (a regression net) until the bug is fixed.
+    void headerlessParseNamesCellsByTheir1BasedColumnPosition() {
+        // Regression for FastChickensHR/edi#152: a headerless file has no column names to read, so
+        // every cell used to be dropped and each row became an empty Record — silent data loss.
+        // Cells are now addressed positionally, 1-based like the element numbering elsewhere.
         DelimitedFormat noHeader = DelimitedFormat.builder().header(false).build();
 
         List<Record> back = new DelimitedFileParser(noHeader).parse("1,Jane\n2,John\n").records();
 
-        assertEquals(List.of(Record.of(List.of()), Record.of(List.of())), back);
+        assertEquals(List.of(
+                Record.of(List.of(f(RECORD, "1", "1"), f(RECORD, "2", "Jane"))),
+                Record.of(List.of(f(RECORD, "1", "2"), f(RECORD, "2", "John")))), back);
+    }
+
+    @Test
+    void headerlessRoundTripsOnceTheColumnsArePositional() {
+        // The asymmetry #152 described is gone: what the headerless parser produces, the headerless
+        // generator writes back byte-identically.
+        DelimitedFormat noHeader = DelimitedFormat.builder().header(false).build();
+        String raw = "1,Jane\n2,John\n";
+
+        FileContent parsed = new DelimitedFileParser(noHeader).parse(raw);
+
+        assertEquals(raw, new DelimitedFileGenerator(noHeader).generate(
+                new FileContent(Direction.OUTBOUND, List.of(), parsed.records())));
+    }
+
+    @Test
+    void headerlessParseNamesEachCellByWhereItActuallySits() {
+        // Ragged rows are named by position, not by the widest row: a short row simply has no field
+        // for the columns it does not reach, and an empty cell stays absent rather than blank.
+        DelimitedFormat noHeader = DelimitedFormat.builder().header(false).build();
+
+        List<Record> back = new DelimitedFileParser(noHeader).parse("1,Jane,x\n2,,\n3\n").records();
+
+        assertEquals(List.of(
+                Record.of(List.of(f(RECORD, "1", "1"), f(RECORD, "2", "Jane"), f(RECORD, "3", "x"))),
+                Record.of(List.of(f(RECORD, "1", "2"))),
+                Record.of(List.of(f(RECORD, "1", "3")))), back);
     }
 
     @Test

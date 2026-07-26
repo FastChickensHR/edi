@@ -133,6 +133,11 @@ public final class DelimitedFormat {
             return this;
         }
 
+        /**
+         * Whether files in this format carry a leading header row (the default). With {@code false}
+         * the generator omits it and the parser, having no column names to read, addresses cells by
+         * their 1-based position instead — see {@link DelimitedFileParser}.
+         */
         public Builder header(boolean header) {
             this.header = header;
             return this;
