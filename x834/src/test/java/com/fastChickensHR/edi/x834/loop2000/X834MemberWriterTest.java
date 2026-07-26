@@ -18,6 +18,8 @@ import com.fastChickensHR.edi.x834.data.PayerResponsibilitySequenceCode;
 import com.fastChickensHR.edi.x834.data.ActionCode;
 import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
+import com.fastChickensHR.edi.x834.data.FrequencyCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
@@ -466,6 +468,77 @@ class X834MemberWriterTest {
         ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
 
         assertTrue(ex.getMessage().contains("at most 3"), ex.getMessage());
+    }
+
+    @Test
+    void emitsTheIcmAfterTheDmg() throws ValidationException {
+        // 834 Loop 2100A order: NM1, PER, N3, N4, DMG, ICM.
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+        member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
+        Income income = new Income(FrequencyCode.MONTHLY, "4500");
+        income.setLocationIdentifier("DEPT42");
+        member.setIncome(income);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("ICM*4*4500**DEPT42~"),
+                () -> "expected the BCBS Kansas ICM shape; got:\n" + out);
+        assertTrue(out.indexOf("DMG*") < out.indexOf("ICM*"),
+                () -> "the ICM must follow the DMG; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheIcmEvenWhenTheMemberHasNoDemographics() throws ValidationException {
+        // The DMG is emitted only when a birth date is present; the ICM must not depend on it.
+        Member member = baseSubscriber();
+        member.setIncome(new Income(FrequencyCode.HOURLY, "24.50"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("ICM*H*24.50~"), () -> "expected the ICM; got:\n" + out);
+        assertFalse(out.contains("DMG*"), () -> "no DMG without a birth date; got:\n" + out);
+    }
+
+    @Test
+    void omitsTheIcmWhenTheMemberHasNoIncome() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("ICM"), () -> "no ICM without an income; got:\n" + out);
+    }
+
+    @Test
+    void rejectsAnIncomeCarryingOnlyTheDepartmentNumber() throws ValidationException {
+        // The Kansas case: a sponsor holding the department number but not the wage cannot emit the
+        // department alone, because ICM01/ICM02 are mandatory.
+        Member member = baseSubscriber();
+        Income income = new Income();
+        income.setLocationIdentifier("DEPT42");
+        member.setIncome(income);
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(ex.getMessage().contains("ICM01"), ex.getMessage());
+    }
+
+    @Test
+    void emitsAnIcmForEachDependentThatCarriesOne() throws ValidationException {
+        Member subscriber = baseSubscriber();
+        subscriber.setIncome(new Income(FrequencyCode.MONTHLY, "4500"));
+        DependentMember dependent = new DependentMember();
+        dependent.setMemberIndicator(MemberIndicator.NOT_INSURED);
+        dependent.setRelationshipCode(IndividualRelationshipCode.SPOUSE);
+        dependent.setMaintenanceTypeCode(MaintenanceTypeCode.ADDITION);
+        dependent.setIncome(new Income(FrequencyCode.WEEKLY, "800"));
+        subscriber.addDependent(dependent);
+
+        String out = render(writer.toSegments(subscriber));
+
+        assertTrue(out.contains("ICM*4*4500~"), () -> "expected the subscriber's ICM; got:\n" + out);
+        assertTrue(out.contains("ICM*1*800~"), () -> "expected the dependent's own ICM; got:\n" + out);
     }
 
     @Test
