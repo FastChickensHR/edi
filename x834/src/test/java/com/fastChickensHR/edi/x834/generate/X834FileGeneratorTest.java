@@ -524,6 +524,105 @@ class X834FileGeneratorTest {
         assertFalse(out.contains("LUI"), () -> "no LUI; got:\n" + out);
     }
 
+    @Test
+    void emitsThe2310And2320LoopsFromKernelFields() {
+        // Anthem's PCP change and BCBSM's Medicare coordination, both driven from locations. The
+        // golden pins that each loop sits after the 2300 block and in 2310-then-2320 order.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.LAST_NAME, "DOE"),
+                emp(X834Location.HD_MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.HD_INSURANCE_LINE_CODE, "HLT"),
+                emp(X834Location.PROVIDER_LAST_NAME, "WELBY"),
+                emp(X834Location.PROVIDER_FIRST_NAME, "MARCUS"),
+                emp(X834Location.PROVIDER_ID_QUALIFIER, "XX"),
+                emp(X834Location.PROVIDER_ID, "1234567893"),
+                emp(X834Location.PROVIDER_CHANGE_ACTION, "2"),
+                emp(X834Location.PROVIDER_CHANGE_DATE, "2026-01-01"),
+                emp(X834Location.PROVIDER_CHANGE_REASON, "07"),
+                emp(X834Location.COB_PAYER_RESPONSIBILITY, "S"),
+                emp(X834Location.COB_POLICY_IDENTIFIER, "1EG4TE5MK73"),
+                emp(X834Location.COB_BENEFITS_COORDINATION, "1"),
+                emp(X834Location.COB_GROUP_NUMBER, "GRP001"),
+                emp(X834Location.COB_BEGIN_DATE, "2026-01-01"),
+                emp(X834Location.COB_RELATED_ENTITY_NAME, "MEDICARE PART A")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        TestFixtures.assertMatchesGolden("golden/member-2310-2320.834", out);
+    }
+
+    @Test
+    void numbersIndexedProviderGroupsFromOne() {
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.provider(0, X834Location.PROVIDER_LAST_NAME), "WELBY"),
+                emp(X834Location.provider(1, X834Location.PROVIDER_LAST_NAME), "KILDARE")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.contains("LX*1~"), () -> "expected the first LX; got:\n" + out);
+        assertTrue(out.contains("LX*2~"), () -> "expected the second LX; got:\n" + out);
+        assertTrue(out.indexOf("NM1*1P*1*WELBY~") < out.indexOf("NM1*1P*1*KILDARE~"),
+                () -> "providers emit in index order; got:\n" + out);
+    }
+
+    @Test
+    void emitsOneCobBlockPerIndexedGroup() {
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.cob(0, X834Location.COB_PAYER_RESPONSIBILITY), "P"),
+                emp(X834Location.cob(0, X834Location.COB_RELATED_ENTITY_NAME), "MEDA"),
+                emp(X834Location.cob(1, X834Location.COB_PAYER_RESPONSIBILITY), "S"),
+                emp(X834Location.cob(1, X834Location.COB_RELATED_ENTITY_NAME), "MEDB")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.indexOf("COB*P~") < out.indexOf("NM1*IN*2*MEDA~"),
+                () -> "each 2330 stays inside its own 2320; got:\n" + out);
+        assertTrue(out.indexOf("NM1*IN*2*MEDA~") < out.indexOf("COB*S~"),
+                () -> "the second block follows the first; got:\n" + out);
+    }
+
+    @Test
+    void honorsACobGroupNumberQualifierWhenGiven() {
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.COB_PAYER_RESPONSIBILITY, "P"),
+                emp(X834Location.COB_GROUP_NUMBER, "SUB77"),
+                emp(X834Location.COB_GROUP_NUMBER_QUALIFIER, "ZZ")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber)));
+
+        assertTrue(out.contains("REF*ZZ*SUB77~"),
+                () -> "expected the caller's qualifier, not the 6P default; got:\n" + out);
+    }
+
+    @Test
+    void failsLoudlyWhenAProviderChangeHasNoEffectiveDate() {
+        // PLA03 is mandatory once an action is stated; the generator passes the half-stated change
+        // through so the writer rejects it rather than dropping the action.
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.PROVIDER_LAST_NAME, "WELBY"),
+                emp(X834Location.PROVIDER_CHANGE_ACTION, "2")));
+
+        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+                () -> generator.generate(new FileContent(Direction.OUTBOUND, envelope(), List.of(subscriber))));
+
+        assertTrue(thrown.getMessage().contains("PLA03"), thrown.getMessage());
+    }
+
     /** The envelope every member-level test shares. */
     private static List<Field> envelope() {
         return List.of(

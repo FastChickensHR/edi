@@ -137,6 +137,64 @@ public final class X834Location {
         return LUI_PREFIX + index + "." + luiField.substring(LUI_PREFIX.length());
     }
 
+    // ---- Member level: Loop 2310 (provider) ----
+    public static final String PROVIDER_PREFIX = "provider.";
+    /** 2310 NM103 — the provider's last or organization name. */
+    public static final String PROVIDER_LAST_NAME = "provider.lastName";
+    /** 2310 NM104 — the provider's first name. */
+    public static final String PROVIDER_FIRST_NAME = "provider.firstName";
+    /** 2310 NM105 — the provider's middle name. */
+    public static final String PROVIDER_MIDDLE_NAME = "provider.middleName";
+    /**
+     * 2310 NM108 — what kind of identifier {@link #PROVIDER_ID} is, e.g. {@code XX} for an NPI.
+     * Required with it: an identifier that does not say which scheme it belongs to names nothing.
+     */
+    public static final String PROVIDER_ID_QUALIFIER = "provider.idQualifier";
+    /** 2310 NM109 — the provider's identifier. Required with {@link #PROVIDER_ID_QUALIFIER}. */
+    public static final String PROVIDER_ID = "provider.id";
+    /** 2310 PLA01 — what is happening to the assignment. The PLA is emitted only when this is set. */
+    public static final String PROVIDER_CHANGE_ACTION = "provider.changeAction";
+    /** 2310 PLA03 — when the change takes effect. Required once {@link #PROVIDER_CHANGE_ACTION} is set. */
+    public static final String PROVIDER_CHANGE_DATE = "provider.changeDate";
+    /** 2310 PLA05 — why the change is happening. */
+    public static final String PROVIDER_CHANGE_REASON = "provider.changeReason";
+
+    /**
+     * The position name for the {@code index}-th provider of one member, so a Record can carry
+     * several — {@code provider(1, PROVIDER_LAST_NAME)} &rarr; {@code "provider.1.lastName"}. Same
+     * indexed convention as {@link #hd(int, String)}; un-indexed keys are a single implicit provider.
+     */
+    public static String provider(int index, String providerField) {
+        return PROVIDER_PREFIX + index + "." + providerField.substring(PROVIDER_PREFIX.length());
+    }
+
+    // ---- Member level: Loop 2320/2330 (coordination of benefits) ----
+    public static final String COB_PREFIX = "cob.";
+    /** 2320 COB01 — where the other payer sits in the payment order. Required. */
+    public static final String COB_PAYER_RESPONSIBILITY = "cob.payerResponsibility";
+    /** 2320 COB02 — the other plan's policy identifier; BCBSM carries the Medicare MBI here. */
+    public static final String COB_POLICY_IDENTIFIER = "cob.policyIdentifier";
+    /** 2320 COB03 — whether benefits are coordinated, and for whom. */
+    public static final String COB_BENEFITS_COORDINATION = "cob.benefitsCoordination";
+    /** 2320 REF01 — the qualifier for {@link #COB_GROUP_NUMBER}; defaults to {@code 6P}. */
+    public static final String COB_GROUP_NUMBER_QUALIFIER = "cob.groupNumberQualifier";
+    /** 2320 REF02 — the group number the other plan is held under. */
+    public static final String COB_GROUP_NUMBER = "cob.groupNumber";
+    /** 2320 {@code DTP*344} — when coordination begins. */
+    public static final String COB_BEGIN_DATE = "cob.beginDate";
+    /** 2320 {@code DTP*345} — when it ends. */
+    public static final String COB_END_DATE = "cob.endDate";
+    /** 2330 NM103 — the other plan's name, e.g. {@code MEDICARE PART A}. */
+    public static final String COB_RELATED_ENTITY_NAME = "cob.relatedEntityName";
+
+    /**
+     * The position name for the {@code index}-th other plan of one member — {@code cob(1, COB_BEGIN_DATE)}
+     * &rarr; {@code "cob.1.beginDate"}. The 834 permits five; a sixth is rejected when written.
+     */
+    public static String cob(int index, String cobField) {
+        return COB_PREFIX + index + "." + cobField.substring(COB_PREFIX.length());
+    }
+
     // ---- Member level: Loop 2100C mailing address ----
     public static final String MAILING_ADDRESS_LINE_1 = "mailingAddressLine1"; // 2100C N301
     public static final String MAILING_ADDRESS_LINE_2 = "mailingAddressLine2"; // 2100C N302

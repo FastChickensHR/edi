@@ -11,12 +11,14 @@ import com.fastChickensHR.edi.x834.data.AcknowledgmentRequested;
 import com.fastChickensHR.edi.x834.data.ActionCode;
 import com.fastChickensHR.edi.x834.data.AuthorizationInformationQualifier;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
+import com.fastChickensHR.edi.x834.data.CoordinationOfBenefitsCode;
 import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import com.fastChickensHR.edi.x834.data.EntityIdentifierCode;
 import com.fastChickensHR.edi.x834.data.FrequencyCode;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
 import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
 import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
+import com.fastChickensHR.edi.x834.data.PayerResponsibilitySequenceCode;
 import com.fastChickensHR.edi.x834.data.InterchangeControlVersionNumber;
 import com.fastChickensHR.edi.x834.data.InterchangeIdQualifier;
 import com.fastChickensHR.edi.x834.data.InterchangeUsageIndicator;
@@ -245,15 +247,7 @@ public final class X834Spec {
         dateTimePeriod(t, "2000");
 
         // ---- 2100A member name, demographics and residence address.
-        t.coded("2100A NM101", "98", "Entity Identifier Code", 2, 3, EntityIdentifierCode.class);
-        t.element("2100A NM102", "1065", "Entity Type Qualifier", DataType.ID, 1, 1);
-        t.element("2100A NM103", "1035", "Name Last or Organization Name", DataType.AN, 1, 60);
-        t.element("2100A NM104", "1036", "Name First", DataType.AN, 1, 35);
-        t.element("2100A NM105", "1037", "Name Middle", DataType.AN, 1, 25);
-        t.element("2100A NM106", "1038", "Name Prefix", DataType.AN, 1, 10);
-        t.element("2100A NM107", "1039", "Name Suffix", DataType.AN, 1, 10);
-        t.coded("2100A NM108", "66", "Identification Code Qualifier", 1, 2, IdentificationCodeQualifier.class);
-        t.element("2100A NM109", "67", "Identification Code", DataType.AN, 2, 80);
+        partyName(t, "2100A");
         t.element("2100A DMG01", "1250", "Date Time Period Format Qualifier", DataType.ID, 2, 3);
         t.element("2100A DMG02", "1251", "Member Birth Date", DataType.AN, 1, 35);
         t.coded("2100A DMG03", "1068", "Gender Code", 1, 1, GenderCode.class);
@@ -305,6 +299,9 @@ public final class X834Spec {
         t.element("2100A LUI03", "352", "Description", DataType.AN, 1, 80);
 
         // ---- 2100C member mailing address (N3/N4 only; the loop's NM1 is not emitted).
+        // The mailing loop opens with an NM1*31 the generator emits; it was absent from the published
+        // table while its N3/N4 were present.
+        partyName(t, "2100C");
         address(t, "2100C");
 
         // ---- 2300 health coverage. HD02 is Not Used in the 220A1: the library renders it as an empty
@@ -314,6 +311,27 @@ public final class X834Spec {
         t.element("2300 HD04", "1204", "Plan Coverage Description", DataType.AN, 1, 50);
         t.coded("2300 HD05", "1207", "Coverage Level Code", 3, 3, CoverageLevelCode.class);
         dateTimePeriod(t, "2300");
+
+        // ---- 2310 provider. LX opens each occurrence, the NM1 names the provider, and the PLA states
+        // what is happening to the assignment. PLA04 (time) is published because it is a rendered slot,
+        // though nothing writes it — PLA05 sits after it and an element cannot be skipped.
+        t.element("2310 LX01", "554", "Assigned Number", DataType.N0, 1, 6);
+        partyName(t, "2310");
+        t.coded("2310 PLA01", "306", "Action Code", 1, 2, ActionCode.class);
+        t.coded("2310 PLA02", "98", "Entity Identifier Code", 2, 3, EntityIdentifierCode.class);
+        t.element("2310 PLA03", "373", "Date", DataType.DT, 8, 8);
+        t.element("2310 PLA04", "337", "Time", DataType.TM, 4, 8);
+        t.coded("2310 PLA05", "1203", "Maintenance Reason Code", 2, 3, MaintenanceReasonCode.class);
+
+        // ---- 2320/2330 coordination of benefits: the COB, its group-number REF and 344/345 dates,
+        // then the 2330 NM1 naming the other plan.
+        t.coded("2320 COB01", "1138", "Payer Responsibility Sequence Number Code", 1, 1,
+                PayerResponsibilitySequenceCode.class);
+        t.element("2320 COB02", "127", "Reference Identification", DataType.AN, 1, 50);
+        t.coded("2320 COB03", "1143", "Coordination of Benefits Code", 1, 1, CoordinationOfBenefitsCode.class);
+        reference(t, "2320");
+        dateTimePeriod(t, "2320");
+        partyName(t, "2330");
 
         // ---- Trailers.
         t.element("TRAILER SE01", "96", "Number of Included Segments", DataType.N0, 1, 10);
@@ -338,6 +356,23 @@ public final class X834Spec {
         t.coded(loop + " DTP01", "374", "Date/Time Qualifier", 3, 3, DateTimeQualifier.class);
         t.element(loop + " DTP02", "1250", "Date Time Period Format Qualifier", DataType.ID, 2, 3);
         t.element(loop + " DTP03", "1251", "Date Time Period", DataType.AN, 1, 35);
+    }
+
+    /**
+     * NM101–NM109 as every loop writes them. Shared rather than repeated per loop because
+     * {@link #atSegment(String, int)} answers only while the loops agree on an ordinal — declaring the
+     * positions once makes that agreement structural instead of a convention to be re-checked.
+     */
+    private static void partyName(Table t, String loop) {
+        t.coded(loop + " NM101", "98", "Entity Identifier Code", 2, 3, EntityIdentifierCode.class);
+        t.element(loop + " NM102", "1065", "Entity Type Qualifier", DataType.ID, 1, 1);
+        t.element(loop + " NM103", "1035", "Name Last or Organization Name", DataType.AN, 1, 60);
+        t.element(loop + " NM104", "1036", "Name First", DataType.AN, 1, 35);
+        t.element(loop + " NM105", "1037", "Name Middle", DataType.AN, 1, 25);
+        t.element(loop + " NM106", "1038", "Name Prefix", DataType.AN, 1, 10);
+        t.element(loop + " NM107", "1039", "Name Suffix", DataType.AN, 1, 10);
+        t.coded(loop + " NM108", "66", "Identification Code Qualifier", 1, 2, IdentificationCodeQualifier.class);
+        t.element(loop + " NM109", "67", "Identification Code", DataType.AN, 2, 80);
     }
 
     /** The N3/N4 address pair a member-address loop writes. */
