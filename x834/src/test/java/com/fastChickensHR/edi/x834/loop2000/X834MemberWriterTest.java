@@ -15,6 +15,10 @@ import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import com.fastChickensHR.edi.x834.data.CoordinationOfBenefitsCode;
 import com.fastChickensHR.edi.x834.data.PayerResponsibilitySequenceCode;
+import com.fastChickensHR.edi.x834.data.ActionCode;
+import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
+import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
@@ -462,6 +466,125 @@ class X834MemberWriterTest {
         ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
 
         assertTrue(ex.getMessage().contains("at most 3"), ex.getMessage());
+    }
+
+    @Test
+    void emitsTheProviderLoopAsLxThenNm1() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addProvider(new Provider("WELBY", IdentificationCodeQualifier.CMS_NPI, "1234567893"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("LX*1~"), () -> "expected the 2310 LX; got:\n" + out);
+        assertTrue(out.contains("NM1*1P*1*WELBY*****XX*1234567893~"),
+                () -> "expected the provider NM1; got:\n" + out);
+        assertTrue(out.indexOf("LX*1~") < out.indexOf("NM1*1P"),
+                () -> "LX opens the loop, before the NM1; got:\n" + out);
+    }
+
+    @Test
+    void emitsThePlaOnlyWhenTheAssignmentIsChanging() throws ValidationException {
+        // A provider merely stated (no change action) gets LX + NM1 and no PLA.
+        Member member = baseSubscriber();
+        member.addProvider(new Provider("WELBY"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("NM1*1P*1*WELBY~"), () -> "expected the provider NM1; got:\n" + out);
+        assertFalse(out.contains("PLA"), () -> "no PLA without a change action; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheAnthemPcpChangeBlock() throws ValidationException {
+        Member member = baseSubscriber();
+        Provider pcp = new Provider("WELBY", IdentificationCodeQualifier.CMS_NPI, "1234567893");
+        pcp.setChangeAction(ActionCode.CHANGE);
+        pcp.setChangeDate(LocalDateTime.of(2026, 1, 1, 0, 0));
+        pcp.setChangeReason(MaintenanceReasonCode.TERMINATION_OF_BENEFITS);
+        member.addProvider(pcp);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("PLA*2*1P*20260101**07~"),
+                () -> "expected Anthem's PLA*2*1P*<date>**<reason>; got:\n" + out);
+        assertTrue(out.indexOf("NM1*1P") < out.indexOf("PLA*2"),
+                () -> "the PLA closes the loop, after the NM1; got:\n" + out);
+    }
+
+    @Test
+    void numbersEachProviderLoopFromOne() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addProvider(new Provider("WELBY"));
+        member.addProvider(new Provider("KILDARE"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("LX*1~") < out.indexOf("NM1*1P*1*WELBY~"),
+                () -> "first provider is LX*1; got:\n" + out);
+        assertTrue(out.indexOf("NM1*1P*1*WELBY~") < out.indexOf("LX*2~"),
+                () -> "the second LX opens its own loop; got:\n" + out);
+        assertTrue(out.indexOf("LX*2~") < out.indexOf("NM1*1P*1*KILDARE~"),
+                () -> "second provider follows LX*2; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheProviderLoopAfterTheCoverageSegmentsAndBeforeTheCobBlock() throws ValidationException {
+        // 834 loop order: 2300 (HD) → 2310 (provider) → 2320 (COB) → 2700.
+        Member member = baseSubscriber();
+        member.addSegment(new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("1L")
+                .setReferenceIdentification("PLAN9")
+                .build());
+        member.addProvider(new Provider("WELBY"));
+        member.addCoordinationOfBenefits(new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.PRIMARY,
+                CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS));
+        member.addReportingCategory(new ReportingCategory("CLASS", "0042"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("REF*1L*PLAN9") < out.indexOf("LX*1~"),
+                () -> "the 2310 loop must follow the 2300 segments; got:\n" + out);
+        assertTrue(out.indexOf("LX*1~") < out.indexOf("COB*P"),
+                () -> "the 2310 loop must precede the 2320 block; got:\n" + out);
+        assertTrue(out.indexOf("COB*P") < out.indexOf("LS*2700"),
+                () -> "the 2320 block must still precede the 2700 block; got:\n" + out);
+    }
+
+    @Test
+    void omitsTheProviderLoopWhenTheMemberHasNoProvider() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("LX*"), () -> "no 2310 loop without a provider; got:\n" + out);
+        assertFalse(out.contains("PLA"), () -> "and no PLA; got:\n" + out);
+    }
+
+    @Test
+    void rejectsAProviderChangeMissingItsEffectiveDate() throws ValidationException {
+        // PLA03 is mandatory; "this provider changed, at no particular time" is not applicable.
+        Member member = baseSubscriber();
+        Provider pcp = new Provider("WELBY");
+        pcp.setChangeAction(ActionCode.CHANGE);
+        member.addProvider(pcp);
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(ex.getMessage().contains("PLA03"), ex.getMessage());
+    }
+
+    @Test
+    void rejectsMoreProvidersThanThe834Permits() throws ValidationException {
+        Member member = baseSubscriber();
+        for (int i = 0; i < X834MemberWriter.MAX_PROVIDERS + 1; i++) {
+            member.addProvider(new Provider("DOC" + i));
+        }
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(ex.getMessage().contains("at most 30"), ex.getMessage());
     }
 
     @Test
