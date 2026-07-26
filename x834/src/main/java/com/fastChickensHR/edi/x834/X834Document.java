@@ -9,6 +9,9 @@ package com.fastChickensHR.edi.x834;
 
 import com.fastChickensHR.edi.x834.GenerationError.Phase;
 import com.fastChickensHR.edi.x834.segments.Segment;
+import com.fastChickensHR.edi.x834.spec.CharacterClass;
+import com.fastChickensHR.edi.x834.spec.ElementSpec;
+import com.fastChickensHR.edi.x834.spec.X834Spec;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Represents an EDI 834 document for benefit enrollment and maintenance.
@@ -118,6 +122,11 @@ public class X834Document {
         // from what is emitted (#160). Each offending value is collected as its own error.
         errors.addAll(delimiterViolations(allSegments));
 
+        // Backstop the same segment list against what the standard says about each position it fills:
+        // the interchange's character set, the element's length bounds, and — where the position is
+        // coded — membership of its code list (#188).
+        errors.addAll(specViolations(allSegments));
+
         if (!errors.isEmpty()) {
             return new GenerationResult.Failure(errors);
         }
@@ -180,6 +189,79 @@ public class X834Document {
             }
         }
         return violations;
+    }
+
+    /**
+     * Collects a {@link GenerationError} for every element value that contradicts what
+     * {@link X834Spec} publishes about the position it is being written into.
+     * <p>
+     * Three checks, all driven from the published {@link ElementSpec} rather than hand-written per
+     * segment, so a position is enforced because the standard describes it and not because its builder
+     * happened to take an enum:
+     * <ul>
+     *   <li><strong>Character set</strong> — every value must draw from the interchange's
+     *       {@link X834Context#getCharacterClass() character set}. Applies to every value, including the
+     *       positions this library publishes no spec for, since the set is the partner's agreement about
+     *       the whole interchange.</li>
+     *   <li><strong>Length</strong> — the element's own bounds. A value that has been padded to width
+     *       (the fixed-width ISA elements) satisfies them by construction; one that overruns is reported
+     *       rather than silently truncated at render.</li>
+     *   <li><strong>Code membership</strong> — for a coded position, strictly, via
+     *       {@link ElementSpec#permits}. This is the only enforcement the raw-string positions
+     *       (DMG03, HD03, HD05, NM101) have ever had.</li>
+     * </ul>
+     * <p>
+     * This is a backstop, not a front line: a caller that pre-checks its data per member and holds the
+     * bad record never reaches here. What it guarantees is that a non-conformant 834 is never emitted
+     * silently — the last possible moment to notice, which is exactly where a guarantee belongs.
+     * <p>
+     * A position the library publishes no spec for is character-set checked and otherwise skipped; see
+     * {@link X834Spec} for what is unpublished and why.
+     *
+     * @param segments the full ordered segment list about to be rendered
+     * @return one {@link GenerationError} per offending element value, empty if every value conforms
+     */
+    private List<GenerationError> specViolations(List<Segment> segments) {
+        CharacterClass characterClass = context.getCharacterClass();
+        List<GenerationError> violations = new ArrayList<>();
+        for (Segment segment : segments) {
+            String[] values = segment.getElementValues();
+            if (values == null) {
+                continue;
+            }
+            for (int i = 0; i < values.length; i++) {
+                String value = values[i];
+                if (value == null || value.isEmpty()) {
+                    continue;
+                }
+                int ordinal = i + 1;
+                characterClass.firstViolation(value).ifPresent(position -> violations.add(error(segment, ordinal, value,
+                        "contains '%c' at position %d, which the %s character set does not permit"
+                                .formatted(value.charAt(position), position, characterClass))));
+
+                Optional<ElementSpec> published = X834Spec.atSegment(segment.getSegmentIdentifier(), ordinal);
+                if (published.isEmpty()) {
+                    continue;
+                }
+                ElementSpec spec = published.get();
+                if (value.length() < spec.minLength() || value.length() > spec.maxLength()) {
+                    violations.add(error(segment, ordinal, value,
+                            "is %d characters, outside element %s's %d/%d"
+                                    .formatted(value.length(), spec.elementId(), spec.minLength(), spec.maxLength())));
+                }
+                if (spec.isCoded() && !spec.permits(List.of(value)).ok()) {
+                    violations.add(error(segment, ordinal, value,
+                            "is not a code element %s permits".formatted(spec.elementId())));
+                }
+            }
+        }
+        return violations;
+    }
+
+    /** One violation, located by segment and element the way the delimiter pass locates its own. */
+    private static GenerationError error(Segment segment, int ordinal, String value, String problem) {
+        return new GenerationError(Phase.RENDER, segment.getSegmentIdentifier(),
+                "element %02d (\"%s\") %s".formatted(ordinal, value, problem));
     }
 
     /**

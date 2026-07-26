@@ -227,6 +227,88 @@ class X834SpecTest {
     }
 
     @Test
+    void everySegmentOrdinalMeansTheSameThingInEveryLoopThatPublishesIt() {
+        // A renderer sees a segment and an element index, never a loop. That is only safe while the
+        // loops agree about each ordinal — so assert it for the whole table rather than assuming it.
+        Map<String, List<ElementSpec>> byPositionWithinSegment = new LinkedHashMap<>();
+        for (ElementSpec spec : X834Spec.all()) {
+            ElementPosition position = spec.position();
+            String key = position.segment() + position.ordinal() + "-" + position.component();
+            byPositionWithinSegment.computeIfAbsent(key, k -> new ArrayList<>()).add(spec);
+        }
+
+        for (Map.Entry<String, List<ElementSpec>> entry : byPositionWithinSegment.entrySet()) {
+            List<ElementSpec> specs = entry.getValue();
+            ElementSpec first = specs.getFirst();
+            for (ElementSpec other : specs) {
+                assertEquals(first.elementId(), other.elementId(), entry.getKey() + " disagrees on element number");
+                assertEquals(first.type(), other.type(), entry.getKey() + " disagrees on type");
+                assertEquals(first.minLength(), other.minLength(), entry.getKey() + " disagrees on min length");
+                assertEquals(first.maxLength(), other.maxLength(), entry.getKey() + " disagrees on max length");
+                assertEquals(first.codes(), other.codes(), entry.getKey() + " disagrees on codes");
+            }
+        }
+    }
+
+    @Test
+    void everyOrdinalIsAnswerableWithoutALoopUnlessItsComponentsDisagree() {
+        Map<Integer, List<ElementSpec>> byOrdinal = new LinkedHashMap<>();
+        for (ElementSpec spec : X834Spec.all()) {
+            byOrdinal.computeIfAbsent(spec.position().ordinal(), k -> new ArrayList<>()).add(spec);
+        }
+
+        for (ElementSpec spec : X834Spec.all()) {
+            String segment = spec.position().segment();
+            int ordinal = spec.position().ordinal();
+            long distinctComponents = byOrdinal.get(ordinal).stream()
+                    .filter(candidate -> candidate.position().segment().equals(segment))
+                    .map(candidate -> candidate.position().component())
+                    .distinct()
+                    .count();
+            Optional<ElementSpec> answer = X834Spec.atSegment(segment, ordinal);
+            if (distinctComponents == 1) {
+                assertTrue(answer.isPresent(), segment + ordinal + " should be answerable without a loop");
+            } else {
+                assertTrue(answer.isEmpty(),
+                        segment + ordinal + " publishes several components, so one flat slot cannot be resolved");
+            }
+        }
+    }
+
+    @Test
+    void atSegmentRefusesAFlatSlotThatCouldHoldSeveralComponents() {
+        // DMG05 is the C056 composite and publishes three components, so a renderer holding only the
+        // flat DMG05 value gets no answer rather than the wrong one. INS06 publishes one, so it does.
+        assertTrue(X834Spec.atSegment("DMG", 5).isEmpty());
+        assertTrue(X834Spec.at("2100A DMG05-1").isPresent(), "the components are still published individually");
+    }
+
+    @Test
+    void atSegmentAnswersForASegmentSharedAcrossLoops() {
+        // N4 is published in 2100A and 2100C; a renderer holding only "N4" element 02 still gets an answer.
+        ElementSpec state = X834Spec.atSegment("N4", 2).orElseThrow();
+
+        assertEquals("156", state.elementId());
+        assertEquals(DataType.ID, state.type());
+    }
+
+    @Test
+    void atSegmentAnswersAComposteSlotWithItsFirstComponent() {
+        // The INS renders C052 into one flat slot, and the 834 uses only its first component.
+        ElementSpec medicarePlan = X834Spec.atSegment("INS", 6).orElseThrow();
+
+        assertEquals("1218", medicarePlan.elementId());
+        assertEquals(1, medicarePlan.position().component());
+    }
+
+    @Test
+    void atSegmentIsEmptyForAnythingUnpublished() {
+        assertTrue(X834Spec.atSegment("AMT", 1).isEmpty(), "a segment nothing emits");
+        assertTrue(X834Spec.atSegment("HD", 2).isEmpty(), "a position Not Used in the 220A1");
+        assertTrue(X834Spec.atSegment("INS", 99).isEmpty(), "an ordinal past the segment");
+    }
+
+    @Test
     void theTableIsImmutable() {
         assertThrows(UnsupportedOperationException.class, () -> X834Spec.all().clear());
         assertThrows(UnsupportedOperationException.class,

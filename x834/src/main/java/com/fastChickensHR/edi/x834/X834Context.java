@@ -8,6 +8,7 @@
 package com.fastChickensHR.edi.x834;
 
 import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.spec.CharacterClass;
 import com.fastChickensHR.edi.x834.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.dates.TimeFormat;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
@@ -60,6 +61,13 @@ public class X834Context {
     private LocalDateTime documentDate;
     private DateFormat dateFormat;
     private TimeFormat timeFormat;
+    /**
+     * The character set this interchange's data may draw from — a property of the interchange, not of
+     * any element, since it is what the receiving partner agreed to accept. Defaults to
+     * {@link CharacterClass#EXTENDED}, the wider of X12's two named sets: narrowing it to
+     * {@link CharacterClass#BASIC} rejects lower case and {@code @}, which some partners require.
+     */
+    private CharacterClass characterClass;
 
     // Constants
     /** Interchange control version (ISA12) for the 5010 release: {@code "00501"}. */
@@ -84,6 +92,7 @@ public class X834Context {
         this.subElementSeparator = SubElementSeparator.GREATER_THAN;
         this.lineTerminator = LineTerminator.LF;
         this.transactionSetControlNumber = "0001";
+        this.characterClass = CharacterClass.EXTENDED;
     }
 
     /**
