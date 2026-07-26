@@ -15,6 +15,7 @@ import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
+import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import lombok.Getter;
@@ -206,6 +207,32 @@ public abstract class BaseMember {
      */
     public void addCommunication(CommunicationNumberQualifier qualifier, String number) {
         addCommunication(new MemberCommunication(qualifier, number));
+    }
+
+    /**
+     * The other plans this member also holds (Loop 2320/2330). Emitted by {@link X834MemberWriter}
+     * after the member's 2300 coverage segments, one {@code COB}(/{@code REF}/{@code DTP}/2330
+     * {@code NM1}) block per entry. Empty for a member with no other coverage, in which case
+     * nothing is emitted.
+     *
+     * @see #addCoordinationOfBenefits(CoordinationOfBenefits)
+     */
+    private final List<CoordinationOfBenefits> coordinationOfBenefits = new ArrayList<>();
+
+    /**
+     * Adds another plan this member holds (Loop 2320).
+     * <p>
+     * Order is preserved. The 834 permits at most
+     * {@value com.fastChickensHR.edi.x834.loop2000.X834MemberWriter#MAX_COORDINATION_OF_BENEFITS}
+     * occurrences per member; a member carrying more is rejected when written, not silently
+     * truncated.
+     *
+     * @param cob the other coverage to emit (ignored if null)
+     */
+    public void addCoordinationOfBenefits(CoordinationOfBenefits cob) {
+        if (cob != null) {
+            coordinationOfBenefits.add(cob);
+        }
     }
 
     /**

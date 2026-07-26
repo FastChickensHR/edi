@@ -18,6 +18,7 @@ import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
+import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
@@ -29,6 +30,9 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddre
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingAddress;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
+import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
+import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefitsRelatedEntityName;
+import com.fastChickensHR.edi.x834.loop2000.loop2320.MemberCoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.MemberReportingCategoryName;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 
@@ -138,6 +142,9 @@ public class X834MemberWriter {
         // dependent's loop begins.
         segments.addAll(member.getAdditionalSegments());
 
+        // Loop 2320/2330 (coordination of benefits), emitted after the 2300 block and before 2700.
+        appendCoordinationOfBenefits(segments, member);
+
         // Loop 2700/2710/2750 (member reporting categories), emitted after the 2300 block.
         appendReportingCategories(segments, member);
     }
@@ -178,6 +185,65 @@ public class X834MemberWriter {
 
     /** LS01/LE01 loop identifier for the Member Reporting Categories loop (2700). */
     private static final String REPORTING_CATEGORY_LOOP_ID = "2700";
+
+    /** The most Loop 2320 occurrences the 834 permits per member. */
+    public static final int MAX_COORDINATION_OF_BENEFITS = 5;
+
+    /**
+     * Loop 2320/2330 (coordination of benefits): per other plan the member holds, a {@code COB}
+     * followed by its optional group-number {@code REF}, its coordination {@code DTP*344}/
+     * {@code DTP*345} dates, and the 2330 {@code NM1} naming that plan. Emitted after the 2300
+     * coverage segments and before the 2700 block, and suppressed entirely when the member has no
+     * other coverage.
+     * <p>
+     * The 834 permits five occurrences. A member carrying more is rejected rather than truncated —
+     * dropping someone's other insurance would produce a file that reads as though they simply do
+     * not have it.
+     */
+    private void appendCoordinationOfBenefits(List<Segment> segments, BaseMember member)
+            throws ValidationException {
+        List<CoordinationOfBenefits> others = member.getCoordinationOfBenefits();
+        if (others.isEmpty()) {
+            return;
+        }
+        if (others.size() > MAX_COORDINATION_OF_BENEFITS) {
+            throw new ValidationException("A member carries at most " + MAX_COORDINATION_OF_BENEFITS
+                    + " coordination-of-benefits loops (2320); got " + others.size());
+        }
+        for (CoordinationOfBenefits other : others) {
+            segments.add(MemberCoordinationOfBenefits.builder()
+                    .setPayerResponsibility(other.getPayerResponsibility())
+                    .setReferenceIdentification(emptyToNull(other.getPolicyIdentifier()))
+                    .setCoordinationOfBenefitsCode(other.getBenefitsCoordination())
+                    .build());
+            if (!isBlank(other.getGroupNumber())) {
+                segments.add(new RefSegment.Builder()
+                        .setReferenceIdentificationQualifier(other.getGroupNumberQualifier())
+                        .setReferenceIdentification(other.getGroupNumber())
+                        .build());
+            }
+            addCobDateSegment(segments, DateTimeQualifier.COORDINATION_OF_BENEFITS_BEGIN, other.getBeginDate());
+            addCobDateSegment(segments, DateTimeQualifier.COORDINATION_OF_BENEFITS_END, other.getEndDate());
+            if (!isBlank(other.getRelatedEntityName())) {
+                segments.add(CoordinationOfBenefitsRelatedEntityName.builder()
+                        .setRelatedEntityName(other.getRelatedEntityName())
+                        .build());
+            }
+        }
+    }
+
+    /** A 2320 coordination date, emitted only when present. */
+    private void addCobDateSegment(List<Segment> segments, DateTimeQualifier qualifier, LocalDateTime date)
+            throws ValidationException {
+        if (date == null) {
+            return;
+        }
+        segments.add(new DTPSegment.Builder()
+                .setDateTimeQualifier(qualifier.getCode())
+                .setDateTimeFormat(DateFormat.D8)
+                .setDateTimePeriod(date, DateFormat.D8)
+                .build());
+    }
 
     /** Loop 2100A NM1 (member name). Emitted when a last name is present. */
     private void appendMemberName(List<Segment> segments, BaseMember member) throws ValidationException {

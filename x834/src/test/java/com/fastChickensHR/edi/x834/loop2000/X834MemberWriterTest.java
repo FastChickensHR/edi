@@ -13,7 +13,11 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.data.CoordinationOfBenefitsCode;
+import com.fastChickensHR.edi.x834.data.PayerResponsibilitySequenceCode;
+import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
+import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import org.junit.jupiter.api.Test;
 
@@ -458,6 +462,144 @@ class X834MemberWriterTest {
         ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
 
         assertTrue(ex.getMessage().contains("at most 3"), ex.getMessage());
+    }
+
+    @Test
+    void emitsTheCareFirstEveryRowCobStatement() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addCoordinationOfBenefits(new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.UNKNOWN,
+                CoordinationOfBenefitsCode.NO_COORDINATION_OF_BENEFITS));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("COB*U**6~"),
+                () -> "expected CareFirst's bare every-row COB; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheFullBcbsmMedicareCobBlockInLoopOrder() throws ValidationException {
+        // BCBSM's Medicare block: COB, then the group-number REF*6P, the 344/345 coordination
+        // dates, and the 2330 NM1 naming the other plan.
+        Member member = baseSubscriber();
+        CoordinationOfBenefits medicare = new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.SECONDARY,
+                CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS);
+        medicare.setPolicyIdentifier("1EG4TE5MK73");
+        medicare.setGroupNumber("GRP001");
+        medicare.setBeginDate(LocalDateTime.of(2026, 1, 1, 0, 0));
+        medicare.setEndDate(LocalDateTime.of(2026, 12, 31, 0, 0));
+        medicare.setRelatedEntityName("MEDICARE PART A");
+        member.addCoordinationOfBenefits(medicare);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("COB*S*1EG4TE5MK73*1~"), () -> "expected the COB; got:\n" + out);
+        assertTrue(out.contains("REF*6P*GRP001~"), () -> "expected the group-number REF*6P; got:\n" + out);
+        assertTrue(out.contains("DTP*344*D8*20260101~"), () -> "expected COB begin DTP*344; got:\n" + out);
+        assertTrue(out.contains("DTP*345*D8*20261231~"), () -> "expected COB end DTP*345; got:\n" + out);
+        assertTrue(out.contains("NM1*IN*2*MEDICARE PART A~"), () -> "expected the 2330 NM1; got:\n" + out);
+
+        assertTrue(out.indexOf("COB*S") < out.indexOf("REF*6P"), () -> "REF follows COB; got:\n" + out);
+        assertTrue(out.indexOf("REF*6P") < out.indexOf("DTP*344"), () -> "DTP follows REF; got:\n" + out);
+        assertTrue(out.indexOf("DTP*345") < out.indexOf("NM1*IN"), () -> "2330 NM1 closes the loop; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheCobBlockAfterTheCoverageSegmentsAndBeforeTheReportingCategories() throws ValidationException {
+        // 834 loop order: 2300 (HD) → 2320/2330 (COB) → 2700 (reporting categories).
+        Member member = baseSubscriber();
+        member.addSegment(new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("1L")
+                .setReferenceIdentification("PLAN9")
+                .build());
+        member.addCoordinationOfBenefits(new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.PRIMARY,
+                CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS));
+        member.addReportingCategory(new ReportingCategory("CLASS", "0042"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("REF*1L*PLAN9") < out.indexOf("COB*P"),
+                () -> "the 2320 block must follow the 2300 segments; got:\n" + out);
+        assertTrue(out.indexOf("COB*P") < out.indexOf("LS*2700"),
+                () -> "the 2320 block must precede the 2700 block; got:\n" + out);
+    }
+
+    @Test
+    void emitsOneBlockPerOtherPlanInOrder() throws ValidationException {
+        // BCBSM repeats the Medicare loop up to twice — Part A and Part B.
+        Member member = baseSubscriber();
+        CoordinationOfBenefits partA = new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.PRIMARY, CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS);
+        partA.setRelatedEntityName("MEDA");
+        CoordinationOfBenefits partB = new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.SECONDARY, CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS);
+        partB.setRelatedEntityName("MEDB");
+        member.addCoordinationOfBenefits(partA);
+        member.addCoordinationOfBenefits(partB);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("NM1*IN*2*MEDA~") < out.indexOf("NM1*IN*2*MEDB~"),
+                () -> "expected both loops, in the order added; got:\n" + out);
+        assertTrue(out.indexOf("COB*P") < out.indexOf("NM1*IN*2*MEDA~")
+                        && out.indexOf("NM1*IN*2*MEDA~") < out.indexOf("COB*S"),
+                () -> "each 2330 must stay inside its own 2320; got:\n" + out);
+    }
+
+    @Test
+    void omitsTheCobBlockWhenTheMemberHasNoOtherCoverage() throws ValidationException {
+        Member member = baseSubscriber();
+        member.setLastName("DOE");
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("COB"),
+                () -> "no 2320 block for a member with no other coverage; got:\n" + out);
+    }
+
+    @Test
+    void omitsTheOptionalCobPartsThatAreAbsent() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addCoordinationOfBenefits(new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.PRIMARY,
+                CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS));
+
+        String out = render(writer.toSegments(member));
+
+        assertFalse(out.contains("REF*6P"), () -> "no REF without a group number; got:\n" + out);
+        assertFalse(out.contains("DTP*344"), () -> "no DTP without a begin date; got:\n" + out);
+        assertFalse(out.contains("NM1*IN"), () -> "no 2330 without a related entity name; got:\n" + out);
+    }
+
+    @Test
+    void honorsACustomGroupNumberQualifier() throws ValidationException {
+        Member member = baseSubscriber();
+        CoordinationOfBenefits other = new CoordinationOfBenefits(
+                PayerResponsibilitySequenceCode.PRIMARY, CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS);
+        other.setGroupNumber("SUB77");
+        other.setGroupNumberQualifier("ZZ");
+        member.addCoordinationOfBenefits(other);
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("REF*ZZ*SUB77~"),
+                () -> "expected the caller's own REF qualifier; got:\n" + out);
+    }
+
+    @Test
+    void rejectsMoreOtherPlansThanThe834Permits() throws ValidationException {
+        Member member = baseSubscriber();
+        for (int i = 0; i < X834MemberWriter.MAX_COORDINATION_OF_BENEFITS + 1; i++) {
+            member.addCoordinationOfBenefits(new CoordinationOfBenefits(
+                    PayerResponsibilitySequenceCode.PRIMARY,
+                    CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS));
+        }
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(ex.getMessage().contains("at most 5"), ex.getMessage());
     }
 
     @Test
