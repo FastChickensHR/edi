@@ -7,10 +7,12 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
+import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import lombok.Getter;
@@ -57,19 +59,21 @@ public abstract class BaseMember {
     protected LocalDateTime coverageEndDate;
     protected IndividualRelationshipCode relationshipCode;
     /**
-     * The member's telephone number.
+     * The member's telephone number, emitted in the Loop 2100A {@code PER} under
+     * {@link CommunicationNumberQualifier#HOME_PHONE} — the qualifier carriers most often ask for
+     * (Anthem's worked examples send {@code PER*IP**HP*<phone>}).
      *
-     * <p><b>Not serialized.</b> A member's communications contact belongs in a Loop 2100A {@code PER}
-     * segment, and no {@code PER} class exists yet, so no writer emits this — a value set here does
-     * not reach the wire. Kept because the field is the natural home for it once {@code PER} support
-     * lands (FastChickensHR/edi#139).
+     * <p>A convenience for the common case. To send the number under a different qualifier — work,
+     * cellular, alternate — add a {@link MemberCommunication} instead; an explicit communication
+     * for a qualifier takes precedence over this field.
      */
     protected String phoneNumber;
     /**
-     * The member's email address.
+     * The member's email address, emitted in the Loop 2100A {@code PER} under
+     * {@link CommunicationNumberQualifier#ELECTRONIC_MAIL}.
      *
-     * <p><b>Not serialized.</b> See {@link #phoneNumber} — both await Loop 2100A {@code PER}
-     * (FastChickensHR/edi#139).
+     * <p>The same convenience as {@link #phoneNumber}, and overridden the same way by an explicit
+     * {@link MemberCommunication}.
      */
     protected String email;
 
@@ -152,6 +156,45 @@ public abstract class BaseMember {
      * Empty for a member that carries none, in which case no block is emitted.
      */
     private final List<ReportingCategory> reportingCategories = new ArrayList<>();
+
+    /**
+     * This member's communication numbers (Loop 2100A {@code PER}). Emitted by
+     * {@link X834MemberWriter} as a single {@code PER} carrying one qualifier/number pair per
+     * entry, after the member's {@code NM1}. Empty for a member that carries none, in which case
+     * no {@code PER} is emitted.
+     *
+     * @see #addCommunication(MemberCommunication)
+     */
+    private final List<MemberCommunication> communications = new ArrayList<>();
+
+    /**
+     * Adds a way to reach this member (Loop 2100A {@code PER}).
+     * <p>
+     * Order is preserved and determines which element pair each occupies — the first added
+     * becomes PER03/04, then PER05/06, then PER07/08. An explicit communication takes precedence
+     * over the {@link #phoneNumber}/{@link #email} conveniences when both name the same
+     * qualifier. The 834 permits at most
+     * {@value com.fastChickensHR.edi.x834.segments.PERSegment#MAX_COMMUNICATION_PAIRS} per
+     * member; a member carrying more is rejected when written, not silently truncated.
+     *
+     * @param communication the communication number to emit (ignored if null)
+     */
+    public void addCommunication(MemberCommunication communication) {
+        if (communication != null) {
+            communications.add(communication);
+        }
+    }
+
+    /**
+     * Adds a way to reach this member — convenience for
+     * {@link #addCommunication(MemberCommunication)}.
+     *
+     * @param qualifier what kind of number this is (PER03/05/07)
+     * @param number    the number itself (PER04/06/08)
+     */
+    public void addCommunication(CommunicationNumberQualifier qualifier, String number) {
+        addCommunication(new MemberCommunication(qualifier, number));
+    }
 
     /**
      * Adds a reporting category (one Loop 2710/2750 occurrence) to this member. Order is

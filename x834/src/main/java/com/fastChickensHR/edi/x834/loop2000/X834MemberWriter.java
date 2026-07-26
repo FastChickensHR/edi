@@ -17,8 +17,11 @@ import com.fastChickensHR.edi.x834.segments.LXSegment;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunicationsNumbers;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberName;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceCityStateZipCode;
@@ -111,10 +114,11 @@ public class X834MemberWriter {
         addDateSegment(segments, MemberDateQualifier.COVERAGE_BEGIN, member.getCoverageStartDate());
         addDateSegment(segments, MemberDateQualifier.COVERAGE_END, member.getCoverageEndDate());
 
-        // Loop 2100A (member detail): NM1 name, N3/N4 residence address, DMG demographics —
-        // in the order required by the 834 spec. Each is emitted only when its source data is
-        // present, so a member carrying only INS-level data renders exactly as before.
+        // Loop 2100A (member detail): NM1 name, PER communications, N3/N4 residence address,
+        // DMG demographics — in the order required by the 834 spec. Each is emitted only when its
+        // source data is present, so a member carrying only INS-level data renders exactly as before.
         appendMemberName(segments, member);
+        appendCommunications(segments, member);
         appendResidenceAddress(segments, member);
         appendDemographics(segments, member);
 
@@ -184,6 +188,56 @@ public class X834MemberWriter {
             name.setIdentificationCodeQualifier(idQualifier).setIdentificationCode(id);
         }
         segments.add(name.build());
+    }
+
+    /**
+     * Loop 2100A PER (member communications numbers): a single {@code PER*IP} carrying one
+     * qualifier/number pair per channel the member has, emitted after the {@code NM1}. Suppressed
+     * when the member has no way to be reached.
+     * <p>
+     * The member's explicit {@link MemberCommunication}s come first, in the order they were added.
+     * The {@code phoneNumber} and {@code email} conveniences then contribute {@code HP} and
+     * {@code EM} — but only when no explicit communication already claims that qualifier, so a
+     * member given both a {@code phoneNumber} and an explicit work number does not emit the same
+     * channel twice. Precedence is the explicit one's: it says which qualifier the caller meant.
+     * <p>
+     * A PER carries at most three pairs, and a member with more is rejected by the builder rather
+     * than truncated — losing a member's fourth contact number silently is the class of bug this
+     * whole segment exists to end.
+     */
+    private void appendCommunications(List<Segment> segments, BaseMember member) throws ValidationException {
+        List<MemberCommunication> channels = new ArrayList<>();
+        for (MemberCommunication communication : member.getCommunications()) {
+            if (communication != null && communication.getQualifier() != null
+                    && !isBlank(communication.getNumber())) {
+                channels.add(communication);
+            }
+        }
+        addConvenience(channels, CommunicationNumberQualifier.HOME_PHONE, member.getPhoneNumber());
+        addConvenience(channels, CommunicationNumberQualifier.ELECTRONIC_MAIL, member.getEmail());
+
+        if (channels.isEmpty()) {
+            return;
+        }
+        MemberCommunicationsNumbers.Builder per = MemberCommunicationsNumbers.builder();
+        for (MemberCommunication channel : channels) {
+            per.addCommunicationNumber(channel.getQualifier(), channel.getNumber());
+        }
+        segments.add(per.build());
+    }
+
+    /** Adds a {@code phoneNumber}/{@code email} convenience unless an explicit channel claims its qualifier. */
+    private static void addConvenience(List<MemberCommunication> channels,
+                                       CommunicationNumberQualifier qualifier, String number) {
+        if (isBlank(number)) {
+            return;
+        }
+        for (MemberCommunication channel : channels) {
+            if (channel.getQualifier() == qualifier) {
+                return;
+            }
+        }
+        channels.add(new MemberCommunication(qualifier, number));
     }
 
     /**
