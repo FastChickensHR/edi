@@ -169,6 +169,7 @@ public abstract class DTPSegment extends Segment {
         }
     }
 
+    /** Builds a plain {@link DTPSegment} — use a loop-specific subclass when one exists. */
     public static class Builder extends AbstractBuilder<Builder> {
         @Override
         protected Builder self() {

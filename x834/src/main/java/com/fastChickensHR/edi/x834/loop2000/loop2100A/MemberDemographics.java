@@ -24,6 +24,7 @@ public class MemberDemographics extends DMGSegment {
         super(builder);
     }
 
+    /** Builds the Loop 2100A member DMG; DMG01 (date format) and DMG02 (birth date) are required. */
     public static class Builder extends AbstractBuilder<Builder> {
 
         protected void validate() throws ValidationException {

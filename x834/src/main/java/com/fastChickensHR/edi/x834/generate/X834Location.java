@@ -8,10 +8,10 @@
 package com.fastChickensHR.edi.x834.generate;
 
 /**
- * The 834 dialect's {@code Location.location} vocabulary — the contract between the app (which builds
- * a {@link com.fastChickensHR.edi.core.FileContent}) and {@link X834FileGenerator} (which serializes it).
- * Each constant names <em>where</em> a resolved value goes; the generator maps it onto the library's
- * typed builders so the wire output is identical to the legacy converter path.
+ * The 834 dialect's {@code Location.name} vocabulary — the contract between the consuming application
+ * (which builds a {@link com.fastChickensHR.edi.core.FileContent}) and {@link X834FileGenerator} (which
+ * serializes it). Each constant names <em>where</em> a resolved value goes; the generator maps it onto
+ * the library's own typed builders, so the wire output is exactly what those builders emit.
  *
  * <p>File-level keys feed the envelope/header ({@code fileFields}); member-level keys feed each
  * subscriber/dependent Record. Custom REF extensions use the {@link #REF_EXTENSION_PREFIX} + qualifier

@@ -30,6 +30,7 @@ public class MemberName extends NM1Segment {
         return new Builder();
     }
 
+    /** Builds the Loop 2100A member NM1, defaulting NM102 to {@link MemberName#PERSON_ENTITY_TYPE}. */
     @Accessors(chain = true)
     public static class Builder extends NM1Segment.AbstractBuilder<MemberName.Builder> {
         public Builder() {

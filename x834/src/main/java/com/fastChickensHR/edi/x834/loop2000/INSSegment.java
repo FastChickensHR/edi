@@ -189,6 +189,7 @@ public abstract class INSSegment extends Segment {
         return getIns13();
     }
 
+    /** Builds the Loop 2000 {@link INSSegment} that opens each member's enrollment loop. */
     @Setter
     @Accessors(chain = true)
     public static class Builder {

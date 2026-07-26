@@ -29,6 +29,10 @@ public class MemberPolicyNumber extends RefSegment {
         return new MemberPolicyNumber.Builder();
     }
 
+    /**
+     * Builds the member policy-number REF, defaulting REF01 to
+     * {@link MemberPolicyNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
+     */
     @Accessors(chain = true)
     public static class Builder extends RefSegment.AbstractBuilder<MemberPolicyNumber.Builder> {
         public Builder() {

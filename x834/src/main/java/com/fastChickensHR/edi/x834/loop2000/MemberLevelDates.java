@@ -23,6 +23,7 @@ public class MemberLevelDates extends DTPSegment {
         super(builder);
     }
 
+    /** Builds a Loop 2000 member-level date DTP — the qualifier (DTP01) selects which date. */
     public static class Builder extends DTPSegment.AbstractBuilder<Builder> {
         public Builder(X834Context context) {
             super();

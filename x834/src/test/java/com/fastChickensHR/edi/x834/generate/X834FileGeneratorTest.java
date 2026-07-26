@@ -34,7 +34,7 @@ class X834FileGeneratorTest {
     private final X834FileGenerator generator = new X834FileGenerator();
 
     @Test
-    void emitsAWellFormed834FromAPlannedFile() {
+    void emitsAWellFormed834FromAFileContent() {
         List<Field> envelope = List.of(
                 file(X834Location.SENDER_ID, "SENDER123"),
                 file(X834Location.RECEIVER_ID, "RECV456"),

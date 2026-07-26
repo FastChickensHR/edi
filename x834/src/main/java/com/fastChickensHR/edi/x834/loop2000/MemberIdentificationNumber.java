@@ -29,6 +29,10 @@ public class MemberIdentificationNumber extends RefSegment {
         return new MemberIdentificationNumber.Builder();
     }
 
+    /**
+     * Builds the member-identification REF, defaulting REF01 to
+     * {@link MemberIdentificationNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
+     */
     @Accessors(chain = true)
     public static class Builder extends RefSegment.AbstractBuilder<MemberIdentificationNumber.Builder> {
         public Builder() {

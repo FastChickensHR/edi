@@ -47,10 +47,10 @@ import java.util.stream.Collectors;
 /**
  * The 834 implementation of the {@link FileGenerator} seam: serializes a format-neutral
  * {@link FileContent} into an X12 834 document. It holds no domain logic — every Value has already
- * been resolved upstream by the app's requirements engine. It only interprets each
+ * been resolved upstream by the consuming application. It only interprets each
  * {@link com.fastChickensHR.edi.core.Location} (via {@link X834Location}) onto the library's own typed
  * builders (`X834Context`, `Header`, `Member`, `HealthCoverage`, `RefSegment`), so the emitted bytes
- * match the legacy converter path by construction.
+ * are by construction what those builders produce.
  *
  * <p>Structure produced: the header/envelope (from file fields), then one {@link Member} per
  * Record (dependents attached as child members), then — after all members, in Record order — each
@@ -275,7 +275,7 @@ public final class X834FileGenerator implements FileGenerator {
                 .build());
     }
 
-    /** Index a Record's non-omitted fields by their location (a built-in position is unique). */
+    /** Index a Record's non-omitted fields by their location (a built-in location is unique). */
     private static Map<String, String> byLocation(List<Field> fields) {
         Map<String, String> map = new LinkedHashMap<>();
         for (Field field : fields) {

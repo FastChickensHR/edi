@@ -25,7 +25,7 @@ class DelimitedFileParserTest {
     private final DelimitedFileParser parser = new DelimitedFileParser();
 
     @Test
-    void parsesFlatCsvIntoRecordsOfColumnPlacements() {
+    void parsesFlatCsvIntoRecordsOfColumnFields() {
         String csv = "employeeId,firstName,lastName\nE1,Jane,Doe\nE2,John,\n";
 
         FileContent file = parser.parse(csv);
