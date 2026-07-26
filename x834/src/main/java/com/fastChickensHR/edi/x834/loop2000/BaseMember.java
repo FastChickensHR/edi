@@ -68,7 +68,21 @@ public abstract class BaseMember {
     protected LocalDateTime coverageStartDate;
     protected LocalDateTime coverageEndDate;
     protected IndividualRelationshipCode relationshipCode;
+    /**
+     * The member's telephone number.
+     *
+     * <p><b>Not serialized.</b> A member's communications contact belongs in a Loop 2100A {@code PER}
+     * segment, and no {@code PER} class exists yet, so no writer emits this — a value set here does
+     * not reach the wire. Kept because the field is the natural home for it once {@code PER} support
+     * lands (FastChickensHR/edi#139).
+     */
     protected String phoneNumber;
+    /**
+     * The member's email address.
+     *
+     * <p><b>Not serialized.</b> See {@link #phoneNumber} — both await Loop 2100A {@code PER}
+     * (FastChickensHR/edi#139).
+     */
     protected String email;
 
     /**
