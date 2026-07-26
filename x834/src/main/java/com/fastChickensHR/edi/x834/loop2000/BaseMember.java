@@ -14,6 +14,7 @@ import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
@@ -90,6 +91,13 @@ public abstract class BaseMember {
      * {@link MemberCommunication}.
      */
     protected String email;
+    /**
+     * What this member earns (Loop 2100A {@code ICM}). Emitted by {@link X834MemberWriter} after the
+     * member's {@code DMG}, and only when present — the 834 sends income only when the sponsor's
+     * contract with the payer requires it. A member has at most one, the 834 permitting a single
+     * {@code ICM}.
+     */
+    protected Income income;
 
     /**
      * All of this member's postal addresses, keyed by {@link AddressType}. A member may carry a

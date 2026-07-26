@@ -21,9 +21,11 @@ import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.data.DateTimeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.BenefitStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunicationsNumbers;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberIncome;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberName;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceCityStateZipCode;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberResidenceStreetAddress;
@@ -129,12 +131,13 @@ public class X834MemberWriter {
         addDateSegment(segments, MemberDateQualifier.COVERAGE_END, member.getCoverageEndDate());
 
         // Loop 2100A (member detail): NM1 name, PER communications, N3/N4 residence address,
-        // DMG demographics — in the order required by the 834 spec. Each is emitted only when its
-        // source data is present, so a member carrying only INS-level data renders exactly as before.
+        // DMG demographics, ICM income — in the order required by the 834 spec. Each is emitted only
+        // when its source data is present, so a member carrying only INS-level data renders as before.
         appendMemberName(segments, member);
         appendCommunications(segments, member);
         appendResidenceAddress(segments, member);
         appendDemographics(segments, member);
+        appendIncome(segments, member);
 
         // Loop 2100C (member mailing address), emitted after the 2100A block when the member
         // carries a distinct mailing address.
@@ -421,6 +424,31 @@ public class X834MemberWriter {
                     .setPostalCode(mailing.getZipCode())
                     .build());
         }
+    }
+
+    /**
+     * Loop 2100A ICM (member income), emitted after the DMG when the member carries one. The 834
+     * sends income only when the sponsor's contract with the payer requires it, so absence is the
+     * normal case.
+     * <p>
+     * ICM01 (frequency) and ICM02 (amount) are mandatory, so an income carrying only the later
+     * elements is rejected rather than emitted with empty mandatory slots. This is the case a
+     * carrier hits when it wants just the ICM04 location identifier — BCBS Kansas puts its
+     * department number there — and it is a property of the 834 rather than a rule invented here.
+     */
+    private void appendIncome(List<Segment> segments, BaseMember member) throws ValidationException {
+        Income income = member.getIncome();
+        if (income == null) {
+            return;
+        }
+        segments.add(MemberIncome.builder()
+                .setFrequencyCode(income.getFrequency())
+                .setMonetaryAmount(emptyToNull(income.getAmount()))
+                .setQuantity(emptyToNull(income.getHours()))
+                .setLocationIdentifier(emptyToNull(income.getLocationIdentifier()))
+                .setSalaryGrade(emptyToNull(income.getSalaryGrade()))
+                .setCurrencyCode(emptyToNull(income.getCurrencyCode()))
+                .build());
     }
 
     /** Loop 2100A DMG (member demographics). Emitted when a birth date is present. */
