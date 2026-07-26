@@ -18,7 +18,9 @@ import com.fastChickensHR.edi.x834.loop2000.AddressType;
 import com.fastChickensHR.edi.x834.loop2000.BaseMember;
 import com.fastChickensHR.edi.x834.loop2000.DependentMember;
 import com.fastChickensHR.edi.x834.loop2000.Member;
+import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
+import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
 import com.fastChickensHR.edi.x834.dates.DateFormat;
@@ -137,6 +139,8 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.MEMBER_INDICATOR, v -> member.setMemberIndicator(MemberIndicator.fromString(v)));
         apply(loc, X834Location.RELATIONSHIP_CODE, v -> member.setRelationshipCode(IndividualRelationshipCode.fromString(v)));
         apply(loc, X834Location.MAINTENANCE_TYPE_CODE, v -> member.setMaintenanceTypeCode(MaintenanceTypeCode.fromString(v)));
+        apply(loc, X834Location.MAINTENANCE_REASON_CODE, v -> member.setMaintenanceReasonCode(MaintenanceReasonCode.fromString(v)));
+        apply(loc, X834Location.EMPLOYMENT_STATUS_CODE, v -> member.setEmploymentStatusCode(EmploymentStatusCode.fromString(v)));
         apply(loc, X834Location.POLICY_NUMBER, member::setPolicyNumber);
         apply(loc, X834Location.MEMBER_ID, member::setMemberId);
         apply(loc, X834Location.MEMBER_ID_QUALIFIER, member::setMemberIdQualifier);

@@ -45,6 +45,18 @@ public final class X834Location {
     public static final String MEMBER_INDICATOR = "memberIndicator";       // INS01
     public static final String RELATIONSHIP_CODE = "relationshipCode";     // INS02
     public static final String MAINTENANCE_TYPE_CODE = "maintenanceTypeCode"; // INS03
+    /**
+     * INS04 — maintenance reason code (element 1203): why this maintenance is happening, e.g. {@code 07}
+     * (termination of benefits) or {@code XN} (notification only). The member-level home for a reason
+     * code; the 220A1's HD segment has no HD02 to put one in.
+     */
+    public static final String MAINTENANCE_REASON_CODE = "maintenanceReasonCode";
+    /**
+     * INS08 — employment status code (element 584), e.g. {@code AC} (active), {@code TE} (terminated),
+     * {@code RT} (retired). Element 584 is alphabetic; the numeric statuses some payroll systems carry
+     * are not element-584 codes.
+     */
+    public static final String EMPLOYMENT_STATUS_CODE = "employmentStatusCode";
     public static final String POLICY_NUMBER = "policyNumber";             // REF*1L
     public static final String MEMBER_ID = "memberId";                     // REF*<qual>
     public static final String MEMBER_ID_QUALIFIER = "memberIdQualifier";  // that REF's qualifier

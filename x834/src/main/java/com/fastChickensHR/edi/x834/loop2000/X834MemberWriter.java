@@ -72,13 +72,20 @@ public class X834MemberWriter {
     }
 
     private void appendMemberSegments(List<Segment> segments, BaseMember member) throws ValidationException {
-        INSSegment insSegment = new INSSegment.Builder()
+        INSSegment.Builder ins = new INSSegment.Builder()
                 .setMaintenanceTypeCode(member.getMaintenanceTypeCode().getCode())
                 .setIndividualRelationshipCode(member.getRelationshipCode().getCode())
                 .setBenefitStatusCode(BenefitStatusCode.ACTIVE.getCode())
-                .setMemberIndicator(member.getMemberIndicator().getCode())
-                .build();
-        segments.add(insSegment);
+                .setMemberIndicator(member.getMemberIndicator().getCode());
+        // INS04 and INS08 are optional; each renders only when the member carries one, so a member
+        // without them emits the same INS as before.
+        if (member.getMaintenanceReasonCode() != null) {
+            ins.setMaintenanceReasonCode(member.getMaintenanceReasonCode().getCode());
+        }
+        if (member.getEmploymentStatusCode() != null) {
+            ins.setEmploymentStatusCode(member.getEmploymentStatusCode().getCode());
+        }
+        segments.add(ins.build());
 
         String policyNumber = member.getPolicyNumber();
         if (policyNumber != null && !policyNumber.isEmpty()) {

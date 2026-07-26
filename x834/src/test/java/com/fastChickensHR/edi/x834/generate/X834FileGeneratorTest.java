@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * End-to-end goldens for the {@link X834FileGenerator} seam: each test plans a realistic
  * {@link FileContent} and asserts the <em>entire</em> emitted 834 against an on-disk golden. Whole-payload
@@ -191,6 +193,64 @@ class X834FileGeneratorTest {
 
         // The golden pins the full Loop 2100A member loop in order: INS -> NM1 -> N3 -> N4 -> DMG.
         TestFixtures.assertMatchesGolden("golden/member-full-demographics-address.834", out);
+    }
+
+    @Test
+    void emitsMaintenanceReasonAndEmploymentStatusOnTheINSSegment() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.MAINTENANCE_REASON_CODE, "07"),
+                emp(X834Location.EMPLOYMENT_STATUS_CODE, "TE"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "E12345"),
+                emp(X834Location.LAST_NAME, "DOE")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        // The maintenance reason lands on INS04 and the employment status on INS08 — the positions the
+        // 220A1 gives them. The golden pins both, including the empty INS06/INS07 slots between them.
+        TestFixtures.assertMatchesGolden("golden/member-ins-reason-and-employment-status.834", out);
+    }
+
+    @Test
+    void omitsMaintenanceReasonAndEmploymentStatusWhenTheMemberHasNeither() {
+        List<Field> envelope = List.of(
+                file(X834Location.SENDER_ID, "SENDER123"),
+                file(X834Location.RECEIVER_ID, "RECV456"),
+                file(X834Location.INTERCHANGE_CONTROL_NUMBER, "000000001"),
+                file(X834Location.GROUP_CONTROL_NUMBER, "1"),
+                file(X834Location.TRANSACTION_SET_CONTROL_NUMBER, "0001"),
+                file(X834Location.DOCUMENT_DATE, "2026-01-15"),
+                file(X834Location.REFERENCE_IDENTIFICATION, "REFID001"),
+                file(X834Location.MASTER_POLICY_NUMBER, "MP-100"),
+                file(X834Location.PLAN_SPONSOR_NAME, "ACME CORP"),
+                file(X834Location.PAYER_NAME, "BLUE CROSS"));
+
+        Record subscriber = Record.of(List.of(
+                emp(X834Location.MEMBER_INDICATOR, "Y"),
+                emp(X834Location.RELATIONSHIP_CODE, "18"),
+                emp(X834Location.MAINTENANCE_TYPE_CODE, "001"),
+                emp(X834Location.SUBSCRIBER_NUMBER, "E12345"),
+                emp(X834Location.LAST_NAME, "DOE")));
+
+        String out = generator.generate(new FileContent(Direction.OUTBOUND, envelope, List.of(subscriber)));
+
+        // The INS ends at INS05 as it always has: two new optional positions must not widen the segment
+        // for a member that carries neither.
+        assertTrue(out.contains("INS*Y*18*001**A~"), out);
     }
 
     @Test
