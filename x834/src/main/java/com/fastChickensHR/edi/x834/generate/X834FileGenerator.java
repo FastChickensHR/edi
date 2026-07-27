@@ -71,6 +71,15 @@ import java.util.stream.Collectors;
  * Record (dependents attached as child members), then — after all members, in Record order — each
  * Record's custom REF extensions followed by its HD coverage segment, then the trailer. Control
  * numbers, segment counts and SE/GE/IEA are generated internally by the library.
+ *
+ * <p><strong>Failure channel — this seam flattens.</strong> {@link FileGenerator#generate} returns a
+ * {@code String}, so there is nowhere to hand back a structured result: a
+ * {@link GenerationResult.Failure} becomes an unchecked {@link IllegalStateException} whose message
+ * concatenates every {@link GenerationError}, and a construction-phase {@link ValidationException}
+ * is wrapped into the same exception type. Every reason still arrives — but as prose in one message,
+ * with the errors' phase and location structure lost. A caller that wants the errors as data (to
+ * route, count, or display them individually) should drive {@link X834Document} directly and switch
+ * on its {@link GenerationResult}.
  */
 public final class X834FileGenerator implements FileGenerator {
 

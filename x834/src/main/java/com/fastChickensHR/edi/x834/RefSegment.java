@@ -107,7 +107,8 @@ public abstract class RefSegment extends Segment {
          * Builds and validates the REF segment.
          *
          * @return a new {@link RefSegment} instance
-         * @throws ValidationException if validation fails
+         * @throws ValidationException if the segment is mis-constructed — the construction-phase
+         * side of the failure contract; see {@link ValidationException}
          */
         public abstract RefSegment build() throws ValidationException;
 

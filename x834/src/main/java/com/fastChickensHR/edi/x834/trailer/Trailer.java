@@ -204,7 +204,8 @@ public class Trailer {
          * Builds the final Trailer object
          *
          * @return The configured Trailer
-         * @throws ValidationException If validation fails
+         * @throws ValidationException if the trailer is mis-constructed — the construction-phase
+         * side of the failure contract; see {@link ValidationException}
          */
         public Trailer build() throws ValidationException {
             return new Trailer(this);
