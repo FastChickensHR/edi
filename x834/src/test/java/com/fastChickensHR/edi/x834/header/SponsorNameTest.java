@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class SponsorNameTest {
                 .setN103("FI")
                 .setN104(sponsorIdentifier)
                 .build();
-        segment.setContext(context);
+        SegmentTestSupport.setContext(segment, context);
 
         assertEquals("N1", segment.getSegmentIdentifier(), "Expected segment identifier should be 'N1'");
         assertEquals("N1*P5*fake plan sponsor name*FI*FPO~", segment.render().trim(), "The segment is not formatted correctly.");
@@ -41,7 +42,7 @@ class SponsorNameTest {
         SponsorName segment = new SponsorName.Builder()
                 .setPlanSponsorName(planSponsorName)
                 .build();
-        segment.setContext(context);
+        SegmentTestSupport.setContext(segment, context);
 
         assertEquals("N1*P5*fake plan sponsor name~", segment.render().trim(),
                 "A name-only sponsor must not carry a dangling identification-code qualifier");

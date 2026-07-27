@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
@@ -25,7 +26,7 @@ public class FileEffectiveDateTest {
         FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
                 .setDateTimePeriod(localDateTime)
                 .build();
-        segment.setContext(context);
+        SegmentTestSupport.setContext(segment, context);
 
         assertEquals("DTP", segment.getSegmentIdentifier(), "Expected segment identifier should be 'DTP'");
         assertEquals("DTP*007*D8*20250313~", segment.render().trim(), "The segment is not formatted correctly.");

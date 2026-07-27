@@ -33,4 +33,13 @@ public enum TimeFormat {
         this.validationPattern = validationPattern;
     }
 
+    /**
+     * Renders the given date/time as a string encoded in this format.
+     *
+     * @param time the date/time to format
+     * @return the formatted value (e.g. {@code 1230} for {@link #TIME})
+     */
+    public String format(java.time.LocalDateTime time) {
+        return DateFormatter.formatTime(this, time);
+    }
 }

@@ -20,7 +20,7 @@ import java.util.List;
  * <p>
  * This is a pure domain object — it carries no knowledge of the X12 834
  * wire format. Translation to 834 segments is performed by
- * {@link X834MemberWriter}.
+ * {@code X834MemberWriter}.
  */
 @Getter
 @Setter
@@ -43,7 +43,7 @@ public class Member extends BaseMember {
     /**
      * Validates this member has the minimum required fields: the INS-segment trio
      * (member indicator, relationship code, maintenance type code) that
-     * {@link X834MemberWriter} dereferences unconditionally, plus each dependent's
+     * {@code X834MemberWriter} dereferences unconditionally, plus each dependent's
      * own validation.
      *
      * @throws ValidationException If validation fails

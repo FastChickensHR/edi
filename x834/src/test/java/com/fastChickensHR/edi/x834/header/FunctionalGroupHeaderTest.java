@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
 import com.fastChickensHR.edi.x834.data.ResponsibleAgencyCode;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
@@ -134,7 +135,7 @@ class FunctionalGroupHeaderTest {
     @Test
     void rendersGsSegmentFromContextDefaults() throws ValidationException {
         FunctionalGroupHeader header = new FunctionalGroupHeader.Builder(context).build();
-        header.setContext(context);
+        SegmentTestSupport.setContext(header, context);
 
         assertEquals("GS*BE*SENDER123*RECEIVER456*20231115*1230*123456789*X*005010X220A1~\n",
                 header.render());

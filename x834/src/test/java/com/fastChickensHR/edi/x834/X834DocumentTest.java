@@ -15,7 +15,6 @@ import com.fastChickensHR.edi.x834.loop2000.data.GenderCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
-import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
 import com.fastChickensHR.edi.x834.spec.CharacterClass;
 import com.fastChickensHR.edi.x834.testsupport.TestFixtures;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
