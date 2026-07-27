@@ -30,7 +30,9 @@ import java.util.Optional;
  * {@link GenerationResult.Failure} carrying <em>every</em> reason it could not be produced. There is
  * no separate {@code isValid()}/{@code getErrors()} accessor and no thrown exception: build-time
  * (structure/configuration) and render-time (serialization) problems all surface as
- * {@link GenerationError}s in the {@code Failure}.
+ * {@link GenerationError}s in the {@code Failure}. The only checked failure in the contract sits
+ * upstream of this boundary — a component builder that cannot construct its component throws
+ * {@link ValidationException} at its own {@code build()}; from the document inward, nothing throws.
  */
 public class X834Document {
     private final Header header;

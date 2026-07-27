@@ -17,6 +17,11 @@ import java.util.List;
  * problem, generation accumulates every problem it can (all build-time checks, every member's
  * assembly, every delimiter-unsafe value) into one {@link Failure}, so the source can be fixed in a
  * single round-trip instead of one failed generation at a time.
+ *
+ * <p>Its counterpart is the construction phase: an individual component builder that cannot produce
+ * its component at all fails earlier, at its own {@code build()}, with a checked
+ * {@link com.fastChickensHR.edi.x834.exception.ValidationException} — see that type for why the
+ * split exists. Everything after construction reports here.
  */
 public sealed interface GenerationResult {
 

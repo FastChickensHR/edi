@@ -8,9 +8,17 @@
 package com.fastChickensHR.edi.x834.exception;
 
 /**
- * Exception thrown when EDI document validation fails.
- * This exception is used to signal issues with segment content,
- * required fields, or cross-segment validation failures.
+ * The construction-phase half of the failure contract: thrown — checked, at the call site — by a
+ * component's {@code build()} or {@code validate()} when that one component is mis-constructed
+ * (a missing required element, an over-length value, a broken cross-element rule).
+ *
+ * <p>The split is deliberate. A construction failure is local to the component being built and is
+ * the caller's own coding or data error, so it surfaces immediately, as a checked exception, at the
+ * call that caused it. Document-level generation, by contrast, never throws for content problems:
+ * once components reach {@link com.fastChickensHR.edi.x834.X834Document}, every problem — build-time
+ * and render-time alike — accumulates into a
+ * {@link com.fastChickensHR.edi.x834.GenerationResult.Failure} so one
+ * {@code generateDocument()} call reports them all.
  */
 public class ValidationException extends Exception {
 
