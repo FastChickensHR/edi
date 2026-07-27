@@ -10,6 +10,7 @@ package com.fastChickensHR.edi.x834.loop2000;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
+import com.fastChickensHR.edi.x834.loop2000.data.GenderCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
@@ -60,7 +61,8 @@ public abstract class BaseMember {
      */
     protected String nameId;
     protected LocalDateTime birthDate;
-    protected String gender;
+    /** DMG03 — the member's gender, drawn from the element-1068 code list. */
+    protected GenderCode gender;
     protected MemberIndicator memberIndicator;
     protected MaintenanceTypeCode maintenanceTypeCode;
     /**
@@ -208,7 +210,7 @@ public abstract class BaseMember {
      * becomes PER03/04, then PER05/06, then PER07/08. An explicit communication takes precedence
      * over the {@link #phoneNumber}/{@link #email} conveniences when both name the same
      * qualifier. The 834 permits at most
-     * {@value com.fastChickensHR.edi.x834.segments.PERSegment#MAX_COMMUNICATION_PAIRS} per
+     * {@value com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication#MAX_PER_MEMBER} per
      * member; a member carrying more is rejected when written, not silently truncated.
      *
      * @param communication the communication number to emit (ignored if null)
@@ -306,7 +308,7 @@ public abstract class BaseMember {
      * <p>
      * Order is preserved, and the {@code LX} assigned number is counted over the emitted
      * occurrences. The 834 permits at most
-     * {@value com.fastChickensHR.edi.x834.loop2000.X834MemberWriter#MAX_PROVIDERS} per member; a
+     * {@value com.fastChickensHR.edi.x834.loop2000.loop2310.Provider#MAX_PER_MEMBER} per member; a
      * member carrying more is rejected when written, not silently truncated.
      *
      * @param provider the provider to emit (ignored if null)
@@ -331,7 +333,7 @@ public abstract class BaseMember {
      * Adds another plan this member holds (Loop 2320).
      * <p>
      * Order is preserved. The 834 permits at most
-     * {@value com.fastChickensHR.edi.x834.loop2000.X834MemberWriter#MAX_COORDINATION_OF_BENEFITS}
+     * {@value com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits#MAX_PER_MEMBER}
      * occurrences per member; a member carrying more is rejected when written, not silently
      * truncated.
      *

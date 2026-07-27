@@ -18,8 +18,7 @@ import lombok.Setter;
  * The {@link #qualifier} states what kind of number this is (home phone, email, cellular, …) and
  * {@link #number} is the number itself. A member may carry several; the writer emits them as the
  * PER03/04, PER05/06 and PER07/08 pairs of a single {@code PER} segment, which is why the 834
- * permits at most {@value com.fastChickensHR.edi.x834.segments.PERSegment#MAX_COMMUNICATION_PAIRS}
- * per member.
+ * permits at most {@value #MAX_PER_MEMBER} per member.
  * <p>
  * Which channels a carrier wants is a per-carrier choice rather than a fixed list — BCBSM
  * MembersEdge asks for email, home and work; its Medicare Advantage product for alternate,
@@ -30,6 +29,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemberCommunication {
+
+    /**
+     * The most communications the 834 permits per member — fixed by the single Loop 2100A
+     * {@code PER}'s three qualifier/number element pairs (PER03/04, PER05/06, PER07/08).
+     */
+    public static final int MAX_PER_MEMBER = 3;
+
     /** What kind of number this is (PER03/05/07) — required. */
     private CommunicationNumberQualifier qualifier;
     /** The number itself (PER04/06/08) — required. */

@@ -208,12 +208,6 @@ public class X834MemberWriter {
     /** LS01/LE01 loop identifier for the Member Reporting Categories loop (2700). */
     private static final String REPORTING_CATEGORY_LOOP_ID = "2700";
 
-    /** The most Loop 2320 occurrences the 834 permits per member. */
-    public static final int MAX_COORDINATION_OF_BENEFITS = 5;
-
-    /** The most Loop 2310 occurrences the 834 permits per member. */
-    public static final int MAX_PROVIDERS = 30;
-
     /**
      * Loop 2310 (provider): per provider the member is assigned to, an {@code LX} assigned number,
      * the {@code NM1} naming them, and — when the assignment is being changed rather than merely
@@ -232,8 +226,8 @@ public class X834MemberWriter {
         if (providers.isEmpty()) {
             return;
         }
-        if (providers.size() > MAX_PROVIDERS) {
-            throw new ValidationException("A member carries at most " + MAX_PROVIDERS
+        if (providers.size() > Provider.MAX_PER_MEMBER) {
+            throw new ValidationException("A member carries at most " + Provider.MAX_PER_MEMBER
                     + " provider loops (2310); got " + providers.size());
         }
         int assignedNumber = 1;
@@ -287,8 +281,8 @@ public class X834MemberWriter {
         if (others.isEmpty()) {
             return;
         }
-        if (others.size() > MAX_COORDINATION_OF_BENEFITS) {
-            throw new ValidationException("A member carries at most " + MAX_COORDINATION_OF_BENEFITS
+        if (others.size() > CoordinationOfBenefits.MAX_PER_MEMBER) {
+            throw new ValidationException("A member carries at most " + CoordinationOfBenefits.MAX_PER_MEMBER
                     + " coordination-of-benefits loops (2320); got " + others.size());
         }
         for (CoordinationOfBenefits other : others) {
@@ -549,7 +543,7 @@ public class X834MemberWriter {
         segments.add(new MemberDemographics.Builder()
                 .setDateTimePeriodFormatQualifier(DateFormat.D8.getFormat())
                 .setBirthDate(DateFormatter.formatDate(DateFormat.D8, member.getBirthDate()))
-                .setGenderCode(emptyToNull(member.getGender()))
+                .setGenderCode(member.getGender() == null ? null : member.getGender().getCode())
                 .build());
     }
 

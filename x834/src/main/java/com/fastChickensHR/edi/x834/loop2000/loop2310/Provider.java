@@ -35,6 +35,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Provider {
+
+    /** The most Loop 2310 occurrences the 834 permits per member. */
+    public static final int MAX_PER_MEMBER = 30;
+
     /** The provider's last or organization name (NM103) — required. */
     private String lastName;
     /** The provider's first name (NM104). */
