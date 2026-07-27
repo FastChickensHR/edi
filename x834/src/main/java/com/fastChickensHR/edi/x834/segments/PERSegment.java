@@ -9,6 +9,7 @@ package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import lombok.Getter;
 
 /**
@@ -44,9 +45,6 @@ public abstract class PERSegment extends Segment {
 
     /** Element 364 is AN 1/256 — a longer communication number cannot be represented. */
     public static final int MAX_COMMUNICATION_NUMBER_LENGTH = 256;
-
-    /** The most qualifier/number pairs one PER can carry (PER03/04, PER05/06, PER07/08). */
-    public static final int MAX_COMMUNICATION_PAIRS = 3;
 
     protected final String per01;
     protected final String per02;
@@ -160,12 +158,13 @@ public abstract class PERSegment extends Segment {
          * <p>
          * Callers state <em>which</em> channels a member has, not which element positions they
          * occupy, so the pairs fill in call order. A PER carries at most
-         * {@link #MAX_COMMUNICATION_PAIRS}; a fourth is rejected rather than dropped, because
-         * silently discarding a communication number is the data loss this segment exists to end.
+         * {@link MemberCommunication#MAX_PER_MEMBER} pairs; a fourth is rejected rather than
+         * dropped, because silently discarding a communication number is the data loss this
+         * segment exists to end.
          *
          * @param qualifier the communication number qualifier (PER03/05/07)
          * @param number    the communication number it qualifies (PER04/06/08)
-         * @throws ValidationException if the segment already carries {@link #MAX_COMMUNICATION_PAIRS}
+         * @throws ValidationException if the segment already carries {@link MemberCommunication#MAX_PER_MEMBER} pairs
          */
         public T addCommunicationNumber(CommunicationNumberQualifier qualifier, String number)
                 throws ValidationException {
@@ -180,7 +179,7 @@ public abstract class PERSegment extends Segment {
                 per08 = number;
             } else {
                 throw new ValidationException("A PER segment carries at most "
-                        + MAX_COMMUNICATION_PAIRS + " communication numbers");
+                        + MemberCommunication.MAX_PER_MEMBER + " communication numbers");
             }
             return self();
         }

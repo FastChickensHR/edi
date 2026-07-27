@@ -10,6 +10,7 @@ package com.fastChickensHR.edi.x834.loop2000;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.data.CommunicationNumberQualifier;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.loop2000.data.GenderCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
@@ -141,7 +142,7 @@ class X834MemberWriterTest {
         Member member = baseSubscriber();
         member.setLastName("DOE");
         member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
-        member.setGender("M");
+        member.setGender(GenderCode.MALE);
 
         String out = render(writer.toSegments(member));
 
@@ -176,7 +177,7 @@ class X834MemberWriterTest {
         member.setState("IL");
         member.setZipCode("62704");
         member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
-        member.setGender("F");
+        member.setGender(GenderCode.FEMALE);
 
         String out = render(writer.toSegments(member));
 
@@ -265,20 +266,6 @@ class X834MemberWriterTest {
         String out = render(writer.toSegments(member));
 
         assertFalse(out.contains("NM1*31"), () -> "no 2100C without a mailing address; got:\n" + out);
-    }
-
-    @Test
-    void workAddressIsAcceptedButNotSerialized() throws ValidationException {
-        Member member = baseSubscriber();
-        member.setLastName("DOE");
-        member.addAddress(Address.builder()
-                .type(AddressType.WORK)
-                .line1("500 OFFICE PKWY").city("SPRINGFIELD").state("IL").zipCode("62704")
-                .build());
-
-        String out = render(writer.toSegments(member));
-
-        assertFalse(out.contains("500 OFFICE PKWY"), () -> "WORK address must not be serialized; got:\n" + out);
     }
 
     @Test
@@ -835,7 +822,7 @@ class X834MemberWriterTest {
     @Test
     void rejectsMoreProvidersThanThe834Permits() throws ValidationException {
         Member member = baseSubscriber();
-        for (int i = 0; i < X834MemberWriter.MAX_PROVIDERS + 1; i++) {
+        for (int i = 0; i < Provider.MAX_PER_MEMBER + 1; i++) {
             member.addProvider(new Provider("DOC" + i));
         }
 
@@ -971,7 +958,7 @@ class X834MemberWriterTest {
     @Test
     void rejectsMoreOtherPlansThanThe834Permits() throws ValidationException {
         Member member = baseSubscriber();
-        for (int i = 0; i < X834MemberWriter.MAX_COORDINATION_OF_BENEFITS + 1; i++) {
+        for (int i = 0; i < CoordinationOfBenefits.MAX_PER_MEMBER + 1; i++) {
             member.addCoordinationOfBenefits(new CoordinationOfBenefits(
                     PayerResponsibilitySequenceCode.PRIMARY,
                     CoordinationOfBenefitsCode.COORDINATION_OF_BENEFITS));

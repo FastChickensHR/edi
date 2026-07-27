@@ -27,6 +27,7 @@ import com.fastChickensHR.edi.x834.data.FrequencyCode;
 import com.fastChickensHR.edi.x834.data.HealthRelatedCode;
 import com.fastChickensHR.edi.x834.data.IdentificationCodeQualifier;
 import com.fastChickensHR.edi.x834.loop2000.data.EmploymentStatusCode;
+import com.fastChickensHR.edi.x834.loop2000.data.GenderCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
@@ -172,7 +173,7 @@ public final class X834FileGenerator implements FileGenerator {
         apply(loc, X834Location.NAME_ID_QUALIFIER, member::setNameIdQualifier);
         apply(loc, X834Location.NAME_ID, member::setNameId);
         apply(loc, X834Location.BIRTH_DATE, v -> member.setBirthDate(parseDateTime(v)));
-        apply(loc, X834Location.GENDER, member::setGender);
+        apply(loc, X834Location.GENDER, v -> member.setGender(GenderCode.fromString(v)));
         apply(loc, X834Location.ADDRESS_LINE_1, member::setAddressLine1);
         apply(loc, X834Location.ADDRESS_LINE_2, member::setAddressLine2);
         apply(loc, X834Location.CITY, member::setCity);

@@ -8,11 +8,14 @@
 package com.fastChickensHR.edi.x834;
 
 import com.fastChickensHR.edi.x834.GenerationError.Phase;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
+import com.fastChickensHR.edi.x834.loop2000.data.GenderCode;
 import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
+import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberDemographics;
 import com.fastChickensHR.edi.x834.spec.CharacterClass;
 import com.fastChickensHR.edi.x834.testsupport.TestFixtures;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
@@ -241,13 +244,16 @@ class X834DocumentTest {
     }
 
     @Test
-    void rejectsACodeTheElementDoesNotPermit() {
-        // DMG03 takes a raw string all the way to the wire: before the spec ring, nothing anywhere
-        // checked that a gender was an element-1068 code.
+    void rejectsACodeTheElementDoesNotPermit() throws ValidationException {
+        // The domain model's typed gender cannot carry a bad code, but a custom segment still
+        // takes raw strings to the wire; the spec ring is what checks element-1068 codes there.
         Member member = buildMinimalMember();
         member.setLastName("DOE");
-        member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
-        member.setGender("Q");
+        member.addSegment(new MemberDemographics.Builder()
+                .setDateTimePeriodFormatQualifier("D8")
+                .setBirthDate("19800115")
+                .setGenderCode("Q")
+                .build());
         X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
@@ -264,7 +270,7 @@ class X834DocumentTest {
         Member member = buildMinimalMember();
         member.setLastName("DOE");
         member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
-        member.setGender("F");
+        member.setGender(GenderCode.FEMALE);
         X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeader())
                 .withTrailer(new Trailer.Builder(context))
@@ -275,13 +281,17 @@ class X834DocumentTest {
     }
 
     @Test
-    void aggregatesSpecViolationsWithEachOtherAndWithDelimiterViolations() {
+    void aggregatesSpecViolationsWithEachOtherAndWithDelimiterViolations() throws ValidationException {
         // One channel, one pass: a caller fixing its data should see every problem at once rather
         // than one failed generation at a time.
         Member member = buildMinimalMember();
         member.setLastName("D".repeat(61));
         member.setBirthDate(LocalDateTime.of(1980, 1, 15, 0, 0));
-        member.setGender("Q");
+        member.addSegment(new MemberDemographics.Builder()
+                .setDateTimePeriodFormatQualifier("D8")
+                .setBirthDate("19800115")
+                .setGenderCode("Q")
+                .build());
         X834Document doc = new X834Document.Builder(context)
                 .withHeader(buildHeaderWithSponsor("ACME*CORP"))
                 .withTrailer(new Trailer.Builder(context))

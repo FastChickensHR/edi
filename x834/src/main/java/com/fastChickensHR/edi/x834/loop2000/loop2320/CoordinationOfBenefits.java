@@ -36,6 +36,9 @@ import java.time.LocalDateTime;
 @Setter
 public class CoordinationOfBenefits {
 
+    /** The most Loop 2320 occurrences the 834 permits per member. */
+    public static final int MAX_PER_MEMBER = 5;
+
     /** REF01 qualifier {@code 6P} — Group Number; the default for the 2320 group-number REF. */
     public static final String DEFAULT_GROUP_NUMBER_QUALIFIER = "6P";
 
