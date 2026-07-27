@@ -38,6 +38,7 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingCityStateZipC
 import com.fastChickensHR.edi.x834.loop2000.loop2100C.MemberMailingStreetAddress;
 import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
 import com.fastChickensHR.edi.x834.loop2000.loop2200.MemberDisability;
+import com.fastChickensHR.edi.x834.loop2000.loop2300.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.ProviderChange;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.ProviderName;
@@ -154,10 +155,11 @@ public class X834MemberWriter {
         // Loop 2200 (disability), emitted after the 2100 loops and before the 2300 block.
         appendDisabilities(segments, member);
 
-        // Loop 2300: this member's own trailing segments (health coverage HD, REF extensions).
-        // Emitting them here keeps a member's coverage nested inside its own loop, before any
-        // dependent's loop begins.
+        // This member's own trailing segments (custom REF extensions), then its Loop 2300
+        // coverage blocks. Emitting them here keeps a member's coverage nested inside its own
+        // loop, before any dependent's loop begins.
         segments.addAll(member.getAdditionalSegments());
+        appendHealthCoverages(segments, member);
 
         // Loop 2310 (provider), emitted after the 2300 block and before 2320.
         appendProviders(segments, member);
@@ -504,6 +506,24 @@ public class X834MemberWriter {
      * is. The guide itself is wrong on this point, reading "DTP01 … Start / DTP02 … End" when DTP02
      * is the date-format qualifier; two dates are two DTP segments, which is what this emits.
      */
+    /**
+     * Loop 2300 (health coverage): per coverage, an {@code HD} followed by its benefit-period
+     * {@code DTP*348}/{@code DTP*349} dates. Emitted after the member's trailing segments and
+     * before the 2310 block, and suppressed when the member has none. HD01 and HD03 are required
+     * by the segment, so a coverage missing either fails generation.
+     */
+    private void appendHealthCoverages(List<Segment> segments, BaseMember member) throws ValidationException {
+        for (HealthCoverage coverage : member.getHealthCoverages()) {
+            segments.add(new HealthCoverageSegment(
+                    coverage.getMaintenanceTypeCode(),
+                    coverage.getInsuranceLineCode(),
+                    emptyToNull(coverage.getPlanCoverageDescription()),
+                    emptyToNull(coverage.getCoverageLevelCode())));
+            addQualifiedDate(segments, DateTimeQualifier.BENEFIT_BEGIN, coverage.getStartDate());
+            addQualifiedDate(segments, DateTimeQualifier.BENEFIT_END, coverage.getEndDate());
+        }
+    }
+
     private void appendDisabilities(List<Segment> segments, BaseMember member) throws ValidationException {
         for (Disability disability : member.getDisabilities()) {
             segments.add(MemberDisability.builder()

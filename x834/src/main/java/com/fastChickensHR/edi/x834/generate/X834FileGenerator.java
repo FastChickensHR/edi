@@ -31,8 +31,6 @@ import com.fastChickensHR.edi.x834.loop2000.data.IndividualRelationshipCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceReasonCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MaintenanceTypeCode;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberIndicator;
-import com.fastChickensHR.edi.x834.dates.DateFormat;
-import com.fastChickensHR.edi.x834.loop2000.data.HealthCoverageDateQualifier;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
@@ -41,8 +39,7 @@ import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
-import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverage;
-import com.fastChickensHR.edi.x834.loop2000.loop3000.HealthCoverageDates;
+import com.fastChickensHR.edi.x834.loop2000.loop2300.HealthCoverage;
 import com.fastChickensHR.edi.x834.segments.RefSegment;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
@@ -89,13 +86,14 @@ public final class X834FileGenerator implements FileGenerator {
 
             for (Record record : file.records()) {
                 Member member = buildMember(record);
-                // This Record's REF extensions then its HD (Loop 2300) attach to the member, so
-                // they are emitted inside that member's own loop rather than after every member.
+                // This Record's REF extensions then its HD (Loop 2300) coverages attach to the
+                // member, so they are emitted inside that member's own loop rather than after
+                // every member.
                 for (Segment ref : refExtensions(record.fields())) {
                     member.addSegment(ref);
                 }
-                for (Segment coverage : healthCoverage(record.fields())) {
-                    member.addSegment(coverage);
+                for (HealthCoverage coverage : healthCoverage(record.fields())) {
+                    member.addHealthCoverage(coverage);
                 }
                 document.addMember(member);
             }
@@ -415,37 +413,32 @@ public final class X834FileGenerator implements FileGenerator {
     }
 
     /**
-     * The Record's HD (Loop 2300) coverage segments — one HD loop per coverage group, in ascending
-     * index order. A member can carry multiple coverages: fields addressed with the indexed form
-     * {@link X834Location#hd(int, String)} ({@code "hd.<i>.<suffix>"}) are grouped by {@code <i>}, each
-     * group emitting its own HD segment + begin/end DTPs. Un-indexed {@code "hd.<suffix>"} fields form a
-     * single implicit group (the legacy single-coverage shape), so existing callers are byte-identical.
+     * The Record's HD (Loop 2300) coverages — one per coverage group, in ascending index order.
+     * A member can carry multiple coverages: fields addressed with the indexed form
+     * {@link X834Location#hd(int, String)} ({@code "hd.<i>.<suffix>"}) are grouped by {@code <i>},
+     * each group becoming its own {@link HealthCoverage} (rendered as an HD segment + begin/end
+     * DTPs by the member writer). Un-indexed {@code "hd.<suffix>"} fields form a single implicit
+     * group (the legacy single-coverage shape), so existing callers are byte-identical.
      */
-    private List<Segment> healthCoverage(List<Field> fields) throws ValidationException {
-        List<Segment> segments = new java.util.ArrayList<>();
+    private List<HealthCoverage> healthCoverage(List<Field> fields) {
+        List<HealthCoverage> coverages = new java.util.ArrayList<>();
         for (Map<String, String> group : hdGroupsByIndex(fields).values()) {
-            segments.addAll(oneHealthCoverage(group));
+            coverages.add(oneHealthCoverage(group));
         }
-        return segments;
+        return coverages;
     }
 
-    /** Emit one HD (Loop 2300) segment for a single coverage group, followed by its begin/end DTPs. */
-    private List<Segment> oneHealthCoverage(Map<String, String> loc) throws ValidationException {
-        HealthCoverage.Builder hd = HealthCoverage.builder();
+    /** Read one coverage group into a {@link HealthCoverage} value object. */
+    private HealthCoverage oneHealthCoverage(Map<String, String> loc) {
+        HealthCoverage coverage = new HealthCoverage();
         // The 220A1 HD segment carries only HD01/HD03/HD04/HD05. HD02 and HD06+ are Not Used —
-        // employment status, in particular, belongs on INS08, never HD (see HDSegment javadoc).
-        apply(loc, X834Location.HD_MAINTENANCE_TYPE_CODE, hd::setMaintenanceTypeCode);
-        apply(loc, X834Location.HD_INSURANCE_LINE_CODE, hd::setInsuranceLineCode);
-        apply(loc, X834Location.HD_PLAN_COVERAGE_DESCRIPTION, hd::setPlanCoverageDescription);
-        apply(loc, X834Location.HD_COVERAGE_LEVEL_CODE, hd::setCoverageLevelCode);
-
-        // Loop 2300: the HD segment, followed by its coverage-date DTP segments (begin/end).
-        List<Segment> coverage = new java.util.ArrayList<>();
-        coverage.add(hd.build());
-        coverageDate(loc, X834Location.HD_BENEFIT_BEGIN_DATE, HealthCoverageDateQualifier.EFFECTIVE_DATE)
-                .ifPresent(coverage::add);
-        coverageDate(loc, X834Location.HD_BENEFIT_END_DATE, HealthCoverageDateQualifier.EXPIRATION_DATE)
-                .ifPresent(coverage::add);
+        // employment status, in particular, belongs on INS08, never HD.
+        apply(loc, X834Location.HD_MAINTENANCE_TYPE_CODE, coverage::setMaintenanceTypeCode);
+        apply(loc, X834Location.HD_INSURANCE_LINE_CODE, coverage::setInsuranceLineCode);
+        apply(loc, X834Location.HD_PLAN_COVERAGE_DESCRIPTION, coverage::setPlanCoverageDescription);
+        apply(loc, X834Location.HD_COVERAGE_LEVEL_CODE, coverage::setCoverageLevelCode);
+        apply(loc, X834Location.HD_BENEFIT_BEGIN_DATE, v -> coverage.setStartDate(parseDateTime(v)));
+        apply(loc, X834Location.HD_BENEFIT_END_DATE, v -> coverage.setEndDate(parseDateTime(v)));
         return coverage;
     }
 
@@ -476,20 +469,6 @@ public final class X834FileGenerator implements FileGenerator {
                     .put(X834Location.HD_PREFIX + suffix, field.value());
         }
         return groups;
-    }
-
-    /** Build a Loop 2300 coverage-date DTP (D8) for {@code key} when present, using {@code qualifier}. */
-    private static Optional<Segment> coverageDate(Map<String, String> loc, String key,
-                                                  HealthCoverageDateQualifier qualifier) throws ValidationException {
-        String value = loc.get(key);
-        if (value == null || value.isBlank()) {
-            return Optional.empty();
-        }
-        return Optional.of(HealthCoverageDates.builder()
-                .setDateTimeQualifier(qualifier.getCode())
-                .setDateTimeFormat(DateFormat.D8)
-                .setDateTimePeriod(parseDateTime(value))
-                .build());
     }
 
     /** Index a Record's non-omitted fields by their location (a built-in location is unique). */
