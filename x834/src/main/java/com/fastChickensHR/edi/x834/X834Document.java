@@ -8,14 +8,12 @@
 package com.fastChickensHR.edi.x834;
 
 import com.fastChickensHR.edi.x834.GenerationError.Phase;
-import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.spec.CharacterClass;
 import com.fastChickensHR.edi.x834.spec.ElementSpec;
 import com.fastChickensHR.edi.x834.spec.X834Spec;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.header.Header;
 import com.fastChickensHR.edi.x834.loop2000.Member;
-import com.fastChickensHR.edi.x834.loop2000.X834MemberWriter;
 import com.fastChickensHR.edi.x834.trailer.Trailer;
 
 import java.util.ArrayList;

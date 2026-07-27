@@ -8,7 +8,6 @@
 package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.segments.STSegment;
 import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 

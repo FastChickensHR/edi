@@ -16,7 +16,7 @@ import lombok.Setter;
  * Cannot have dependents of its own.
  * <p>
  * Pure domain object; X12 834 serialization is handled by
- * {@link X834MemberWriter}.
+ * {@code X834MemberWriter}.
  */
 @Setter
 @Getter

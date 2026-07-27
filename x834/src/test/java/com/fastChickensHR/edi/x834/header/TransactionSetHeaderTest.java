@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ public class TransactionSetHeaderTest {
                 .setSt02("0001")
                 .setSt03("005010X220A1")
                 .build();
-        segment.setContext(context);
+        SegmentTestSupport.setContext(segment, context);
 
         assertEquals("ST", segment.getSegmentIdentifier(), "Expected segment identifier should be 'ST'");
         assertEquals("ST*834*0001*005010X220A1~", segment.render().trim(), "The segment is not formatted correctly.");

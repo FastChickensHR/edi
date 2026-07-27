@@ -7,7 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
-import com.fastChickensHR.edi.x834.segments.Segment;
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
+import com.fastChickensHR.edi.x834.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +78,7 @@ class TrailerTest {
 
         StringBuilder rendered = new StringBuilder();
         for (Segment segment : trailer.generateSegments()) {
-            segment.setContext(context);
+            SegmentTestSupport.setContext(segment, context);
             rendered.append(segment.render());
         }
 

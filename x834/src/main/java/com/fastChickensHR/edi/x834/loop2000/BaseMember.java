@@ -24,7 +24,7 @@ import com.fastChickensHR.edi.x834.loop2000.loop2300.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
-import com.fastChickensHR.edi.x834.segments.Segment;
+import com.fastChickensHR.edi.x834.Segment;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * This is a plain data object describing a person. It is intentionally
  * decoupled from any specific EDI transaction format; serialization to
  * the X12 834 wire format is the responsibility of a dedicated writer
- * (see {@link X834MemberWriter}).
+ * (see {@code X834MemberWriter}).
  */
 @Getter
 @Setter
@@ -98,7 +98,7 @@ public abstract class BaseMember {
      */
     protected String email;
     /**
-     * What this member earns (Loop 2100A {@code ICM}). Emitted by {@link X834MemberWriter} after the
+     * What this member earns (Loop 2100A {@code ICM}). Emitted by {@code X834MemberWriter} after the
      * member's {@code DMG}, and only when present — the 834 sends income only when the sponsor's
      * contract with the payer requires it. A member has at most one, the 834 permitting a single
      * {@code ICM}.
@@ -106,7 +106,7 @@ public abstract class BaseMember {
     protected Income income;
     /**
      * This member's health-related status (Loop 2100A {@code HLH}) — tobacco and substance use, plus
-     * height and weight. Emitted by {@link X834MemberWriter} after the {@code ICM}, and only when
+     * height and weight. Emitted by {@code X834MemberWriter} after the {@code ICM}, and only when
      * present. A member has at most one, the 834 permitting a single {@code HLH}.
      */
     protected HealthInformation healthInformation;
@@ -167,7 +167,7 @@ public abstract class BaseMember {
 
     /**
      * Trailing segments that belong to <em>this</em> member — notably custom REF extensions.
-     * They are emitted by {@link X834MemberWriter} at the end of this member's own segment
+     * They are emitted by {@code X834MemberWriter} at the end of this member's own segment
      * stream (just before the {@link #addHealthCoverage(HealthCoverage) 2300 coverage block}),
      * so they stay nested inside the member's own loop rather than being batched after every
      * member.
@@ -187,7 +187,7 @@ public abstract class BaseMember {
 
     /**
      * This member's reporting categories (Loop 2700/2710/2750). Emitted by
-     * {@link X834MemberWriter} as an {@code LS*2700} … {@code LE*2700} block after the
+     * {@code X834MemberWriter} as an {@code LS*2700} … {@code LE*2700} block after the
      * member's 2300 segments, one {@code LX}/{@code N1*75}/{@code REF} occurrence per entry.
      * Empty for a member that carries none, in which case no block is emitted.
      */
@@ -195,7 +195,7 @@ public abstract class BaseMember {
 
     /**
      * This member's communication numbers (Loop 2100A {@code PER}). Emitted by
-     * {@link X834MemberWriter} as a single {@code PER} carrying one qualifier/number pair per
+     * {@code X834MemberWriter} as a single {@code PER} carrying one qualifier/number pair per
      * entry, after the member's {@code NM1}. Empty for a member that carries none, in which case
      * no {@code PER} is emitted.
      *
@@ -233,7 +233,7 @@ public abstract class BaseMember {
     }
 
     /**
-     * The languages this member uses (Loop 2100A {@code LUI}). Emitted by {@link X834MemberWriter}
+     * The languages this member uses (Loop 2100A {@code LUI}). Emitted by {@code X834MemberWriter}
      * after the {@code HLH}, one {@code LUI} per entry, in the order added. Empty for a member with
      * none, in which case nothing is emitted.
      *
@@ -253,7 +253,7 @@ public abstract class BaseMember {
     }
 
     /**
-     * The disabilities this member has (Loop 2200). Emitted by {@link X834MemberWriter} after the
+     * The disabilities this member has (Loop 2200). Emitted by {@code X834MemberWriter} after the
      * 2100 loops and before the 2300 coverage segments, one {@code DSB}(/{@code DTP}) block per
      * entry. Empty for a member with none, in which case nothing is emitted.
      *
@@ -273,7 +273,7 @@ public abstract class BaseMember {
     }
 
     /**
-     * The health coverages this member carries (Loop 2300). Emitted by {@link X834MemberWriter}
+     * The health coverages this member carries (Loop 2300). Emitted by {@code X834MemberWriter}
      * after the member's trailing segments ({@link #addSegment(Segment)}) and before the 2310
      * block, one {@code HD}(/{@code DTP*348}/{@code DTP*349}) block per entry. Empty for a member
      * with none, in which case nothing is emitted.
@@ -295,7 +295,7 @@ public abstract class BaseMember {
 
     /**
      * The providers this member is assigned to (Loop 2310) — typically a primary care physician.
-     * Emitted by {@link X834MemberWriter} after the member's 2300 coverage segments and before the
+     * Emitted by {@code X834MemberWriter} after the member's 2300 coverage segments and before the
      * 2320 block, one {@code LX}/{@code NM1}(/{@code PLA}) occurrence per entry. Empty for a member
      * with no provider assignment, in which case nothing is emitted.
      *
@@ -320,7 +320,7 @@ public abstract class BaseMember {
     }
 
     /**
-     * The other plans this member also holds (Loop 2320/2330). Emitted by {@link X834MemberWriter}
+     * The other plans this member also holds (Loop 2320/2330). Emitted by {@code X834MemberWriter}
      * after the member's 2300 coverage segments, one {@code COB}(/{@code REF}/{@code DTP}/2330
      * {@code NM1}) block per entry. Empty for a member with no other coverage, in which case
      * nothing is emitted.

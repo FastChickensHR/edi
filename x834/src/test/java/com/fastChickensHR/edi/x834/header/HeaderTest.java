@@ -7,7 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.segments.Segment;
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
+import com.fastChickensHR.edi.x834.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
@@ -89,7 +90,7 @@ class HeaderTest {
 
         StringBuilder rendered = new StringBuilder();
         for (Segment segment : header.generateSegments()) {
-            segment.setContext(context);
+            SegmentTestSupport.setContext(segment, context);
             rendered.append(segment.render());
         }
 

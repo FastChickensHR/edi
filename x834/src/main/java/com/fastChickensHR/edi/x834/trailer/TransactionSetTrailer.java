@@ -7,7 +7,6 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
-import com.fastChickensHR.edi.x834.segments.SESegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 import lombok.Setter;

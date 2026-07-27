@@ -11,9 +11,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Utility class for handling EDI date and time formats.
+ * Utility class for handling EDI date and time formats. Internal: consumers format
+ * through {@link DateFormat#format} and {@link TimeFormat#format}.
  */
-public class DateFormatter {
+final class DateFormatter {
+    private DateFormatter() {
+    }
+
     /**
      * Format a date in the specified EDI format.
      *
@@ -21,7 +25,7 @@ public class DateFormatter {
      * @param date   The date to format
      * @return A string formatted according to the specified format
      */
-    public static String formatDate(DateFormat format, LocalDateTime date) {
+    static String formatDate(DateFormat format, LocalDateTime date) {
         switch (format) {
             case D8:
                 return date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -118,7 +122,7 @@ public class DateFormatter {
      * @param time   The date to format
      * @return A string formatted according to the specified format
      */
-    public static String formatTime(TimeFormat format, LocalDateTime time) {
+    static String formatTime(TimeFormat format, LocalDateTime time) {
         switch (format) {
             case TIME:
                 return time.format(DateTimeFormatter.ofPattern("HHmm"));

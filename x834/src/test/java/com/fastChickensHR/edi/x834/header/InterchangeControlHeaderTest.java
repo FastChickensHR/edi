@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.data.InterchangeUsageIndicator;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
@@ -80,7 +81,7 @@ class InterchangeControlHeaderTest {
         InterchangeControlHeader header = new InterchangeControlHeader.Builder(context)
                 .setInterchangeControlNumber("000000001")
                 .build();
-        header.setContext(context);
+        SegmentTestSupport.setContext(header, context);
 
         assertEquals(
                 "ISA*00*          *00*          *30*SENDER123      *ZZ*RECEIVER456    *230630*0000*^*00501*000000001*0*T*:~\n",

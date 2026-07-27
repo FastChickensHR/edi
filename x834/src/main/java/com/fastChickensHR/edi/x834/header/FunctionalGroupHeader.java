@@ -11,7 +11,6 @@ import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
 import com.fastChickensHR.edi.x834.data.ResponsibleAgencyCode;
 import com.fastChickensHR.edi.x834.data.VersionCode;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.segments.GSSegment;
 import com.fastChickensHR.edi.x834.X834Context;
 import lombok.Getter;
 

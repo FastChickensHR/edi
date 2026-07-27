@@ -7,6 +7,7 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
 import org.junit.jupiter.api.Test;
@@ -121,7 +122,7 @@ class BeginningSegmentTest {
                 .setBgn08("A1")
                 .setBgn09("ZZ")
                 .build();
-        segment.setContext(context);
+        SegmentTestSupport.setContext(segment, context);
 
         String rendered = segment.render().trim();
         assertEquals("BGN*01*REF123*20230101*1200*ET*ORIG123*T1*A1*ZZ~", rendered);

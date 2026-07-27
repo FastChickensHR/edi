@@ -7,8 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.X834Context;
-import com.fastChickensHR.edi.x834.segments.IEASegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,7 @@ class InterchangeControlTrailerTest {
                 .setNumberOfIncludedGroups("7")
                 .setInterchangeControlNumber("000054321")
                 .build();
-        trailer.setContext(new X834Context());
+        SegmentTestSupport.setContext(trailer, new X834Context());
 
         assertEquals("IEA*7*000054321~\n", trailer.render());
     }

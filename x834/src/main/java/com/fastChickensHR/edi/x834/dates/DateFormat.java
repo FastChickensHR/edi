@@ -231,4 +231,14 @@ public enum DateFormat {
         this.format = format;
         this.validationPattern = validationPattern;
     }
+
+    /**
+     * Renders the given date/time as a string encoded in this format.
+     *
+     * @param date the date/time to format
+     * @return the formatted value (e.g. {@code 20231115} for {@link #D8})
+     */
+    public String format(java.time.LocalDateTime date) {
+        return DateFormatter.formatDate(this, date);
+    }
 }

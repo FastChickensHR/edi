@@ -7,7 +7,6 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.segments.N1Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.experimental.Accessors;
 

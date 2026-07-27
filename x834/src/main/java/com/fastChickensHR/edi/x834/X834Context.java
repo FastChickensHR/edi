@@ -9,7 +9,6 @@ package com.fastChickensHR.edi.x834;
 
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.spec.CharacterClass;
-import com.fastChickensHR.edi.x834.dates.DateFormatter;
 import com.fastChickensHR.edi.x834.dates.TimeFormat;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.LineTerminator;
@@ -187,7 +186,7 @@ public class X834Context {
      * @return Formatted date string
      */
     public String formatDate(LocalDateTime date) {
-        return DateFormatter.formatDate(getDateFormat(), date);
+        return getDateFormat().format(date);
     }
 
     /**
@@ -197,6 +196,6 @@ public class X834Context {
      * @return Formatted time string
      */
     public String formatTime(LocalDateTime time) {
-        return DateFormatter.formatTime(getTimeFormat(), time);
+        return getTimeFormat().format(time);
     }
 }
