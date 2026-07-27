@@ -37,32 +37,20 @@ public class Trailer {
     private Trailer(Builder builder) throws ValidationException {
         this.context = builder.context;
 
-        // Build the Transaction Set Trailer
-        TransactionSetTrailer.Builder tsBuilder = builder.customTransactionSetBuilder;
-        if (tsBuilder == null) {
-            tsBuilder = TransactionSetTrailer.builder()
-                    .setSetControlNumber(builder.transactionSetControlNumber)
-                    .setTransactionSegmentCount(builder.numberOfIncludedSegments);
-        }
-        this.transactionSetTrailer = tsBuilder.build();
+        this.transactionSetTrailer = TransactionSetTrailer.builder()
+                .setSetControlNumber(builder.transactionSetControlNumber)
+                .setTransactionSegmentCount(builder.numberOfIncludedSegments)
+                .build();
 
-        // Build the Functional Group Trailer
-        FunctionalGroupTrailer.Builder fgBuilder = builder.customFunctionalGroupBuilder;
-        if (fgBuilder == null) {
-            fgBuilder = FunctionalGroupTrailer.builder()
-                    .setNumberOfTransactionSets(builder.numberOfTransactionSetsIncluded)
-                    .setGroupControlNumber(builder.groupControlNumber);
-        }
-        this.functionalGroupTrailer = fgBuilder.build();
+        this.functionalGroupTrailer = FunctionalGroupTrailer.builder()
+                .setNumberOfTransactionSets(builder.numberOfTransactionSetsIncluded)
+                .setGroupControlNumber(builder.groupControlNumber)
+                .build();
 
-        // Build the Interchange Control Trailer
-        InterchangeControlTrailer.Builder icBuilder = builder.customInterchangeControlBuilder;
-        if (icBuilder == null) {
-            icBuilder = InterchangeControlTrailer.builder()
-                    .setNumberOfIncludedGroups(builder.numberOfIncludedFunctionalGroups)
-                    .setInterchangeControlNumber(builder.interchangeControlNumber);
-        }
-        this.interchangeControlTrailer = icBuilder.build();
+        this.interchangeControlTrailer = InterchangeControlTrailer.builder()
+                .setNumberOfIncludedGroups(builder.numberOfIncludedFunctionalGroups)
+                .setInterchangeControlNumber(builder.interchangeControlNumber)
+                .build();
     }
 
     /**
@@ -122,11 +110,6 @@ public class Trailer {
         private String groupControlNumber;
         private String numberOfIncludedFunctionalGroups = InterchangeControlTrailer.DEFAULT_NUMBER_OF_INCLUDED_GROUPS;
         private String interchangeControlNumber;
-
-        // Custom builders for advanced configuration
-        private TransactionSetTrailer.Builder customTransactionSetBuilder;
-        private FunctionalGroupTrailer.Builder customFunctionalGroupBuilder;
-        private InterchangeControlTrailer.Builder customInterchangeControlBuilder;
 
         /**
          * Creates a new Builder with the specified context. Control numbers (SE02, GE02, IEA02)
@@ -214,39 +197,6 @@ public class Trailer {
          */
         public Builder setInterchangeControlNumber(String interchangeControlNumber) {
             this.interchangeControlNumber = interchangeControlNumber;
-            return this;
-        }
-
-        /**
-         * Sets a custom TransactionSetTrailer builder for advanced configuration.
-         *
-         * @param builder A custom transaction set trailer builder
-         * @return This builder instance
-         */
-        public Builder withTransactionSetTrailer(TransactionSetTrailer.Builder builder) {
-            this.customTransactionSetBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Sets a custom FunctionalGroupTrailer builder for advanced configuration.
-         *
-         * @param builder A custom functional group trailer builder
-         * @return This builder instance
-         */
-        public Builder withFunctionalGroupTrailer(FunctionalGroupTrailer.Builder builder) {
-            this.customFunctionalGroupBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Sets a custom InterchangeControlTrailer builder for advanced configuration.
-         *
-         * @param builder A custom interchange control trailer builder
-         * @return This builder instance
-         */
-        public Builder withInterchangeControlTrailer(InterchangeControlTrailer.Builder builder) {
-            this.customInterchangeControlBuilder = builder;
             return this;
         }
 

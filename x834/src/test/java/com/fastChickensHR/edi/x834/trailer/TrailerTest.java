@@ -125,30 +125,6 @@ class TrailerTest {
     }
 
     @Test
-    void testCustomBuilders() throws ValidationException {
-        // Test using custom builders for the component trailers
-        TransactionSetTrailer.Builder transBuilder = new TransactionSetTrailer.Builder();
-        transBuilder.setSetControlNumber("9999");
-
-        FunctionalGroupTrailer.Builder functionalBuilder = new FunctionalGroupTrailer.Builder();
-        functionalBuilder.setGroupControlNumber("8888");
-
-        InterchangeControlTrailer.Builder interchangeBuilder = new InterchangeControlTrailer.Builder();
-        interchangeBuilder.setNumberOfIncludedGroups("1");
-        interchangeBuilder.setInterchangeControlNumber("7777777");
-
-        Trailer trailer = new Trailer.Builder(context)
-                .withTransactionSetTrailer(transBuilder)
-                .withFunctionalGroupTrailer(functionalBuilder)
-                .withInterchangeControlTrailer(interchangeBuilder)
-                .build();
-
-        assertEquals("9999", trailer.getTransactionSetTrailer().getSetControlNumber());
-        assertEquals("8888", trailer.getFunctionalGroupTrailer().getGroupControlNumber());
-        assertEquals("7777777", trailer.getInterchangeControlTrailer().getInterchangeControlNumber());
-    }
-
-    @Test
     void testDefaultValues() throws ValidationException {
         // Test default values
         Trailer trailer = new Trailer.Builder(context).build();

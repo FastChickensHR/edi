@@ -125,21 +125,6 @@ class HeaderTest {
     }
 
     @Test
-    void testBuilderWithCustomBuilders() throws ValidationException {
-        InterchangeControlHeader.Builder interchangeBuilder = new InterchangeControlHeader.Builder(context);
-        FunctionalGroupHeader.Builder functionalBuilder = new FunctionalGroupHeader.Builder(context);
-
-        Header.Builder builder = new Header.Builder(context)
-                .setInterchangeControlHeaderBuilder(interchangeBuilder)
-                .setFunctionalGroupHeaderBuilder(functionalBuilder);
-
-        Header header = builder.build();
-
-        assertEquals(interchangeBuilder, header.getCustomInterchangeBuilder());
-        assertEquals(functionalBuilder, header.getCustomFunctionalBuilder());
-    }
-
-    @Test
     void testBuilderDefaultValues() throws ValidationException {
         Header header = new Header.Builder(context).build();
 

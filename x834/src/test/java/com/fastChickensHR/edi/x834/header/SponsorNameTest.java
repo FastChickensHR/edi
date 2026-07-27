@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.loop1000A;
+package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;

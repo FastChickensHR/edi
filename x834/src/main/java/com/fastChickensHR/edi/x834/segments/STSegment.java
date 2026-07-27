@@ -9,7 +9,6 @@ package com.fastChickensHR.edi.x834.segments;
 
 import com.fastChickensHR.edi.x834.data.TransactionSetIdentifierCode;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.header.TransactionSetHeader;
 import lombok.Getter;
 
 /**

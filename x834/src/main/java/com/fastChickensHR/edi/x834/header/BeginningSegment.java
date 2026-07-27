@@ -18,7 +18,7 @@ import lombok.Getter;
  * of the 834 and provides transaction set purpose and control information.
  */
 @Getter
-public class BeginningSegment extends BGNSegment {
+class BeginningSegment extends BGNSegment {
     /** Default BGN01 transaction set purpose code {@code "00"} (Original). */
     public static final String DEFAULT_TRANSACTION_SET_PURPOSE_CODE = "00";
 
