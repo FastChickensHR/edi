@@ -10,8 +10,6 @@ package com.fastChickensHR.edi.x834.header;
 import com.fastChickensHR.edi.x834.segments.Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
-import com.fastChickensHR.edi.x834.loop1000A.SponsorName;
-import com.fastChickensHR.edi.x834.loop1000B.Payer;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,16 +36,6 @@ public class Header {
     private String payerName;
     private String payerIdentification;
 
-    // Custom builders to allow advanced customization
-    private InterchangeControlHeader.Builder customInterchangeBuilder;
-    private FunctionalGroupHeader.Builder customFunctionalBuilder;
-    private TransactionSetHeader.Builder customTransactionSetBuilder;
-    private BeginningSegment.Builder customBeginningSegmentBuilder;
-    private FileEffectiveDate.Builder customFileEffectiveDateBuilder;
-    private TransactionSetPolicyNumber.Builder customPolicyNumberBuilder;
-    private SponsorName.Builder customSponsorBuilder;
-    private Payer.Builder customPayerBuilder;
-
     /**
      * Creates a new Header instance with the specified context
      *
@@ -63,7 +51,7 @@ public class Header {
      * @throws ValidationException If validation fails
      */
     public void validate() throws ValidationException {
-        if (customTransactionSetBuilder == null && (transactionSetIdentifierCode == null || transactionSetIdentifierCode.isEmpty())) {
+        if (transactionSetIdentifierCode == null || transactionSetIdentifierCode.isEmpty()) {
             throw new ValidationException("Transaction Set Identifier Code is required");
         }
     }
@@ -77,49 +65,20 @@ public class Header {
         validate();
 
         List<Segment> segments = new ArrayList<>();
-
-        // Create or use builders as appropriate
-        InterchangeControlHeader.Builder interchangeBuilder = customInterchangeBuilder != null ?
-                customInterchangeBuilder :
-                new InterchangeControlHeader.Builder(context);
-
-        FunctionalGroupHeader.Builder functionalBuilder = customFunctionalBuilder != null ?
-                customFunctionalBuilder :
-                new FunctionalGroupHeader.Builder(context);
-
-        TransactionSetHeader.Builder transactionSetBuilder = customTransactionSetBuilder != null ?
-                customTransactionSetBuilder :
-                new TransactionSetHeader.Builder(context)
-                        .setTransactionSetIdentifierCode(transactionSetIdentifierCode);
-
-        BeginningSegment.Builder beginningSegmentBuilder = customBeginningSegmentBuilder != null ?
-                customBeginningSegmentBuilder :
-                new BeginningSegment.Builder(context).setReferenceIdentification(referenceIdentification);
-
-        FileEffectiveDate.Builder fileEffectiveDateBuilder = customFileEffectiveDateBuilder != null ?
-                customFileEffectiveDateBuilder :
-                new FileEffectiveDate.Builder(context);
-
-        TransactionSetPolicyNumber.Builder policyNumberBuilder = customPolicyNumberBuilder != null ?
-                customPolicyNumberBuilder :
-                new TransactionSetPolicyNumber.Builder().setMasterPolicyNumber(masterPolicyNumber);
-
-        SponsorName.Builder sponsorBuilder = customSponsorBuilder != null ?
-                customSponsorBuilder :
-                new SponsorName.Builder().setPlanSponsorName(planSponsorName);
-
-        Payer.Builder payerBuilder = customPayerBuilder != null ?
-                customPayerBuilder :
-                createDefaultPayerBuilder();
-
-        segments.add(interchangeBuilder.build());
-        segments.add(functionalBuilder.build());
-        segments.add(transactionSetBuilder.build());
-        segments.add(beginningSegmentBuilder.build());
-        segments.add(fileEffectiveDateBuilder.build());
-        segments.add(policyNumberBuilder.build());
-        segments.add(sponsorBuilder.build());
-        segments.add(payerBuilder.build());
+        segments.add(new InterchangeControlHeader.Builder(context).build());
+        segments.add(new FunctionalGroupHeader.Builder(context).build());
+        segments.add(new TransactionSetHeader.Builder(context)
+                .setTransactionSetIdentifierCode(transactionSetIdentifierCode)
+                .build());
+        segments.add(new BeginningSegment.Builder(context)
+                .setReferenceIdentification(referenceIdentification)
+                .build());
+        segments.add(new FileEffectiveDate.Builder(context).build());
+        segments.add(new TransactionSetPolicyNumber.Builder()
+                .setMasterPolicyNumber(masterPolicyNumber)
+                .build());
+        segments.add(new SponsorName.Builder().setPlanSponsorName(planSponsorName).build());
+        segments.add(createDefaultPayerBuilder().build());
 
         return segments;
     }
@@ -152,16 +111,6 @@ public class Header {
         private String planSponsorName;
         private String payerName;
         private String payerIdentification;
-
-        // Custom builders
-        private InterchangeControlHeader.Builder customInterchangeBuilder;
-        private FunctionalGroupHeader.Builder customFunctionalBuilder;
-        private TransactionSetHeader.Builder customTransactionSetBuilder;
-        private BeginningSegment.Builder customBeginningSegmentBuilder;
-        private FileEffectiveDate.Builder customFileEffectiveDateBuilder;
-        private TransactionSetPolicyNumber.Builder customPolicyNumberBuilder;
-        private SponsorName.Builder customSponsorBuilder;
-        private Payer.Builder customPayerBuilder;
 
         /**
          * Creates a new Builder with the required context
@@ -239,95 +188,6 @@ public class Header {
             return this;
         }
 
-        // Custom builder setters
-        /**
-         * Supplies a custom Interchange Control Header (ISA) builder, overriding the default.
-         *
-         * @param builder the custom ISA builder
-         * @return this builder instance
-         */
-        public Builder setInterchangeControlHeaderBuilder(InterchangeControlHeader.Builder builder) {
-            this.customInterchangeBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom Functional Group Header (GS) builder, overriding the default.
-         *
-         * @param builder the custom GS builder
-         * @return this builder instance
-         */
-        public Builder setFunctionalGroupHeaderBuilder(FunctionalGroupHeader.Builder builder) {
-            this.customFunctionalBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom Transaction Set Header (ST) builder, overriding the default.
-         *
-         * @param builder the custom ST builder
-         * @return this builder instance
-         */
-        public Builder setTransactionSetHeaderBuilder(TransactionSetHeader.Builder builder) {
-            this.customTransactionSetBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom Beginning Segment (BGN) builder, overriding the default.
-         *
-         * @param builder the custom BGN builder
-         * @return this builder instance
-         */
-        public Builder setBeginningSegmentBuilder(BeginningSegment.Builder builder) {
-            this.customBeginningSegmentBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom File Effective Date (DTP*007) builder, overriding the default.
-         *
-         * @param builder the custom DTP builder
-         * @return this builder instance
-         */
-        public Builder setFileEffectiveDateBuilder(FileEffectiveDate.Builder builder) {
-            this.customFileEffectiveDateBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom Transaction Set Policy Number (REF*38) builder, overriding the default.
-         *
-         * @param builder the custom REF builder
-         * @return this builder instance
-         */
-        public Builder setTransactionSetPolicyNumberBuilder(TransactionSetPolicyNumber.Builder builder) {
-            this.customPolicyNumberBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom Sponsor Name (Loop 1000A, N1*P5) builder, overriding the default.
-         *
-         * @param builder the custom sponsor builder
-         * @return this builder instance
-         */
-        public Builder setSponsorNameBuilder(SponsorName.Builder builder) {
-            this.customSponsorBuilder = builder;
-            return this;
-        }
-
-        /**
-         * Supplies a custom Payer (Loop 1000B, N1*IN) builder, overriding the default.
-         *
-         * @param builder the custom payer builder
-         * @return this builder instance
-         */
-        public Builder setPayerBuilder(Payer.Builder builder) {
-            this.customPayerBuilder = builder;
-            return this;
-        }
-
         /**
          * Builds a new Header instance
          *
@@ -342,15 +202,6 @@ public class Header {
             header.planSponsorName = this.planSponsorName;
             header.payerName = this.payerName;
             header.payerIdentification = this.payerIdentification;
-
-            header.customInterchangeBuilder = this.customInterchangeBuilder;
-            header.customFunctionalBuilder = this.customFunctionalBuilder;
-            header.customTransactionSetBuilder = this.customTransactionSetBuilder;
-            header.customBeginningSegmentBuilder = this.customBeginningSegmentBuilder;
-            header.customFileEffectiveDateBuilder = this.customFileEffectiveDateBuilder;
-            header.customPolicyNumberBuilder = this.customPolicyNumberBuilder;
-            header.customSponsorBuilder = this.customSponsorBuilder;
-            header.customPayerBuilder = this.customPayerBuilder;
 
             return header;
         }

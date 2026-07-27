@@ -22,7 +22,7 @@ import lombok.Getter;
  * with X834-specific defaults.
  */
 @Getter
-public class FunctionalGroupHeader extends GSSegment {
+class FunctionalGroupHeader extends GSSegment {
     /** Default GS01 functional identifier code {@code "BE"} (Benefit Enrollment and Maintenance, 834). */
     private static final FunctionalIdentifierCode DEFAULT_FUNCTIONAL_ID_CODE = FunctionalIdentifierCode.fromString("BE");
     /** Default GS07 responsible agency code (ASC X12). */

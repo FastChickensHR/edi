@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.loop1000B;
+package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.segments.N1Segment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
  * Produces the N1 segment that identifies the payer (insurer) in the header portion
  * of the 834, following the plan sponsor (Loop 1000A). Extends the generic {@link N1Segment}.
  */
-public class Payer extends N1Segment {
+class Payer extends N1Segment {
     /** Default N101 entity identifier code {@code "IN"} (Insurer). */
     public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "IN";
     /** Default N103 identification code qualifier {@code "FI"} (Federal Taxpayer's Identification Number). */

@@ -5,7 +5,7 @@
  *
  * For license information see the LICENSE file in the root of this project.
  */
-package com.fastChickensHR.edi.x834.loop1000A;
+package com.fastChickensHR.edi.x834.header;
 
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.segments.N1Segment;
@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * in the header portion of the 834, after the transaction set header/BGN and before
  * the payer (Loop 1000B). Extends the generic {@link N1Segment}.
  */
-public class SponsorName extends N1Segment {
+class SponsorName extends N1Segment {
     /** Default N101 entity identifier code {@code "P5"} (Plan Sponsor). */
     public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "P5";
     /** Default N103 identification code qualifier {@code "FI"} (Federal Taxpayer's Identification Number). */

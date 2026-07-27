@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * This class extends the GESegment (GE - Functional Group Trailer segment).
  */
 @Getter
-public class FunctionalGroupTrailer extends GESegment {
+class FunctionalGroupTrailer extends GESegment {
 
     private FunctionalGroupTrailer(Builder builder) throws ValidationException {
         super(builder);

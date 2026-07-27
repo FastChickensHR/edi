@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * Produces the DTP segment carrying the master effective date for the file. Extends the
  * generic {@link DTPSegment}.
  */
-public class FileEffectiveDate extends DTPSegment {
+class FileEffectiveDate extends DTPSegment {
     /** Default DTP01 date/time qualifier {@code "007"} (Effective). */
     public static final String DEFAULT_DATE_TIME_QUALIFIER = "007";
 

@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
  * the number of functional groups included and the interchange control number.
  */
 @Getter
-public class InterchangeControlTrailer extends IEASegment {
+class InterchangeControlTrailer extends IEASegment {
     /** Default IEA01 — number of functional groups in the interchange; always {@code "1"} for an 834. */
     public static final String DEFAULT_NUMBER_OF_INCLUDED_GROUPS = "1";
 

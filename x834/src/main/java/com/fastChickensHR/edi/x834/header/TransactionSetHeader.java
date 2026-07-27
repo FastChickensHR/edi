@@ -19,7 +19,7 @@ import lombok.Getter;
  * and implementation convention reference (ST03). Extends the generic ST segment.
  */
 @Getter
-public class TransactionSetHeader extends STSegment {
+class TransactionSetHeader extends STSegment {
     /** Default ST01 transaction set identifier code {@code "834"} (Benefit Enrollment and Maintenance). */
     private final static String DEFAULT_TRANSACTION_SET_ID = "834";
     /** Default ST02 transaction set control number {@code "0001"}. */

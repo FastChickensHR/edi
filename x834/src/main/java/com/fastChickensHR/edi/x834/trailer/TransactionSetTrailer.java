@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
  * This class extends the SESegment (SE - Transaction Set Trailer segment).
  */
 @Getter
-public class TransactionSetTrailer extends SESegment {
+class TransactionSetTrailer extends SESegment {
 
     private TransactionSetTrailer(Builder builder) throws ValidationException {
         super(builder);

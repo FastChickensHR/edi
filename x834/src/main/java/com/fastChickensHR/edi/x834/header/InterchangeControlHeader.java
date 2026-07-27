@@ -22,7 +22,7 @@ import lombok.Getter;
  * paired with the closing IEA. Extends the generic ISA segment with X834-specific defaults.
  */
 @Getter
-public class InterchangeControlHeader extends ISASegment {
+class InterchangeControlHeader extends ISASegment {
     private final X834Context context;
     /** Default ISA01 authorization information qualifier {@code "00"} (No authorization information present). */
     public static final AuthorizationInformationQualifier DEFAULT_AUTHORIZATION_INFO_QUALIFIER = AuthorizationInformationQualifier.fromString("00");

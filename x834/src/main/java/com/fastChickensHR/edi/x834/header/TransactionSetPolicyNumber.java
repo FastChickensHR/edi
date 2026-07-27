@@ -16,7 +16,7 @@ import lombok.Getter;
  * This segment uses the REF segment format with the {@code "38"} qualifier for the master policy number.
  */
 @Getter
-public class TransactionSetPolicyNumber extends RefSegment {
+class TransactionSetPolicyNumber extends RefSegment {
     /** Default REF01 reference identification qualifier {@code "38"} (Master Policy Number). */
     private final static String DEFAULT_REFERENCE_IDENTIFICATION_QUALIFIER = "38";
 
