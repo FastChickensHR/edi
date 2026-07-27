@@ -19,6 +19,7 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.MemberCommunication;
 import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
+import com.fastChickensHR.edi.x834.loop2000.loop2300.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
@@ -163,16 +164,18 @@ public abstract class BaseMember {
     public void setZipCode(String value) { residenceOrCreate().setZipCode(value); }
 
     /**
-     * Loop 2300 (and other trailing) segments that belong to <em>this</em> member — most
-     * notably health coverage (HD) and any custom REF extensions. They are emitted by
-     * {@link X834MemberWriter} at the end of this member's own segment stream, so a member's
-     * coverage stays nested inside its own loop rather than being batched after every member.
+     * Trailing segments that belong to <em>this</em> member — notably custom REF extensions.
+     * They are emitted by {@link X834MemberWriter} at the end of this member's own segment
+     * stream (just before the {@link #addHealthCoverage(HealthCoverage) 2300 coverage block}),
+     * so they stay nested inside the member's own loop rather than being batched after every
+     * member.
      */
     private final List<Segment> additionalSegments = new ArrayList<>();
 
     /**
-     * Appends a trailing (Loop 2300) segment to this member — e.g. an HD coverage segment
-     * or a custom REF extension. Order is preserved.
+     * Appends a trailing segment to this member — e.g. a custom REF extension. Order is
+     * preserved. Health coverage is not a segment here: it is modeled by
+     * {@link #addHealthCoverage(HealthCoverage)} and rendered by the writer.
      *
      * @param segment the segment to emit within this member's loop
      */
@@ -264,6 +267,27 @@ public abstract class BaseMember {
     public void addDisability(Disability disability) {
         if (disability != null) {
             disabilities.add(disability);
+        }
+    }
+
+    /**
+     * The health coverages this member carries (Loop 2300). Emitted by {@link X834MemberWriter}
+     * after the member's trailing segments ({@link #addSegment(Segment)}) and before the 2310
+     * block, one {@code HD}(/{@code DTP*348}/{@code DTP*349}) block per entry. Empty for a member
+     * with none, in which case nothing is emitted.
+     *
+     * @see #addHealthCoverage(HealthCoverage)
+     */
+    private final List<HealthCoverage> healthCoverages = new ArrayList<>();
+
+    /**
+     * Adds a health coverage this member carries (Loop 2300). Order is preserved.
+     *
+     * @param healthCoverage the coverage to emit (ignored if null)
+     */
+    public void addHealthCoverage(HealthCoverage healthCoverage) {
+        if (healthCoverage != null) {
+            healthCoverages.add(healthCoverage);
         }
     }
 

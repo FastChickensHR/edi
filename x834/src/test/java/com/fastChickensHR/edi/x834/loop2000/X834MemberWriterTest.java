@@ -25,6 +25,7 @@ import com.fastChickensHR.edi.x834.loop2000.loop2100A.HealthInformation;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Income;
 import com.fastChickensHR.edi.x834.loop2000.loop2100A.Language;
 import com.fastChickensHR.edi.x834.loop2000.loop2200.Disability;
+import com.fastChickensHR.edi.x834.loop2000.loop2300.HealthCoverage;
 import com.fastChickensHR.edi.x834.loop2000.loop2310.Provider;
 import com.fastChickensHR.edi.x834.loop2000.loop2320.CoordinationOfBenefits;
 import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
@@ -640,6 +641,88 @@ class X834MemberWriterTest {
 
         assertTrue(out.contains("DSB*3~"), () -> "expected the DSB; got:\n" + out);
         assertFalse(out.contains("DTP*360"), () -> "no period start without a date; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheCoverageLoopWithItsBenefitDates() throws ValidationException {
+        Member member = baseSubscriber();
+        HealthCoverage coverage = new HealthCoverage("021", "HLT");
+        coverage.setPlanCoverageDescription("PREMIUM HEALTH");
+        coverage.setCoverageLevelCode("FAM");
+        coverage.setStartDate(LocalDateTime.of(2026, 1, 1, 0, 0));
+        coverage.setEndDate(LocalDateTime.of(2026, 6, 30, 0, 0));
+        member.addHealthCoverage(coverage);
+
+        String out = render(writer.toSegments(member));
+
+        // HD02 is Not Used in 220A1 but is a real element position, so it renders as an empty
+        // slot to keep HD03/HD04/HD05 in their correct positions.
+        assertTrue(out.contains("HD*021**HLT*PREMIUM HEALTH*FAM~"), () -> "expected the HD; got:\n" + out);
+        assertTrue(out.contains("DTP*348*D8*20260101~"), () -> "expected the benefit begin; got:\n" + out);
+        assertTrue(out.contains("DTP*349*D8*20260630~"), () -> "expected the benefit end; got:\n" + out);
+        assertTrue(out.indexOf("HD*021") < out.indexOf("DTP*348"),
+                () -> "the HD opens the loop, before its dates; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheCoverageLoopAfterTheTrailingSegments() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addSegment(new RefSegment.Builder()
+                .setReferenceIdentificationQualifier("1L")
+                .setReferenceIdentification("PLAN9")
+                .build());
+        member.addHealthCoverage(new HealthCoverage("001", "DEN"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("REF*1L*PLAN9") < out.indexOf("HD*001**DEN~"),
+                () -> "the member's trailing segments precede the 2300 coverage block; got:\n" + out);
+    }
+
+    @Test
+    void emitsOneCoverageLoopPerCoverageInOrder() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addHealthCoverage(new HealthCoverage("001", "HLT"));
+        member.addHealthCoverage(new HealthCoverage("001", "DEN"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.indexOf("HD*001**HLT~") < out.indexOf("HD*001**DEN~"),
+                () -> "expected both coverages, in the order added; got:\n" + out);
+    }
+
+    @Test
+    void emitsTheCoverageHdEvenWithNoBenefitDates() throws ValidationException {
+        Member member = baseSubscriber();
+        member.addHealthCoverage(new HealthCoverage("024", "VIS"));
+
+        String out = render(writer.toSegments(member));
+
+        assertTrue(out.contains("HD*024**VIS~"), () -> "expected the HD; got:\n" + out);
+        assertFalse(out.contains("DTP*348"), () -> "no benefit begin without a date; got:\n" + out);
+        assertFalse(out.contains("DTP*349"), () -> "no benefit end without a date; got:\n" + out);
+    }
+
+    @Test
+    void rejectsACoverageMissingItsInsuranceLine() {
+        Member member = baseSubscriber();
+        member.addHealthCoverage(new HealthCoverage("021", null));
+
+        ValidationException thrown = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(thrown.getMessage().contains("Insurance Line Code"),
+                () -> "expected the HD03 requirement; got: " + thrown.getMessage());
+    }
+
+    @Test
+    void rejectsACoverageMissingItsMaintenanceType() {
+        Member member = baseSubscriber();
+        member.addHealthCoverage(new HealthCoverage(null, "HLT"));
+
+        ValidationException thrown = assertThrows(ValidationException.class, () -> writer.toSegments(member));
+
+        assertTrue(thrown.getMessage().contains("Maintenance Type Code"),
+                () -> "expected the HD01 requirement; got: " + thrown.getMessage());
     }
 
     @Test
