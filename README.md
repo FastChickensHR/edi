@@ -46,7 +46,7 @@ member.setMaintenanceTypeCode(MaintenanceTypeCode.ADDITION);
 member.setRelationshipCode(IndividualRelationshipCode.EMPLOYEE);
 member.setMemberIndicator(MemberIndicator.INSURED);
 
-Optional<String> document = new X834Document.Builder(context)
+GenerationResult result = new X834Document.Builder(context)
         .withHeader(new Header.Builder(context)
                 .setReferenceIdentification("834TEST")
                 .setMasterPolicyNumber("POL-001")
@@ -57,7 +57,20 @@ Optional<String> document = new X834Document.Builder(context)
         .addMember(member)
         .build()
         .generateDocument();
+
+switch (result) {
+    case GenerationResult.Success success ->
+            Files.writeString(Path.of("enrollment.834"), success.document());
+    case GenerationResult.Failure failure -> failure.errors().forEach(error ->
+            System.err.println(error.phase() + " " + error.location() + ": " + error.message()));
+}
 ```
+
+Generation reports through exactly one channel: `generateDocument()` returns a
+`GenerationResult` — a `Success` carrying the finished X12 834, or a `Failure` carrying
+*every* reason it could not be produced. Problems are accumulated, not thrown: build-time
+structure/configuration problems and render-time serialization problems all surface as
+`GenerationError`s in a single pass, so the source can be fixed in one round-trip.
 
 ## Requirements
 
