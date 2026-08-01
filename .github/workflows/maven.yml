@@ -36,7 +36,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven and run tests
-        run: mvn -B test
+        run: mvn -B verify
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
