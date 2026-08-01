@@ -7,74 +7,95 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.SegmentTestSupport;
-import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.X834Context;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
+import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import org.junit.jupiter.api.Test;
+
 class PayerTest {
-    X834Context context = new X834Context();
-    String entityIdentifierCode = "T3";
-    String planSponsorName = "fake plan sponsor name";
-    String identificationCodeQualifier = "FL";
-    String sponsorIdentifier = "FPO";
+  X834Context context = new X834Context();
+  String entityIdentifierCode = "T3";
+  String planSponsorName = "fake plan sponsor name";
+  String identificationCodeQualifier = "FL";
+  String sponsorIdentifier = "FPO";
 
-    @Test
-    public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        // N103 must be supplied alongside N104 (P0304); the builder no longer auto-seeds FI.
-        Payer segment = new Payer.Builder()
-                .setN102(planSponsorName)
-                .setN103("FI")
-                .setN104(sponsorIdentifier)
-                .build();
-        SegmentTestSupport.setContext(segment, context);
+  @Test
+  public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
+    // N103 must be supplied alongside N104 (P0304); the builder no longer auto-seeds FI.
+    Payer segment =
+        new Payer.Builder()
+            .setN102(planSponsorName)
+            .setN103("FI")
+            .setN104(sponsorIdentifier)
+            .build();
+    SegmentTestSupport.setContext(segment, context);
 
-        assertEquals("N1", segment.getSegmentIdentifier(), "Expected segment identifier should be 'N1'");
-        assertEquals("N1*IN*fake plan sponsor name*FI*FPO~", segment.render().trim(), "The segment is not formatted correctly.");
-    }
+    assertEquals(
+        "N1", segment.getSegmentIdentifier(), "Expected segment identifier should be 'N1'");
+    assertEquals(
+        "N1*IN*fake plan sponsor name*FI*FPO~",
+        segment.render().trim(),
+        "The segment is not formatted correctly.");
+  }
 
-    @Test
-    public void testNameOnlyPayerEmitsNoDanglingQualifier() throws ValidationException {
-        // A payer with a name but no identification code must emit N1*IN*<name> only —
-        // no dangling "*FI" qualifier (X12 P0304).
-        Payer segment = new Payer.Builder()
-                .setPlanSponsorName(planSponsorName)
-                .build();
-        SegmentTestSupport.setContext(segment, context);
+  @Test
+  public void testNameOnlyPayerEmitsNoDanglingQualifier() throws ValidationException {
+    // A payer with a name but no identification code must emit N1*IN*<name> only —
+    // no dangling "*FI" qualifier (X12 P0304).
+    Payer segment = new Payer.Builder().setPlanSponsorName(planSponsorName).build();
+    SegmentTestSupport.setContext(segment, context);
 
-        assertEquals("N1*IN*fake plan sponsor name~", segment.render().trim(),
-                "A name-only payer must not carry a dangling identification-code qualifier");
-    }
+    assertEquals(
+        "N1*IN*fake plan sponsor name~",
+        segment.render().trim(),
+        "A name-only payer must not carry a dangling identification-code qualifier");
+  }
 
-    @Test
-    public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        Payer segment = new Payer.Builder()
-                .setN101(entityIdentifierCode)
-                .setN102(planSponsorName)
-                .setN103(identificationCodeQualifier)
-                .setN104(sponsorIdentifier)
-                .build();
+  @Test
+  public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
+    Payer segment =
+        new Payer.Builder()
+            .setN101(entityIdentifierCode)
+            .setN102(planSponsorName)
+            .setN103(identificationCodeQualifier)
+            .setN104(sponsorIdentifier)
+            .build();
 
-        assertEquals(entityIdentifierCode, segment.getEntityIdentifierCode().getCode(), "Entity Identifier Code should match N101");
-        assertEquals(planSponsorName, segment.getPlanSponsorName(), "Plan Sponsor Name should match N102");
-        assertEquals(identificationCodeQualifier, segment.getIdentificationCodeQualifier().getCode(), "Identification Code Qualifier should match N103");
-        assertEquals(sponsorIdentifier, segment.getSponsorIdentifier(), "Sponsor Identifier should match N104");
-    }
+    assertEquals(
+        entityIdentifierCode,
+        segment.getEntityIdentifierCode().getCode(),
+        "Entity Identifier Code should match N101");
+    assertEquals(
+        planSponsorName, segment.getPlanSponsorName(), "Plan Sponsor Name should match N102");
+    assertEquals(
+        identificationCodeQualifier,
+        segment.getIdentificationCodeQualifier().getCode(),
+        "Identification Code Qualifier should match N103");
+    assertEquals(
+        sponsorIdentifier, segment.getSponsorIdentifier(), "Sponsor Identifier should match N104");
+  }
 
-    @Test
-    public void testSettingSpecNamesGettingSpecNames() throws ValidationException {
-        Payer segment = new Payer.Builder()
-                .setEntityIdentifierCode(entityIdentifierCode)
-                .setPlanSponsorName(planSponsorName)
-                .setIdentificationCodeQualifier(identificationCodeQualifier)
-                .setSponsorIdentifier(sponsorIdentifier)
-                .build();
+  @Test
+  public void testSettingSpecNamesGettingSpecNames() throws ValidationException {
+    Payer segment =
+        new Payer.Builder()
+            .setEntityIdentifierCode(entityIdentifierCode)
+            .setPlanSponsorName(planSponsorName)
+            .setIdentificationCodeQualifier(identificationCodeQualifier)
+            .setSponsorIdentifier(sponsorIdentifier)
+            .build();
 
-        assertEquals(entityIdentifierCode, segment.getN101().getCode(), "Entity Identifier Code should match N101");
-        assertEquals(planSponsorName, segment.getN102(), "Plan Sponsor Name should match N102");
-        assertEquals(identificationCodeQualifier, segment.getN103().getCode(), "Identification Code Qualifier should match N103");
-        assertEquals(sponsorIdentifier, segment.getN104(), "Sponsor Identifier should match N104");
-    }
+    assertEquals(
+        entityIdentifierCode,
+        segment.getN101().getCode(),
+        "Entity Identifier Code should match N101");
+    assertEquals(planSponsorName, segment.getN102(), "Plan Sponsor Name should match N102");
+    assertEquals(
+        identificationCodeQualifier,
+        segment.getN103().getCode(),
+        "Identification Code Qualifier should match N103");
+    assertEquals(sponsorIdentifier, segment.getN104(), "Sponsor Identifier should match N104");
+  }
 }

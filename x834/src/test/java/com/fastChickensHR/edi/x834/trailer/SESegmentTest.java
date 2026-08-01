@@ -7,108 +7,94 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 class SESegmentTest {
-    private static class TestSESegment extends SESegment {
-        private TestSESegment(AbstractBuilder<?> builder) throws ValidationException {
-            super(builder);
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        public static class Builder extends AbstractBuilder<Builder> {
-            @Override
-            protected Builder self() {
-                return this;
-            }
-
-            @Override
-            public TestSESegment build() throws ValidationException {
-                return new TestSESegment(this);
-            }
-        }
+  private static class TestSESegment extends SESegment {
+    private TestSESegment(AbstractBuilder<?> builder) throws ValidationException {
+      super(builder);
     }
 
-    @Test
-    void testConstructionAndGetters() throws ValidationException {
-        SESegment segment = TestSESegment.builder()
-                .setSe01("15")
-                .setSe02("0001")
-                .build();
-
-        assertEquals("15", segment.getSe01());
-        assertEquals("0001", segment.getSe02());
-        assertEquals("15", segment.getTransactionSegmentCount());
-        assertEquals("0001", segment.getSetControlNumber());
+    public static Builder builder() {
+      return new Builder();
     }
 
-    @Test
-    void testAlternativeSetters() throws ValidationException {
-        SESegment segment = TestSESegment.builder()
-                .setTransactionSegmentCount("25")
-                .setSetControlNumber("1234")
-                .build();
+    public static class Builder extends AbstractBuilder<Builder> {
+      @Override
+      protected Builder self() {
+        return this;
+      }
 
-        assertEquals("25", segment.getSe01());
-        assertEquals("1234", segment.getSe02());
+      @Override
+      public TestSESegment build() throws ValidationException {
+        return new TestSESegment(this);
+      }
     }
+  }
 
-    @Test
-    void testSegmentIdentifier() throws ValidationException {
-        SESegment segment = TestSESegment.builder()
-                .setSe01("10")
-                .setSe02("9999")
-                .build();
+  @Test
+  void testConstructionAndGetters() throws ValidationException {
+    SESegment segment = TestSESegment.builder().setSe01("15").setSe02("0001").build();
 
-        assertEquals("SE", segment.getSegmentIdentifier());
-        assertEquals(SESegment.SEGMENT_ID, segment.getSegmentIdentifier());
-    }
+    assertEquals("15", segment.getSe01());
+    assertEquals("0001", segment.getSe02());
+    assertEquals("15", segment.getTransactionSegmentCount());
+    assertEquals("0001", segment.getSetControlNumber());
+  }
 
-    /**
-     * Render golden for the SE transaction-set trailer: {@code SE*<segmentCount>*<setControlNumber>~}.
-     * This is the only per-unit render assertion for SE; whole-string equality pins the element order
-     * and terminator that the {@code getElementValues()} array check leaves unrendered. Delimiters come
-     * from the default {@link X834Context}.
-     */
-    @Test
-    void rendersSeSegment() throws ValidationException {
-        SESegment segment = TestSESegment.builder()
-                .setSe01("42")
-                .setSe02("5678")
-                .build();
-        SegmentTestSupport.setContext(segment, new X834Context());
+  @Test
+  void testAlternativeSetters() throws ValidationException {
+    SESegment segment =
+        TestSESegment.builder()
+            .setTransactionSegmentCount("25")
+            .setSetControlNumber("1234")
+            .build();
 
-        assertEquals("SE*42*5678~\n", segment.render());
-    }
+    assertEquals("25", segment.getSe01());
+    assertEquals("1234", segment.getSe02());
+  }
 
-    @Test
-    void testBuilderMethodChaining() throws ValidationException {
-        SESegment segment = TestSESegment.builder()
-                .setSe01("50")
-                .setSe02("1111")
-                .build();
+  @Test
+  void testSegmentIdentifier() throws ValidationException {
+    SESegment segment = TestSESegment.builder().setSe01("10").setSe02("9999").build();
 
-        assertEquals("50", segment.getSe01());
-        assertEquals("1111", segment.getSe02());
-    }
+    assertEquals("SE", segment.getSegmentIdentifier());
+    assertEquals(SESegment.SEGMENT_ID, segment.getSegmentIdentifier());
+  }
 
-    @Test
-    void testNullValues() throws ValidationException {
-        SESegment segment = TestSESegment.builder()
-                .setSe01(null)
-                .setSe02(null)
-                .build();
+  /**
+   * Render golden for the SE transaction-set trailer: {@code
+   * SE*<segmentCount>*<setControlNumber>~}. This is the only per-unit render assertion for SE;
+   * whole-string equality pins the element order and terminator that the {@code getElementValues()}
+   * array check leaves unrendered. Delimiters come from the default {@link X834Context}.
+   */
+  @Test
+  void rendersSeSegment() throws ValidationException {
+    SESegment segment = TestSESegment.builder().setSe01("42").setSe02("5678").build();
+    SegmentTestSupport.setContext(segment, new X834Context());
 
-        assertNull(segment.getSe01());
-        assertNull(segment.getSe02());
-    }
+    assertEquals("SE*42*5678~\n", segment.render());
+  }
+
+  @Test
+  void testBuilderMethodChaining() throws ValidationException {
+    SESegment segment = TestSESegment.builder().setSe01("50").setSe02("1111").build();
+
+    assertEquals("50", segment.getSe01());
+    assertEquals("1111", segment.getSe02());
+  }
+
+  @Test
+  void testNullValues() throws ValidationException {
+    SESegment segment = TestSESegment.builder().setSe01(null).setSe02(null).build();
+
+    assertNull(segment.getSe01());
+    assertNull(segment.getSe02());
+  }
 }

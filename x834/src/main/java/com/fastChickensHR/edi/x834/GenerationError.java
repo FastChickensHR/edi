@@ -20,22 +20,24 @@ import java.util.Objects;
  */
 public record GenerationError(Phase phase, String location, String message) {
 
-    public GenerationError {
-        Objects.requireNonNull(phase, "phase");
-        Objects.requireNonNull(location, "location");
-        Objects.requireNonNull(message, "message");
-    }
+  public GenerationError {
+    Objects.requireNonNull(phase, "phase");
+    Objects.requireNonNull(location, "location");
+    Objects.requireNonNull(message, "message");
+  }
 
-    /** The generation stage a {@link GenerationError} arose in. */
-    public enum Phase {
-        /** The document's structure or configuration was invalid before serialization was attempted. */
-        BUILD,
-        /** A value could not be serialized into a conformant X12 segment. */
-        RENDER
-    }
+  /** The generation stage a {@link GenerationError} arose in. */
+  public enum Phase {
+    /** The document's structure or configuration was invalid before serialization was attempted. */
+    BUILD,
+    /** A value could not be serialized into a conformant X12 segment. */
+    RENDER
+  }
 
-    /** A single-line rendering — {@code PHASE | location | message} — for log and exception surfaces. */
-    public String formatted() {
-        return phase + " | " + location + " | " + message;
-    }
+  /**
+   * A single-line rendering — {@code PHASE | location | message} — for log and exception surfaces.
+   */
+  public String formatted() {
+    return phase + " | " + location + " | " + message;
+  }
 }

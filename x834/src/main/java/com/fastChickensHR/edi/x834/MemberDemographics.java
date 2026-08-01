@@ -12,48 +12,48 @@ import lombok.Getter;
 
 /**
  * Member demographics as a DMG segment in Loop 2100A of the X12 834.
- * <p>
- * Carries the member's demographic detail — the date format qualifier (DMG01)
- * and birth date (DMG02) are required; gender and related elements follow.
+ *
+ * <p>Carries the member's demographic detail — the date format qualifier (DMG01) and birth date
+ * (DMG02) are required; gender and related elements follow.
  */
 @Getter
 class MemberDemographics extends DMGSegment {
 
-    private MemberDemographics(Builder builder) throws ValidationException {
-        super(builder);
+  private MemberDemographics(Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  /** Builds the Loop 2100A member DMG; DMG01 (date format) and DMG02 (birth date) are required. */
+  public static class Builder extends AbstractBuilder<Builder> {
+
+    protected void validate() throws ValidationException {
+      // At minimum, the format qualifier and birth date are required
+      if (dmg01 == null || dmg01.isEmpty()) {
+        throw new ValidationException("Date Time Period Format Qualifier (DMG01) is required");
+      }
+      if (dmg02 == null || dmg02.isEmpty()) {
+        throw new ValidationException("Birth Date (DMG02) is required");
+      }
     }
 
-    /** Builds the Loop 2100A member DMG; DMG01 (date format) and DMG02 (birth date) are required. */
-    public static class Builder extends AbstractBuilder<Builder> {
-
-        protected void validate() throws ValidationException {
-            // At minimum, the format qualifier and birth date are required
-            if (dmg01 == null || dmg01.isEmpty()) {
-                throw new ValidationException("Date Time Period Format Qualifier (DMG01) is required");
-            }
-            if (dmg02 == null || dmg02.isEmpty()) {
-                throw new ValidationException("Birth Date (DMG02) is required");
-            }
-        }
-
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        @Override
-        public MemberDemographics build() throws ValidationException {
-            validate();
-            return new MemberDemographics(this);
-        }
+    @Override
+    protected Builder self() {
+      return this;
     }
 
-    /**
-     * Creates a new Builder instance
-     *
-     * @return a new Builder
-     */
-    public static Builder builder() {
-        return new Builder();
+    @Override
+    public MemberDemographics build() throws ValidationException {
+      validate();
+      return new MemberDemographics(this);
     }
+  }
+
+  /**
+   * Creates a new Builder instance
+   *
+   * @return a new Builder
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
 }

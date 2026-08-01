@@ -12,6 +12,6 @@ package com.fastChickensHR.edi.core;
  * partner (emitted).
  */
 public enum Direction {
-    INBOUND,
-    OUTBOUND
+  INBOUND,
+  OUTBOUND
 }

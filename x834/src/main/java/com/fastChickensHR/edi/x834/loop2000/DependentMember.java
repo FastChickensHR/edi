@@ -12,25 +12,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Represents a dependent in a benefit enrollment.
- * Cannot have dependents of its own.
- * <p>
- * Pure domain object; X12 834 serialization is handled by
- * {@code X834MemberWriter}.
+ * Represents a dependent in a benefit enrollment. Cannot have dependents of its own.
+ *
+ * <p>Pure domain object; X12 834 serialization is handled by {@code X834MemberWriter}.
  */
 @Setter
 @Getter
 public class DependentMember extends BaseMember {
-    private Member primaryMember;
+  private Member primaryMember;
 
-    public DependentMember() {
-        // No-arg constructor; the X12 834 context is no longer a concern of the domain model.
-    }
+  public DependentMember() {
+    // No-arg constructor; the X12 834 context is no longer a concern of the domain model.
+  }
 
-    @Override
-    public void validate() throws ValidationException {
-        if (relationshipCode == null) {
-            throw new ValidationException("Dependent must have a relationship code");
-        }
+  @Override
+  public void validate() throws ValidationException {
+    if (relationshipCode == null) {
+      throw new ValidationException("Dependent must have a relationship code");
     }
+  }
 }

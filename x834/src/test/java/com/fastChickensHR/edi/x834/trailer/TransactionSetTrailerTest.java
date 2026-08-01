@@ -7,63 +7,66 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
-import com.fastChickensHR.edi.x834.SegmentTestSupport;
-import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.X834Context;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
+import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import org.junit.jupiter.api.Test;
 
 class TransactionSetTrailerTest {
 
-    @Test
-    void testInheritance() {
-        TransactionSetTrailer trailer = null;
-        try {
-            trailer = TransactionSetTrailer.builder()
-                    .setTransactionSegmentCount("10")
-                    .setSetControlNumber("1234")
-                    .build();
-        } catch (ValidationException e) {
-            fail("Failed to build TransactionSetTrailer: " + e.getMessage());
-        }
-
-        assertNotNull(trailer);
+  @Test
+  void testInheritance() {
+    TransactionSetTrailer trailer = null;
+    try {
+      trailer =
+          TransactionSetTrailer.builder()
+              .setTransactionSegmentCount("10")
+              .setSetControlNumber("1234")
+              .build();
+    } catch (ValidationException e) {
+      fail("Failed to build TransactionSetTrailer: " + e.getMessage());
     }
 
-    @Test
-    void testBuilderCreation() {
-        TransactionSetTrailer.Builder builder = TransactionSetTrailer.builder();
-        assertNotNull(builder);
-    }
+    assertNotNull(trailer);
+  }
 
-    @Test
-    void testUsageInTransactionContext() throws ValidationException {
-        TransactionSetTrailer trailer = TransactionSetTrailer.builder()
-                .setTransactionSegmentCount("25")
-                .setSetControlNumber("9876")
-                .build();
+  @Test
+  void testBuilderCreation() {
+    TransactionSetTrailer.Builder builder = TransactionSetTrailer.builder();
+    assertNotNull(builder);
+  }
 
-        assertEquals("25", trailer.getTransactionSegmentCount());
-        assertEquals("9876", trailer.getSetControlNumber());
-        assertEquals("SE", trailer.getSegmentIdentifier());
+  @Test
+  void testUsageInTransactionContext() throws ValidationException {
+    TransactionSetTrailer trailer =
+        TransactionSetTrailer.builder()
+            .setTransactionSegmentCount("25")
+            .setSetControlNumber("9876")
+            .build();
 
-        String[] elements = trailer.getElementValues();
-        assertEquals(2, elements.length);
-        assertEquals("25", elements[0]);
-        assertEquals("9876", elements[1]);
-    }
+    assertEquals("25", trailer.getTransactionSegmentCount());
+    assertEquals("9876", trailer.getSetControlNumber());
+    assertEquals("SE", trailer.getSegmentIdentifier());
 
-    @Test
-    void testToString() throws ValidationException {
-        TransactionSetTrailer trailer = TransactionSetTrailer.builder()
-                .setTransactionSegmentCount("15")
-                .setSetControlNumber("5678")
-                .build();
-        SegmentTestSupport.setContext(trailer, new X834Context());
+    String[] elements = trailer.getElementValues();
+    assertEquals(2, elements.length);
+    assertEquals("25", elements[0]);
+    assertEquals("9876", elements[1]);
+  }
 
-        String segment = trailer.render().trim();
+  @Test
+  void testToString() throws ValidationException {
+    TransactionSetTrailer trailer =
+        TransactionSetTrailer.builder()
+            .setTransactionSegmentCount("15")
+            .setSetControlNumber("5678")
+            .build();
+    SegmentTestSupport.setContext(trailer, new X834Context());
 
-        assertEquals("SE*15*5678~", segment);
-    }
+    String segment = trailer.render().trim();
+
+    assertEquals("SE*15*5678~", segment);
+  }
 }

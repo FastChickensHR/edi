@@ -7,62 +7,70 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.SegmentTestSupport;
-import com.fastChickensHR.edi.x834.dates.DateFormat;
-import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.X834Context;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
+import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.Test;
+
 public class FileEffectiveDateTest {
-    X834Context context = new X834Context();
-     LocalDateTime localDateTime = LocalDateTime.of(2025, 3,13,0,0,0);
+  X834Context context = new X834Context();
+  LocalDateTime localDateTime = LocalDateTime.of(2025, 3, 13, 0, 0, 0);
 
-    @Test
-    public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
-                .setDateTimePeriod(localDateTime)
-                .build();
-        SegmentTestSupport.setContext(segment, context);
+  @Test
+  public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
+    FileEffectiveDate segment =
+        new FileEffectiveDate.Builder(context).setDateTimePeriod(localDateTime).build();
+    SegmentTestSupport.setContext(segment, context);
 
-        assertEquals("DTP", segment.getSegmentIdentifier(), "Expected segment identifier should be 'DTP'");
-        assertEquals("DTP*007*D8*20250313~", segment.render().trim(), "The segment is not formatted correctly.");
-    }
+    assertEquals(
+        "DTP", segment.getSegmentIdentifier(), "Expected segment identifier should be 'DTP'");
+    assertEquals(
+        "DTP*007*D8*20250313~", segment.render().trim(), "The segment is not formatted correctly.");
+  }
 
-    /**
-     * Tests setting and getting values via the spec names and retrieving via the business domain names.
-     */
-    @Test
-    public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        String dateTimeQualifier = "001";
-        DateFormat dateTimeFormat = DateFormat.D8;
-        LocalDateTime dateTimePeriod = context.getDocumentDate();
-        FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
-                .setDtp01(dateTimeQualifier)
-                .setDtp02(dateTimeFormat)
-                .setDtp03(dateTimePeriod)
-                .build();
+  /**
+   * Tests setting and getting values via the spec names and retrieving via the business domain
+   * names.
+   */
+  @Test
+  public void testSettingSpecNamesGettingDomainNames() throws ValidationException {
+    String dateTimeQualifier = "001";
+    DateFormat dateTimeFormat = DateFormat.D8;
+    LocalDateTime dateTimePeriod = context.getDocumentDate();
+    FileEffectiveDate segment =
+        new FileEffectiveDate.Builder(context)
+            .setDtp01(dateTimeQualifier)
+            .setDtp02(dateTimeFormat)
+            .setDtp03(dateTimePeriod)
+            .build();
 
-        assertEquals(dateTimeQualifier, segment.getDateTimeQualifier().getCode(), "DateTimeQualifier should match DTP01");
-    }
+    assertEquals(
+        dateTimeQualifier,
+        segment.getDateTimeQualifier().getCode(),
+        "DateTimeQualifier should match DTP01");
+  }
 
-    /**
-     * Tests setting and getting values via the business domain names and retrieving via the spec names.
-     */
-    @Test
-    public void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        String dateTimeQualifier = "001";
-        DateFormat dateTimeFormat = DateFormat.D8;
-        LocalDateTime dateTimePeriod = context.getDocumentDate();
-        FileEffectiveDate segment = new FileEffectiveDate.Builder(context)
-                .setDateTimeQualifier(dateTimeQualifier)
-                .setDateTimeFormat(dateTimeFormat)
-                .setDateTimePeriod(dateTimePeriod)
-                .build();
+  /**
+   * Tests setting and getting values via the business domain names and retrieving via the spec
+   * names.
+   */
+  @Test
+  public void testSettingDomainNamesGettingSpecNames() throws ValidationException {
+    String dateTimeQualifier = "001";
+    DateFormat dateTimeFormat = DateFormat.D8;
+    LocalDateTime dateTimePeriod = context.getDocumentDate();
+    FileEffectiveDate segment =
+        new FileEffectiveDate.Builder(context)
+            .setDateTimeQualifier(dateTimeQualifier)
+            .setDateTimeFormat(dateTimeFormat)
+            .setDateTimePeriod(dateTimePeriod)
+            .build();
 
-        assertEquals(dateTimeQualifier, segment.getDtp01().getCode(), "DateTimeQualifier should match DTP01");
-    }
+    assertEquals(
+        dateTimeQualifier, segment.getDtp01().getCode(), "DateTimeQualifier should match DTP01");
+  }
 }

@@ -7,59 +7,59 @@
  */
 package com.fastChickensHR.edi.x834.trailer;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class InterchangeControlTrailerTest {
 
-    @Test
-    void testBuilderCreation() {
-        InterchangeControlTrailer.Builder builder = InterchangeControlTrailer.builder();
-        assertNotNull(builder);
-    }
+  @Test
+  void testBuilderCreation() {
+    InterchangeControlTrailer.Builder builder = InterchangeControlTrailer.builder();
+    assertNotNull(builder);
+  }
 
-    @Test
-    void testUsageInInterchangeContext() throws ValidationException {
-        InterchangeControlTrailer trailer = InterchangeControlTrailer.builder()
-                .setNumberOfIncludedGroups("5")
-                .setInterchangeControlNumber("000098765")
-                .build();
+  @Test
+  void testUsageInInterchangeContext() throws ValidationException {
+    InterchangeControlTrailer trailer =
+        InterchangeControlTrailer.builder()
+            .setNumberOfIncludedGroups("5")
+            .setInterchangeControlNumber("000098765")
+            .build();
 
-        IEASegment ieaSegment = trailer;
+    IEASegment ieaSegment = trailer;
 
-        assertEquals("5", ieaSegment.getNumberOfIncludedGroups());
-        assertEquals("000098765", ieaSegment.getInterchangeControlNumber());
-    }
+    assertEquals("5", ieaSegment.getNumberOfIncludedGroups());
+    assertEquals("000098765", ieaSegment.getInterchangeControlNumber());
+  }
 
-    /**
-     * Render golden: the Interchange Control Trailer renders as its underlying IEA segment,
-     * {@code IEA*<groupCount>*<interchangeControlNumber>~}. Whole-string equality pins the segment id,
-     * element order, and terminator that the getter/{@code getElementValues()} echo left unrendered.
-     * Delimiters come from the default {@link X834Context}.
-     */
-    @Test
-    void rendersAsIeaSegment() throws ValidationException {
-        InterchangeControlTrailer trailer = InterchangeControlTrailer.builder()
-                .setNumberOfIncludedGroups("7")
-                .setInterchangeControlNumber("000054321")
-                .build();
-        SegmentTestSupport.setContext(trailer, new X834Context());
+  /**
+   * Render golden: the Interchange Control Trailer renders as its underlying IEA segment, {@code
+   * IEA*<groupCount>*<interchangeControlNumber>~}. Whole-string equality pins the segment id,
+   * element order, and terminator that the getter/{@code getElementValues()} echo left unrendered.
+   * Delimiters come from the default {@link X834Context}.
+   */
+  @Test
+  void rendersAsIeaSegment() throws ValidationException {
+    InterchangeControlTrailer trailer =
+        InterchangeControlTrailer.builder()
+            .setNumberOfIncludedGroups("7")
+            .setInterchangeControlNumber("000054321")
+            .build();
+    SegmentTestSupport.setContext(trailer, new X834Context());
 
-        assertEquals("IEA*7*000054321~\n", trailer.render());
-    }
+    assertEquals("IEA*7*000054321~\n", trailer.render());
+  }
 
-    @Test
-    void testBuilderFluentInterface() throws ValidationException {
-        InterchangeControlTrailer trailer = InterchangeControlTrailer.builder()
-                .setIea01("8")
-                .setIea02("000087654")
-                .build();
+  @Test
+  void testBuilderFluentInterface() throws ValidationException {
+    InterchangeControlTrailer trailer =
+        InterchangeControlTrailer.builder().setIea01("8").setIea02("000087654").build();
 
-        assertEquals("8", trailer.getNumberOfIncludedGroups());
-        assertEquals("000087654", trailer.getInterchangeControlNumber());
-    }
+    assertEquals("8", trailer.getNumberOfIncludedGroups());
+    assertEquals("000087654", trailer.getInterchangeControlNumber());
+  }
 }

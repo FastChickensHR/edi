@@ -7,214 +7,210 @@
  */
 package com.fastChickensHR.edi.x999;
 
-import com.fastChickensHR.edi.core.Direction;
-import com.fastChickensHR.edi.core.Field;
-import com.fastChickensHR.edi.core.FileContent;
-import com.fastChickensHR.edi.core.Record;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fastChickensHR.edi.core.Direction;
+import com.fastChickensHR.edi.core.Field;
+import com.fastChickensHR.edi.core.FileContent;
+import com.fastChickensHR.edi.core.Record;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 class X999FileParserTest {
 
-    private final X999FileParser parser = new X999FileParser();
+  private final X999FileParser parser = new X999FileParser();
 
-    // A well-formed 106-char ISA (element sep '*', segment terminator '~', ISA13 = 000000123).
-    private static final String ISA =
-            "ISA*00*          *00*          *ZZ*SENDER         *ZZ*RECEIVER       *260119*1200*U*00501*000000123*0*P*:~";
+  // A well-formed 106-char ISA (element sep '*', segment terminator '~', ISA13 = 000000123).
+  private static final String ISA =
+      "ISA*00*          *00*          *ZZ*SENDER         *ZZ*RECEIVER       *260119*1200*U*00501*000000123*0*P*:~";
 
-    @Test
-    void parsesAnAcceptedAcknowledgment() {
-        String ack = ISA
-                + "GS*FA*SENDER*RECEIVER*20260119*1200*42*X*005010X231A1~"
-                + "ST*999*0001~"
-                + "AK1*BE*000000042~"
-                + "AK2*834*0001~"
-                + "IK5*A~"
-                + "AK9*A*1*1*1~"
-                + "SE*5*0001~GE*1*42~IEA*1*000000123~";
+  @Test
+  void parsesAnAcceptedAcknowledgment() {
+    String ack =
+        ISA
+            + "GS*FA*SENDER*RECEIVER*20260119*1200*42*X*005010X231A1~"
+            + "ST*999*0001~"
+            + "AK1*BE*000000042~"
+            + "AK2*834*0001~"
+            + "IK5*A~"
+            + "AK9*A*1*1*1~"
+            + "SE*5*0001~GE*1*42~IEA*1*000000123~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals(Direction.INBOUND, out.direction());
-        assertEquals("000000123", file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // ISA13
-        assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE));                // AK101
-        assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER));       // AK102 (acked GS06)
-        assertEquals("A", file(out, X999.GROUP_STATUS));                       // AK901
+    assertEquals(Direction.INBOUND, out.direction());
+    assertEquals("000000123", file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // ISA13
+    assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE)); // AK101
+    assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER)); // AK102 (acked GS06)
+    assertEquals("A", file(out, X999.GROUP_STATUS)); // AK901
 
-        assertEquals(1, out.records().size());
-        Record ts = out.records().get(0);
-        assertEquals("0001", rec(ts, X999.TRANSACTION_SET_CONTROL_NUMBER));    // AK202 (acked ST02)
-        assertEquals("A", rec(ts, X999.TRANSACTION_SET_STATUS));               // IK501
-    }
+    assertEquals(1, out.records().size());
+    Record ts = out.records().get(0);
+    assertEquals("0001", rec(ts, X999.TRANSACTION_SET_CONTROL_NUMBER)); // AK202 (acked ST02)
+    assertEquals("A", rec(ts, X999.TRANSACTION_SET_STATUS)); // IK501
+  }
 
-    @Test
-    void parsesARejectionWithMultipleTransactionSets() {
-        String ack = ISA
-                + "AK1*BE*000000042~"
-                + "AK2*834*0001~IK5*A~"
-                + "AK2*834*0002~IK5*R~"
-                + "AK9*P*2*2*1~";
+  @Test
+  void parsesARejectionWithMultipleTransactionSets() {
+    String ack =
+        ISA + "AK1*BE*000000042~" + "AK2*834*0001~IK5*A~" + "AK2*834*0002~IK5*R~" + "AK9*P*2*2*1~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("P", file(out, X999.GROUP_STATUS)); // partially accepted
-        assertEquals(2, out.records().size());
-        assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
-        assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
-        assertEquals("0002", rec(out.records().get(1), X999.TRANSACTION_SET_CONTROL_NUMBER));
-        assertEquals("R", rec(out.records().get(1), X999.TRANSACTION_SET_STATUS));
-    }
+    assertEquals("P", file(out, X999.GROUP_STATUS)); // partially accepted
+    assertEquals(2, out.records().size());
+    assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+    assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+    assertEquals("0002", rec(out.records().get(1), X999.TRANSACTION_SET_CONTROL_NUMBER));
+    assertEquals("R", rec(out.records().get(1), X999.TRANSACTION_SET_STATUS));
+  }
 
-    @Test
-    void reads997StyleAk5AndSkipsErrorDetailSegments() {
-        String ack = ISA
-                + "AK1*BE*000000042~"
-                + "AK2*834*0007~"
-                + "AK3*NM1*8**8~AK4*3*1068*7~" // error-detail segments — skipped this pass
-                + "AK5*E~"
-                + "AK9*E*1*1*1~";
+  @Test
+  void reads997StyleAk5AndSkipsErrorDetailSegments() {
+    String ack =
+        ISA
+            + "AK1*BE*000000042~"
+            + "AK2*834*0007~"
+            + "AK3*NM1*8**8~AK4*3*1068*7~" // error-detail segments — skipped this pass
+            + "AK5*E~"
+            + "AK9*E*1*1*1~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("E", file(out, X999.GROUP_STATUS));
-        assertEquals(1, out.records().size());
-        assertEquals("0007", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
-        assertEquals("E", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
-    }
+    assertEquals("E", file(out, X999.GROUP_STATUS));
+    assertEquals(1, out.records().size());
+    assertEquals("0007", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+    assertEquals("E", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+  }
 
-    @Test
-    void fallsBackToDefaultDelimitersWhenNoIsaEnvelope() {
-        // No ISA — the parser defaults to '*' / '~'.
-        String ack = "AK1*BE*000000042~AK2*834*0001~IK5*A~AK9*A*1*1*1~";
+  @Test
+  void fallsBackToDefaultDelimitersWhenNoIsaEnvelope() {
+    // No ISA — the parser defaults to '*' / '~'.
+    String ack = "AK1*BE*000000042~AK2*834*0001~IK5*A~AK9*A*1*1*1~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER));
-        assertNull(file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // no ISA present
-        assertEquals(1, out.records().size());
-        assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
-    }
+    assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER));
+    assertNull(file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // no ISA present
+    assertEquals(1, out.records().size());
+    assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+  }
 
-    @Test
-    void parsesAStandaloneTa1InterchangeAcknowledgment() {
-        String ack = ISA + "TA1*000000123*260119*1200*A*000~";
+  @Test
+  void parsesAStandaloneTa1InterchangeAcknowledgment() {
+    String ack = ISA + "TA1*000000123*260119*1200*A*000~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("000000123", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER)); // TA101
-        assertEquals("A", file(out, X999.INTERCHANGE_ACK_STATUS));                           // TA104
-    }
+    assertEquals("000000123", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER)); // TA101
+    assertEquals("A", file(out, X999.INTERCHANGE_ACK_STATUS)); // TA104
+  }
 
-    @Test
-    void parsesARejectingTa1() {
-        String ack = ISA + "TA1*000000777*260119*1200*R*022~";
+  @Test
+  void parsesARejectingTa1() {
+    String ack = ISA + "TA1*000000777*260119*1200*R*022~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("000000777", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER));
-        assertEquals("R", file(out, X999.INTERCHANGE_ACK_STATUS));
-    }
+    assertEquals("000000777", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER));
+    assertEquals("R", file(out, X999.INTERCHANGE_ACK_STATUS));
+  }
 
-    @Test
-    void blankInputProducesAnEmptyFileContent() {
-        FileContent out = parser.parse("   ");
-        assertTrue(out.fileFields().isEmpty());
-        assertTrue(out.records().isEmpty());
-        assertEquals(Direction.INBOUND, out.direction());
-    }
+  @Test
+  void blankInputProducesAnEmptyFileContent() {
+    FileContent out = parser.parse("   ");
+    assertTrue(out.fileFields().isEmpty());
+    assertTrue(out.records().isEmpty());
+    assertEquals(Direction.INBOUND, out.direction());
+  }
 
-    // The same well-formed 106-char ISA as ISA above, but with a '|' element separator and a '^'
-    // segment terminator instead of the '*'/'~' that happen to equal the parser's fallback defaults.
-    private static final String ISA_PIPE_CARET =
-            "ISA|00|          |00|          |ZZ|SENDER         |ZZ|RECEIVER       |260119|1200|U|00501|000000123|0|P|:^";
+  // The same well-formed 106-char ISA as ISA above, but with a '|' element separator and a '^'
+  // segment terminator instead of the '*'/'~' that happen to equal the parser's fallback defaults.
+  private static final String ISA_PIPE_CARET =
+      "ISA|00|          |00|          |ZZ|SENDER         |ZZ|RECEIVER       |260119|1200|U|00501|000000123|0|P|:^";
 
-    @Test
-    void readsNonDefaultDelimitersFromTheIsaEnvelope() {
-        // Every other fixture uses '*'/'~', which equal the fallback defaults, so the ISA-reading branch
-        // is indistinguishable from the branch that ignores it. This vendor uses '|' and '^'.
-        String ack = ISA_PIPE_CARET
-                + "AK1|BE|000000042^"
-                + "AK2|834|0001^IK5|A^"
-                + "AK9|A|1|1|1^";
+  @Test
+  void readsNonDefaultDelimitersFromTheIsaEnvelope() {
+    // Every other fixture uses '*'/'~', which equal the fallback defaults, so the ISA-reading
+    // branch
+    // is indistinguishable from the branch that ignores it. This vendor uses '|' and '^'.
+    String ack = ISA_PIPE_CARET + "AK1|BE|000000042^" + "AK2|834|0001^IK5|A^" + "AK9|A|1|1|1^";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("000000123", file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // ISA13, read via '|'
-        assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE));
-        assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER));
-        assertEquals("A", file(out, X999.GROUP_STATUS));
-        assertEquals(1, out.records().size());
-        assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
-        assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
-    }
+    assertEquals("000000123", file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // ISA13, read via '|'
+    assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE));
+    assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER));
+    assertEquals("A", file(out, X999.GROUP_STATUS));
+    assertEquals(1, out.records().size());
+    assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+    assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+  }
 
-    @Test
-    void fallsBackToDefaultsWhenTheIsaIsTruncated() {
-        // Starts with "ISA" but is far shorter than the fixed 106-char envelope, so the parser cannot
-        // read delimiters off it and falls back to '*'/'~' — parsing the rest without crashing, and
-        // simply not surfacing an interchange control number.
-        String ack = "ISA*BAD~AK1*BE*000000042~AK2*834*0001~IK5*A~AK9*A*1*1*1~";
+  @Test
+  void fallsBackToDefaultsWhenTheIsaIsTruncated() {
+    // Starts with "ISA" but is far shorter than the fixed 106-char envelope, so the parser cannot
+    // read delimiters off it and falls back to '*'/'~' — parsing the rest without crashing, and
+    // simply not surfacing an interchange control number.
+    String ack = "ISA*BAD~AK1*BE*000000042~AK2*834*0001~IK5*A~AK9*A*1*1*1~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertNull(file(out, X999.INTERCHANGE_CONTROL_NUMBER));          // truncated ISA yields no ISA13
-        assertEquals("000000042", file(out, X999.GROUP_CONTROL_NUMBER)); // rest still parses on defaults
-        assertEquals("A", file(out, X999.GROUP_STATUS));
-        assertEquals(1, out.records().size());
-        assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
-    }
+    assertNull(file(out, X999.INTERCHANGE_CONTROL_NUMBER)); // truncated ISA yields no ISA13
+    assertEquals(
+        "000000042", file(out, X999.GROUP_CONTROL_NUMBER)); // rest still parses on defaults
+    assertEquals("A", file(out, X999.GROUP_STATUS));
+    assertEquals(1, out.records().size());
+    assertEquals("0001", rec(out.records().get(0), X999.TRANSACTION_SET_CONTROL_NUMBER));
+  }
 
-    @Test
-    void parsesATa1AlongsideAnAckGroupInOneInterchange() {
-        // A TA1 interchange acknowledgment and an AK1/AK9 functional-group acknowledgment can ride in
-        // the same interchange; both the TA1 and the group fields must surface.
-        String ack = ISA
-                + "TA1*000000123*260119*1200*A*000~"
-                + "AK1*BE*000000042~"
-                + "AK2*834*0001~IK5*A~"
-                + "AK9*A*1*1*1~";
+  @Test
+  void parsesATa1AlongsideAnAckGroupInOneInterchange() {
+    // A TA1 interchange acknowledgment and an AK1/AK9 functional-group acknowledgment can ride in
+    // the same interchange; both the TA1 and the group fields must surface.
+    String ack =
+        ISA
+            + "TA1*000000123*260119*1200*A*000~"
+            + "AK1*BE*000000042~"
+            + "AK2*834*0001~IK5*A~"
+            + "AK9*A*1*1*1~";
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("000000123", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER)); // TA101
-        assertEquals("A", file(out, X999.INTERCHANGE_ACK_STATUS));                           // TA104
-        assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE));                              // AK101
-        assertEquals("A", file(out, X999.GROUP_STATUS));                                     // AK901
-        assertEquals(1, out.records().size());
-        assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
-    }
+    assertEquals("000000123", file(out, X999.ACKNOWLEDGED_INTERCHANGE_CONTROL_NUMBER)); // TA101
+    assertEquals("A", file(out, X999.INTERCHANGE_ACK_STATUS)); // TA104
+    assertEquals("BE", file(out, X999.FUNCTIONAL_ID_CODE)); // AK101
+    assertEquals("A", file(out, X999.GROUP_STATUS)); // AK901
+    assertEquals(1, out.records().size());
+    assertEquals("A", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+  }
 
-    @Test
-    void parsesAGroupLevelRejection() {
-        String ack = ISA
-                + "AK1*BE*000000042~"
-                + "AK2*834*0001~IK5*R~"
-                + "AK9*R*1*1*0~"; // group rejected
+  @Test
+  void parsesAGroupLevelRejection() {
+    String ack =
+        ISA + "AK1*BE*000000042~" + "AK2*834*0001~IK5*R~" + "AK9*R*1*1*0~"; // group rejected
 
-        FileContent out = parser.parse(ack);
+    FileContent out = parser.parse(ack);
 
-        assertEquals("R", file(out, X999.GROUP_STATUS));
-        assertEquals("R", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
-    }
+    assertEquals("R", file(out, X999.GROUP_STATUS));
+    assertEquals("R", rec(out.records().get(0), X999.TRANSACTION_SET_STATUS));
+  }
 
-    private static String file(FileContent fc, String location) {
-        return valueAt(fc.fileFields(), location);
-    }
+  private static String file(FileContent fc, String location) {
+    return valueAt(fc.fileFields(), location);
+  }
 
-    private static String rec(Record record, String location) {
-        return valueAt(record.fields(), location);
-    }
+  private static String rec(Record record, String location) {
+    return valueAt(record.fields(), location);
+  }
 
-    private static String valueAt(List<Field> fields, String location) {
-        return fields.stream()
-                .filter(f -> f.location().name().equals(location))
-                .map(Field::value)
-                .findFirst()
-                .orElse(null);
-    }
+  private static String valueAt(List<Field> fields, String location) {
+    return fields.stream()
+        .filter(f -> f.location().name().equals(location))
+        .map(Field::value)
+        .findFirst()
+        .orElse(null);
+  }
 }

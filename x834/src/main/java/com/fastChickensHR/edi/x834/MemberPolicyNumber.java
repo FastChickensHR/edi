@@ -7,49 +7,48 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.x834.RefSegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.experimental.Accessors;
 
 /**
  * Member policy number as a REF segment in Loop 2000 of the X12 834 (005010X220A1).
- * <p>
- * Renders {@code REF*1L*<policy number>}: REF01 is fixed to the qualifier {@code 1L}
- * ("Group or Policy Number") and REF02 carries the member's group/policy number.
+ *
+ * <p>Renders {@code REF*1L*<policy number>}: REF01 is fixed to the qualifier {@code 1L} ("Group or
+ * Policy Number") and REF02 carries the member's group/policy number.
  */
 class MemberPolicyNumber extends RefSegment {
-    /** REF01 qualifier {@code 1L} — Group or Policy Number. */
-    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "1L";
+  /** REF01 qualifier {@code 1L} — Group or Policy Number. */
+  public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "1L";
 
-    private MemberPolicyNumber(MemberPolicyNumber.Builder builder) throws ValidationException {
-        super(builder);
+  private MemberPolicyNumber(MemberPolicyNumber.Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  public static MemberPolicyNumber.Builder builder() {
+    return new MemberPolicyNumber.Builder();
+  }
+
+  /**
+   * Builds the member policy-number REF, defaulting REF01 to {@link
+   * MemberPolicyNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
+   */
+  @Accessors(chain = true)
+  public static class Builder extends RefSegment.AbstractBuilder<MemberPolicyNumber.Builder> {
+    public Builder() {
+      setRef01(DEFAULT_ENTITY_IDENTIFIER_CODE);
     }
 
-    public static MemberPolicyNumber.Builder builder() {
-        return new MemberPolicyNumber.Builder();
+    @Override
+    protected MemberPolicyNumber.Builder self() {
+      return this;
     }
 
-    /**
-     * Builds the member policy-number REF, defaulting REF01 to
-     * {@link MemberPolicyNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
-     */
-    @Accessors(chain = true)
-    public static class Builder extends RefSegment.AbstractBuilder<MemberPolicyNumber.Builder> {
-        public Builder() {
-            setRef01(DEFAULT_ENTITY_IDENTIFIER_CODE);
-        }
-
-        @Override
-        protected MemberPolicyNumber.Builder self() {
-            return this;
-        }
-
-        @Override
-        public MemberPolicyNumber build() throws ValidationException {
-            if (ref02 == null || ref02.isEmpty()) {
-                throw new ValidationException("ref02 (Subscriber Number) is required");
-            }
-            return new MemberPolicyNumber(this);
-        }
+    @Override
+    public MemberPolicyNumber build() throws ValidationException {
+      if (ref02 == null || ref02.isEmpty()) {
+        throw new ValidationException("ref02 (Subscriber Number) is required");
+      }
+      return new MemberPolicyNumber(this);
     }
+  }
 }

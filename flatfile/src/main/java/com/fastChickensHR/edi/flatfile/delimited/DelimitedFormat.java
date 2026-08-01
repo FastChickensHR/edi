@@ -18,133 +18,133 @@ import org.apache.commons.csv.QuoteMode;
  * handling) and never touch the underlying engine, so the dependency stays an implementation detail
  * the module can swap or extend without breaking consumers.
  *
- * <p>Build one with a preset factory such as {@link #csv()} for a known convention, or with
- * {@link #builder()} to match a foreign system's file exactly.
+ * <p>Build one with a preset factory such as {@link #csv()} for a known convention, or with {@link
+ * #builder()} to match a foreign system's file exactly.
  */
 public final class DelimitedFormat {
 
-    private final char delimiter;
-    private final Character quote;
-    private final Character escape;
-    private final QuoteMode quoteMode;
-    private final String recordSeparator;
-    private final boolean header;
+  private final char delimiter;
+  private final Character quote;
+  private final Character escape;
+  private final QuoteMode quoteMode;
+  private final String recordSeparator;
+  private final boolean header;
 
-    private DelimitedFormat(Builder builder) {
-        this.delimiter = builder.delimiter;
-        this.quote = builder.quote;
-        this.escape = builder.escape;
-        this.quoteMode = builder.quoteMode;
-        this.recordSeparator = builder.recordSeparator;
-        this.header = builder.header;
+  private DelimitedFormat(Builder builder) {
+    this.delimiter = builder.delimiter;
+    this.quote = builder.quote;
+    this.escape = builder.escape;
+    this.quoteMode = builder.quoteMode;
+    this.recordSeparator = builder.recordSeparator;
+    this.header = builder.header;
+  }
+
+  /**
+   * The pinned CSV convention: comma-delimited, {@code "}-quoted with quote-doubling (no escape
+   * character), minimal quoting, LF ({@code \n}) record separator, and a leading header row. This
+   * is the format the module's round-trip tests verify; it is the one preset guaranteed to survive
+   * parse-then-generate unchanged.
+   */
+  public static DelimitedFormat csv() {
+    return builder()
+        .delimiter(',')
+        .quote('"')
+        .escape(null)
+        .quoteMode(QuoteMode.MINIMAL)
+        .recordSeparator("\n")
+        .header(true)
+        .build();
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /** Whether files in this format carry a leading header row. */
+  boolean hasHeader() {
+    return header;
+  }
+
+  /** The Commons CSV format for reading — header-aware when {@link #hasHeader()}. */
+  CSVFormat parseFormat() {
+    CSVFormat.Builder builder = base();
+    if (header) {
+      builder.setHeader().setSkipHeaderRecord(true);
+    }
+    return builder.build();
+  }
+
+  /** The Commons CSV format for writing; the header row (when any) is printed by the generator. */
+  CSVFormat generateFormat() {
+    return base().build();
+  }
+
+  private CSVFormat.Builder base() {
+    return CSVFormat.DEFAULT
+        .builder()
+        .setDelimiter(delimiter)
+        .setQuote(quote)
+        .setEscape(escape)
+        .setQuoteMode(quoteMode)
+        .setRecordSeparator(recordSeparator);
+  }
+
+  /**
+   * Assembles a custom {@link DelimitedFormat}. Defaults mirror {@link #csv()}; override only the
+   * knobs a target file differs on.
+   */
+  public static final class Builder {
+    private char delimiter = ',';
+    private Character quote = '"';
+    private Character escape = null;
+    private QuoteMode quoteMode = QuoteMode.MINIMAL;
+    private String recordSeparator = "\n";
+    private boolean header = true;
+
+    private Builder() {}
+
+    public Builder delimiter(char delimiter) {
+      this.delimiter = delimiter;
+      return this;
+    }
+
+    /** The quote character, or {@code null} for an unquoted format. */
+    public Builder quote(Character quote) {
+      this.quote = quote;
+      return this;
     }
 
     /**
-     * The pinned CSV convention: comma-delimited, {@code "}-quoted with quote-doubling (no escape
-     * character), minimal quoting, LF ({@code \n}) record separator, and a leading header row.
-     * This is the format the module's round-trip tests verify; it is the one preset guaranteed to
-     * survive parse-then-generate unchanged.
+     * The escape character, or {@code null} to escape an embedded quote by doubling it (the CSV
+     * convention).
      */
-    public static DelimitedFormat csv() {
-        return builder()
-                .delimiter(',')
-                .quote('"')
-                .escape(null)
-                .quoteMode(QuoteMode.MINIMAL)
-                .recordSeparator("\n")
-                .header(true)
-                .build();
+    public Builder escape(Character escape) {
+      this.escape = escape;
+      return this;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public Builder quoteMode(QuoteMode quoteMode) {
+      this.quoteMode = quoteMode;
+      return this;
     }
 
-    /** Whether files in this format carry a leading header row. */
-    boolean hasHeader() {
-        return header;
-    }
-
-    /** The Commons CSV format for reading — header-aware when {@link #hasHeader()}. */
-    CSVFormat parseFormat() {
-        CSVFormat.Builder builder = base();
-        if (header) {
-            builder.setHeader().setSkipHeaderRecord(true);
-        }
-        return builder.build();
-    }
-
-    /** The Commons CSV format for writing; the header row (when any) is printed by the generator. */
-    CSVFormat generateFormat() {
-        return base().build();
-    }
-
-    private CSVFormat.Builder base() {
-        return CSVFormat.DEFAULT.builder()
-                .setDelimiter(delimiter)
-                .setQuote(quote)
-                .setEscape(escape)
-                .setQuoteMode(quoteMode)
-                .setRecordSeparator(recordSeparator);
+    public Builder recordSeparator(String recordSeparator) {
+      this.recordSeparator = recordSeparator;
+      return this;
     }
 
     /**
-     * Assembles a custom {@link DelimitedFormat}. Defaults mirror {@link #csv()}; override only the
-     * knobs a target file differs on.
+     * Whether files in this format carry a leading header row (the default). With {@code false} the
+     * generator omits it and the parser, having no column names to read, addresses cells by their
+     * 1-based position instead — see {@link DelimitedFileParser}.
      */
-    public static final class Builder {
-        private char delimiter = ',';
-        private Character quote = '"';
-        private Character escape = null;
-        private QuoteMode quoteMode = QuoteMode.MINIMAL;
-        private String recordSeparator = "\n";
-        private boolean header = true;
-
-        private Builder() {
-        }
-
-        public Builder delimiter(char delimiter) {
-            this.delimiter = delimiter;
-            return this;
-        }
-
-        /** The quote character, or {@code null} for an unquoted format. */
-        public Builder quote(Character quote) {
-            this.quote = quote;
-            return this;
-        }
-
-        /**
-         * The escape character, or {@code null} to escape an embedded quote by doubling it (the CSV
-         * convention).
-         */
-        public Builder escape(Character escape) {
-            this.escape = escape;
-            return this;
-        }
-
-        public Builder quoteMode(QuoteMode quoteMode) {
-            this.quoteMode = quoteMode;
-            return this;
-        }
-
-        public Builder recordSeparator(String recordSeparator) {
-            this.recordSeparator = recordSeparator;
-            return this;
-        }
-
-        /**
-         * Whether files in this format carry a leading header row (the default). With {@code false}
-         * the generator omits it and the parser, having no column names to read, addresses cells by
-         * their 1-based position instead — see {@link DelimitedFileParser}.
-         */
-        public Builder header(boolean header) {
-            this.header = header;
-            return this;
-        }
-
-        public DelimitedFormat build() {
-            return new DelimitedFormat(this);
-        }
+    public Builder header(boolean header) {
+      this.header = header;
+      return this;
     }
+
+    public DelimitedFormat build() {
+      return new DelimitedFormat(this);
+    }
+  }
 }
