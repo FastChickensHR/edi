@@ -23,49 +23,97 @@ import lombok.Getter;
  */
 @Getter
 public enum InterchangeIdQualifier implements EdiCodeEnum {
+  /** Duns (Dun &amp; Bradstreet) — X12 code "01". */
   DUNS("01", "Duns (Dun & Bradstreet)"),
+  /** SCAC (Standard Carrier Alpha Code) — X12 code "02". */
   SCAC("02", "SCAC (Standard Carrier Alpha Code)"),
+  /** FMC (Federal Maritime Commission) — X12 code "03". */
   FMC("03", "FMC (Federal Maritime Commission)"),
+  /** IATA (International Air Transport Association) — X12 code "04". */
   IATA("04", "IATA (International Air Transport Association)"),
+  /** Global Location Number (GLN) — X12 code "07". */
   GLN("07", "Global Location Number (GLN)"),
+  /** UCC EDI Communications ID (Comm ID) — X12 code "08". */
   UCC_EDI_COMM_ID("08", "UCC EDI Communications ID (Comm ID)"),
+  /** X.121 (CCITT) — X12 code "09". */
   X121("09", "X.121 (CCITT)"),
+  /** Department of Defense (DoD) Activity Address Code — X12 code "10". */
   DOD_ACTIVITY_CODE("10", "Department of Defense (DoD) Activity Address Code"),
+  /** DEA (Drug Enforcement Administration) — X12 code "11". */
   DEA("11", "DEA (Drug Enforcement Administration)"),
+  /** Phone (Telephone Companies) — X12 code "12". */
   PHONE("12", "Phone (Telephone Companies)"),
+  /** UCS Code — X12 code "13". */
   UCS_CODE("13", "UCS Code"),
+  /** Duns Plus Suffix — X12 code "14". */
   DUNS_PLUS_SUFFIX("14", "Duns Plus Suffix"),
+  /** Petroleum Accountants Society of Canada Company Code — X12 code "15". */
   PASC_COMPANY_CODE("15", "Petroleum Accountants Society of Canada Company Code"),
+  /** Duns Number With 4-Character Suffix — X12 code "16". */
   DUNS_WITH_4CHAR_SUFFIX("16", "Duns Number With 4-Character Suffix"),
+  /** American Bankers Association (ABA) Transit Routing Number — X12 code "17". */
   ABA_ROUTING_NUMBER("17", "American Bankers Association (ABA) Transit Routing Number"),
+  /** Association of American Railroads (AAR) Standard Distribution Code — X12 code "18". */
   AAR_CODE("18", "Association of American Railroads (AAR) Standard Distribution Code"),
+  /** EDI Council of Australia (EDICA) Communications ID Number — X12 code "19". */
   EDICA_COMM_ID("19", "EDI Council of Australia (EDICA) Communications ID Number"),
+  /** Health Industry Number (HIN) — X12 code "20". */
   HIN("20", "Health Industry Number (HIN)"),
+  /** Integrated Postsecondary Education Data System (IPEDS) — X12 code "21". */
   IPEDS("21", "Integrated Postsecondary Education Data System (IPEDS)"),
+  /** Federal Interagency Commission on Education (FICE) — X12 code "22". */
   FICE("22", "Federal Interagency Commission on Education (FICE)"),
+  /**
+   * National Center for Education Statistics Common Core of Data 12-Digit Number — X12 code "23".
+   */
   NCES("23", "National Center for Education Statistics Common Core of Data 12-Digit Number"),
+  /** The College Board's Admission Testing Program 4-Digit Code — X12 code "24". */
   ATP_CODE("24", "The College Board's Admission Testing Program 4-Digit Code"),
+  /** ACT, Inc. 4-Digit Code of Postsecondary Institutions — X12 code "25". */
   ACT_CODE("25", "ACT, Inc. 4-Digit Code of Postsecondary Institutions"),
+  /** Statistics of Canada List of Postsecondary Institutions — X12 code "26". */
   STATS_CANADA_LIST("26", "Statistics of Canada List of Postsecondary Institutions"),
+  /** Carrier Identification Number as assigned by HCFA — X12 code "27". */
   CARRIER_ID_HCFA("27", "Carrier Identification Number as assigned by HCFA"),
+  /** Fiscal Intermediary Identification Number as assigned by HCFA — X12 code "28". */
   FISCAL_INTERMEDIARY_ID("28", "Fiscal Intermediary Identification Number as assigned by HCFA"),
+  /** Medicare Provider and Supplier Identification Number — X12 code "29". */
   MEDICARE_PROVIDER_ID("29", "Medicare Provider and Supplier Identification Number"),
+  /** U.S. Federal Tax Identification Number — X12 code "30". */
   US_FEDERAL_TAX_ID("30", "U.S. Federal Tax Identification Number"),
+  /** Jurisdiction Identification Number Plus 4 as assigned by IAIABC — X12 code "31". */
   IAIABC_ID("31", "Jurisdiction Identification Number Plus 4 as assigned by IAIABC"),
+  /** U.S. Federal Employer Identification Number (FEIN) — X12 code "32". */
   FEIN("32", "U.S. Federal Employer Identification Number (FEIN)"),
+  /** National Association of Insurance Commissioners Company Code (NAIC) — X12 code "33". */
   NAIC("33", "National Association of Insurance Commissioners Company Code (NAIC)"),
+  /** Medicaid Provider and Supplier Identification Number — X12 code "34". */
   MEDICAID_PROVIDER_ID("34", "Medicaid Provider and Supplier Identification Number"),
+  /**
+   * Statistics Canada Canadian College Student Information System Institution Codes — X12 code
+   * "35".
+   */
   STATS_CANADA_COLLEGE_CODES(
       "35", "Statistics Canada Canadian College Student Information System Institution Codes"),
+  /** Statistics Canada University Student Information System Institution Codes — X12 code "36". */
   STATS_CANADA_UNIVERSITY_CODES(
       "36", "Statistics Canada University Student Information System Institution Codes"),
+  /** Society of Property Information Compilers and Analysts — X12 code "37". */
   SPICA("37", "Society of Property Information Compilers and Analysts"),
+  /**
+   * The College Board and ACT, Inc. 6-Digit Code List of Secondary Institutions — X12 code "38".
+   */
   SECONDARY_INST_CODE(
       "38", "The College Board and ACT, Inc. 6-Digit Code List of Secondary Institutions"),
+  /** Association Mexicana del Codigo de Producto (AMECOP) Communication ID — X12 code "AM". */
   AMECOP("AM", "Association Mexicana del Codigo de Producto (AMECOP) Communication ID"),
+  /** National Retail Merchants Association (NRMA) - Assigned — X12 code "NR". */
   NRMA("NR", "National Retail Merchants Association (NRMA) - Assigned"),
+  /** User Identification Number as assigned by SAFER System — X12 code "SA". */
   SAFER_ID("SA", "User Identification Number as assigned by SAFER System"),
+  /** Standard Address Number — X12 code "SN". */
   STANDARD_ADDRESS_NUMBER("SN", "Standard Address Number"),
+  /** Mutually Defined — X12 code "ZZ". */
   MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
   private final String code;

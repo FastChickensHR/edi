@@ -29,13 +29,21 @@ import lombok.Getter;
  */
 @Getter
 public enum CommunicationNumberQualifier implements EdiCodeEnum {
+  /** Alternate Telephone — X12 code "AP". */
   ALTERNATE_TELEPHONE("AP", "Alternate Telephone"),
+  /** Cellular Phone — X12 code "CP". */
   CELLULAR_PHONE("CP", "Cellular Phone"),
+  /** Electronic Mail — X12 code "EM". */
   ELECTRONIC_MAIL("EM", "Electronic Mail"),
+  /** Telephone Extension — X12 code "EX". */
   TELEPHONE_EXTENSION("EX", "Telephone Extension"),
+  /** Facsimile — X12 code "FX". */
   FACSIMILE("FX", "Facsimile"),
+  /** Home Phone Number — X12 code "HP". */
   HOME_PHONE("HP", "Home Phone Number"),
+  /** Telephone — X12 code "TE". */
   TELEPHONE("TE", "Telephone"),
+  /** Work Phone Number — X12 code "WP". */
   WORK_PHONE("WP", "Work Phone Number");
 
   private final String code;

@@ -19,30 +19,51 @@ import lombok.Getter;
  */
 @Getter
 public enum MemberDateQualifier implements EdiCodeEnum {
+  /** Benefit begin — maps to {@link DateTimeQualifier#BENEFIT_BEGIN}. */
   BENEFIT_BEGIN(DateTimeQualifier.BENEFIT_BEGIN),
+  /** Benefit end — maps to {@link DateTimeQualifier#BENEFIT_END}. */
   BENEFIT_END(DateTimeQualifier.BENEFIT_END),
+  /** Birth — maps to {@link DateTimeQualifier#EFFECTIVE}. */
   BIRTH(DateTimeQualifier.EFFECTIVE),
+  /** Coverage begin — maps to {@link DateTimeQualifier#ELIGIBILITY_BEGIN}. */
   COVERAGE_BEGIN(DateTimeQualifier.ELIGIBILITY_BEGIN),
+  /** Coverage end — maps to {@link DateTimeQualifier#ELIGIBILITY_END}. */
   COVERAGE_END(DateTimeQualifier.ELIGIBILITY_END),
+  /** Effective — maps to {@link DateTimeQualifier#MAINTENANCE_EFFECTIVE}. */
   EFFECTIVE(DateTimeQualifier.MAINTENANCE_EFFECTIVE),
+  /** Eligibility begin — maps to {@link DateTimeQualifier#EMPLOYMENT_BEGIN}. */
   ELIGIBILITY_BEGIN(DateTimeQualifier.EMPLOYMENT_BEGIN),
+  /** Eligibility end — maps to {@link DateTimeQualifier#EMPLOYMENT_END}. */
   ELIGIBILITY_END(DateTimeQualifier.EMPLOYMENT_END),
   // 300 "Enrollment Signature Date" — the member-level (Loop 2000) enrollment date the 834
   // 005010X220A1 TR3 permits. The generic 382 "Enrollment" is NOT an allowed member-level DTP01
   // code, so this maps to 300 rather than 382 (grounded in edi #167). Distinct from
   // COVERAGE_BEGIN's 356 (Eligibility Begin), which carries coverageStartDate.
+  /** Enrollment — maps to {@link DateTimeQualifier#ENROLLMENT_SIGNATURE_DATE}. */
   ENROLLMENT(DateTimeQualifier.ENROLLMENT_SIGNATURE_DATE),
+  /** Expiration — maps to {@link DateTimeQualifier#EXPIRATION_DATE}. */
   EXPIRATION(DateTimeQualifier.EXPIRATION_DATE),
+  /** Hire — maps to {@link DateTimeQualifier#EMPLOYMENT_OR_HIRE}. */
   HIRE(DateTimeQualifier.EMPLOYMENT_OR_HIRE),
+  /** Maintenance effective — maps to {@link DateTimeQualifier#MAINTENANCE_EFFECTIVE}. */
   MAINTENANCE_EFFECTIVE(DateTimeQualifier.MAINTENANCE_EFFECTIVE),
+  /** Retirement — maps to {@link DateTimeQualifier#RETIREMENT}. */
   RETIREMENT(DateTimeQualifier.RETIREMENT),
+  /** Signature — maps to {@link DateTimeQualifier#APPLICANT_SIGNED}. */
   SIGNATURE(DateTimeQualifier.APPLICANT_SIGNED),
+  /** Status change — maps to {@link DateTimeQualifier#CHANGED}. */
   STATUS_CHANGE(DateTimeQualifier.CHANGED),
+  /** Termination — maps to {@link DateTimeQualifier#EXPIRATION_DATE}. */
   TERMINATION(DateTimeQualifier.EXPIRATION_DATE), // Same code as EXPIRATION
+  /** Cobra qualifying event — maps to {@link DateTimeQualifier#COBRA_QUALIFYING_EVENT}. */
   COBRA_QUALIFYING_EVENT(DateTimeQualifier.COBRA_QUALIFYING_EVENT),
+  /** Cobra election — maps to {@link DateTimeQualifier#COBRA}. */
   COBRA_ELECTION(DateTimeQualifier.COBRA),
+  /** Cobra begin — maps to {@link DateTimeQualifier#COBRA_BEGIN}. */
   COBRA_BEGIN(DateTimeQualifier.COBRA_BEGIN),
+  /** Cobra end — maps to {@link DateTimeQualifier#COBRA_END}. */
   COBRA_END(DateTimeQualifier.COBRA_END),
+  /** Premium paid to date — maps to {@link DateTimeQualifier#PREMIUM_PAID_TO_DATE}. */
   PREMIUM_PAID_TO_DATE(DateTimeQualifier.PREMIUM_PAID_TO_DATE);
 
   private final DateTimeQualifier dateTimeQualifier;

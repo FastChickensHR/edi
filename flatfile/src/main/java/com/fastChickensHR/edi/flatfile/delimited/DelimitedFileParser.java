@@ -49,7 +49,11 @@ public final class DelimitedFileParser implements FileParser {
     this(DelimitedFormat.csv());
   }
 
-  /** Reads a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
+  /**
+   * Reads a delimited flat file in the given {@code format} (e.g. to match a foreign feed).
+   *
+   * @param format the delimiter/quote/header convention to expect
+   */
   public DelimitedFileParser(DelimitedFormat format) {
     this.format = format;
   }

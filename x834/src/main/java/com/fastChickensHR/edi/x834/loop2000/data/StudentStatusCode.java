@@ -22,8 +22,11 @@ import lombok.Getter;
  */
 @Getter
 public enum StudentStatusCode implements EdiCodeEnum {
+  /** Full-time — X12 code "F". */
   FULL_TIME("F", "Full-time"),
+  /** Not a Student — X12 code "N". */
   NOT_A_STUDENT("N", "Not a Student"),
+  /** Part-time — X12 code "P". */
   PART_TIME("P", "Part-time");
 
   private final String code;

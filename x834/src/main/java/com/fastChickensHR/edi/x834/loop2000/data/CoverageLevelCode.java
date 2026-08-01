@@ -20,15 +20,25 @@ import lombok.Getter;
  */
 @Getter
 public enum CoverageLevelCode implements EdiCodeEnum {
+  /** Children Only — X12 code "CHD". */
   CHILDREN_ONLY("CHD", "Children Only"),
+  /** Dependents Only — X12 code "DEP". */
   DEPENDENTS_ONLY("DEP", "Dependents Only"),
+  /** Employee and Children — X12 code "ECH". */
   EMPLOYEE_AND_CHILDREN("ECH", "Employee and Children"),
+  /** Employee Only — X12 code "EMP". */
   EMPLOYEE_ONLY("EMP", "Employee Only"),
+  /** Employee and Spouse — X12 code "ESP". */
   EMPLOYEE_AND_SPOUSE("ESP", "Employee and Spouse"),
+  /** Family — X12 code "FAM". */
   FAMILY("FAM", "Family"),
+  /** Individual — X12 code "IND". */
   INDIVIDUAL("IND", "Individual"),
+  /** Spouse and Children — X12 code "SPC". */
   SPOUSE_AND_CHILDREN("SPC", "Spouse and Children"),
+  /** Spouse Only — X12 code "SPO". */
   SPOUSE_ONLY("SPO", "Spouse Only"),
+  /** Two Party — X12 code "TWO". */
   TWO_PARTY("TWO", "Two Party");
 
   private final String code;

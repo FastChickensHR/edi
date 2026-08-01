@@ -65,9 +65,12 @@ public class CoordinationOfBenefits {
   /** The other plan's name (2330 {@code NM1} NM103), e.g. {@code MEDICARE PART A}. */
   private String relatedEntityName;
 
+  /** Creates an empty coordination-of-benefits entry; callers set fields afterwards. */
   public CoordinationOfBenefits() {}
 
   /**
+   * Creates a coordination-of-benefits entry stating just the payment-order facts.
+   *
    * @param payerResponsibility where the other payer sits in the payment order (COB01)
    * @param benefitsCoordination whether benefits are coordinated, and for whom (COB03)
    */

@@ -42,7 +42,11 @@ public final class DelimitedFileGenerator implements FileGenerator {
     this(DelimitedFormat.csv());
   }
 
-  /** Writes a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
+  /**
+   * Writes a delimited flat file in the given {@code format} (e.g. to match a foreign feed).
+   *
+   * @param format the delimiter/quote/header convention to write
+   */
   public DelimitedFileGenerator(DelimitedFormat format) {
     this.format = format;
   }

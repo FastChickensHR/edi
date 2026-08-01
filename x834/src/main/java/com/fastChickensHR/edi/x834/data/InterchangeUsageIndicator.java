@@ -23,8 +23,11 @@ import lombok.Getter;
  */
 @Getter
 public enum InterchangeUsageIndicator implements EdiCodeEnum {
+  /** Information — X12 code "I". */
   INFORMATION("I", "Information"),
+  /** Production Data — X12 code "P". */
   PRODUCTION("P", "Production Data"),
+  /** Test Data — X12 code "T". */
   TEST("T", "Test Data");
 
   private final String code;

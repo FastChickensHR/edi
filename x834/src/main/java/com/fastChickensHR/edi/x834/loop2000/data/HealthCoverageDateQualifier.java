@@ -18,12 +18,19 @@ import lombok.Getter;
  */
 @Getter
 public enum HealthCoverageDateQualifier implements EdiCodeEnum {
+  /** Plan Begin Date — X12 code "348". */
   EFFECTIVE_DATE("348", "Plan Begin Date"),
+  /** Plan End Date — X12 code "349". */
   EXPIRATION_DATE("349", "Plan End Date"),
+  /** Eligibility Begin Date — X12 code "356". */
   ELIGIBILITY_BEGIN("356", "Eligibility Begin Date"),
+  /** Eligibility End Date — X12 code "357". */
   ELIGIBILITY_END("357", "Eligibility End Date"),
+  /** COBRA Begin Date — X12 code "340". */
   COBRA_BEGIN("340", "COBRA Begin Date"),
+  /** COBRA End Date — X12 code "341". */
   COBRA_END("341", "COBRA End Date"),
+  /** Premium Paid To Date — X12 code "289". */
   PREMIUM_PAID_TO_DATE("289", "Premium Paid To Date");
 
   private final String code;

@@ -12,6 +12,8 @@ package com.fastChickensHR.edi.core;
  * partner (emitted).
  */
 public enum Direction {
+  /** Parsed from a trading partner's file into the consuming application. */
   INBOUND,
+  /** Emitted by the consuming application toward a trading partner. */
   OUTBOUND
 }

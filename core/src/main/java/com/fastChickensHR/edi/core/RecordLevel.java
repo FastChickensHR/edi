@@ -17,7 +17,10 @@ package com.fastChickensHR.edi.core;
  * </ul>
  */
 public enum RecordLevel {
+  /** Header/trailer fields, once per file. */
   FILE,
+  /** A subject record's own fields (and its coverage). */
   RECORD,
+  /** A child record's fields, nested within a record. */
   SUBRECORD
 }

@@ -34,7 +34,11 @@ public enum DataType {
     this.description = description;
   }
 
-  /** The standard's name for this type, e.g. {@code "Identifier"} for {@link #ID}. */
+  /**
+   * The standard's name for this type, e.g. {@code "Identifier"} for {@link #ID}.
+   *
+   * @return the human-readable type name
+   */
   public String getDescription() {
     return description;
   }

@@ -43,9 +43,12 @@ public class HealthInformation {
   /** Why the weight changed (HLH05). */
   private String description;
 
+  /** Creates an empty health-information entry; callers set fields afterwards. */
   public HealthInformation() {}
 
   /**
+   * Creates a health-information entry stating just the health-related status.
+   *
    * @param healthRelatedCode the member's tobacco/substance status (HLH01)
    */
   public HealthInformation(HealthRelatedCode healthRelatedCode) {

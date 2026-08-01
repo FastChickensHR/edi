@@ -57,6 +57,8 @@ public class Header {
    * Generates all the segments for this header
    *
    * @return List of segments in the correct order
+   * @throws ValidationException if the transaction set identifier code is missing, or a header
+   *     segment builder rejects its inputs
    */
   public List<Segment> generateSegments() throws ValidationException {
     validate();

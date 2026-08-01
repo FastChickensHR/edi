@@ -27,19 +27,33 @@ import lombok.Getter;
  */
 @Getter
 public enum PayerResponsibilitySequenceCode implements EdiCodeEnum {
+  /** Payer Responsibility Four — X12 code "A". */
   PAYER_RESPONSIBILITY_FOUR("A", "Payer Responsibility Four"),
+  /** Payer Responsibility Five — X12 code "B". */
   PAYER_RESPONSIBILITY_FIVE("B", "Payer Responsibility Five"),
+  /** Payer Responsibility Six — X12 code "C". */
   PAYER_RESPONSIBILITY_SIX("C", "Payer Responsibility Six"),
+  /** Payer Responsibility Seven — X12 code "D". */
   PAYER_RESPONSIBILITY_SEVEN("D", "Payer Responsibility Seven"),
+  /** Payer Responsibility Eight — X12 code "E". */
   PAYER_RESPONSIBILITY_EIGHT("E", "Payer Responsibility Eight"),
+  /** Payer Responsibility Nine — X12 code "F". */
   PAYER_RESPONSIBILITY_NINE("F", "Payer Responsibility Nine"),
+  /** Payer Responsibility Ten — X12 code "G". */
   PAYER_RESPONSIBILITY_TEN("G", "Payer Responsibility Ten"),
+  /** Payer Responsibility Eleven — X12 code "H". */
   PAYER_RESPONSIBILITY_ELEVEN("H", "Payer Responsibility Eleven"),
+  /** Unconfirmed — X12 code "N". */
   UNCONFIRMED("N", "Unconfirmed"),
+  /** Noncapitated Agreement — X12 code "O". */
   NONCAPITATED_AGREEMENT("O", "Noncapitated Agreement"),
+  /** Primary — X12 code "P". */
   PRIMARY("P", "Primary"),
+  /** Secondary — X12 code "S". */
   SECONDARY("S", "Secondary"),
+  /** Tertiary — X12 code "T". */
   TERTIARY("T", "Tertiary"),
+  /** Unknown — X12 code "U". */
   UNKNOWN("U", "Unknown");
 
   private final String code;

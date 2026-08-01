@@ -23,7 +23,9 @@ import lombok.Getter;
  */
 @Getter
 public enum SecurityInformationQualifier implements EdiCodeEnum {
+  /** No Security Information Present — X12 code "00". */
   NO_SECURITY_INFORMATION("00", "No Security Information Present"),
+  /** Password — X12 code "01". */
   PASSWORD("01", "Password");
 
   private final String code;

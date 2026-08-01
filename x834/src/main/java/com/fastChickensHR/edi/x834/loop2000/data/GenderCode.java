@@ -18,10 +18,15 @@ import lombok.Getter;
  */
 @Getter
 public enum GenderCode implements EdiCodeEnum {
+  /** Male — X12 code "M". */
   MALE("M", "Male"),
+  /** Female — X12 code "F". */
   FEMALE("F", "Female"),
+  /** Unknown — X12 code "U". */
   UNKNOWN("U", "Unknown"),
+  /** Non-Binary — X12 code "N". */
   NON_BINARY("N", "Non-Binary"),
+  /** Not Specified — X12 code "X". */
   NOT_SPECIFIED("X", "Not Specified");
 
   private final String code;
