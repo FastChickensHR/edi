@@ -76,6 +76,11 @@ structure/configuration problems and render-time serialization problems all surf
 
 Java 23 and Maven.
 
+Formatting is enforced by Spotless (google-java-format); `mvn spotless:apply` fixes a failing
+check. The one-shot reformat commit is listed in `.git-blame-ignore-revs` — GitHub blame skips
+it automatically, and locally you can do the same with
+`git config blame.ignoreRevsFile .git-blame-ignore-revs`.
+
 ## License
 
 [MIT](LICENSE)

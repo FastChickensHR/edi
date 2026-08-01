@@ -1,0 +1,4 @@
+# One-shot google-java-format reformat of the whole tree (#241, PR #252).
+# GitHub blame picks this file up automatically; locally, run:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+e0c831ffae75c86591f7ff0398781e84065062dd
