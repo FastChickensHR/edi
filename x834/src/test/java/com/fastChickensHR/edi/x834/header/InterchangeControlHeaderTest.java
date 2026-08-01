@@ -72,6 +72,27 @@ class InterchangeControlHeaderTest {
      * that GS04/BGN03/DTP carry — the fixed-width layout the getter assertions never render.
      */
     @Test
+    void contextQualifiersOverrideTheIsaDefaults() throws ValidationException {
+        // mono#658/#640: Florida Blue mandates ISA05=ZZ; the context now carries the per-partner
+        // qualifier pair, and null/blank keeps the historical defaults (the test above).
+        X834Context context = new X834Context();
+        context.setSenderID("SENDER123");
+        context.setReceiverID("RECEIVER456");
+        context.setSenderIdQualifier("ZZ");
+        context.setReceiverIdQualifier("30");
+        context.setDocumentDate(LocalDateTime.of(2023, 6, 30, 0, 0));
+
+        InterchangeControlHeader header = new InterchangeControlHeader.Builder(context)
+                .setInterchangeControlNumber("000000001")
+                .build();
+        SegmentTestSupport.setContext(header, context);
+
+        assertEquals(
+                "ISA*00*          *00*          *ZZ*SENDER123      *30*RECEIVER456    *230630*0000*^*00501*000000001*0*T*:~\n",
+                header.render());
+    }
+
+    @Test
     void rendersIsaSegmentFromContextDefaults() throws ValidationException {
         X834Context context = new X834Context();
         context.setSenderID("SENDER123");

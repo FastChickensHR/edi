@@ -42,6 +42,18 @@ public class X834Context {
     private String senderID;
     private String receiverID;
     /**
+     * ISA05 — Interchange Sender ID Qualifier. Null or blank falls back to the header's default
+     * ({@code "30"}, U.S. Federal Tax Identification Number). Trading partners routinely mandate
+     * {@code "ZZ"} (Mutually Defined) instead (mono#658/#640), so this is a per-partner value,
+     * not a constant.
+     */
+    private String senderIdQualifier;
+    /**
+     * ISA07 — Interchange Receiver ID Qualifier. Null or blank falls back to the header's default
+     * ({@code "ZZ"}, Mutually Defined).
+     */
+    private String receiverIdQualifier;
+    /**
      * GS02 — Application Sender's Code, the functional-group sender identifier. Distinct from
      * {@link #senderID} (ISA06): a trading partner may assign a sender code that differs from the
      * interchange mailbox ID. Null or blank falls back to {@link #senderID}, which is the common

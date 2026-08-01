@@ -126,6 +126,8 @@ public final class X834FileGenerator implements FileGenerator {
         X834Context context = new X834Context();
         apply(file, X834Location.SENDER_ID, context::setSenderID);
         apply(file, X834Location.RECEIVER_ID, context::setReceiverID);
+        apply(file, X834Location.SENDER_ID_QUALIFIER, context::setSenderIdQualifier);
+        apply(file, X834Location.RECEIVER_ID_QUALIFIER, context::setReceiverIdQualifier);
         apply(file, X834Location.APPLICATION_SENDER_CODE, context::setApplicationSenderCode);
         apply(file, X834Location.APPLICATION_RECEIVER_CODE, context::setApplicationReceiverCode);
         apply(file, X834Location.INTERCHANGE_CONTROL_NUMBER, context::setInterchangeControlNumber);
