@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a defect in the edi library
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > [!CAUTION]
+        > **Synthetic data only.** 834 files carry real people's names, SSNs, dates of birth,
+        > and other protected information. Never paste production EDI content, real member
+        > data, or anything derived from it into this public issue. Rebuild your reproducer
+        > with made-up values before filing.
+  - type: input
+    id: version
+    attributes:
+      label: edi version or commit SHA
+      description: The release you depend on, or the commit SHA if you build from source.
+      placeholder: "1.0.0-beta.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - core
+        - x834
+        - x999
+        - flatfile
+        - not sure
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer
+      description: The smallest code snippet (with synthetic input, if any) that shows the problem.
+      render: java
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happens instead — output, exception, stack trace.
+    validations:
+      required: true

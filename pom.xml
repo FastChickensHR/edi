@@ -21,6 +21,15 @@
     <name>FastChickensHR EDI</name>
     <description>Open-source toolkit for generating X12 EDI benefit enrollment documents</description>
 
+    <developers>
+        <developer>
+            <name>Mark Beebe</name>
+            <email>contact@fastchickenshr.com</email>
+            <organization>FastChickensHR</organization>
+            <organizationUrl>https://fastchickenshr.com</organizationUrl>
+        </developer>
+    </developers>
+
     <modules>
         <module>core</module>
         <module>x834</module>
