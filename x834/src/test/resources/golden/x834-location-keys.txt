@@ -89,10 +89,12 @@ provider.idQualifier
 provider.lastName
 provider.middleName
 receiverId
+receiverIdQualifier
 ref.
 referenceIdentification
 relationshipCode
 senderId
+senderIdQualifier
 state
 subscriberNumber
 transactionSetControlNumber

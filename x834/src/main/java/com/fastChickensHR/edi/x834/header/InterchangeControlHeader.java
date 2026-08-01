@@ -67,9 +67,15 @@ class InterchangeControlHeader extends ISASegment {
             this.isa02 = DEFAULT_AUTHORIZATION_INFO;
             this.isa03 = DEFAULT_SECURITY_INFO_QUALIFIER;
             this.isa04 = DEFAULT_SECURITY_INFO;
-            this.isa05 = DEFAULT_INTERCHANGE_SENDER_QUALIFIER;
+            // Per-partner interchange qualifiers (mono#658/#640): a trading partner may mandate
+            // e.g. ISA05=ZZ; a null/blank context value keeps the historical defaults.
+            this.isa05 = context.getSenderIdQualifier() == null || context.getSenderIdQualifier().isBlank()
+                    ? DEFAULT_INTERCHANGE_SENDER_QUALIFIER
+                    : InterchangeIdQualifier.fromString(context.getSenderIdQualifier());
             this.setIsa06(context.getSenderID());
-            this.isa07 = DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER;
+            this.isa07 = context.getReceiverIdQualifier() == null || context.getReceiverIdQualifier().isBlank()
+                    ? DEFAULT_INTERCHANGE_RECEIVER_QUALIFIER
+                    : InterchangeIdQualifier.fromString(context.getReceiverIdQualifier());
             this.setIsa08(context.getReceiverID());
             // ISA09 is the fixed 6-digit YYMMDD interchange date, independent of the
             // document's D8 (CCYYMMDD) format used by GS04/BGN03/DTP.

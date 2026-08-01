@@ -24,6 +24,10 @@ public final class X834Location {
     // ---- File level: envelope + control numbers (X834Context) ----
     public static final String SENDER_ID = "senderId";       // ISA06
     public static final String RECEIVER_ID = "receiverId";   // ISA08
+    /** ISA05 — interchange sender ID qualifier; absent keeps the header default ("30"). */
+    public static final String SENDER_ID_QUALIFIER = "senderIdQualifier";
+    /** ISA07 — interchange receiver ID qualifier; absent keeps the header default ("ZZ"). */
+    public static final String RECEIVER_ID_QUALIFIER = "receiverIdQualifier";
     /** GS02 — application sender's code; falls back to {@link #SENDER_ID} when absent. */
     public static final String APPLICATION_SENDER_CODE = "applicationSenderCode";
     /** GS03 — application receiver's code; falls back to {@link #RECEIVER_ID} when absent. */
