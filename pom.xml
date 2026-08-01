@@ -43,6 +43,7 @@
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.36</lombok.version>
+        <errorprone.version>2.50.0</errorprone.version>
         <junit.version>5.10.2</junit.version>
     </properties>
 
@@ -73,11 +74,23 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <compilerArgs>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <arg>--should-stop=ifError=FLOW</arg>
+                            <arg>-Xplugin:ErrorProne</arg>
+                            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+                        </compilerArgs>
                         <annotationProcessorPaths>
+                            <!-- lombok must stay first so Error Prone analyzes post-Lombok trees -->
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
                                 <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${errorprone.version}</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
