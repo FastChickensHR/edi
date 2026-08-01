@@ -22,8 +22,11 @@ import lombok.Getter;
  */
 @Getter
 public enum ConfidentialityCode implements EdiCodeEnum {
+  /** Other Restrictions — X12 code "O". */
   OTHER_RESTRICTIONS("O", "Other Restrictions"),
+  /** Restricted Access — X12 code "R". */
   RESTRICTED("R", "Restricted Access"),
+  /** Unrestricted Access — X12 code "U". */
   UNRESTRICTED("U", "Unrestricted Access");
 
   private final String code;

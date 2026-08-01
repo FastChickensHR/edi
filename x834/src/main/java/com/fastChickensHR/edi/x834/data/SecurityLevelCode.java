@@ -23,22 +23,39 @@ import lombok.Getter;
  */
 @Getter
 public enum SecurityLevelCode implements EdiCodeEnum {
+  /** Company Non-Classified — X12 code "00". */
   COMPANY_NON_CLASSIFIED("00", "Company Non-Classified"),
+  /** Company Internal Use Only — X12 code "01". */
   COMPANY_INTERNAL("01", "Company Internal Use Only"),
+  /** Company Confidential — X12 code "02". */
   COMPANY_CONFIDENTIAL("02", "Company Confidential"),
+  /** Company Confidential, Restricted (Need to Know) — X12 code "03". */
   COMPANY_CONFIDENTIAL_RESTRICTED("03", "Company Confidential, Restricted (Need to Know)"),
+  /** Company Registered (Signature Required) — X12 code "04". */
   COMPANY_REGISTERED("04", "Company Registered (Signature Required)"),
+  /** Personal — X12 code "05". */
   PERSONAL("05", "Personal"),
+  /** Supplier Proprietary — X12 code "06". */
   SUPPLIER_PROPRIETARY("06", "Supplier Proprietary"),
+  /** Company Defined (Trading Partner Level) — X12 code "09". */
   COMPANY_DEFINED("09", "Company Defined (Trading Partner Level)"),
+  /** Competition Sensitive — X12 code "11". */
   COMPETITION_SENSITIVE("11", "Competition Sensitive"),
+  /** Court Restricted — X12 code "20". */
   COURT_RESTRICTED("20", "Court Restricted"),
+  /** Juvenile Record Restricted — X12 code "21". */
   JUVENILE_RECORD_RESTRICTED("21", "Juvenile Record Restricted"),
+  /** Government Non-Classified — X12 code "90". */
   GOVERNMENT_NON_CLASSIFIED("90", "Government Non-Classified"),
+  /** Government Confidential — X12 code "92". */
   GOVERNMENT_CONFIDENTIAL("92", "Government Confidential"),
+  /** Government Secret — X12 code "93". */
   GOVERNMENT_SECRET("93", "Government Secret"),
+  /** Government Top Secret — X12 code "94". */
   GOVERNMENT_TOP_SECRET("94", "Government Top Secret"),
+  /** Government Defined (Trading Partner Level) — X12 code "99". */
   GOVERNMENT_DEFINED("99", "Government Defined (Trading Partner Level)"),
+  /** Mutually Defined — X12 code "ZZ". */
   MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
   private final String code;

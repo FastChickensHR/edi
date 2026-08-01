@@ -30,17 +30,26 @@ import lombok.Getter;
  */
 @Getter
 public enum CoordinationOfBenefitsCode implements EdiCodeEnum {
+  /** Coordination of Benefits — X12 code "1". */
   COORDINATION_OF_BENEFITS("1", "Coordination of Benefits"),
+  /** Coordination of Benefits applies to Spouse Only — X12 code "2". */
   COORDINATION_OF_BENEFITS_SPOUSE_ONLY("2", "Coordination of Benefits applies to Spouse Only"),
+  /** Coordination of Benefits applies to Spouse and Dependents — X12 code "3". */
   COORDINATION_OF_BENEFITS_SPOUSE_AND_DEPENDENTS(
       "3", "Coordination of Benefits applies to Spouse and Dependents"),
+  /** Coordination of Benefits applies to Dependents Only — X12 code "4". */
   COORDINATION_OF_BENEFITS_DEPENDENTS_ONLY(
       "4", "Coordination of Benefits applies to Dependents Only"),
+  /** Unknown — X12 code "5". */
   UNKNOWN("5", "Unknown"),
+  /** No Coordination of Benefits — X12 code "6". */
   NO_COORDINATION_OF_BENEFITS("6", "No Coordination of Benefits"),
+  /** Coordination of Benefits Applies to Subscriber Only — X12 code "7". */
   COORDINATION_OF_BENEFITS_SUBSCRIBER_ONLY(
       "7", "Coordination of Benefits Applies to Subscriber Only"),
+  /** Conflict in Coordination of Benefit — X12 code "8". */
   CONFLICT_IN_COORDINATION_OF_BENEFIT("8", "Conflict in Coordination of Benefit"),
+  /** Coordination of Benefits Applies to Whole Family — X12 code "9". */
   COORDINATION_OF_BENEFITS_WHOLE_FAMILY("9", "Coordination of Benefits Applies to Whole Family");
 
   private final String code;

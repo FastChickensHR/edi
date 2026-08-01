@@ -15,8 +15,13 @@ import java.util.List;
  * file) plus one {@link Record} per subject. This is the pivot between the consuming application
  * and a format's dialect — the caller speaks only this, and each format interprets the {@link
  * Location}s.
+ *
+ * @param direction whether this content was parsed from a partner file or is being emitted to one
+ * @param fileFields the file-level (header/trailer) fields, appearing once per file
+ * @param records one {@link Record} per subject, in file order
  */
 public record FileContent(Direction direction, List<Field> fileFields, List<Record> records) {
+  /** Rejects a null direction and normalizes null lists to empty immutable copies. */
   public FileContent {
     if (direction == null) {
       throw new IllegalArgumentException("direction is required");

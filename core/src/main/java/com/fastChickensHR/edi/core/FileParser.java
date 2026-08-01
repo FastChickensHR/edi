@@ -12,5 +12,11 @@ package com.fastChickensHR.edi.core;
  * format's dialect into a format-neutral {@link FileContent}, keeping the kernel bidirectional.
  */
 public interface FileParser {
+  /**
+   * Reads this format's text into the format-neutral tree.
+   *
+   * @param raw the file's complete text in this format's dialect
+   * @return the parsed content, direction {@link Direction#INBOUND}
+   */
   FileContent parse(String raw);
 }

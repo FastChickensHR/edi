@@ -33,6 +33,9 @@ import java.util.List;
  */
 public final class X999FileParser implements FileParser {
 
+  /** Creates a parser; the parser is stateless and reusable across files. */
+  public X999FileParser() {}
+
   private static final char DEFAULT_ELEMENT_SEPARATOR = '*';
   private static final char DEFAULT_SEGMENT_TERMINATOR = '~';
   private static final int ISA_LENGTH = 106;

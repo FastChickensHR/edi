@@ -18,12 +18,19 @@ import lombok.Getter;
  */
 @Getter
 public enum IndividualRelationshipCode implements EdiCodeEnum {
+  /** Spouse — X12 code "01". */
   SPOUSE("01", "Spouse"),
+  /** Child — X12 code "19". */
   CHILD("19", "Child"),
+  /** Employee — X12 code "20". */
   EMPLOYEE("20", "Employee"),
+  /** Disabled Dependent — X12 code "22". */
   DISABLED_DEPENDENT("22", "Disabled Dependent"),
+  /** Self — X12 code "18". */
   SELF("18", "Self"),
+  /** Life Partner — X12 code "53". */
   LIFE_PARTNER("53", "Life Partner"),
+  /** Other Related — X12 code "29". */
   OTHER_RELATED("29", "Other Related");
 
   private final String code;

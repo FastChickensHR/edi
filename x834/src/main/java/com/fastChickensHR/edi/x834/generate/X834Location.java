@@ -22,7 +22,10 @@ public final class X834Location {
   private X834Location() {}
 
   // ---- File level: envelope + control numbers (X834Context) ----
+  /** Render-location key {@value}. */
   public static final String SENDER_ID = "senderId"; // ISA06
+
+  /** Render-location key {@value}. */
   public static final String RECEIVER_ID = "receiverId"; // ISA08
 
   /** ISA05 — interchange sender ID qualifier; absent keeps the header default ("30"). */
@@ -37,23 +40,46 @@ public final class X834Location {
   /** GS03 — application receiver's code; falls back to {@link #RECEIVER_ID} when absent. */
   public static final String APPLICATION_RECEIVER_CODE = "applicationReceiverCode";
 
+  /** Render-location key {@value}. */
   public static final String INTERCHANGE_CONTROL_NUMBER = "interchangeControlNumber";
+
+  /** Render-location key {@value}. */
   public static final String GROUP_CONTROL_NUMBER = "groupControlNumber";
+
+  /** Render-location key {@value}. */
   public static final String TRANSACTION_SET_CONTROL_NUMBER = "transactionSetControlNumber";
+
+  /** Render-location key {@value}. */
   public static final String DOCUMENT_DATE = "documentDate";
+
+  /** Render-location key {@value}. */
   public static final String ACKNOWLEDGMENT_REQUESTED =
       "acknowledgmentRequested"; // ISA14 ("1" requests a TA1/999)
 
   // ---- File level: header data (Header.Builder) ----
+  /** Render-location key {@value}. */
   public static final String TRANSACTION_SET_ID = "transactionSetId";
+
+  /** Render-location key {@value}. */
   public static final String REFERENCE_IDENTIFICATION = "referenceIdentification"; // BGN02
+
+  /** Render-location key {@value}. */
   public static final String MASTER_POLICY_NUMBER = "masterPolicyNumber"; // REF*38
+
+  /** Render-location key {@value}. */
   public static final String PLAN_SPONSOR_NAME = "planSponsorName"; // N1*P5
+
+  /** Render-location key {@value}. */
   public static final String PAYER_NAME = "payerName"; // N1*IN
 
   // ---- Member level: INS / built-in REF / DTP (Member fields) ----
+  /** Render-location key {@value}. */
   public static final String MEMBER_INDICATOR = "memberIndicator"; // INS01
+
+  /** Render-location key {@value}. */
   public static final String RELATIONSHIP_CODE = "relationshipCode"; // INS02
+
+  /** Render-location key {@value}. */
   public static final String MAINTENANCE_TYPE_CODE = "maintenanceTypeCode"; // INS03
 
   /**
@@ -70,28 +96,64 @@ public final class X834Location {
    */
   public static final String EMPLOYMENT_STATUS_CODE = "employmentStatusCode";
 
+  /** Render-location key {@value}. */
   public static final String POLICY_NUMBER = "policyNumber"; // REF*1L
+
+  /** Render-location key {@value}. */
   public static final String MEMBER_ID = "memberId"; // REF*<qual>
+
+  /** Render-location key {@value}. */
   public static final String MEMBER_ID_QUALIFIER = "memberIdQualifier"; // that REF's qualifier
+
+  /** Render-location key {@value}. */
   public static final String SUBSCRIBER_NUMBER = "subscriberNumber"; // REF*OF
+
+  /** Render-location key {@value}. */
   public static final String ENROLLMENT_DATE =
       "enrollmentDate"; // DTP*300 (Enrollment Signature Date)
+
+  /** Render-location key {@value}. */
   public static final String COVERAGE_START_DATE =
       "coverageStartDate"; // DTP*356 (Eligibility Begin)
+
+  /** Render-location key {@value}. */
   public static final String COVERAGE_END_DATE = "coverageEndDate"; // DTP*357
 
   // ---- Member level: Loop 2100A name / demographics / residence address ----
+  /** Render-location key {@value}. */
   public static final String LAST_NAME = "lastName"; // NM103
+
+  /** Render-location key {@value}. */
   public static final String FIRST_NAME = "firstName"; // NM104
+
+  /** Render-location key {@value}. */
   public static final String MIDDLE_NAME = "middleName"; // NM105
+
+  /** Render-location key {@value}. */
   public static final String NAME_ID_QUALIFIER = "nameIdQualifier"; // NM108 (e.g. 34 = SSN)
+
+  /** Render-location key {@value}. */
   public static final String NAME_ID = "nameId"; // NM109 (e.g. the SSN)
+
+  /** Render-location key {@value}. */
   public static final String BIRTH_DATE = "birthDate"; // DMG02 (D8)
+
+  /** Render-location key {@value}. */
   public static final String GENDER = "gender"; // DMG03
+
+  /** Render-location key {@value}. */
   public static final String ADDRESS_LINE_1 = "addressLine1"; // N301
+
+  /** Render-location key {@value}. */
   public static final String ADDRESS_LINE_2 = "addressLine2"; // N302
+
+  /** Render-location key {@value}. */
   public static final String CITY = "city"; // N401
+
+  /** Render-location key {@value}. */
   public static final String STATE = "state"; // N402
+
+  /** Render-location key {@value}. */
   public static final String ZIP_CODE = "zipCode"; // N403
 
   // ---- Member level: Loop 2100A PER (communications numbers) ----
@@ -141,6 +203,7 @@ public final class X834Location {
   public static final String HLH_DESCRIPTION = "hlh.description";
 
   // ---- Member level: Loop 2100A LUI (member language) ----
+  /** Render-location key {@value}. */
   public static final String LUI_PREFIX = "lui.";
 
   /** LUI01 — what kind of code {@link #LUI_CODE} is. Required with it. */
@@ -159,12 +222,17 @@ public final class X834Location {
    * "lui.1.description"}. Languages emit in ascending index order, and the un-indexed {@code LUI_*}
    * constants remain a single implicit language — the same convention {@link #hd(int, String)} uses
    * for coverage groups.
+   *
+   * @param index the occurrence index to embed in the key
+   * @param luiField the un-indexed {@code lui.*} key constant to rewrite
+   * @return the indexed key, {@code lui.<index>.<suffix>}
    */
   public static String lui(int index, String luiField) {
     return LUI_PREFIX + index + "." + luiField.substring(LUI_PREFIX.length());
   }
 
   // ---- Member level: Loop 2310 (provider) ----
+  /** Render-location key {@value}. */
   public static final String PROVIDER_PREFIX = "provider.";
 
   /** 2310 NM103 — the provider's last or organization name. */
@@ -201,12 +269,17 @@ public final class X834Location {
    * The position name for the {@code index}-th provider of one member, so a Record can carry
    * several — {@code provider(1, PROVIDER_LAST_NAME)} &rarr; {@code "provider.1.lastName"}. Same
    * indexed convention as {@link #hd(int, String)}; un-indexed keys are a single implicit provider.
+   *
+   * @param index the occurrence index to embed in the key
+   * @param providerField the un-indexed {@code provider.*} key constant to rewrite
+   * @return the indexed key, {@code provider.<index>.<suffix>}
    */
   public static String provider(int index, String providerField) {
     return PROVIDER_PREFIX + index + "." + providerField.substring(PROVIDER_PREFIX.length());
   }
 
   // ---- Member level: Loop 2320/2330 (coordination of benefits) ----
+  /** Render-location key {@value}. */
   public static final String COB_PREFIX = "cob.";
 
   /** 2320 COB01 — where the other payer sits in the payment order. Required. */
@@ -237,12 +310,17 @@ public final class X834Location {
    * The position name for the {@code index}-th other plan of one member — {@code cob(1,
    * COB_BEGIN_DATE)} &rarr; {@code "cob.1.beginDate"}. The 834 permits five; a sixth is rejected
    * when written.
+   *
+   * @param index the occurrence index to embed in the key
+   * @param cobField the un-indexed {@code cob.*} key constant to rewrite
+   * @return the indexed key, {@code cob.<index>.<suffix>}
    */
   public static String cob(int index, String cobField) {
     return COB_PREFIX + index + "." + cobField.substring(COB_PREFIX.length());
   }
 
   // ---- Member level: Loop 2200 (disability) ----
+  /** Render-location key {@value}. */
   public static final String DISABILITY_PREFIX = "disability.";
 
   /** 2200 DSB01 — what kind of disability this is. Required; the dates cannot travel without it. */
@@ -273,12 +351,17 @@ public final class X834Location {
    * The position name for the {@code index}-th disability of one member — {@code disability(1,
    * DISABILITY_START_DATE)} &rarr; {@code "disability.1.startDate"}. The same indexed convention as
    * {@link #hd(int, String)}.
+   *
+   * @param index the occurrence index to embed in the key
+   * @param disabilityField the un-indexed {@code disability.*} key constant to rewrite
+   * @return the indexed key, {@code disability.<index>.<suffix>}
    */
   public static String disability(int index, String disabilityField) {
     return DISABILITY_PREFIX + index + "." + disabilityField.substring(DISABILITY_PREFIX.length());
   }
 
   // ---- Member level: Loops 2700/2750 (member reporting categories) ----
+  /** Render-location key {@value}. */
   public static final String CATEGORY_PREFIX = "category.";
 
   /** 2750 {@code N1*75} N102 — the category label, e.g. {@code CLASS}. Required. */
@@ -301,25 +384,47 @@ public final class X834Location {
    * category(1, CATEGORY_VALUE)} &rarr; {@code "category.1.value"}. Categories emit in ascending
    * index order inside a single {@code LS*2700} … {@code LE*2700} block, and the {@code LX} number
    * is assigned at render time over the emitted occurrences.
+   *
+   * @param index the occurrence index to embed in the key
+   * @param categoryField the un-indexed {@code category.*} key constant to rewrite
+   * @return the indexed key, {@code category.<index>.<suffix>}
    */
   public static String category(int index, String categoryField) {
     return CATEGORY_PREFIX + index + "." + categoryField.substring(CATEGORY_PREFIX.length());
   }
 
   // ---- Member level: Loop 2100C mailing address ----
+  /** Render-location key {@value}. */
   public static final String MAILING_ADDRESS_LINE_1 = "mailingAddressLine1"; // 2100C N301
+
+  /** Render-location key {@value}. */
   public static final String MAILING_ADDRESS_LINE_2 = "mailingAddressLine2"; // 2100C N302
+
+  /** Render-location key {@value}. */
   public static final String MAILING_CITY = "mailingCity"; // 2100C N401
+
+  /** Render-location key {@value}. */
   public static final String MAILING_STATE = "mailingState"; // 2100C N402
+
+  /** Render-location key {@value}. */
   public static final String MAILING_ZIP_CODE = "mailingZipCode"; // 2100C N403
 
   // ---- Member level: health coverage (HD segment) ----
+  /** Render-location key {@value}. */
   public static final String HD_PREFIX = "hd.";
+
   // The 220A1 HD segment carries only HD01/HD03/HD04/HD05; HD02 and HD06+ are Not Used
   // (employment status lives on INS08, not HD09), so there are no HD_* fields for them.
+  /** Render-location key {@value}. */
   public static final String HD_MAINTENANCE_TYPE_CODE = "hd.maintenanceTypeCode"; // HD01
+
+  /** Render-location key {@value}. */
   public static final String HD_INSURANCE_LINE_CODE = "hd.insuranceLineCode"; // HD03
+
+  /** Render-location key {@value}. */
   public static final String HD_PLAN_COVERAGE_DESCRIPTION = "hd.planCoverageDescription"; // HD04
+
+  /** Render-location key {@value}. */
   public static final String HD_COVERAGE_LEVEL_CODE = "hd.coverageLevelCode"; // HD05
 
   /** Loop 2300 coverage begin date — DTP*348 (D8). */
@@ -336,6 +441,10 @@ public final class X834Location {
    * "hd.1.benefitBeginDate"}. Groups emit in ascending index order, each with its own begin/end
    * DTPs. The un-indexed {@code HD_*} constants remain a single implicit group, so existing
    * single-coverage callers are unaffected.
+   *
+   * @param index the occurrence index to embed in the key
+   * @param hdField the un-indexed {@code hd.*} key constant to rewrite
+   * @return the indexed key, {@code hd.<index>.<suffix>}
    */
   public static String hd(int index, String hdField) {
     return HD_PREFIX + index + "." + hdField.substring(HD_PREFIX.length());

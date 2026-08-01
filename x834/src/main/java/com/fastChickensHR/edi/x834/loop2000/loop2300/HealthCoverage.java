@@ -46,9 +46,12 @@ public class HealthCoverage {
   /** When it ends ({@code DTP*349}). */
   private LocalDateTime endDate;
 
+  /** Creates an empty coverage; callers set the required HD01/HD03 codes afterwards. */
   public HealthCoverage() {}
 
   /**
+   * Creates a coverage from the two codes the HD segment requires.
+   *
    * @param maintenanceTypeCode the maintenance action being applied (HD01)
    * @param insuranceLineCode the insurance line (HD03)
    */

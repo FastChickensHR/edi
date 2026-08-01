@@ -21,6 +21,7 @@ import lombok.Setter;
 public class DependentMember extends BaseMember {
   private Member primaryMember;
 
+  /** Creates a dependent with no fields set; callers populate it afterwards. */
   public DependentMember() {
     // No-arg constructor; the X12 834 context is no longer a concern of the domain model.
   }

@@ -25,11 +25,21 @@ import java.util.List;
  */
 public sealed interface GenerationResult {
 
-  /** Generation succeeded; {@link #document()} is the complete X12 834 string. */
+  /**
+   * Generation succeeded; {@link #document()} is the complete X12 834 string.
+   *
+   * @param document the finished X12 834 document text
+   */
   record Success(String document) implements GenerationResult {}
 
-  /** Generation failed; {@link #errors()} lists every reason, accumulated in one pass. */
+  /**
+   * Generation failed; {@link #errors()} lists every reason, accumulated in one pass.
+   *
+   * @param errors every reason generation failed, in the order encountered
+   */
   record Failure(List<GenerationError> errors) implements GenerationResult {
+
+    /** Defensively copies the error list. */
     public Failure {
       errors = List.copyOf(errors);
     }

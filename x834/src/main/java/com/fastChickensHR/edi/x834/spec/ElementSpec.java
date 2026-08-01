@@ -39,6 +39,16 @@ import java.util.Set;
  * and colloquial aliases, so that {@code "fired"} finds a code — is deliberately unreachable from
  * here. Resolving user input and checking conformance are different jobs, and only the second one
  * belongs to the spec.
+ *
+ * @param position the element position this spec describes
+ * @param elementId the X12 element number as the standard writes it, e.g. {@code "584"} or {@code
+ *     "I05"}
+ * @param name the standard's name for the element at this position
+ * @param type the element's X12 data type
+ * @param minLength the minimum length of a value at this position, at least 1
+ * @param maxLength the maximum length of a value at this position, at least {@code minLength}
+ * @param codes the permitted codes in the order the standard lists them; empty for a non-coded
+ *     position (only a {@link DataType#ID} position may carry a non-empty list)
  */
 public record ElementSpec(
     ElementPosition position,
@@ -49,6 +59,7 @@ public record ElementSpec(
     int maxLength,
     List<CodeValue> codes) {
 
+  /** Validates the spec parts and defensively copies the code list. */
   public ElementSpec {
     if (position == null) {
       throw new IllegalArgumentException("Position cannot be null");
@@ -78,7 +89,11 @@ public record ElementSpec(
     }
   }
 
-  /** Whether this position is coded — i.e. its legal values are a closed list. */
+  /**
+   * Whether this position is coded — i.e. its legal values are a closed list.
+   *
+   * @return true when this spec publishes a non-empty code list
+   */
   public boolean isCoded() {
     return !codes.isEmpty();
   }
@@ -89,12 +104,19 @@ public record ElementSpec(
    * spelled with upper-case letters and digits and so never need more than {@link
    * CharacterClass#BASIC}. What an individual interchange permits is narrower still — that is the
    * trading partner's pick, not the element's property.
+   *
+   * @return {@link CharacterClass#EXTENDED} for a string element, {@link CharacterClass#BASIC}
+   *     otherwise
    */
   public CharacterClass characterClass() {
     return type == DataType.AN ? CharacterClass.EXTENDED : CharacterClass.BASIC;
   }
 
-  /** The permitted codes as a set, in the order the standard lists them. Empty when not coded. */
+  /**
+   * The permitted codes as a set, in the order the standard lists them. Empty when not coded.
+   *
+   * @return the codes of {@code codes()}, in declaration order
+   */
   public Set<String> codeSet() {
     Set<String> set = new LinkedHashSet<>(codes.size());
     for (CodeValue value : codes) {
@@ -112,6 +134,8 @@ public record ElementSpec(
    * unknown rather than ignored, since neither is a code. An empty proposal trivially passes: it
    * narrows nothing.
    *
+   * @param proposed the codes the caller wants to narrow this position's list to
+   * @return the outcome, naming any proposed codes the standard does not permit here
    * @throws IllegalStateException if this position is not coded — proposing a code list for a
    *     free-text element is a mistake in the caller's data, not a failed check, and silently
    *     answering "not permitted" would hide it

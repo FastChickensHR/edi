@@ -45,9 +45,12 @@ public class ReportingCategory {
    */
   private String dateQualifier;
 
+  /** Creates an empty reporting category; callers set the name and value afterwards. */
   public ReportingCategory() {}
 
   /**
+   * Creates a reporting category from its name/value pair.
+   *
    * @param name the category label (2750 {@code N1*75})
    * @param value the reported value (2750 {@code REF})
    */

@@ -82,6 +82,9 @@ import java.util.stream.Collectors;
  */
 public final class X834FileGenerator implements FileGenerator {
 
+  /** Creates a generator. The generator is stateless; one instance can serve many files. */
+  public X834FileGenerator() {}
+
   @Override
   public String generate(FileContent file) {
     try {

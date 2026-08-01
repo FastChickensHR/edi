@@ -23,11 +23,17 @@ import lombok.Getter;
  */
 @Getter
 public enum BenefitStatusCode implements EdiCodeEnum {
+  /** Active — X12 code "A". */
   ACTIVE("A", "Active"),
+  /** Consolidated Omnibus Budget Reconciliation Act (COBRA) — X12 code "C". */
   COBRA("C", "Consolidated Omnibus Budget Reconciliation Act (COBRA)"),
+  /** Involuntary — X12 code "I". */
   INVOLUNTARY("I", "Involuntary"),
+  /** Surviving Insured — X12 code "S". */
   SURVIVING_INSURED("S", "Surviving Insured"),
+  /** Tax Equity and Fiscal Responsibility Act (TEFRA) — X12 code "T". */
   TEFRA("T", "Tax Equity and Fiscal Responsibility Act (TEFRA)"),
+  /** Voluntary — X12 code "V". */
   VOLUNTARY("V", "Voluntary");
 
   private final String code;

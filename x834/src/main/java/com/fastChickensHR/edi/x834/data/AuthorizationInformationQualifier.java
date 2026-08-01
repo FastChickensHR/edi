@@ -23,12 +23,19 @@ import lombok.Getter;
  */
 @Getter
 public enum AuthorizationInformationQualifier implements EdiCodeEnum {
+  /** No Authorization — X12 code "00". */
   NO_AUTHORIZATION_INFORMATION("00", "No Authorization"),
+  /** UCS Communications ID — X12 code "01". */
   UCS_COMMUNICATIONS_ID("01", "UCS Communications ID"),
+  /** EDX Communications ID — X12 code "02". */
   EDX_COMMUNICATIONS_ID("02", "EDX Communications ID"),
+  /** Additional Data Identification — X12 code "03". */
   ADDITIONAL_DATA_ID("03", "Additional Data Identification"),
+  /** Rail Communications ID — X12 code "04". */
   RAIL_COMMUNICATIONS_ID("04", "Rail Communications ID"),
+  /** Department of Defense (DoD) Communication Identifier — X12 code "05". */
   DOD_COMMUNICATION_ID("05", "Department of Defense (DoD) Communication Identifier"),
+  /** United States Federal Government Communication Identifier — X12 code "06". */
   US_FEDERAL_GOVT_COMM_ID("06", "United States Federal Government Communication Identifier");
 
   private final String code;

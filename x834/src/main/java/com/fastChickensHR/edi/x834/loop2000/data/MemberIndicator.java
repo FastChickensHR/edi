@@ -18,7 +18,9 @@ import lombok.Getter;
  */
 @Getter
 public enum MemberIndicator implements EdiCodeEnum {
+  /** Insured — X12 code "Y". */
   INSURED("Y", "Insured"),
+  /** Not Insured — X12 code "N". */
   NOT_INSURED("N", "Not Insured");
 
   private final String code;

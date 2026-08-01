@@ -52,9 +52,12 @@ public class Disability {
   /** When it ended ({@code DTP*361}). */
   private LocalDateTime endDate;
 
+  /** Creates an empty disability; callers set the required {@code type} afterwards. */
   public Disability() {}
 
   /**
+   * Creates a disability of the given kind.
+   *
    * @param type what kind of disability this is (DSB01)
    */
   public Disability(DisabilityTypeCode type) {

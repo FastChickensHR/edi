@@ -18,8 +18,11 @@ import lombok.Getter;
  */
 @Getter
 public enum HandicapIndicator implements EdiCodeEnum {
+  /** Yes - Individual has a handicap — X12 code "Y". */
   YES("Y", "Yes - Individual has a handicap"),
+  /** No - Individual does not have a handicap — X12 code "N". */
   NO("N", "No - Individual does not have a handicap"),
+  /** Unknown handicap status — X12 code "U". */
   UNKNOWN("U", "Unknown handicap status");
 
   private final String code;
