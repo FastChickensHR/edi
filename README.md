@@ -133,7 +133,7 @@ for (Record transactionSet : ack.records()) {
 }
 ```
 
-where `field` is the one-liner for reading a value by location name:
+where `field` is the small helper for reading a value by location name:
 
 ```java
 static String field(List<Field> fields, String name) {
