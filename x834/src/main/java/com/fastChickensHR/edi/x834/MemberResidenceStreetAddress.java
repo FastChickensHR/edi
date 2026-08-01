@@ -11,37 +11,35 @@ import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.Getter;
 
 /**
- * Member residence street address as an N3 segment in Loop 2100A of the X12 834.
- * Implements address line 1 (N301) and address line 2 (N302).
+ * Member residence street address as an N3 segment in Loop 2100A of the X12 834. Implements address
+ * line 1 (N301) and address line 2 (N302).
  */
 @Getter
 class MemberResidenceStreetAddress extends N3Segment {
 
-    private MemberResidenceStreetAddress(Builder builder) throws ValidationException {
-        super(builder);
+  private MemberResidenceStreetAddress(Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  /** Builder for MemberResidenceStreetAddress */
+  public static class Builder extends AbstractBuilder<Builder> {
+    @Override
+    protected Builder self() {
+      return this;
     }
 
-    /**
-     * Builder for MemberResidenceStreetAddress
-     */
-    public static class Builder extends AbstractBuilder<Builder> {
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        @Override
-        public MemberResidenceStreetAddress build() throws ValidationException {
-            return new MemberResidenceStreetAddress(this);
-        }
+    @Override
+    public MemberResidenceStreetAddress build() throws ValidationException {
+      return new MemberResidenceStreetAddress(this);
     }
+  }
 
-    /**
-     * Creates a new Builder instance
-     *
-     * @return a new Builder
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
+  /**
+   * Creates a new Builder instance
+   *
+   * @return a new Builder
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
 }

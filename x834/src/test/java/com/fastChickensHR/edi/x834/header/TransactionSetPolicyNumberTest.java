@@ -7,50 +7,53 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
-import com.fastChickensHR.edi.x834.SegmentTestSupport;
-import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.X834Context;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fastChickensHR.edi.x834.SegmentTestSupport;
+import com.fastChickensHR.edi.x834.X834Context;
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import org.junit.jupiter.api.Test;
+
 class TransactionSetPolicyNumberTest {
-    @Test
-    void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        TransactionSetPolicyNumber segment = new TransactionSetPolicyNumber.Builder()
-                .setRef01("ZZ")
-                .setRef02("asdf")
-                .build();
+  @Test
+  void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
+    TransactionSetPolicyNumber segment =
+        new TransactionSetPolicyNumber.Builder().setRef01("ZZ").setRef02("asdf").build();
 
-        SegmentTestSupport.setContext(segment, new X834Context());
+    SegmentTestSupport.setContext(segment, new X834Context());
 
-        assertEquals("REF", segment.getSegmentIdentifier(), "Expected segment identifier should be 'REF'");
-        assertEquals("REF*ZZ*asdf~", segment.render().trim(), "The segment is not formatted correctly.");
-    }
+    assertEquals(
+        "REF", segment.getSegmentIdentifier(), "Expected segment identifier should be 'REF'");
+    assertEquals(
+        "REF*ZZ*asdf~", segment.render().trim(), "The segment is not formatted correctly.");
+  }
 
-    @Test
-    void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        String referenceIdentificationQualifier = "01";
-        String masterPolicyNumber = "2";
-        TransactionSetPolicyNumber segment = new TransactionSetPolicyNumber.Builder()
-                .setRef01(referenceIdentificationQualifier)
-                .setRef02(masterPolicyNumber)
-                .build();
+  @Test
+  void testSettingSpecNamesGettingDomainNames() throws ValidationException {
+    String referenceIdentificationQualifier = "01";
+    String masterPolicyNumber = "2";
+    TransactionSetPolicyNumber segment =
+        new TransactionSetPolicyNumber.Builder()
+            .setRef01(referenceIdentificationQualifier)
+            .setRef02(masterPolicyNumber)
+            .build();
 
-        assertEquals(referenceIdentificationQualifier, segment.getReferenceIdentificationQualifier().getCode());
-        assertEquals(masterPolicyNumber, segment.getMasterPolicyNumber());
-    }
+    assertEquals(
+        referenceIdentificationQualifier, segment.getReferenceIdentificationQualifier().getCode());
+    assertEquals(masterPolicyNumber, segment.getMasterPolicyNumber());
+  }
 
-    @Test
-    void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        String referenceIdentificationQualifier = "01";
-        String masterPolicyNumber = "2";
-        TransactionSetPolicyNumber segment = new TransactionSetPolicyNumber.Builder()
-                .setReferenceIdentificationQualifier(referenceIdentificationQualifier)
-                .setMasterPolicyNumber(masterPolicyNumber)
-                .build();
+  @Test
+  void testSettingDomainNamesGettingSpecNames() throws ValidationException {
+    String referenceIdentificationQualifier = "01";
+    String masterPolicyNumber = "2";
+    TransactionSetPolicyNumber segment =
+        new TransactionSetPolicyNumber.Builder()
+            .setReferenceIdentificationQualifier(referenceIdentificationQualifier)
+            .setMasterPolicyNumber(masterPolicyNumber)
+            .build();
 
-        assertEquals(referenceIdentificationQualifier, segment.getRef01().getCode());
-        assertEquals(masterPolicyNumber, segment.getRef02());
-    }
+    assertEquals(referenceIdentificationQualifier, segment.getRef01().getCode());
+    assertEquals(masterPolicyNumber, segment.getRef02());
+  }
 }

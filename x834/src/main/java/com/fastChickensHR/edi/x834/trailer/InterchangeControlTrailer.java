@@ -13,50 +13,50 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Represents the Interchange Control Trailer in an EDI 834 transaction.
- * This class extends the IEASegment (IEA - Interchange Control Trailer segment).
- * It marks the end of an interchange envelope and contains information about
- * the number of functional groups included and the interchange control number.
+ * Represents the Interchange Control Trailer in an EDI 834 transaction. This class extends the
+ * IEASegment (IEA - Interchange Control Trailer segment). It marks the end of an interchange
+ * envelope and contains information about the number of functional groups included and the
+ * interchange control number.
  */
 @Getter
 class InterchangeControlTrailer extends IEASegment {
-    /** Default IEA01 — number of functional groups in the interchange; always {@code "1"} for an 834. */
-    public static final String DEFAULT_NUMBER_OF_INCLUDED_GROUPS = "1";
+  /**
+   * Default IEA01 — number of functional groups in the interchange; always {@code "1"} for an 834.
+   */
+  public static final String DEFAULT_NUMBER_OF_INCLUDED_GROUPS = "1";
 
-    private InterchangeControlTrailer(Builder builder) throws ValidationException {
-        super(builder);
+  private InterchangeControlTrailer(Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  /**
+   * Creates a new Builder instance for InterchangeControlTrailer.
+   *
+   * @return a new Builder instance
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /** Builder for InterchangeControlTrailer. */
+  @Setter
+  @Accessors(chain = true)
+  public static class Builder extends AbstractBuilder<Builder> {
+
+    @Override
+    protected Builder self() {
+      return this;
     }
 
     /**
-     * Creates a new Builder instance for InterchangeControlTrailer.
+     * Builds a new InterchangeControlTrailer instance.
      *
-     * @return a new Builder instance
+     * @return A new InterchangeControlTrailer instance
+     * @throws ValidationException if validation fails
      */
-    public static Builder builder() {
-        return new Builder();
+    @Override
+    public InterchangeControlTrailer build() throws ValidationException {
+      return new InterchangeControlTrailer(this);
     }
-
-    /**
-     * Builder for InterchangeControlTrailer.
-     */
-    @Setter
-    @Accessors(chain = true)
-    public static class Builder extends AbstractBuilder<Builder> {
-
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        /**
-         * Builds a new InterchangeControlTrailer instance.
-         *
-         * @return A new InterchangeControlTrailer instance
-         * @throws ValidationException if validation fails
-         */
-        @Override
-        public InterchangeControlTrailer build() throws ValidationException {
-            return new InterchangeControlTrailer(this);
-        }
-    }
+  }
 }

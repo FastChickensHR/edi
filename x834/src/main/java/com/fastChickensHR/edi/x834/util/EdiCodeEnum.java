@@ -7,23 +7,20 @@
  */
 package com.fastChickensHR.edi.x834.util;
 
-/**
- * Interface for EDI code enumerations.
- * Provides common methods for all EDI code enums.
- */
+/** Interface for EDI code enumerations. Provides common methods for all EDI code enums. */
 public interface EdiCodeEnum {
 
-    /**
-     * Gets the EDI code value.
-     *
-     * @return the code string
-     */
-    String getCode();
+  /**
+   * Gets the EDI code value.
+   *
+   * @return the code string
+   */
+  String getCode();
 
-    /**
-     * Gets the description of the EDI code.
-     *
-     * @return the description string
-     */
-    String getDescription();
+  /**
+   * Gets the description of the EDI code.
+   *
+   * @return the description string
+   */
+  String getDescription();
 }

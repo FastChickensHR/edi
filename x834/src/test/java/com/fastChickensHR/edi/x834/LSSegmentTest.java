@@ -7,31 +7,30 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.x834.X834Context;
-import com.fastChickensHR.edi.x834.exception.ValidationException;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import org.junit.jupiter.api.Test;
+
 class LSSegmentTest {
-    private final X834Context context = new X834Context();
+  private final X834Context context = new X834Context();
 
-    @Test
-    void rendersLoopHeaderWithIdentifier() throws ValidationException {
-        LSSegment segment = LSSegment.builder().setLoopIdentifierCode("2700").build();
-        segment.setContext(context);
+  @Test
+  void rendersLoopHeaderWithIdentifier() throws ValidationException {
+    LSSegment segment = LSSegment.builder().setLoopIdentifierCode("2700").build();
+    segment.setContext(context);
 
-        assertEquals("LS", segment.getSegmentIdentifier());
-        assertEquals("2700", segment.getLoopIdentifierCode());
-        assertEquals("LS*2700~", segment.render().trim());
-    }
+    assertEquals("LS", segment.getSegmentIdentifier());
+    assertEquals("2700", segment.getLoopIdentifierCode());
+    assertEquals("LS*2700~", segment.render().trim());
+  }
 
-    @Test
-    void rejectsMissingLoopIdentifier() {
-        ValidationException ex = assertThrows(ValidationException.class,
-                () -> LSSegment.builder().build());
-        assertTrue(ex.getMessage().contains("LS01"));
-    }
+  @Test
+  void rejectsMissingLoopIdentifier() {
+    ValidationException ex =
+        assertThrows(ValidationException.class, () -> LSSegment.builder().build());
+    assertTrue(ex.getMessage().contains("LS01"));
+  }
 }

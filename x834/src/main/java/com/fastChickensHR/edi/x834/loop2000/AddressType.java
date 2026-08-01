@@ -9,17 +9,18 @@ package com.fastChickensHR.edi.x834.loop2000;
 
 /**
  * The kind of postal address a member can carry.
- * <p>
- * A member may have more than one address of different kinds. Only the kinds the X12 834
+ *
+ * <p>A member may have more than one address of different kinds. Only the kinds the X12 834
  * (005010X220A1) member structure can actually serialize are modelled:
+ *
  * <ul>
- *   <li>{@link #RESIDENCE} — the member's residence address, emitted as Loop 2100A N3/N4.</li>
- *   <li>{@link #MAILING} — the member's mailing address, emitted as Loop 2100C (NM1*31, N3, N4).</li>
+ *   <li>{@link #RESIDENCE} — the member's residence address, emitted as Loop 2100A N3/N4.
+ *   <li>{@link #MAILING} — the member's mailing address, emitted as Loop 2100C (NM1*31, N3, N4).
  * </ul>
  */
 public enum AddressType {
-    /** Residence / home address — Loop 2100A. */
-    RESIDENCE,
-    /** Mailing address — Loop 2100C. */
-    MAILING
+  /** Residence / home address — Loop 2100A. */
+  RESIDENCE,
+  /** Mailing address — Loop 2100C. */
+  MAILING
 }

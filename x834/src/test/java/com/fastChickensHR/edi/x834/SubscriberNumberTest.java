@@ -7,70 +7,88 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.X834Context;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.fastChickensHR.edi.x834.exception.ValidationException;
+import org.junit.jupiter.api.Test;
+
 class SubscriberNumberTest {
-    X834Context context = new X834Context();
-    String referenceIdentification = "123456789";
+  X834Context context = new X834Context();
+  String referenceIdentification = "123456789";
 
-    @Test
-    public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        SubscriberNumber segment = SubscriberNumber.builder()
-                .setRef02(referenceIdentification)
-                .build();
-        segment.setContext(context);
+  @Test
+  public void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
+    SubscriberNumber segment = SubscriberNumber.builder().setRef02(referenceIdentification).build();
+    segment.setContext(context);
 
-        assertEquals("REF", segment.getSegmentIdentifier(), "Expected segment identifier should be 'REF'");
-        assertEquals("REF*0F*123456789~", segment.render().trim(), "The segment is not formatted correctly.");
-    }
+    assertEquals(
+        "REF", segment.getSegmentIdentifier(), "Expected segment identifier should be 'REF'");
+    assertEquals(
+        "REF*0F*123456789~", segment.render().trim(), "The segment is not formatted correctly.");
+  }
 
-    @Test
-    public void testSettingAndGettingValues() throws ValidationException {
-        SubscriberNumber segment = SubscriberNumber.builder()
-                .setRef01("ZZ") // Override default
-                .setRef02(referenceIdentification)
-                .build();
+  @Test
+  public void testSettingAndGettingValues() throws ValidationException {
+    SubscriberNumber segment =
+        SubscriberNumber.builder()
+            .setRef01("ZZ") // Override default
+            .setRef02(referenceIdentification)
+            .build();
 
-        assertEquals("ZZ", segment.getRef01().getCode(), "Reference Identification Qualifier should match ref01");
-        assertEquals(referenceIdentification, segment.getRef02(), "Reference Identification should match ref02");
+    assertEquals(
+        "ZZ",
+        segment.getRef01().getCode(),
+        "Reference Identification Qualifier should match ref01");
+    assertEquals(
+        referenceIdentification, segment.getRef02(), "Reference Identification should match ref02");
 
-        assertEquals("ZZ", segment.getReferenceIdentificationQualifier().getCode(), "Reference Identification Qualifier should match ref01");
-        assertEquals(referenceIdentification, segment.getReferenceIdentification(), "Reference Identification should match ref02");
-    }
+    assertEquals(
+        "ZZ",
+        segment.getReferenceIdentificationQualifier().getCode(),
+        "Reference Identification Qualifier should match ref01");
+    assertEquals(
+        referenceIdentification,
+        segment.getReferenceIdentification(),
+        "Reference Identification should match ref02");
+  }
 
-    @Test
-    public void testDefaultValuesAreSet() throws ValidationException {
-        SubscriberNumber segment = SubscriberNumber.builder()
-                .setRef02(referenceIdentification)
-                .build();
+  @Test
+  public void testDefaultValuesAreSet() throws ValidationException {
+    SubscriberNumber segment = SubscriberNumber.builder().setRef02(referenceIdentification).build();
 
-        assertEquals(SubscriberNumber.DEFAULT_ENTITY_IDENTIFIER_CODE, segment.getRef01().getCode(),
-                "Reference Identification Qualifier should be set to default value");
-    }
+    assertEquals(
+        SubscriberNumber.DEFAULT_ENTITY_IDENTIFIER_CODE,
+        segment.getRef01().getCode(),
+        "Reference Identification Qualifier should be set to default value");
+  }
 
-    @Test
-    public void testValidationRequiresRef02() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            SubscriberNumber.builder().build();
-        }, "Should throw ValidationException when ref02 is not set");
+  @Test
+  public void testValidationRequiresRef02() {
+    ValidationException exception =
+        assertThrows(
+            ValidationException.class,
+            () -> {
+              SubscriberNumber.builder().build();
+            },
+            "Should throw ValidationException when ref02 is not set");
 
-        assertTrue(exception.getMessage().contains("ref02"),
-                "Exception message should mention the missing ref02 field");
-    }
+    assertTrue(
+        exception.getMessage().contains("ref02"),
+        "Exception message should mention the missing ref02 field");
+  }
 
-    @Test
-    public void testValidationRejectsEmptyRef02() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            SubscriberNumber.builder()
-                    .setRef02("")
-                    .build();
-        }, "Should throw ValidationException when ref02 is empty");
+  @Test
+  public void testValidationRejectsEmptyRef02() {
+    ValidationException exception =
+        assertThrows(
+            ValidationException.class,
+            () -> {
+              SubscriberNumber.builder().setRef02("").build();
+            },
+            "Should throw ValidationException when ref02 is empty");
 
-        assertTrue(exception.getMessage().contains("ref02"),
-                "Exception message should mention the empty ref02 field");
-    }
+    assertTrue(
+        exception.getMessage().contains("ref02"),
+        "Exception message should mention the empty ref02 field");
+  }
 }

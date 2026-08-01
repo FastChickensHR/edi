@@ -19,19 +19,19 @@ import java.util.List;
  * single round-trip instead of one failed generation at a time.
  *
  * <p>Its counterpart is the construction phase: an individual component builder that cannot produce
- * its component at all fails earlier, at its own {@code build()}, with a checked
- * {@link com.fastChickensHR.edi.x834.exception.ValidationException} — see that type for why the
- * split exists. Everything after construction reports here.
+ * its component at all fails earlier, at its own {@code build()}, with a checked {@link
+ * com.fastChickensHR.edi.x834.exception.ValidationException} — see that type for why the split
+ * exists. Everything after construction reports here.
  */
 public sealed interface GenerationResult {
 
-    /** Generation succeeded; {@link #document()} is the complete X12 834 string. */
-    record Success(String document) implements GenerationResult {}
+  /** Generation succeeded; {@link #document()} is the complete X12 834 string. */
+  record Success(String document) implements GenerationResult {}
 
-    /** Generation failed; {@link #errors()} lists every reason, accumulated in one pass. */
-    record Failure(List<GenerationError> errors) implements GenerationResult {
-        public Failure {
-            errors = List.copyOf(errors);
-        }
+  /** Generation failed; {@link #errors()} lists every reason, accumulated in one pass. */
+  record Failure(List<GenerationError> errors) implements GenerationResult {
+    public Failure {
+      errors = List.copyOf(errors);
     }
+  }
 }

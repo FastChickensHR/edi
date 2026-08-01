@@ -10,17 +10,18 @@ package com.fastChickensHR.edi.core;
 import java.util.List;
 
 /**
- * The format-neutral, fully-resolved file a {@link FileGenerator} serializes (or a {@link FileParser}
- * produces). An ordered tree: file-level {@code fileFields} (header/trailer, once per file) plus
- * one {@link Record} per subject. This is the pivot between the consuming application and a
- * format's dialect — the caller speaks only this, and each format interprets the {@link Location}s.
+ * The format-neutral, fully-resolved file a {@link FileGenerator} serializes (or a {@link
+ * FileParser} produces). An ordered tree: file-level {@code fileFields} (header/trailer, once per
+ * file) plus one {@link Record} per subject. This is the pivot between the consuming application
+ * and a format's dialect — the caller speaks only this, and each format interprets the {@link
+ * Location}s.
  */
 public record FileContent(Direction direction, List<Field> fileFields, List<Record> records) {
-    public FileContent {
-        if (direction == null) {
-            throw new IllegalArgumentException("direction is required");
-        }
-        fileFields = fileFields == null ? List.of() : List.copyOf(fileFields);
-        records = records == null ? List.of() : List.copyOf(records);
+  public FileContent {
+    if (direction == null) {
+      throw new IllegalArgumentException("direction is required");
     }
+    fileFields = fileFields == null ? List.of() : List.copyOf(fileFields);
+    records = records == null ? List.of() : List.copyOf(records);
+  }
 }

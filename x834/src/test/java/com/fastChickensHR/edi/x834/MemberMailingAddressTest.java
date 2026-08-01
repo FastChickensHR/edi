@@ -7,34 +7,37 @@
  */
 package com.fastChickensHR.edi.x834;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class MemberMailingAddressTest {
 
-    @Test
-    void testDefaultEntityIdentifierCode() throws ValidationException {
-        MemberMailingAddress address = MemberMailingAddress.builder()
-                .build();
+  @Test
+  void testDefaultEntityIdentifierCode() throws ValidationException {
+    MemberMailingAddress address = MemberMailingAddress.builder().build();
 
-        assertEquals("31", address.getNm101());
-        assertEquals("31", address.getEntityIdentifierCode());
-    }
+    assertEquals("31", address.getNm101());
+    assertEquals("31", address.getEntityIdentifierCode());
+  }
 
-    @Test
-    void testEntityIdentifierCodeEnum() {
-        assertEquals("31", MemberMailingAddress.EntityIdentifierCode.POSTAL_MAILING_ADDRESS.getCode());
-        assertEquals("Postal Mailing Address", MemberMailingAddress.EntityIdentifierCode.POSTAL_MAILING_ADDRESS.getDescription());
-    }
+  @Test
+  void testEntityIdentifierCodeEnum() {
+    assertEquals("31", MemberMailingAddress.EntityIdentifierCode.POSTAL_MAILING_ADDRESS.getCode());
+    assertEquals(
+        "Postal Mailing Address",
+        MemberMailingAddress.EntityIdentifierCode.POSTAL_MAILING_ADDRESS.getDescription());
+  }
 
-    @Test
-    void testSetEntityIdentifierCodeUsingEnum() throws ValidationException {
-        MemberMailingAddress address = MemberMailingAddress.builder()
-                .setEntityIdentifierCode(MemberMailingAddress.EntityIdentifierCode.POSTAL_MAILING_ADDRESS)
-                .build();
+  @Test
+  void testSetEntityIdentifierCodeUsingEnum() throws ValidationException {
+    MemberMailingAddress address =
+        MemberMailingAddress.builder()
+            .setEntityIdentifierCode(
+                MemberMailingAddress.EntityIdentifierCode.POSTAL_MAILING_ADDRESS)
+            .build();
 
-        assertEquals("31", address.getNm101());
-    }
+    assertEquals("31", address.getNm101());
+  }
 }

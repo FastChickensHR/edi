@@ -12,5 +12,5 @@ package com.fastChickensHR.edi.core;
  * format's dialect into a format-neutral {@link FileContent}, keeping the kernel bidirectional.
  */
 public interface FileParser {
-    FileContent parse(String raw);
+  FileContent parse(String raw);
 }

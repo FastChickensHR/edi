@@ -7,428 +7,458 @@
  */
 package com.fastChickensHR.edi.x834.header;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.fastChickensHR.edi.x834.SegmentTestSupport;
 import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.data.FunctionalIdentifierCode;
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.dates.TimeFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class GSSegmentTest {
 
-    // Concrete implementation of GSSegment for testing
-    private static class TestGSSegment extends GSSegment {
-        protected TestGSSegment(AbstractBuilder<?> builder) throws ValidationException {
-            super(builder);
-        }
-
-        // Concrete builder implementation for testing
-        public static class Builder extends AbstractBuilder<Builder> {
-            @Override
-            protected Builder self() {
-                return this;
-            }
-
-            public TestGSSegment build() throws ValidationException {
-                return new TestGSSegment(this);
-            }
-        }
+  // Concrete implementation of GSSegment for testing
+  private static class TestGSSegment extends GSSegment {
+    protected TestGSSegment(AbstractBuilder<?> builder) throws ValidationException {
+      super(builder);
     }
 
-    private TestGSSegment.Builder builder;
-    private LocalDateTime testDateTime;
+    // Concrete builder implementation for testing
+    public static class Builder extends AbstractBuilder<Builder> {
+      @Override
+      protected Builder self() {
+        return this;
+      }
 
-    @BeforeEach
-    void setUp() {
-        builder = new TestGSSegment.Builder();
-        testDateTime = LocalDateTime.of(2023, 11, 15, 12, 30, 0);
+      public TestGSSegment build() throws ValidationException {
+        return new TestGSSegment(this);
+      }
     }
+  }
 
-    @Test
-    void testGetSegmentIdentifier() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("PO")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  private TestGSSegment.Builder builder;
+  private LocalDateTime testDateTime;
 
-        assertEquals("GS", segment.getSegmentIdentifier());
-    }
+  @BeforeEach
+  void setUp() {
+    builder = new TestGSSegment.Builder();
+    testDateTime = LocalDateTime.of(2023, 11, 15, 12, 30, 0);
+  }
 
-    /**
-     * Render golden for the GS functional-group header. Whole-string equality pins all eight element
-     * positions — including the {@code CCYYMMDD} date and {@code HHMM} time formatted from the supplied
-     * {@link LocalDateTime} — plus the terminator, which the {@code getElementValues()} array check
-     * leaves unrendered. Delimiters come from the default {@link X834Context}.
-     */
-    @Test
-    void rendersGsSegment() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
-        SegmentTestSupport.setContext(segment, new X834Context());
+  @Test
+  void testGetSegmentIdentifier() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("PO")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("GS*BE*SENDER*RECEIVER*20231115*1230*12345*X*005010X220A1~\n", segment.render());
-    }
+    assertEquals("GS", segment.getSegmentIdentifier());
+  }
 
-    /* Tests for all getters */
+  /**
+   * Render golden for the GS functional-group header. Whole-string equality pins all eight element
+   * positions — including the {@code CCYYMMDD} date and {@code HHMM} time formatted from the
+   * supplied {@link LocalDateTime} — plus the terminator, which the {@code getElementValues()}
+   * array check leaves unrendered. Delimiters come from the default {@link X834Context}.
+   */
+  @Test
+  void rendersGsSegment() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
+    SegmentTestSupport.setContext(segment, new X834Context());
 
-    @Test
-    void testGetFunctionalIdentifierCode() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+    assertEquals("GS*BE*SENDER*RECEIVER*20231115*1230*12345*X*005010X220A1~\n", segment.render());
+  }
 
-        assertEquals(FunctionalIdentifierCode.fromString("BE"), segment.getFunctionalIdentifierCode());
-        assertEquals(FunctionalIdentifierCode.fromString("BE"), segment.getGs01());
-    }
+  /* Tests for all getters */
 
-    @Test
-    void testGetApplicationSenderCode() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetFunctionalIdentifierCode() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("SENDER", segment.getApplicationSenderCode());
-        assertEquals("SENDER", segment.getGs02());
-    }
+    assertEquals(FunctionalIdentifierCode.fromString("BE"), segment.getFunctionalIdentifierCode());
+    assertEquals(FunctionalIdentifierCode.fromString("BE"), segment.getGs01());
+  }
 
-    @Test
-    void testGetApplicationReceiverCode() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetApplicationSenderCode() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("RECEIVER", segment.getApplicationReceiverCode());
-        assertEquals("RECEIVER", segment.getGs03());
-    }
+    assertEquals("SENDER", segment.getApplicationSenderCode());
+    assertEquals("SENDER", segment.getGs02());
+  }
 
-    @Test
-    void testGetTransactionSetCreationDate() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetApplicationReceiverCode() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("20231115", segment.getTransactionSetCreationDate());
-        assertEquals("20231115", segment.getGs04());
-    }
+    assertEquals("RECEIVER", segment.getApplicationReceiverCode());
+    assertEquals("RECEIVER", segment.getGs03());
+  }
 
-    @Test
-    void testGetTransactionSetCreationTime() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetTransactionSetCreationDate() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("1230", segment.getTransactionSetCreationTime());
-        assertEquals("1230", segment.getGs05());
-    }
+    assertEquals("20231115", segment.getTransactionSetCreationDate());
+    assertEquals("20231115", segment.getGs04());
+  }
 
-    @Test
-    void testGetGroupControlNumber() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetTransactionSetCreationTime() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("12345", segment.getGroupControlNumber());
-        assertEquals("12345", segment.getGs06());
-    }
+    assertEquals("1230", segment.getTransactionSetCreationTime());
+    assertEquals("1230", segment.getGs05());
+  }
 
-    @Test
-    void testGetResponsibleAgencyCode() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetGroupControlNumber() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("X", segment.getResponsibleAgencyCode().getCode());
-        assertEquals("X", segment.getGs07().getCode());
-    }
+    assertEquals("12345", segment.getGroupControlNumber());
+    assertEquals("12345", segment.getGs06());
+  }
 
-    @Test
-    void testGetVersionReleaseIndustryCode() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testGetResponsibleAgencyCode() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("005010X220A1", segment.getVersionReleaseIndustryCode().getCode());
-        assertEquals("005010X220A1", segment.getGs08().getCode());
-    }
+    assertEquals("X", segment.getResponsibleAgencyCode().getCode());
+    assertEquals("X", segment.getGs07().getCode());
+  }
 
-    /* Tests for all setter methods */
+  @Test
+  void testGetVersionReleaseIndustryCode() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-    @Test
-    void testSetFunctionalIdentifierCode() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+    assertEquals("005010X220A1", segment.getVersionReleaseIndustryCode().getCode());
+    assertEquals("005010X220A1", segment.getGs08().getCode());
+  }
 
-        assertEquals(FunctionalIdentifierCode.fromString("BE"), segment.getFunctionalIdentifierCode());
-    }
+  /* Tests for all setter methods */
 
-    @Test
-    void testSetGs01() throws ValidationException {
-        TestGSSegment segment = builder
-                .setGs01("PO")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetFunctionalIdentifierCode() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals(FunctionalIdentifierCode.fromString("PO"), segment.getFunctionalIdentifierCode());
-    }
+    assertEquals(FunctionalIdentifierCode.fromString("BE"), segment.getFunctionalIdentifierCode());
+  }
 
-    @Test
-    void testSetGs02() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setGs02("TESTSENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetGs01() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setGs01("PO")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("TESTSENDER", segment.getApplicationSenderCode());
-    }
+    assertEquals(FunctionalIdentifierCode.fromString("PO"), segment.getFunctionalIdentifierCode());
+  }
 
-    @Test
-    void testSetGs03() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setGs03("TESTRECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetGs02() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setGs02("TESTSENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("TESTRECEIVER", segment.getApplicationReceiverCode());
-    }
+    assertEquals("TESTSENDER", segment.getApplicationSenderCode());
+  }
 
-    @Test
-    void testSetGs04() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setGs04(LocalDateTime.of(2023, 10, 1, 9, 15, 0), DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetGs03() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setGs03("TESTRECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("20231001", segment.getTransactionSetCreationDate());
-    }
+    assertEquals("TESTRECEIVER", segment.getApplicationReceiverCode());
+  }
 
-    @Test
-    void testSetGs05() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setGs05(LocalDateTime.of(2023, 10, 1, 9, 15, 0), TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetGs04() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setGs04(LocalDateTime.of(2023, 10, 1, 9, 15, 0), DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("0915", segment.getTransactionSetCreationTime());
-    }
+    assertEquals("20231001", segment.getTransactionSetCreationDate());
+  }
 
-    @Test
-    void testSetGs06() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGs06("67890")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetGs05() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setGs05(LocalDateTime.of(2023, 10, 1, 9, 15, 0), TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("67890", segment.getGroupControlNumber());
-    }
+    assertEquals("0915", segment.getTransactionSetCreationTime());
+  }
 
-    @Test
-    void testSetGs07() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setGs07("T")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build();
+  @Test
+  void testSetGs06() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGs06("67890")
+            .setResponsibleAgencyCode("X")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("T", segment.getResponsibleAgencyCode().getCode());
-    }
+    assertEquals("67890", segment.getGroupControlNumber());
+  }
 
-    @Test
-    void testSetGs08() throws ValidationException {
-        TestGSSegment segment = builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setGs08("004061")
-                .build();
+  @Test
+  void testSetGs07() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setGs07("T")
+            .setVersionReleaseIndustryCode("005010X220A1")
+            .build();
 
-        assertEquals("004061", segment.getVersionReleaseIndustryCode().getCode());
-    }
+    assertEquals("T", segment.getResponsibleAgencyCode().getCode());
+  }
 
-    /* Validation tests for required fields */
+  @Test
+  void testSetGs08() throws ValidationException {
+    TestGSSegment segment =
+        builder
+            .setFunctionalIdentifierCode("BE")
+            .setApplicationSenderCode("SENDER")
+            .setApplicationReceiverCode("RECEIVER")
+            .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+            .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+            .setGroupControlNumber("12345")
+            .setResponsibleAgencyCode("X")
+            .setGs08("004061")
+            .build();
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidGs02_ShouldThrowValidationException(String invalidValue) {
-        Exception exception = assertThrows(ValidationException.class, () -> builder
-                .setFunctionalIdentifierCode("BE")
-                .setGs02(invalidValue)
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build());
+    assertEquals("004061", segment.getVersionReleaseIndustryCode().getCode());
+  }
 
-        assertTrue(exception.getMessage().contains("GS02"));
-    }
+  /* Validation tests for required fields */
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidGs03_ShouldThrowValidationException(String invalidValue) {
-        Exception exception = assertThrows(ValidationException.class, () -> builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setGs03(invalidValue)
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGroupControlNumber("12345")
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build());
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {" ", "   "})
+  void testInvalidGs02_ShouldThrowValidationException(String invalidValue) {
+    Exception exception =
+        assertThrows(
+            ValidationException.class,
+            () ->
+                builder
+                    .setFunctionalIdentifierCode("BE")
+                    .setGs02(invalidValue)
+                    .setApplicationReceiverCode("RECEIVER")
+                    .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+                    .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+                    .setGroupControlNumber("12345")
+                    .setResponsibleAgencyCode("X")
+                    .setVersionReleaseIndustryCode("005010X220A1")
+                    .build());
 
-        assertTrue(exception.getMessage().contains("GS03"));
-    }
+    assertTrue(exception.getMessage().contains("GS02"));
+  }
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "   "})
-    void testInvalidGs06_ShouldThrowValidationException(String invalidValue) {
-        Exception exception = assertThrows(ValidationException.class, () -> builder
-                .setFunctionalIdentifierCode("BE")
-                .setApplicationSenderCode("SENDER")
-                .setApplicationReceiverCode("RECEIVER")
-                .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
-                .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
-                .setGs06(invalidValue)
-                .setResponsibleAgencyCode("X")
-                .setVersionReleaseIndustryCode("005010X220A1")
-                .build());
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {" ", "   "})
+  void testInvalidGs03_ShouldThrowValidationException(String invalidValue) {
+    Exception exception =
+        assertThrows(
+            ValidationException.class,
+            () ->
+                builder
+                    .setFunctionalIdentifierCode("BE")
+                    .setApplicationSenderCode("SENDER")
+                    .setGs03(invalidValue)
+                    .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+                    .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+                    .setGroupControlNumber("12345")
+                    .setResponsibleAgencyCode("X")
+                    .setVersionReleaseIndustryCode("005010X220A1")
+                    .build());
 
-        assertTrue(exception.getMessage().contains("GS06"));
-    }
+    assertTrue(exception.getMessage().contains("GS03"));
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {" ", "   "})
+  void testInvalidGs06_ShouldThrowValidationException(String invalidValue) {
+    Exception exception =
+        assertThrows(
+            ValidationException.class,
+            () ->
+                builder
+                    .setFunctionalIdentifierCode("BE")
+                    .setApplicationSenderCode("SENDER")
+                    .setApplicationReceiverCode("RECEIVER")
+                    .setTransactionSetCreationDate(testDateTime, DateFormat.D8)
+                    .setTransactionSetCreationTime(testDateTime, TimeFormat.TIME)
+                    .setGs06(invalidValue)
+                    .setResponsibleAgencyCode("X")
+                    .setVersionReleaseIndustryCode("005010X220A1")
+                    .build());
+
+    assertTrue(exception.getMessage().contains("GS06"));
+  }
 }

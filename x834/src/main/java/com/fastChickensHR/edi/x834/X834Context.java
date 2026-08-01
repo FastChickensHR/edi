@@ -7,207 +7,217 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.x834.dates.DateFormat;
-import com.fastChickensHR.edi.x834.spec.CharacterClass;
-import com.fastChickensHR.edi.x834.dates.TimeFormat;
 import com.fastChickensHR.edi.x834.constants.ElementSeparator;
 import com.fastChickensHR.edi.x834.constants.LineTerminator;
 import com.fastChickensHR.edi.x834.constants.SegmentTerminator;
 import com.fastChickensHR.edi.x834.constants.SubElementSeparator;
+import com.fastChickensHR.edi.x834.dates.DateFormat;
+import com.fastChickensHR.edi.x834.dates.TimeFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
+import com.fastChickensHR.edi.x834.spec.CharacterClass;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
-
 /**
- * Context object that contains document-level information needed by segments.
- * This reduces direct coupling between segments and the X834Document.
+ * Context object that contains document-level information needed by segments. This reduces direct
+ * coupling between segments and the X834Document.
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 public class X834Context {
-    // Document formatting
-    private ElementSeparator elementSeparator;
-    private SubElementSeparator subElementSeparator;
-    private SegmentTerminator segmentTerminator;
-    private LineTerminator lineTerminator;
+  // Document formatting
+  private ElementSeparator elementSeparator;
+  private SubElementSeparator subElementSeparator;
+  private SegmentTerminator segmentTerminator;
+  private LineTerminator lineTerminator;
 
-    // Document metadata
-    private String interchangeControlNumber;
-    private String transactionSetControlNumber;
-    private String groupControlNumber;
-    private String senderID;
-    private String receiverID;
-    /**
-     * ISA05 — Interchange Sender ID Qualifier. Null or blank falls back to the header's default
-     * ({@code "30"}, U.S. Federal Tax Identification Number). Trading partners routinely mandate
-     * {@code "ZZ"} (Mutually Defined) instead (mono#658/#640), so this is a per-partner value,
-     * not a constant.
-     */
-    private String senderIdQualifier;
-    /**
-     * ISA07 — Interchange Receiver ID Qualifier. Null or blank falls back to the header's default
-     * ({@code "ZZ"}, Mutually Defined).
-     */
-    private String receiverIdQualifier;
-    /**
-     * GS02 — Application Sender's Code, the functional-group sender identifier. Distinct from
-     * {@link #senderID} (ISA06): a trading partner may assign a sender code that differs from the
-     * interchange mailbox ID. Null or blank falls back to {@link #senderID}, which is the common
-     * case (GS mirrors ISA); set it only when the partner requires the two to differ.
-     */
-    private String applicationSenderCode;
-    /**
-     * GS03 — Application Receiver's Code, the functional-group receiver identifier. Distinct from
-     * {@link #receiverID} (ISA08); some partners mandate a GS03 that is not the interchange
-     * receiver ID (e.g. an implementation-convention reference). Null or blank falls back to
-     * {@link #receiverID}.
-     */
-    private String applicationReceiverCode;
-    /** ISA14 — Interchange Acknowledgment Requested ("1" to request a TA1/999). Null defaults to "0". */
-    private String acknowledgmentRequested;
-    private LocalDateTime documentDate;
-    private DateFormat dateFormat;
-    private TimeFormat timeFormat;
-    /**
-     * The character set this interchange's data may draw from — a property of the interchange, not of
-     * any element, since it is what the receiving partner agreed to accept. Defaults to
-     * {@link CharacterClass#EXTENDED}, the wider of X12's two named sets: narrowing it to
-     * {@link CharacterClass#BASIC} rejects lower case and {@code @}, which some partners require.
-     */
-    private CharacterClass characterClass;
+  // Document metadata
+  private String interchangeControlNumber;
+  private String transactionSetControlNumber;
+  private String groupControlNumber;
+  private String senderID;
+  private String receiverID;
 
-    // Constants
-    /** Interchange control version (ISA12) for the 5010 release: {@code "00501"}. */
-    private static final String EDI_VERSION = "00501";
-    /** Transaction set identifier for benefit enrollment and maintenance: {@code "834"} (ST01). */
-    private static final String TRANSACTION_SET_ID = "834";
-    /** Implementation convention reference identifying the 834 guide 005010X220A1 (ST03 / GS08). */
-    private static final String IMPLEMENTATION_CONVENTION_REFERENCE = "005010X220A1";
+  /**
+   * ISA05 — Interchange Sender ID Qualifier. Null or blank falls back to the header's default
+   * ({@code "30"}, U.S. Federal Tax Identification Number). Trading partners routinely mandate
+   * {@code "ZZ"} (Mutually Defined) instead (mono#658/#640), so this is a per-partner value, not a
+   * constant.
+   */
+  private String senderIdQualifier;
 
-    /**
-     * Creates a new X834Context with default values: current timestamp as the document
-     * date, {@link DateFormat#D8}/{@link TimeFormat#TIME} formats, the conventional 834
-     * delimiters ('*' element, '~' segment, '&gt;' sub-element) and LF line terminator,
-     * and a transaction set control number of {@code "0001"}.
-     */
-    public X834Context() {
-        this.documentDate = LocalDateTime.now();
-        this.dateFormat = DateFormat.D8;
-        this.timeFormat = TimeFormat.TIME;
-        this.elementSeparator = ElementSeparator.ASTERISK;
-        this.segmentTerminator = SegmentTerminator.TILDE;
-        this.subElementSeparator = SubElementSeparator.GREATER_THAN;
-        this.lineTerminator = LineTerminator.LF;
-        this.transactionSetControlNumber = "0001";
-        this.characterClass = CharacterClass.EXTENDED;
+  /**
+   * ISA07 — Interchange Receiver ID Qualifier. Null or blank falls back to the header's default
+   * ({@code "ZZ"}, Mutually Defined).
+   */
+  private String receiverIdQualifier;
+
+  /**
+   * GS02 — Application Sender's Code, the functional-group sender identifier. Distinct from {@link
+   * #senderID} (ISA06): a trading partner may assign a sender code that differs from the
+   * interchange mailbox ID. Null or blank falls back to {@link #senderID}, which is the common case
+   * (GS mirrors ISA); set it only when the partner requires the two to differ.
+   */
+  private String applicationSenderCode;
+
+  /**
+   * GS03 — Application Receiver's Code, the functional-group receiver identifier. Distinct from
+   * {@link #receiverID} (ISA08); some partners mandate a GS03 that is not the interchange receiver
+   * ID (e.g. an implementation-convention reference). Null or blank falls back to {@link
+   * #receiverID}.
+   */
+  private String applicationReceiverCode;
+
+  /**
+   * ISA14 — Interchange Acknowledgment Requested ("1" to request a TA1/999). Null defaults to "0".
+   */
+  private String acknowledgmentRequested;
+
+  private LocalDateTime documentDate;
+  private DateFormat dateFormat;
+  private TimeFormat timeFormat;
+
+  /**
+   * The character set this interchange's data may draw from — a property of the interchange, not of
+   * any element, since it is what the receiving partner agreed to accept. Defaults to {@link
+   * CharacterClass#EXTENDED}, the wider of X12's two named sets: narrowing it to {@link
+   * CharacterClass#BASIC} rejects lower case and {@code @}, which some partners require.
+   */
+  private CharacterClass characterClass;
+
+  // Constants
+  /** Interchange control version (ISA12) for the 5010 release: {@code "00501"}. */
+  private static final String EDI_VERSION = "00501";
+
+  /** Transaction set identifier for benefit enrollment and maintenance: {@code "834"} (ST01). */
+  private static final String TRANSACTION_SET_ID = "834";
+
+  /** Implementation convention reference identifying the 834 guide 005010X220A1 (ST03 / GS08). */
+  private static final String IMPLEMENTATION_CONVENTION_REFERENCE = "005010X220A1";
+
+  /**
+   * Creates a new X834Context with default values: current timestamp as the document date, {@link
+   * DateFormat#D8}/{@link TimeFormat#TIME} formats, the conventional 834 delimiters ('*' element,
+   * '~' segment, '&gt;' sub-element) and LF line terminator, and a transaction set control number
+   * of {@code "0001"}.
+   */
+  public X834Context() {
+    this.documentDate = LocalDateTime.now();
+    this.dateFormat = DateFormat.D8;
+    this.timeFormat = TimeFormat.TIME;
+    this.elementSeparator = ElementSeparator.ASTERISK;
+    this.segmentTerminator = SegmentTerminator.TILDE;
+    this.subElementSeparator = SubElementSeparator.GREATER_THAN;
+    this.lineTerminator = LineTerminator.LF;
+    this.transactionSetControlNumber = "0001";
+    this.characterClass = CharacterClass.EXTENDED;
+  }
+
+  /**
+   * Validates that all required context fields are set.
+   *
+   * @throws ValidationException if interchangeControlNumber or groupControlNumber is null
+   */
+  public void validate() throws ValidationException {
+    if (interchangeControlNumber == null || interchangeControlNumber.isEmpty()) {
+      throw new ValidationException("Interchange Control Number is required on X834Context");
     }
-
-    /**
-     * Validates that all required context fields are set.
-     *
-     * @throws ValidationException if interchangeControlNumber or groupControlNumber is null
-     */
-    public void validate() throws ValidationException {
-        if (interchangeControlNumber == null || interchangeControlNumber.isEmpty()) {
-            throw new ValidationException("Interchange Control Number is required on X834Context");
-        }
-        if (!interchangeControlNumber.matches("\\d{9}")) {
-            throw new ValidationException("Interchange Control Number must be exactly 9 numeric digits");
-        }
-        if (groupControlNumber == null || groupControlNumber.isEmpty()) {
-            throw new ValidationException("Group Control Number is required on X834Context");
-        }
+    if (!interchangeControlNumber.matches("\\d{9}")) {
+      throw new ValidationException("Interchange Control Number must be exactly 9 numeric digits");
     }
-
-    /**
-     * @return the element separator character (the character value, not the enum)
-     */
-    public char getElementSeparator() {
-        return elementSeparator.getValue();
+    if (groupControlNumber == null || groupControlNumber.isEmpty()) {
+      throw new ValidationException("Group Control Number is required on X834Context");
     }
+  }
 
-    /**
-     * @return the sub-element (component) separator character
-     */
-    public char getSubElementSeparator() {
-        return subElementSeparator.getValue();
-    }
+  /**
+   * @return the element separator character (the character value, not the enum)
+   */
+  public char getElementSeparator() {
+    return elementSeparator.getValue();
+  }
 
-    /**
-     * @return the segment terminator character
-     */
-    public char getSegmentTerminator() {
-        return segmentTerminator.getValue();
-    }
+  /**
+   * @return the sub-element (component) separator character
+   */
+  public char getSubElementSeparator() {
+    return subElementSeparator.getValue();
+  }
 
-    /**
-     * @return the line terminator string appended after each rendered segment
-     */
-    public String getLineTerminator() {
-        return lineTerminator.getValue();
-    }
+  /**
+   * @return the segment terminator character
+   */
+  public char getSegmentTerminator() {
+    return segmentTerminator.getValue();
+  }
 
-    /**
-     * @return the interchange control version number {@value #EDI_VERSION} (ISA12)
-     */
-    public String getEdiVersion() {
-        return EDI_VERSION;
-    }
+  /**
+   * @return the line terminator string appended after each rendered segment
+   */
+  public String getLineTerminator() {
+    return lineTerminator.getValue();
+  }
 
-    /**
-     * @return the transaction set identifier {@value #TRANSACTION_SET_ID}
-     */
-    public String getTransactionSetId() {
-        return TRANSACTION_SET_ID;
-    }
+  /**
+   * @return the interchange control version number {@value #EDI_VERSION} (ISA12)
+   */
+  public String getEdiVersion() {
+    return EDI_VERSION;
+  }
 
-    /**
-     * @return the implementation convention reference {@value #IMPLEMENTATION_CONVENTION_REFERENCE}
-     */
-    public String getImplementationConventionReference() {
-        return IMPLEMENTATION_CONVENTION_REFERENCE;
-    }
+  /**
+   * @return the transaction set identifier {@value #TRANSACTION_SET_ID}
+   */
+  public String getTransactionSetId() {
+    return TRANSACTION_SET_ID;
+  }
 
-    /**
-     * @return the document date formatted with the current {@link #getDateFormat() date format}.
-     * Rendered into ISA09 (interchange date), GS04 (group date), BGN03 and the file effective DTP.
-     * Always derived from {@link #getDocumentDate()} on read, so it can never go stale.
-     */
-    public String getFormattedDocumentDate() {
-        return formatDate(documentDate);
-    }
+  /**
+   * @return the implementation convention reference {@value #IMPLEMENTATION_CONVENTION_REFERENCE}
+   */
+  public String getImplementationConventionReference() {
+    return IMPLEMENTATION_CONVENTION_REFERENCE;
+  }
 
-    /**
-     * @return the document time formatted with the current {@link #getTimeFormat() time format}.
-     * Rendered into ISA10 (interchange time) and GS05 (group time). Always derived from
-     * {@link #getDocumentDate()} on read, so it follows {@link #setDocumentDate} consistently
-     * with the formatted date.
-     */
-    public String getFormattedDocumentTime() {
-        return formatTime(documentDate);
-    }
+  /**
+   * @return the document date formatted with the current {@link #getDateFormat() date format}.
+   *     Rendered into ISA09 (interchange date), GS04 (group date), BGN03 and the file effective
+   *     DTP. Always derived from {@link #getDocumentDate()} on read, so it can never go stale.
+   */
+  public String getFormattedDocumentDate() {
+    return formatDate(documentDate);
+  }
 
-    /**
-     * Formats a date according to the context's date format
-     *
-     * @param date The date to format
-     * @return Formatted date string
-     */
-    public String formatDate(LocalDateTime date) {
-        return getDateFormat().format(date);
-    }
+  /**
+   * @return the document time formatted with the current {@link #getTimeFormat() time format}.
+   *     Rendered into ISA10 (interchange time) and GS05 (group time). Always derived from {@link
+   *     #getDocumentDate()} on read, so it follows {@link #setDocumentDate} consistently with the
+   *     formatted date.
+   */
+  public String getFormattedDocumentTime() {
+    return formatTime(documentDate);
+  }
 
-    /**
-     * Formats a time according to the context's time format
-     *
-     * @param time The time to format
-     * @return Formatted time string
-     */
-    public String formatTime(LocalDateTime time) {
-        return getTimeFormat().format(time);
-    }
+  /**
+   * Formats a date according to the context's date format
+   *
+   * @param date The date to format
+   * @return Formatted date string
+   */
+  public String formatDate(LocalDateTime date) {
+    return getDateFormat().format(date);
+  }
+
+  /**
+   * Formats a time according to the context's time format
+   *
+   * @param time The time to format
+   * @return Formatted time string
+   */
+  public String formatTime(LocalDateTime time) {
+    return getTimeFormat().format(time);
+  }
 }

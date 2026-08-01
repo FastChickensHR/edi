@@ -7,180 +7,192 @@
  */
 package com.fastChickensHR.edi.x834;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.fastChickensHR.edi.x834.dates.DateFormat;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
-import com.fastChickensHR.edi.x834.X834Context;
 import com.fastChickensHR.edi.x834.loop2000.data.MemberDateQualifier;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class MemberLevelDatesTest {
 
-    private X834Context context;
-    private final String dateQualifierCode = MemberDateQualifier.BIRTH.getCode();
-    private final DateFormat dateFormatQualifier = DateFormat.D8;
-    private final LocalDateTime dateValue = LocalDateTime.of(2025, 1, 1, 0, 0);
+  private X834Context context;
+  private final String dateQualifierCode = MemberDateQualifier.BIRTH.getCode();
+  private final DateFormat dateFormatQualifier = DateFormat.D8;
+  private final LocalDateTime dateValue = LocalDateTime.of(2025, 1, 1, 0, 0);
 
-    @BeforeEach
-    void setUp() {
-        context = new X834Context();
-        context.setDateFormat(DateFormat.D8);
+  @BeforeEach
+  void setUp() {
+    context = new X834Context();
+    context.setDateFormat(DateFormat.D8);
+  }
+
+  @Test
+  void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDtp01(dateQualifierCode)
+            .setDtp03(dateValue)
+            .build();
+
+    assertEquals("DTP", dates.getSegmentIdentifier());
+  }
+
+  @Test
+  void testGetElementValues() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDtp01(dateQualifierCode)
+            .setDtp03(dateValue)
+            .build();
+
+    String[] elements = dates.getElementValues();
+    assertEquals(3, elements.length);
+    assertEquals(dateQualifierCode, elements[0]);
+  }
+
+  @Test
+  void testSettingSpecNamesGettingDomainNames() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDtp01(dateQualifierCode)
+            .setDtp02(dateFormatQualifier)
+            .setDtp03(dateValue)
+            .build();
+
+    assertEquals(dateQualifierCode, dates.getDateTimeQualifier().getCode());
+  }
+
+  @Test
+  void testSettingDomainNamesGettingSpecNames() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDateTimeQualifier(dateQualifierCode)
+            .setDateTimeFormat(dateFormatQualifier)
+            .setDateTimePeriod(dateValue)
+            .build();
+
+    assertEquals(dateQualifierCode, dates.getDtp01().getCode());
+  }
+
+  @Test
+  void testSetDateQualifierWithEnum() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDateQualifier(MemberDateQualifier.BIRTH)
+            .setDateTimePeriod(dateValue)
+            .build();
+
+    assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
+    assertEquals(MemberDateQualifier.BIRTH.toString(), dates.getDateTimeQualifier().getCode());
+  }
+
+  @Test
+  void testGetMemberDateQualifier() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDtp01(MemberDateQualifier.COVERAGE_BEGIN.getCode())
+            .setDtp03(dateValue)
+            .build();
+
+    assertEquals(
+        MemberDateQualifier.COVERAGE_BEGIN.getCode(), dates.getDateTimeQualifier().getCode());
+  }
+
+  @Test
+  void testRender() throws ValidationException {
+    MemberLevelDates segment =
+        new MemberLevelDates.Builder(context)
+            .setDateQualifier(MemberDateQualifier.BIRTH)
+            .setDateTimePeriod(dateValue)
+            .build();
+
+    segment.setContext(context);
+
+    String rendered = segment.render();
+    assertEquals("DTP*007*D8*20250101~", rendered.trim());
+  }
+
+  /**
+   * Regression for #156.1: DTP02 must carry the X12 date-time-period-format qualifier code (e.g.
+   * {@code D8}), never a human-readable pattern like {@code CCYYMMDD}. The retired {@code
+   * DateFormat.DATE} alias used to leak the pattern into DTP02.
+   */
+  @Test
+  void testDtp02CarriesX12CodeNotHumanPattern() throws ValidationException {
+    MemberLevelDates segment =
+        new MemberLevelDates.Builder(context)
+            .setDateQualifier(MemberDateQualifier.BIRTH)
+            .setDateTimePeriod(dateValue)
+            .build();
+    segment.setContext(context);
+
+    String rendered = segment.render();
+    assertTrue(rendered.contains("*D8*"), "DTP02 should be the X12 code D8: " + rendered);
+    assertFalse(rendered.contains("CCYYMMDD"), "DTP02 must not carry a human pattern: " + rendered);
+  }
+
+  @Test
+  void testValidationRequiresDtp01() {
+    IllegalArgumentException exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              new MemberLevelDates.Builder(context)
+                  .setDtp01("") // Empty value
+                  .setDtp03(dateValue)
+                  .build();
+            });
+
+    assertTrue(exception.getMessage().contains("Input cannot be null or empty"));
+  }
+
+  @Test
+  void testDefaultsFromContext() throws ValidationException {
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDtp01(dateQualifierCode)
+            .setDtp03(dateValue)
+            .build();
+
+    assertEquals(DateFormat.D8, dates.getDtp02());
+  }
+
+  @Test
+  void testDifferentQualifiersWorkCorrectly() throws ValidationException {
+    MemberDateQualifier[] qualifiers = {
+      MemberDateQualifier.EFFECTIVE,
+      MemberDateQualifier.HIRE,
+      MemberDateQualifier.ENROLLMENT,
+      MemberDateQualifier.COBRA_BEGIN
+    };
+
+    for (MemberDateQualifier qualifier : qualifiers) {
+      MemberLevelDates dates =
+          new MemberLevelDates.Builder(context)
+              .setDateQualifier(qualifier)
+              .setDateTimePeriod(dateValue)
+              .build();
+
+      assertEquals(qualifier.getCode(), dates.getDtp01().getCode());
+      assertEquals(qualifier.toString(), dates.getDateTimeQualifier().getCode());
     }
+  }
 
-    @Test
-    void testGetSegmentIdentifierReturnsExpectedValue() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDtp01(dateQualifierCode)
-                .setDtp03(dateValue)
-                .build();
+  @Test
+  void testBuilderIsProperlyChainable() throws ValidationException {
+    // Test that all builder methods can be chained
+    MemberLevelDates dates =
+        new MemberLevelDates.Builder(context)
+            .setDateQualifier(MemberDateQualifier.BIRTH)
+            .setDateTimeFormat(DateFormat.D8)
+            .setDateTimePeriod(LocalDateTime.of(2025, 1, 1, 0, 0))
+            .build();
 
-        assertEquals("DTP", dates.getSegmentIdentifier());
-    }
-
-    @Test
-    void testGetElementValues() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDtp01(dateQualifierCode)
-                .setDtp03(dateValue)
-                .build();
-
-        String[] elements = dates.getElementValues();
-        assertEquals(3, elements.length);
-        assertEquals(dateQualifierCode, elements[0]);
-    }
-
-    @Test
-    void testSettingSpecNamesGettingDomainNames() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDtp01(dateQualifierCode)
-                .setDtp02(dateFormatQualifier)
-                .setDtp03(dateValue)
-                .build();
-
-        assertEquals(dateQualifierCode, dates.getDateTimeQualifier().getCode());
-    }
-
-    @Test
-    void testSettingDomainNamesGettingSpecNames() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDateTimeQualifier(dateQualifierCode)
-                .setDateTimeFormat(dateFormatQualifier)
-                .setDateTimePeriod(dateValue)
-                .build();
-
-        assertEquals(dateQualifierCode, dates.getDtp01().getCode());
-    }
-
-    @Test
-    void testSetDateQualifierWithEnum() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDateQualifier(MemberDateQualifier.BIRTH)
-                .setDateTimePeriod(dateValue)
-                .build();
-
-        assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
-        assertEquals(MemberDateQualifier.BIRTH.toString(), dates.getDateTimeQualifier().getCode());
-    }
-
-    @Test
-    void testGetMemberDateQualifier() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDtp01(MemberDateQualifier.COVERAGE_BEGIN.getCode())
-                .setDtp03(dateValue)
-                .build();
-
-        assertEquals(MemberDateQualifier.COVERAGE_BEGIN.getCode(), dates.getDateTimeQualifier().getCode());
-    }
-
-    @Test
-    void testRender() throws ValidationException {
-        MemberLevelDates segment = new MemberLevelDates.Builder(context)
-                .setDateQualifier(MemberDateQualifier.BIRTH)
-                .setDateTimePeriod(dateValue)
-                .build();
-
-        segment.setContext(context);
-
-        String rendered = segment.render();
-        assertEquals("DTP*007*D8*20250101~", rendered.trim());
-    }
-
-    /**
-     * Regression for #156.1: DTP02 must carry the X12 date-time-period-format
-     * qualifier code (e.g. {@code D8}), never a human-readable pattern like
-     * {@code CCYYMMDD}. The retired {@code DateFormat.DATE} alias used to leak the
-     * pattern into DTP02.
-     */
-    @Test
-    void testDtp02CarriesX12CodeNotHumanPattern() throws ValidationException {
-        MemberLevelDates segment = new MemberLevelDates.Builder(context)
-                .setDateQualifier(MemberDateQualifier.BIRTH)
-                .setDateTimePeriod(dateValue)
-                .build();
-        segment.setContext(context);
-
-        String rendered = segment.render();
-        assertTrue(rendered.contains("*D8*"), "DTP02 should be the X12 code D8: " + rendered);
-        assertFalse(rendered.contains("CCYYMMDD"), "DTP02 must not carry a human pattern: " + rendered);
-    }
-
-    @Test
-    void testValidationRequiresDtp01() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            new MemberLevelDates.Builder(context)
-                    .setDtp01("")  // Empty value
-                    .setDtp03(dateValue)
-                    .build();
-        });
-
-        assertTrue(exception.getMessage().contains("Input cannot be null or empty"));
-    }
-
-    @Test
-    void testDefaultsFromContext() throws ValidationException {
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDtp01(dateQualifierCode)
-                .setDtp03(dateValue)
-                .build();
-
-        assertEquals(DateFormat.D8, dates.getDtp02());
-    }
-
-    @Test
-    void testDifferentQualifiersWorkCorrectly() throws ValidationException {
-        MemberDateQualifier[] qualifiers = {
-                MemberDateQualifier.EFFECTIVE,
-                MemberDateQualifier.HIRE,
-                MemberDateQualifier.ENROLLMENT,
-                MemberDateQualifier.COBRA_BEGIN
-        };
-
-        for (MemberDateQualifier qualifier : qualifiers) {
-            MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                    .setDateQualifier(qualifier)
-                    .setDateTimePeriod(dateValue)
-                    .build();
-
-            assertEquals(qualifier.getCode(), dates.getDtp01().getCode());
-            assertEquals(qualifier.toString(), dates.getDateTimeQualifier().getCode());
-        }
-    }
-
-    @Test
-    void testBuilderIsProperlyChainable() throws ValidationException {
-        // Test that all builder methods can be chained
-        MemberLevelDates dates = new MemberLevelDates.Builder(context)
-                .setDateQualifier(MemberDateQualifier.BIRTH)
-                .setDateTimeFormat(DateFormat.D8)
-                .setDateTimePeriod(LocalDateTime.of(2025,1,1,0, 0))
-                .build();
-
-        assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
-        assertEquals(DateFormat.D8, dates.getDtp02());
-        assertEquals("20250101", dates.getDtp03());
-    }
+    assertEquals(MemberDateQualifier.BIRTH.getCode(), dates.getDtp01().getCode());
+    assertEquals(DateFormat.D8, dates.getDtp02());
+    assertEquals("20250101", dates.getDtp03());
+  }
 }

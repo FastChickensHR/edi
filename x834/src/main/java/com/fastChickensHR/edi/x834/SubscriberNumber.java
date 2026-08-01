@@ -7,53 +7,55 @@
  */
 package com.fastChickensHR.edi.x834;
 
-import com.fastChickensHR.edi.x834.RefSegment;
 import com.fastChickensHR.edi.x834.exception.ValidationException;
 import lombok.experimental.Accessors;
 
 /**
  * Subscriber number carried as a REF segment in Loop 2000 of the X12 834.
- * <p>
- * Renders {@code REF*0F*<subscriber number>}: REF01 is fixed to the qualifier
- * {@code 0F} (zero-F, Subscriber Number) and REF02 carries the subscriber's number.
- * <p>
- * Note the leading digit zero: {@code 0F} is element 128's "Subscriber Number", whereas
- * the letter-O {@code OF} is "Operator Identification Number" — a different qualifier the
- * segment previously emitted by mistake.
+ *
+ * <p>Renders {@code REF*0F*<subscriber number>}: REF01 is fixed to the qualifier {@code 0F}
+ * (zero-F, Subscriber Number) and REF02 carries the subscriber's number.
+ *
+ * <p>Note the leading digit zero: {@code 0F} is element 128's "Subscriber Number", whereas the
+ * letter-O {@code OF} is "Operator Identification Number" — a different qualifier the segment
+ * previously emitted by mistake.
  */
 class SubscriberNumber extends RefSegment {
-    /** REF01 qualifier {@code 0F} (zero-F) — Subscriber Number; the fixed default for this REF segment. */
-    public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "0F";
+  /**
+   * REF01 qualifier {@code 0F} (zero-F) — Subscriber Number; the fixed default for this REF
+   * segment.
+   */
+  public static final String DEFAULT_ENTITY_IDENTIFIER_CODE = "0F";
 
-    private SubscriberNumber(SubscriberNumber.Builder builder) throws ValidationException {
-        super(builder);
+  private SubscriberNumber(SubscriberNumber.Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  public static SubscriberNumber.Builder builder() {
+    return new SubscriberNumber.Builder();
+  }
+
+  /**
+   * Builds the subscriber-number REF, defaulting REF01 to {@link
+   * SubscriberNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
+   */
+  @Accessors(chain = true)
+  public static class Builder extends RefSegment.AbstractBuilder<SubscriberNumber.Builder> {
+    public Builder() {
+      setRef01(DEFAULT_ENTITY_IDENTIFIER_CODE);
     }
 
-    public static SubscriberNumber.Builder builder() {
-        return new SubscriberNumber.Builder();
+    @Override
+    protected SubscriberNumber.Builder self() {
+      return this;
     }
 
-    /**
-     * Builds the subscriber-number REF, defaulting REF01 to
-     * {@link SubscriberNumber#DEFAULT_ENTITY_IDENTIFIER_CODE}.
-     */
-    @Accessors(chain = true)
-    public static class Builder extends RefSegment.AbstractBuilder<SubscriberNumber.Builder> {
-        public Builder() {
-            setRef01(DEFAULT_ENTITY_IDENTIFIER_CODE);
-        }
-
-        @Override
-        protected SubscriberNumber.Builder self() {
-            return this;
-        }
-
-        @Override
-        public SubscriberNumber build() throws ValidationException {
-            if (ref02 == null || ref02.isEmpty()) {
-                throw new ValidationException("ref02 (Subscriber Number) is required");
-            }
-            return new SubscriberNumber(this);
-        }
+    @Override
+    public SubscriberNumber build() throws ValidationException {
+      if (ref02 == null || ref02.isEmpty()) {
+        throw new ValidationException("ref02 (Subscriber Number) is required");
+      }
+      return new SubscriberNumber(this);
     }
+  }
 }

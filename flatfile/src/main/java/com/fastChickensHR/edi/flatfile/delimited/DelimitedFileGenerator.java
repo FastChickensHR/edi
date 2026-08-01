@@ -12,8 +12,6 @@ import com.fastChickensHR.edi.core.FileContent;
 import com.fastChickensHR.edi.core.FileGenerator;
 import com.fastChickensHR.edi.core.Record;
 import com.fastChickensHR.edi.core.RecordLevel;
-import org.apache.commons.csv.CSVPrinter;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -21,109 +19,111 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.csv.CSVPrinter;
 
 /**
  * The delimited flat-file implementation of the {@link FileGenerator} seam: writes a format-neutral
- * {@link FileContent} out as a header-row delimited file (CSV by default, or any {@link DelimitedFormat}).
- * The inverse of {@link DelimitedFileParser}.
+ * {@link FileContent} out as a header-row delimited file (CSV by default, or any {@link
+ * DelimitedFormat}). The inverse of {@link DelimitedFileParser}.
  *
  * <p>Each {@link Record} becomes a row and each {@link Field} a cell under its column (the field's
  * {@link com.fastChickensHR.edi.core.Location} name); an omitted field is an empty cell. Nesting —
  * which a flat file cannot express directly — is flattened into <em>linked rows</em>: a parent row
- * followed by its child rows, each tagged in a reserved {@link LinkedRows#RECORD_LEVEL_COLUMN}. When
- * nothing nests, that column is omitted and the output is a plain flat file that round-trips through
- * the parser.
+ * followed by its child rows, each tagged in a reserved {@link LinkedRows#RECORD_LEVEL_COLUMN}.
+ * When nothing nests, that column is omitted and the output is a plain flat file that round-trips
+ * through the parser.
  */
 public final class DelimitedFileGenerator implements FileGenerator {
 
-    private final DelimitedFormat format;
+  private final DelimitedFormat format;
 
-    /** Writes plain flat CSV ({@link DelimitedFormat#csv()}). */
-    public DelimitedFileGenerator() {
-        this(DelimitedFormat.csv());
+  /** Writes plain flat CSV ({@link DelimitedFormat#csv()}). */
+  public DelimitedFileGenerator() {
+    this(DelimitedFormat.csv());
+  }
+
+  /** Writes a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
+  public DelimitedFileGenerator(DelimitedFormat format) {
+    this.format = format;
+  }
+
+  @Override
+  public String generate(FileContent file) {
+    if (!file.fileFields().isEmpty()) {
+      throw new IllegalArgumentException(
+          "a delimited file has no file-level row; FileContent.fileFields must be empty");
+    }
+    if (file.records().isEmpty()) {
+      return "";
     }
 
-    /** Writes a delimited flat file in the given {@code format} (e.g. to match a foreign feed). */
-    public DelimitedFileGenerator(DelimitedFormat format) {
-        this.format = format;
+    boolean nested = file.records().stream().anyMatch(r -> !r.children().isEmpty());
+
+    LinkedHashSet<String> columns = new LinkedHashSet<>();
+    for (Record record : file.records()) {
+      collectColumns(record, columns);
     }
 
-    @Override
-    public String generate(FileContent file) {
-        if (!file.fileFields().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "a delimited file has no file-level row; FileContent.fileFields must be empty");
-        }
-        if (file.records().isEmpty()) {
-            return "";
-        }
-
-        boolean nested = file.records().stream().anyMatch(r -> !r.children().isEmpty());
-
-        LinkedHashSet<String> columns = new LinkedHashSet<>();
-        for (Record record : file.records()) {
-            collectColumns(record, columns);
-        }
-
-        List<String> header = new ArrayList<>();
-        if (nested) {
-            header.add(LinkedRows.RECORD_LEVEL_COLUMN);
-        }
-        header.addAll(columns);
-
-        StringWriter out = new StringWriter();
-        try (CSVPrinter printer = new CSVPrinter(out, format.generateFormat())) {
-            if (format.hasHeader()) {
-                printer.printRecord(header);
-            }
-            for (Record record : file.records()) {
-                printRow(printer, header, record, RecordLevel.RECORD);
-                for (Record child : record.children()) {
-                    if (!child.children().isEmpty()) {
-                        throw new IllegalArgumentException(
-                                "a delimited file supports one level of nesting; a SUBRECORD cannot have children");
-                    }
-                    printRow(printer, header, child, RecordLevel.SUBRECORD);
-                }
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to generate delimited file: " + e.getMessage(), e);
-        }
-        return out.toString();
+    List<String> header = new ArrayList<>();
+    if (nested) {
+      header.add(LinkedRows.RECORD_LEVEL_COLUMN);
     }
+    header.addAll(columns);
 
-    private static void collectColumns(Record record, LinkedHashSet<String> columns) {
-        for (Field field : record.fields()) {
-            if (!field.isOmitted()) {
-                columns.add(field.location().name());
-            }
-        }
+    StringWriter out = new StringWriter();
+    try (CSVPrinter printer = new CSVPrinter(out, format.generateFormat())) {
+      if (format.hasHeader()) {
+        printer.printRecord(header);
+      }
+      for (Record record : file.records()) {
+        printRow(printer, header, record, RecordLevel.RECORD);
         for (Record child : record.children()) {
-            collectColumns(child, columns);
+          if (!child.children().isEmpty()) {
+            throw new IllegalArgumentException(
+                "a delimited file supports one level of nesting; a SUBRECORD cannot have children");
+          }
+          printRow(printer, header, child, RecordLevel.SUBRECORD);
         }
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to generate delimited file: " + e.getMessage(), e);
     }
+    return out.toString();
+  }
 
-    private static void printRow(CSVPrinter printer, List<String> header, Record record, RecordLevel level)
-            throws IOException {
-        Map<String, String> values = fieldValues(record);
-        List<String> cells = new ArrayList<>(header.size());
-        for (String column : header) {
-            if (column.equals(LinkedRows.RECORD_LEVEL_COLUMN)) {
-                cells.add(level.name());
-            } else {
-                cells.add(values.getOrDefault(column, ""));
-            }
-        }
-        printer.printRecord(cells);
+  private static void collectColumns(Record record, LinkedHashSet<String> columns) {
+    for (Field field : record.fields()) {
+      if (!field.isOmitted()) {
+        columns.add(field.location().name());
+      }
     }
+    for (Record child : record.children()) {
+      collectColumns(child, columns);
+    }
+  }
 
-    private static Map<String, String> fieldValues(Record record) {
-        Map<String, String> values = new LinkedHashMap<>();
-        for (Field field : record.fields()) {
-            if (!field.isOmitted()) {
-                values.putIfAbsent(field.location().name(), field.value());
-            }
-        }
-        return values;
+  private static void printRow(
+      CSVPrinter printer, List<String> header, Record record, RecordLevel level)
+      throws IOException {
+    Map<String, String> values = fieldValues(record);
+    List<String> cells = new ArrayList<>(header.size());
+    for (String column : header) {
+      if (column.equals(LinkedRows.RECORD_LEVEL_COLUMN)) {
+        cells.add(level.name());
+      } else {
+        cells.add(values.getOrDefault(column, ""));
+      }
     }
+    printer.printRecord(cells);
+  }
+
+  private static Map<String, String> fieldValues(Record record) {
+    Map<String, String> values = new LinkedHashMap<>();
+    for (Field field : record.fields()) {
+      if (!field.isOmitted()) {
+        values.putIfAbsent(field.location().name(), field.value());
+      }
+    }
+    return values;
+  }
 }

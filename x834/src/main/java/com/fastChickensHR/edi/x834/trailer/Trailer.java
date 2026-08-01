@@ -8,207 +8,207 @@
 package com.fastChickensHR.edi.x834.trailer;
 
 import com.fastChickensHR.edi.x834.Segment;
-import com.fastChickensHR.edi.x834.exception.ValidationException;
 import com.fastChickensHR.edi.x834.X834Context;
-import lombok.Getter;
-
+import com.fastChickensHR.edi.x834.exception.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 
 /**
- * Represents the complete trailer section of an 834 file.
- * This includes Transaction Set Trailer, Functional Group Trailer,
- * and Interchange Control Trailer.
+ * Represents the complete trailer section of an 834 file. This includes Transaction Set Trailer,
+ * Functional Group Trailer, and Interchange Control Trailer.
  */
 @Getter
 public class Trailer {
-    private final X834Context context;
+  private final X834Context context;
 
-    // Component trailers
-    private final TransactionSetTrailer transactionSetTrailer;
-    private final FunctionalGroupTrailer functionalGroupTrailer;
-    private final InterchangeControlTrailer interchangeControlTrailer;
+  // Component trailers
+  private final TransactionSetTrailer transactionSetTrailer;
+  private final FunctionalGroupTrailer functionalGroupTrailer;
+  private final InterchangeControlTrailer interchangeControlTrailer;
+
+  /**
+   * Private constructor used by the Builder class
+   *
+   * @param builder The builder containing configuration
+   */
+  private Trailer(Builder builder) throws ValidationException {
+    this.context = builder.context;
+
+    this.transactionSetTrailer =
+        TransactionSetTrailer.builder()
+            .setSetControlNumber(builder.transactionSetControlNumber)
+            .setTransactionSegmentCount(builder.numberOfIncludedSegments)
+            .build();
+
+    this.functionalGroupTrailer =
+        FunctionalGroupTrailer.builder()
+            .setNumberOfTransactionSets(builder.numberOfTransactionSetsIncluded)
+            .setGroupControlNumber(builder.groupControlNumber)
+            .build();
+
+    this.interchangeControlTrailer =
+        InterchangeControlTrailer.builder()
+            .setNumberOfIncludedGroups(builder.numberOfIncludedFunctionalGroups)
+            .setInterchangeControlNumber(builder.interchangeControlNumber)
+            .build();
+  }
+
+  /**
+   * Validates this trailer has the minimum required fields
+   *
+   * @throws ValidationException If validation fails
+   */
+  public void validate() throws ValidationException {
+    // Add any trailer-specific validation here
+    if (transactionSetTrailer == null) {
+      throw new ValidationException("Transaction Set Trailer is required");
+    }
+
+    if (functionalGroupTrailer == null) {
+      throw new ValidationException("Functional Group Trailer is required");
+    }
+
+    if (interchangeControlTrailer == null) {
+      throw new ValidationException("Interchange Control Trailer is required");
+    }
+  }
+
+  /**
+   * Generates all the segments for this trailer
+   *
+   * @return List of segments in the correct order
+   */
+  public List<Segment> generateSegments() throws ValidationException {
+    validate();
+
+    List<Segment> segments = new ArrayList<>();
+    segments.add(transactionSetTrailer);
+    segments.add(functionalGroupTrailer);
+    segments.add(interchangeControlTrailer);
+
+    return segments;
+  }
+
+  /** Builder for the Trailer class */
+  public static class Builder {
+    /**
+     * Fallback SE01 segment count used only if the document never sets a computed count. In normal
+     * generation {@code X834Document} overwrites this with the real count.
+     */
+    private static final String DEFAULT_NUMBER_OF_INCLUDED_SEGMENTS = "10";
+
+    /** Default GE01 — number of transaction sets in the functional group. */
+    private static final String DEFAULT_NUMBER_OF_TRANSACTION_SETS = "1";
+
+    @Getter private final X834Context context;
+
+    private String transactionSetControlNumber;
+    private String numberOfIncludedSegments = DEFAULT_NUMBER_OF_INCLUDED_SEGMENTS;
+    private String numberOfTransactionSetsIncluded = DEFAULT_NUMBER_OF_TRANSACTION_SETS;
+    private String groupControlNumber;
+    private String numberOfIncludedFunctionalGroups =
+        InterchangeControlTrailer.DEFAULT_NUMBER_OF_INCLUDED_GROUPS;
+    private String interchangeControlNumber;
 
     /**
-     * Private constructor used by the Builder class
+     * Creates a new Builder with the specified context. Control numbers (SE02, GE02, IEA02) are
+     * read from context automatically; GE01 and IEA01 are always 1 for an 834 document.
      *
-     * @param builder The builder containing configuration
+     * @param context The 834 context to use for this trailer
+     * @throws IllegalArgumentException if context is null
      */
-    private Trailer(Builder builder) throws ValidationException {
-        this.context = builder.context;
-
-        this.transactionSetTrailer = TransactionSetTrailer.builder()
-                .setSetControlNumber(builder.transactionSetControlNumber)
-                .setTransactionSegmentCount(builder.numberOfIncludedSegments)
-                .build();
-
-        this.functionalGroupTrailer = FunctionalGroupTrailer.builder()
-                .setNumberOfTransactionSets(builder.numberOfTransactionSetsIncluded)
-                .setGroupControlNumber(builder.groupControlNumber)
-                .build();
-
-        this.interchangeControlTrailer = InterchangeControlTrailer.builder()
-                .setNumberOfIncludedGroups(builder.numberOfIncludedFunctionalGroups)
-                .setInterchangeControlNumber(builder.interchangeControlNumber)
-                .build();
+    public Builder(X834Context context) {
+      if (context == null) {
+        throw new IllegalArgumentException("Context cannot be null");
+      }
+      this.context = context;
+      this.transactionSetControlNumber = context.getTransactionSetControlNumber();
+      this.groupControlNumber = context.getGroupControlNumber();
+      this.interchangeControlNumber = context.getInterchangeControlNumber();
     }
 
     /**
-     * Validates this trailer has the minimum required fields
+     * Sets the transaction set control number. This number must match the transaction set control
+     * number in the ST segment.
      *
-     * @throws ValidationException If validation fails
+     * @param transactionSetControlNumber The transaction set control number
+     * @return This builder instance
      */
-    public void validate() throws ValidationException {
-        // Add any trailer-specific validation here
-        if (transactionSetTrailer == null) {
-            throw new ValidationException("Transaction Set Trailer is required");
-        }
-
-        if (functionalGroupTrailer == null) {
-            throw new ValidationException("Functional Group Trailer is required");
-        }
-
-        if (interchangeControlTrailer == null) {
-            throw new ValidationException("Interchange Control Trailer is required");
-        }
+    public Builder setTransactionSetControlNumber(String transactionSetControlNumber) {
+      this.transactionSetControlNumber = transactionSetControlNumber;
+      return this;
     }
 
     /**
-     * Generates all the segments for this trailer
+     * Sets the number of included segments. This is the total count of segments in the transaction
+     * set, including the ST and SE segments.
      *
-     * @return List of segments in the correct order
+     * @param numberOfIncludedSegments The number of included segments
+     * @return This builder instance
      */
-    public List<Segment> generateSegments() throws ValidationException {
-        validate();
-
-        List<Segment> segments = new ArrayList<>();
-        segments.add(transactionSetTrailer);
-        segments.add(functionalGroupTrailer);
-        segments.add(interchangeControlTrailer);
-
-        return segments;
+    public Builder setNumberOfIncludedSegments(String numberOfIncludedSegments) {
+      this.numberOfIncludedSegments = numberOfIncludedSegments;
+      return this;
     }
 
     /**
-     * Builder for the Trailer class
+     * Sets the number of transaction sets included. This is the total count of transaction sets
+     * (ST/SE pairs) included in the functional group.
+     *
+     * @param numberOfTransactionSetsIncluded The number of transaction sets included
+     * @return This builder instance
      */
-    public static class Builder {
-        /**
-         * Fallback SE01 segment count used only if the document never sets a computed count.
-         * In normal generation {@code X834Document} overwrites this with the real count.
-         */
-        private static final String DEFAULT_NUMBER_OF_INCLUDED_SEGMENTS = "10";
-        /** Default GE01 — number of transaction sets in the functional group. */
-        private static final String DEFAULT_NUMBER_OF_TRANSACTION_SETS = "1";
-
-        @Getter
-        private final X834Context context;
-
-        private String transactionSetControlNumber;
-        private String numberOfIncludedSegments = DEFAULT_NUMBER_OF_INCLUDED_SEGMENTS;
-        private String numberOfTransactionSetsIncluded = DEFAULT_NUMBER_OF_TRANSACTION_SETS;
-        private String groupControlNumber;
-        private String numberOfIncludedFunctionalGroups = InterchangeControlTrailer.DEFAULT_NUMBER_OF_INCLUDED_GROUPS;
-        private String interchangeControlNumber;
-
-        /**
-         * Creates a new Builder with the specified context. Control numbers (SE02, GE02, IEA02)
-         * are read from context automatically; GE01 and IEA01 are always 1 for an 834 document.
-         *
-         * @param context The 834 context to use for this trailer
-         * @throws IllegalArgumentException if context is null
-         */
-        public Builder(X834Context context) {
-            if (context == null) {
-                throw new IllegalArgumentException("Context cannot be null");
-            }
-            this.context = context;
-            this.transactionSetControlNumber = context.getTransactionSetControlNumber();
-            this.groupControlNumber = context.getGroupControlNumber();
-            this.interchangeControlNumber = context.getInterchangeControlNumber();
-        }
-
-        /**
-         * Sets the transaction set control number.
-         * This number must match the transaction set control number in the ST segment.
-         *
-         * @param transactionSetControlNumber The transaction set control number
-         * @return This builder instance
-         */
-        public Builder setTransactionSetControlNumber(String transactionSetControlNumber) {
-            this.transactionSetControlNumber = transactionSetControlNumber;
-            return this;
-        }
-
-        /**
-         * Sets the number of included segments.
-         * This is the total count of segments in the transaction set, including the ST and SE segments.
-         *
-         * @param numberOfIncludedSegments The number of included segments
-         * @return This builder instance
-         */
-        public Builder setNumberOfIncludedSegments(String numberOfIncludedSegments) {
-            this.numberOfIncludedSegments = numberOfIncludedSegments;
-            return this;
-        }
-
-        /**
-         * Sets the number of transaction sets included.
-         * This is the total count of transaction sets (ST/SE pairs) included in the functional group.
-         *
-         * @param numberOfTransactionSetsIncluded The number of transaction sets included
-         * @return This builder instance
-         */
-        public Builder setNumberOfTransactionSetsIncluded(String numberOfTransactionSetsIncluded) {
-            this.numberOfTransactionSetsIncluded = numberOfTransactionSetsIncluded;
-            return this;
-        }
-
-        /**
-         * Sets the group control number.
-         * This number must match the group control number in the GS segment.
-         *
-         * @param groupControlNumber The group control number
-         * @return This builder instance
-         */
-        public Builder setGroupControlNumber(String groupControlNumber) {
-            this.groupControlNumber = groupControlNumber;
-            return this;
-        }
-
-        /**
-         * Sets the number of included functional groups.
-         * This is the total count of functional groups (GS/GE pairs) included in the interchange.
-         *
-         * @param numberOfIncludedFunctionalGroups The number of included functional groups
-         * @return This builder instance
-         */
-        public Builder setNumberOfIncludedFunctionalGroups(String numberOfIncludedFunctionalGroups) {
-            this.numberOfIncludedFunctionalGroups = numberOfIncludedFunctionalGroups;
-            return this;
-        }
-
-        /**
-         * Sets the interchange control number.
-         * This number must match the interchange control number in the ISA segment.
-         *
-         * @param interchangeControlNumber The interchange control number
-         * @return This builder instance
-         */
-        public Builder setInterchangeControlNumber(String interchangeControlNumber) {
-            this.interchangeControlNumber = interchangeControlNumber;
-            return this;
-        }
-
-        /**
-         * Builds the final Trailer object
-         *
-         * @return The configured Trailer
-         * @throws ValidationException if the trailer is mis-constructed — the construction-phase
-         * side of the failure contract; see {@link ValidationException}
-         */
-        public Trailer build() throws ValidationException {
-            return new Trailer(this);
-        }
+    public Builder setNumberOfTransactionSetsIncluded(String numberOfTransactionSetsIncluded) {
+      this.numberOfTransactionSetsIncluded = numberOfTransactionSetsIncluded;
+      return this;
     }
+
+    /**
+     * Sets the group control number. This number must match the group control number in the GS
+     * segment.
+     *
+     * @param groupControlNumber The group control number
+     * @return This builder instance
+     */
+    public Builder setGroupControlNumber(String groupControlNumber) {
+      this.groupControlNumber = groupControlNumber;
+      return this;
+    }
+
+    /**
+     * Sets the number of included functional groups. This is the total count of functional groups
+     * (GS/GE pairs) included in the interchange.
+     *
+     * @param numberOfIncludedFunctionalGroups The number of included functional groups
+     * @return This builder instance
+     */
+    public Builder setNumberOfIncludedFunctionalGroups(String numberOfIncludedFunctionalGroups) {
+      this.numberOfIncludedFunctionalGroups = numberOfIncludedFunctionalGroups;
+      return this;
+    }
+
+    /**
+     * Sets the interchange control number. This number must match the interchange control number in
+     * the ISA segment.
+     *
+     * @param interchangeControlNumber The interchange control number
+     * @return This builder instance
+     */
+    public Builder setInterchangeControlNumber(String interchangeControlNumber) {
+      this.interchangeControlNumber = interchangeControlNumber;
+      return this;
+    }
+
+    /**
+     * Builds the final Trailer object
+     *
+     * @return The configured Trailer
+     * @throws ValidationException if the trailer is mis-constructed — the construction-phase side
+     *     of the failure contract; see {@link ValidationException}
+     */
+    public Trailer build() throws ValidationException {
+      return new Trailer(this);
+    }
+  }
 }

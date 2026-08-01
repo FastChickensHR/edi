@@ -13,33 +13,35 @@ import lombok.Getter;
 /**
  * The HLH (Health Information) segment in Loop 2100A of the X12 834 (005010X220A1) — the member's
  * health-related status.
- * <p>
- * Nothing is defaulted. BCBSM's tobacco use renders as {@code HLH*T~}; a member stated to use
- * neither tobacco nor substances as {@code HLH*N~}. Those are different answers from sending no
- * HLH at all, which says only that nobody asked.
+ *
+ * <p>Nothing is defaulted. BCBSM's tobacco use renders as {@code HLH*T~}; a member stated to use
+ * neither tobacco nor substances as {@code HLH*N~}. Those are different answers from sending no HLH
+ * at all, which says only that nobody asked.
  */
 @Getter
 class MemberHealthInformation extends HLHSegment {
 
-    private MemberHealthInformation(Builder builder) throws ValidationException {
-        super(builder);
+  private MemberHealthInformation(Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  /**
+   * @return a new {@link Builder}.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /** Builder for {@link MemberHealthInformation}. */
+  public static class Builder extends HLHSegment.AbstractBuilder<Builder> {
+    @Override
+    protected Builder self() {
+      return this;
     }
 
-    /** @return a new {@link Builder}. */
-    public static Builder builder() {
-        return new Builder();
+    @Override
+    public MemberHealthInformation build() throws ValidationException {
+      return new MemberHealthInformation(this);
     }
-
-    /** Builder for {@link MemberHealthInformation}. */
-    public static class Builder extends HLHSegment.AbstractBuilder<Builder> {
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        @Override
-        public MemberHealthInformation build() throws ValidationException {
-            return new MemberHealthInformation(this);
-        }
-    }
+  }
 }

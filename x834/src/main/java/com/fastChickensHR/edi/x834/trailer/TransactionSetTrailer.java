@@ -13,46 +13,44 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Represents the Transaction Set Trailer in an EDI 834 transaction.
- * This class extends the SESegment (SE - Transaction Set Trailer segment).
+ * Represents the Transaction Set Trailer in an EDI 834 transaction. This class extends the
+ * SESegment (SE - Transaction Set Trailer segment).
  */
 @Getter
 class TransactionSetTrailer extends SESegment {
 
-    private TransactionSetTrailer(Builder builder) throws ValidationException {
-        super(builder);
+  private TransactionSetTrailer(Builder builder) throws ValidationException {
+    super(builder);
+  }
+
+  /**
+   * Creates a new Builder instance for TransactionSetTrailer.
+   *
+   * @return a new Builder instance
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /** Builder for TransactionSetTrailer. */
+  @Setter
+  @Accessors(chain = true)
+  public static class Builder extends AbstractBuilder<Builder> {
+
+    @Override
+    protected Builder self() {
+      return this;
     }
 
     /**
-     * Creates a new Builder instance for TransactionSetTrailer.
+     * Builds a new TransactionSetTrailer instance.
      *
-     * @return a new Builder instance
+     * @return A new TransactionSetTrailer instance
+     * @throws ValidationException if validation fails
      */
-    public static Builder builder() {
-        return new Builder();
+    @Override
+    public TransactionSetTrailer build() throws ValidationException {
+      return new TransactionSetTrailer(this);
     }
-
-    /**
-     * Builder for TransactionSetTrailer.
-     */
-    @Setter
-    @Accessors(chain = true)
-    public static class Builder extends AbstractBuilder<Builder> {
-
-        @Override
-        protected Builder self() {
-            return this;
-        }
-
-        /**
-         * Builds a new TransactionSetTrailer instance.
-         *
-         * @return A new TransactionSetTrailer instance
-         * @throws ValidationException if validation fails
-         */
-        @Override
-        public TransactionSetTrailer build() throws ValidationException {
-            return new TransactionSetTrailer(this);
-        }
-    }
+  }
 }
