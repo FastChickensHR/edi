@@ -34,6 +34,8 @@ import java.util.Map;
  *   <li><b>Additional mappings (aliases) are best-effort</b> — likewise free-keys-only, so an alias
  *       can never displace a constant's own name, code or description.
  * </ol>
+ *
+ * @param <T> the enum type this lookup resolves, which must carry X12 codes via {@link EdiCodeEnum}
  */
 public final class EdiEnumLookup<T extends Enum<T> & EdiCodeEnum> {
 
@@ -100,7 +102,12 @@ public final class EdiEnumLookup<T extends Enum<T> & EdiCodeEnum> {
         + " — one of them would be unreachable";
   }
 
-  /** Creates an EdiEnumLookup with standard mappings only. */
+  /**
+   * Creates an EdiEnumLookup with standard mappings only.
+   *
+   * @param enumClass the Class object of the enum type
+   * @param enumName the name of the enum type (for error messages)
+   */
   public EdiEnumLookup(Class<T> enumClass, String enumName) {
     this(enumClass, enumName, null);
   }

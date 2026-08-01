@@ -78,6 +78,7 @@ public class Trailer {
    * Generates all the segments for this trailer
    *
    * @return List of segments in the correct order
+   * @throws ValidationException if any of the three trailer segments is missing
    */
   public List<Segment> generateSegments() throws ValidationException {
     validate();

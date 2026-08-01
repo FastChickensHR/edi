@@ -31,6 +31,8 @@ import lombok.Getter;
  */
 @Getter
 public abstract class RefSegment extends Segment {
+
+  /** The X12 segment identifier for this segment: {@code REF}. */
   public static final String SEGMENT_ID = "REF";
 
   /** Maximum length of REF02 (Reference Identification, X12 element 127: AN 1/50 in 005010). */
@@ -48,6 +50,13 @@ public abstract class RefSegment extends Segment {
   /** REF03 — reference description (element 352, max 80 characters). */
   protected final String ref03;
 
+  /**
+   * Creates a REF segment from a builder's captured element values.
+   *
+   * @param builder the builder carrying REF01–REF03
+   * @throws ValidationException if both REF02 and REF03 are absent, or either exceeds its maximum
+   *     length
+   */
   protected RefSegment(RefSegment.AbstractBuilder<?> builder) throws ValidationException {
     this.ref01 = builder.ref01;
     this.ref02 = builder.ref02;
@@ -82,6 +91,8 @@ public abstract class RefSegment extends Segment {
   }
 
   /**
+   * Returns the kind of reference this segment carries.
+   *
    * @return REF01 — reference identification qualifier.
    */
   public ReferenceIdentificationQualifier getReferenceIdentificationQualifier() {
@@ -89,6 +100,8 @@ public abstract class RefSegment extends Segment {
   }
 
   /**
+   * Returns the reference value itself.
+   *
    * @return REF02 — reference identification value.
    */
   public String getReferenceIdentification() {
@@ -96,6 +109,8 @@ public abstract class RefSegment extends Segment {
   }
 
   /**
+   * Returns the free-form description accompanying the reference.
+   *
    * @return REF03 — reference description.
    */
   public String getReferenceDescription() {
@@ -108,11 +123,22 @@ public abstract class RefSegment extends Segment {
    * @param <T> the concrete builder type for method chaining
    */
   public abstract static class AbstractBuilder<T extends RefSegment.AbstractBuilder<T>> {
+
+    /** Creates a builder with no element values set; used by concrete builder subclasses. */
+    protected AbstractBuilder() {}
+
+    /** REF01 — reference identification qualifier to build with. */
     protected ReferenceIdentificationQualifier ref01;
+
+    /** REF02 — reference identification value to build with. */
     protected String ref02;
+
+    /** REF03 — reference description to build with. */
     protected String ref03;
 
     /**
+     * Self-typing hook for method chaining.
+     *
      * @return this builder cast to the concrete type.
      */
     protected abstract T self();
@@ -126,35 +152,66 @@ public abstract class RefSegment extends Segment {
      */
     public abstract RefSegment build() throws ValidationException;
 
-    /** Sets REF01 (reference identification qualifier) from its string code. */
+    /**
+     * Sets REF01 (reference identification qualifier) from its string code.
+     *
+     * @param value the qualifier code, resolved via {@link
+     *     ReferenceIdentificationQualifier#fromString(String)}
+     * @return this builder
+     */
     public T setReferenceIdentificationQualifier(String value) {
       this.ref01 = ReferenceIdentificationQualifier.fromString(value);
       return self();
     }
 
-    /** Sets REF02 (reference identification value). */
+    /**
+     * Sets REF02 (reference identification value).
+     *
+     * @param value the reference identification (element 127, max 50 characters)
+     * @return this builder
+     */
     public T setReferenceIdentification(String value) {
       this.ref02 = value;
       return self();
     }
 
-    /** Sets REF03 (reference description). */
+    /**
+     * Sets REF03 (reference description).
+     *
+     * @param value the reference description (element 352, max 80 characters)
+     * @return this builder
+     */
     public T setReferenceDescription(String value) {
       this.ref03 = value;
       return self();
     }
 
-    /** Element alias for {@link #setReferenceIdentificationQualifier(String)}. */
+    /**
+     * Element alias for {@link #setReferenceIdentificationQualifier(String)}.
+     *
+     * @param value the qualifier code for REF01
+     * @return this builder
+     */
     public T setRef01(String value) {
       return setReferenceIdentificationQualifier(value);
     }
 
-    /** Element alias for {@link #setReferenceIdentification(String)}. */
+    /**
+     * Element alias for {@link #setReferenceIdentification(String)}.
+     *
+     * @param value the reference identification for REF02
+     * @return this builder
+     */
     public T setRef02(String value) {
       return setReferenceIdentification(value);
     }
 
-    /** Element alias for {@link #setReferenceDescription(String)}. */
+    /**
+     * Element alias for {@link #setReferenceDescription(String)}.
+     *
+     * @param value the reference description for REF03
+     * @return this builder
+     */
     public T setRef03(String value) {
       return setReferenceDescription(value);
     }
@@ -162,6 +219,10 @@ public abstract class RefSegment extends Segment {
 
   /** Concrete builder implementation for {@link RefSegment}. */
   public static class Builder extends AbstractBuilder<Builder> {
+
+    /** Creates a builder with no element values set. */
+    public Builder() {}
+
     @Override
     protected RefSegment.Builder self() {
       return this;

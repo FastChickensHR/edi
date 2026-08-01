@@ -28,10 +28,15 @@ import lombok.Getter;
  */
 @Getter
 public enum HealthRelatedCode implements EdiCodeEnum {
+  /** None — X12 code "N". */
   NONE("N", "None"),
+  /** Substance Abuse — X12 code "S". */
   SUBSTANCE_ABUSE("S", "Substance Abuse"),
+  /** Tobacco Use — X12 code "T". */
   TOBACCO_USE("T", "Tobacco Use"),
+  /** Unknown — X12 code "U". */
   UNKNOWN("U", "Unknown"),
+  /** Tobacco Use and Substance Abuse — X12 code "X". */
   TOBACCO_USE_AND_SUBSTANCE_ABUSE("X", "Tobacco Use and Substance Abuse");
 
   private final String code;

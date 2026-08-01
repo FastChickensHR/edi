@@ -27,11 +27,17 @@ import lombok.Getter;
  */
 @Getter
 public enum DisabilityTypeCode implements EdiCodeEnum {
+  /** Short Term Disability — X12 code "1". */
   SHORT_TERM_DISABILITY("1", "Short Term Disability"),
+  /** Long Term Disability — X12 code "2". */
   LONG_TERM_DISABILITY("2", "Long Term Disability"),
+  /** Permanent or Total Disability — X12 code "3". */
   PERMANENT_OR_TOTAL_DISABILITY("3", "Permanent or Total Disability"),
+  /** No Disability — X12 code "4". */
   NO_DISABILITY("4", "No Disability"),
+  /** Partial Disability — X12 code "5". */
   PARTIAL_DISABILITY("5", "Partial Disability"),
+  /** Mutually Defined — X12 code "Z". */
   MUTUALLY_DEFINED("Z", "Mutually Defined");
 
   private final String code;

@@ -16,5 +16,11 @@ package com.fastChickensHR.edi.core;
  * implement it.
  */
 public interface FileGenerator {
+  /**
+   * Serializes the fully-resolved content into this format's text.
+   *
+   * @param file the format-neutral content to serialize
+   * @return the file's complete text in this format's dialect
+   */
   String generate(FileContent file);
 }

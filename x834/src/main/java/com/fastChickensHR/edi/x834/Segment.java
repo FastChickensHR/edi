@@ -21,9 +21,16 @@ package com.fastChickensHR.edi.x834;
  * X834Context} is injected by the document's render loop before {@link #render()} is called.
  */
 public abstract class Segment {
+
+  /** Creates a segment with no context; the document's render loop injects one before render. */
+  protected Segment() {}
+
+  /** The rendering context, injected by the document's render loop before {@link #render()}. */
   protected X834Context context;
 
   /**
+   * The rendering context this segment was given.
+   *
    * @return The X834Context for this segment
    */
   protected X834Context getContext() {
@@ -41,11 +48,15 @@ public abstract class Segment {
   }
 
   /**
+   * The two- or three-character identifier this segment renders under.
+   *
    * @return The segment identifier (e.g., "ST", "GS")
    */
   public abstract String getSegmentIdentifier();
 
   /**
+   * The segment's element values in wire order; a null entry renders as an empty slot.
+   *
    * @return Array of element values for this segment
    */
   public abstract String[] getElementValues();

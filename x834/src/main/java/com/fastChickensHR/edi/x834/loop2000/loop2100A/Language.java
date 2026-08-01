@@ -34,9 +34,12 @@ public class Language {
   /** The language named in words (LUI03). */
   private String description;
 
+  /** Creates an empty language; callers set a code and/or description afterwards. */
   public Language() {}
 
   /**
+   * Names a language by a code under its scheme.
+   *
    * @param codeQualifier what kind of code follows (LUI01)
    * @param code the language code (LUI02)
    */

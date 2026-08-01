@@ -27,6 +27,13 @@ import java.util.regex.Pattern;
  * the common hyphenated variant {@code "2100A NM1-08"}. Because an X12 element reference glues a
  * two-digit ordinal onto a segment identifier that may itself end in a digit, the ordinal is always
  * taken as the <em>last two digits</em>: {@code "2100A N401"} is N4 element 01, not N40 element 1.
+ *
+ * @param loop the loop name as the transaction set spells it, e.g. {@code "2000"}, {@code "2100A"},
+ *     or the envelope regions {@code "HEADER"}/{@code "TRAILER"}
+ * @param segment the 1-3 character X12 segment identifier, e.g. {@code "INS"}
+ * @param ordinal the element ordinal within the segment, 1-99
+ * @param component the component ordinal within a composite element, 1-9, or {@link #NO_COMPONENT}
+ *     for an ordinary element
  */
 public record ElementPosition(String loop, String segment, int ordinal, int component) {
 
@@ -38,6 +45,7 @@ public record ElementPosition(String loop, String segment, int ordinal, int comp
   private static final Pattern TEXT =
       Pattern.compile("(\\S+)\\s+([A-Z][A-Z0-9]*?)-?(\\d{2})(?:-(\\d))?");
 
+  /** Validates the address parts; see the record javadoc for each part's legal form. */
   public ElementPosition {
     if (loop == null || !LOOP.matcher(loop).matches()) {
       throw new IllegalArgumentException(
@@ -56,7 +64,14 @@ public record ElementPosition(String loop, String segment, int ordinal, int comp
     }
   }
 
-  /** An ordinary element position, e.g. {@code of("2000", "INS", 8)} ⇔ {@code "2000 INS08"}. */
+  /**
+   * An ordinary element position, e.g. {@code of("2000", "INS", 8)} ⇔ {@code "2000 INS08"}.
+   *
+   * @param loop the loop name, e.g. {@code "2000"} or {@code "HEADER"}
+   * @param segment the X12 segment identifier, e.g. {@code "INS"}
+   * @param ordinal the element ordinal within the segment, 1-99
+   * @return the position addressing that element
+   */
   public static ElementPosition of(String loop, String segment, int ordinal) {
     return new ElementPosition(loop, segment, ordinal, NO_COMPONENT);
   }
@@ -64,6 +79,12 @@ public record ElementPosition(String loop, String segment, int ordinal, int comp
   /**
    * One component of a composite element, e.g. {@code of("2000", "INS", 6, 1)} ⇔ {@code "2000
    * INS06-1"}.
+   *
+   * @param loop the loop name, e.g. {@code "2000"} or {@code "HEADER"}
+   * @param segment the X12 segment identifier, e.g. {@code "INS"}
+   * @param ordinal the element ordinal within the segment, 1-99
+   * @param component the component ordinal within the composite, 1-9
+   * @return the position addressing that component
    */
   public static ElementPosition of(String loop, String segment, int ordinal, int component) {
     return new ElementPosition(loop, segment, ordinal, component);
@@ -73,6 +94,8 @@ public record ElementPosition(String loop, String segment, int ordinal, int comp
    * Parses the canonical spelling, e.g. {@code "2000 INS08"}, {@code "HEADER BGN01"}, {@code "2000
    * INS06-1"}, {@code "2100A NM1-08"}.
    *
+   * @param text the element position text to parse
+   * @return the parsed position
    * @throws IllegalArgumentException if the text is not a loop followed by an element reference
    */
   public static ElementPosition parse(String text) {
@@ -92,12 +115,20 @@ public record ElementPosition(String loop, String segment, int ordinal, int comp
         matcher.group(4) == null ? NO_COMPONENT : Integer.parseInt(matcher.group(4)));
   }
 
-  /** Whether this position addresses one component of a composite element. */
+  /**
+   * Whether this position addresses one component of a composite element.
+   *
+   * @return true when {@link #component()} is not {@link #NO_COMPONENT}
+   */
   public boolean isComponent() {
     return component != NO_COMPONENT;
   }
 
-  /** The canonical spelling, e.g. {@code "2000 INS08"} or {@code "2000 INS06-1"}. */
+  /**
+   * The canonical spelling, e.g. {@code "2000 INS08"} or {@code "2000 INS06-1"}.
+   *
+   * @return the spelling {@code "<loop> <SEG><nn>"}, with a {@code "-<c>"} suffix for a component
+   */
   public String display() {
     String reference = "%s%02d".formatted(segment, ordinal);
     return loop + " " + (isComponent() ? reference + "-" + component : reference);

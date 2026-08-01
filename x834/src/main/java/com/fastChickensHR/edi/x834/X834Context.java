@@ -134,6 +134,8 @@ public class X834Context {
   }
 
   /**
+   * The separator written between a segment's elements.
+   *
    * @return the element separator character (the character value, not the enum)
    */
   public char getElementSeparator() {
@@ -141,6 +143,8 @@ public class X834Context {
   }
 
   /**
+   * The separator written between the components of a composite element.
+   *
    * @return the sub-element (component) separator character
    */
   public char getSubElementSeparator() {
@@ -148,6 +152,8 @@ public class X834Context {
   }
 
   /**
+   * The terminator written at the end of each segment.
+   *
    * @return the segment terminator character
    */
   public char getSegmentTerminator() {
@@ -155,6 +161,8 @@ public class X834Context {
   }
 
   /**
+   * The line terminator written after each segment, for human-readable output.
+   *
    * @return the line terminator string appended after each rendered segment
    */
   public String getLineTerminator() {
@@ -162,6 +170,8 @@ public class X834Context {
   }
 
   /**
+   * The interchange control version this library writes.
+   *
    * @return the interchange control version number {@value #EDI_VERSION} (ISA12)
    */
   public String getEdiVersion() {
@@ -169,6 +179,8 @@ public class X834Context {
   }
 
   /**
+   * The transaction set identifier for benefit enrollment and maintenance.
+   *
    * @return the transaction set identifier {@value #TRANSACTION_SET_ID}
    */
   public String getTransactionSetId() {
@@ -176,6 +188,8 @@ public class X834Context {
   }
 
   /**
+   * The implementation convention this library writes to (ST03 / GS08).
+   *
    * @return the implementation convention reference {@value #IMPLEMENTATION_CONVENTION_REFERENCE}
    */
   public String getImplementationConventionReference() {
@@ -183,19 +197,22 @@ public class X834Context {
   }
 
   /**
-   * @return the document date formatted with the current {@link #getDateFormat() date format}.
-   *     Rendered into ISA09 (interchange date), GS04 (group date), BGN03 and the file effective
-   *     DTP. Always derived from {@link #getDocumentDate()} on read, so it can never go stale.
+   * The document date as it goes on the wire.
+   *
+   * @return the document date formatted with the current {@code dateFormat}. Rendered into ISA09
+   *     (interchange date), GS04 (group date), BGN03 and the file effective DTP. Always derived
+   *     from {@code documentDate} on read, so it can never go stale.
    */
   public String getFormattedDocumentDate() {
     return formatDate(documentDate);
   }
 
   /**
-   * @return the document time formatted with the current {@link #getTimeFormat() time format}.
-   *     Rendered into ISA10 (interchange time) and GS05 (group time). Always derived from {@link
-   *     #getDocumentDate()} on read, so it follows {@link #setDocumentDate} consistently with the
-   *     formatted date.
+   * The document time as it goes on the wire.
+   *
+   * @return the document time formatted with the current {@code timeFormat}. Rendered into ISA10
+   *     (interchange time) and GS05 (group time). Always derived from {@code documentDate} on read,
+   *     so it follows {@code setDocumentDate} consistently with the formatted date.
    */
   public String getFormattedDocumentTime() {
     return formatTime(documentDate);

@@ -62,9 +62,12 @@ public class Provider {
   /** Why the change is happening (PLA05); optional. */
   private MaintenanceReasonCode changeReason;
 
+  /** Creates an empty provider assignment; callers set fields afterwards. */
   public Provider() {}
 
   /**
+   * Creates a provider assignment naming only the provider.
+   *
    * @param lastName the provider's last or organization name (NM103)
    */
   public Provider(String lastName) {
@@ -72,6 +75,8 @@ public class Provider {
   }
 
   /**
+   * Creates a provider assignment naming the provider and its identifier.
+   *
    * @param lastName the provider's last or organization name (NM103)
    * @param identifierQualifier what kind of identifier follows (NM108)
    * @param identifier the provider's identifier (NM109)

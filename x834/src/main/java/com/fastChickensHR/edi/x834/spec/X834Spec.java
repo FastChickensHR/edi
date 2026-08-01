@@ -112,7 +112,12 @@ public final class X834Spec {
 
   private X834Spec() {}
 
-  /** The spec at {@code position}, or empty when this library publishes nothing there. */
+  /**
+   * The spec at {@code position}, or empty when this library publishes nothing there.
+   *
+   * @param position the element position to look up
+   * @return the published spec, or empty when the position is not published
+   */
   public static Optional<ElementSpec> at(ElementPosition position) {
     return Optional.ofNullable(TABLE.get(position));
   }
@@ -120,6 +125,8 @@ public final class X834Spec {
   /**
    * The spec at a position spelled canonically, e.g. {@code "2000 INS08"}.
    *
+   * @param position the position text, parsed via {@link ElementPosition#parse(String)}
+   * @return the published spec, or empty when the position is not published
    * @throws IllegalArgumentException if the text is not an element position at all — a malformed
    *     address is a caller bug, distinct from a well-formed address with no spec
    */
@@ -141,6 +148,11 @@ public final class X834Spec {
    *
    * <p>A composite element answers with its first component ({@code INS06} → the spec at {@code
    * INS06-1}), which is what the segment renders into that slot while the 834 uses only C052-01.
+   *
+   * @param segment the X12 segment identifier, e.g. {@code "INS"}
+   * @param ordinal the element ordinal within the segment
+   * @return the spec every publishing loop agrees on, or empty when none is published or the loops
+   *     disagree
    */
   public static Optional<ElementSpec> atSegment(String segment, int ordinal) {
     List<ElementSpec> candidates =
@@ -171,12 +183,20 @@ public final class X834Spec {
         && one.position().component() == other.position().component();
   }
 
-  /** Every published spec, in transaction-set order: envelope, header, loops, trailer. */
+  /**
+   * Every published spec, in transaction-set order: envelope, header, loops, trailer.
+   *
+   * @return an immutable list of every published spec
+   */
   public static List<ElementSpec> all() {
     return List.copyOf(TABLE.values());
   }
 
-  /** Every published position, in the same order as {@link #all()}. */
+  /**
+   * Every published position, in the same order as {@link #all()}.
+   *
+   * @return an immutable list of every published position
+   */
   public static List<ElementPosition> positions() {
     return List.copyOf(TABLE.keySet());
   }

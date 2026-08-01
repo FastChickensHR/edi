@@ -25,6 +25,7 @@ import lombok.Setter;
 public class Member extends BaseMember {
   private final List<DependentMember> dependents = new ArrayList<>();
 
+  /** Creates a member with no fields set; callers populate it afterwards. */
   public Member() {
     // No-arg constructor; the X12 834 context is no longer a concern of the domain model.
   }

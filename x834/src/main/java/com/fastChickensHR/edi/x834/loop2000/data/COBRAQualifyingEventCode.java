@@ -23,16 +23,27 @@ import lombok.Getter;
  */
 @Getter
 public enum COBRAQualifyingEventCode implements EdiCodeEnum {
+  /** Termination of Employment — X12 code "1". */
   TERMINATION_OF_EMPLOYMENT("1", "Termination of Employment"),
+  /** Reduction of work hours — X12 code "2". */
   REDUCTION_OF_WORK_HOURS("2", "Reduction of work hours"),
+  /** Medicare — X12 code "3". */
   MEDICARE("3", "Medicare"),
+  /** Death — X12 code "4". */
   DEATH("4", "Death"),
+  /** Divorce — X12 code "5". */
   DIVORCE("5", "Divorce"),
+  /** Separation — X12 code "6". */
   SEPARATION("6", "Separation"),
+  /** Ineligible Child — X12 code "7". */
   INELIGIBLE_CHILD("7", "Ineligible Child"),
+  /** Bankruptcy of Retiree's Former Employer (26 U.S.C. 4980B(f)(3)(F)) — X12 code "8". */
   BANKRUPTCY("8", "Bankruptcy of Retiree's Former Employer (26 U.S.C. 4980B(f)(3)(F))"),
+  /** Layoff — X12 code "9". */
   LAYOFF("9", "Layoff"),
+  /** Leave of Absence — X12 code "10". */
   LEAVE_OF_ABSENCE("10", "Leave of Absence"),
+  /** Mutually Defined — X12 code "ZZ". */
   MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
   private final String code;

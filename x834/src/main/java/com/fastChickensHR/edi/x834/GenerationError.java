@@ -17,9 +17,15 @@ import java.util.Objects;
  * like {@code "Header"} or {@code "Member[3]"}, or a segment identifier like {@code "HD"}), and a
  * human-readable {@code message}. Consumers enumerate these off a {@link GenerationResult.Failure}
  * rather than parsing a flattened exception string.
+ *
+ * @param phase the generation stage the failure arose in
+ * @param location a free-form label naming where it arose, e.g. {@code "Header"} or {@code
+ *     "Member[3]"}
+ * @param message the human-readable reason
  */
 public record GenerationError(Phase phase, String location, String message) {
 
+  /** Rejects a null phase, location, or message. */
   public GenerationError {
     Objects.requireNonNull(phase, "phase");
     Objects.requireNonNull(location, "location");
@@ -36,6 +42,8 @@ public record GenerationError(Phase phase, String location, String message) {
 
   /**
    * A single-line rendering — {@code PHASE | location | message} — for log and exception surfaces.
+   *
+   * @return the error as one pipe-delimited line
    */
   public String formatted() {
     return phase + " | " + location + " | " + message;

@@ -18,16 +18,27 @@ import lombok.Getter;
  */
 @Getter
 public enum MaintenanceTypeCode implements EdiCodeEnum {
+  /** Addition — X12 code "001". */
   ADDITION("001", "Addition"),
+  /** Change — X12 code "002". */
   CHANGE("002", "Change"),
+  /** Cancellation — X12 code "003". */
   CANCELLATION("003", "Cancellation"),
+  /** Reinstatement — X12 code "004". */
   REINSTATEMENT("004", "Reinstatement"),
+  /** Change with Member ID Change — X12 code "021". */
   CHANGE_WITH_MEMBER_ID("021", "Change with Member ID Change"),
+  /** Change Address — X12 code "022". */
   CHANGE_ADDRESS("022", "Change Address"),
+  /** Change Demographic Data — X12 code "023". */
   CHANGE_DEMOGRAPHIC("023", "Change Demographic Data"),
+  /** Change Benefit/Coverage Data — X12 code "024". */
   CHANGE_BENEFIT_COVERAGE("024", "Change Benefit/Coverage Data"),
+  /** Change Billing/Payment Data — X12 code "025". */
   CHANGE_BILLING("025", "Change Billing/Payment Data"),
+  /** Change Employment Data — X12 code "026". */
   CHANGE_EMPLOYMENT("026", "Change Employment Data"),
+  /** COBRA Election — X12 code "030". */
   COBRA_ELECTION("030", "COBRA Election");
 
   private final String code;
