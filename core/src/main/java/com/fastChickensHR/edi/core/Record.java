@@ -14,14 +14,23 @@ import java.util.List;
  * (its {@code RECORD}-level fields plus coverage); {@code children} are the nested child records
  * ({@code SUBRECORD}-level groups, e.g. dependents). In a flat file a record collapses to a single
  * line; in a grouped file it spans many.
+ *
+ * @param fields the subject's own values ({@code RECORD}-level fields plus coverage)
+ * @param children the nested child records ({@code SUBRECORD}-level groups, e.g. dependents)
  */
 public record Record(List<Field> fields, List<Record> children) {
+  /** Normalizes null lists to empty immutable copies. */
   public Record {
     fields = fields == null ? List.of() : List.copyOf(fields);
     children = children == null ? List.of() : List.copyOf(children);
   }
 
-  /** A leaf Record with no nested dependents. */
+  /**
+   * A leaf Record with no nested dependents.
+   *
+   * @param fields the subject's own values
+   * @return a Record carrying {@code fields} and no children
+   */
   public static Record of(List<Field> fields) {
     return new Record(fields, List.of());
   }

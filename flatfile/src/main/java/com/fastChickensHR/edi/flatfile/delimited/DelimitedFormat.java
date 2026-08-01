@@ -44,6 +44,8 @@ public final class DelimitedFormat {
    * character), minimal quoting, LF ({@code \n}) record separator, and a leading header row. This
    * is the format the module's round-trip tests verify; it is the one preset guaranteed to survive
    * parse-then-generate unchanged.
+   *
+   * @return the pinned CSV preset
    */
   public static DelimitedFormat csv() {
     return builder()
@@ -56,6 +58,11 @@ public final class DelimitedFormat {
         .build();
   }
 
+  /**
+   * Starts a custom format; defaults mirror {@link #csv()}.
+   *
+   * @return a builder seeded with the CSV defaults
+   */
   public static Builder builder() {
     return new Builder();
   }
@@ -103,12 +110,23 @@ public final class DelimitedFormat {
 
     private Builder() {}
 
+    /**
+     * The field delimiter, {@code ','} by default.
+     *
+     * @param delimiter the character separating fields within a record
+     * @return this builder
+     */
     public Builder delimiter(char delimiter) {
       this.delimiter = delimiter;
       return this;
     }
 
-    /** The quote character, or {@code null} for an unquoted format. */
+    /**
+     * The quote character, or {@code null} for an unquoted format.
+     *
+     * @param quote the character wrapping quoted fields, or {@code null} to never quote
+     * @return this builder
+     */
     public Builder quote(Character quote) {
       this.quote = quote;
       return this;
@@ -117,17 +135,32 @@ public final class DelimitedFormat {
     /**
      * The escape character, or {@code null} to escape an embedded quote by doubling it (the CSV
      * convention).
+     *
+     * @param escape the escape character, or {@code null} for quote-doubling
+     * @return this builder
      */
     public Builder escape(Character escape) {
       this.escape = escape;
       return this;
     }
 
+    /**
+     * When fields get quoted, {@link QuoteMode#MINIMAL} by default.
+     *
+     * @param quoteMode the Commons CSV quoting policy
+     * @return this builder
+     */
     public Builder quoteMode(QuoteMode quoteMode) {
       this.quoteMode = quoteMode;
       return this;
     }
 
+    /**
+     * The record separator, LF ({@code "\n"}) by default.
+     *
+     * @param recordSeparator the string terminating each record
+     * @return this builder
+     */
     public Builder recordSeparator(String recordSeparator) {
       this.recordSeparator = recordSeparator;
       return this;
@@ -137,12 +170,20 @@ public final class DelimitedFormat {
      * Whether files in this format carry a leading header row (the default). With {@code false} the
      * generator omits it and the parser, having no column names to read, addresses cells by their
      * 1-based position instead — see {@link DelimitedFileParser}.
+     *
+     * @param header {@code true} to read and write a leading header row
+     * @return this builder
      */
     public Builder header(boolean header) {
       this.header = header;
       return this;
     }
 
+    /**
+     * Finishes the format.
+     *
+     * @return the immutable assembled format
+     */
     public DelimitedFormat build() {
       return new DelimitedFormat(this);
     }

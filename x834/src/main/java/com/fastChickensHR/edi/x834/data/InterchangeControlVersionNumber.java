@@ -23,51 +23,113 @@ import lombok.Getter;
  */
 @Getter
 public enum InterchangeControlVersionNumber implements EdiCodeEnum {
+  /** ASC X12 Standards Issued by ANSI in 1987 — X12 code "00200". */
   X12_1987("00200", "ASC X12 Standards Issued by ANSI in 1987"),
+  /** Draft Standards for Trial Use Approved by ASC X12 Through August 1988 — X12 code "00201". */
   X12_DRAFT_1988("00201", "Draft Standards for Trial Use Approved by ASC X12 Through August 1988"),
+  /** Draft Standards for Trial Use Approved by ASC X12 Through May 1989 — X12 code "00204". */
   X12_DRAFT_1989("00204", "Draft Standards for Trial Use Approved by ASC X12 Through May 1989"),
+  /** ASC X12 Standards Issued by ANSI in 1992 — X12 code "00300". */
   X12_1992("00300", "ASC X12 Standards Issued by ANSI in 1992"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * Through October 1990 — X12 code "00301".
+   */
   X12_DRAFT_OCT_1990(
       "00301",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board Through October 1990"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * Through October 1991 — X12 code "00302".
+   */
   X12_DRAFT_OCT_1991(
       "00302",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board Through October 1991"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * Through October 1992 — X12 code "00303".
+   */
   X12_DRAFT_OCT_1992(
       "00303",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board Through October 1992"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * through October 1993 — X12 code "00304".
+   */
   X12_DRAFT_OCT_1993(
       "00304",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board through October 1993"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * through October 1994 — X12 code "00305".
+   */
   X12_DRAFT_OCT_1994(
       "00305",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board through October 1994"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * through October 1995 — X12 code "00306".
+   */
   X12_DRAFT_OCT_1995(
       "00306",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board through October 1995"),
+  /**
+   * Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board
+   * through October 1996 — X12 code "00307".
+   */
   X12_DRAFT_OCT_1996(
       "00307",
       "Draft Standards for Trial Use Approved for Publication by ASC X12 Procedures Review Board through October 1996"),
+  /** ASC X12 Standards Issued by ANSI in 1997 — X12 code "00400". */
   X12_1997("00400", "ASC X12 Standards Issued by ANSI in 1997"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 1997 —
+   * X12 code "00401".
+   */
   X12_OCT_1997(
       "00401",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 1997"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 1998 —
+   * X12 code "00402".
+   */
   X12_OCT_1998(
       "00402",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 1998"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 1999 —
+   * X12 code "00403".
+   */
   X12_OCT_1999(
       "00403",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 1999"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 2000 —
+   * X12 code "00404".
+   */
   X12_OCT_2000(
       "00404",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 2000"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 2001 —
+   * X12 code "00405".
+   */
   X12_OCT_2001(
       "00405",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 2001"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 2002 —
+   * X12 code "00406".
+   */
   X12_OCT_2002(
       "00406",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 2002"),
+  /** ASC X12 Standards Issued by ANSI in 2003 — X12 code "00500". */
   X12_2003("00500", "ASC X12 Standards Issued by ANSI in 2003"),
+  /**
+   * Standards Approved for Publication by ASC X12 Procedures Review Board through October 2003 —
+   * X12 code "00501".
+   */
   X12_OCT_2003(
       "00501",
       "Standards Approved for Publication by ASC X12 Procedures Review Board through October 2003");

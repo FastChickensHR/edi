@@ -23,7 +23,9 @@ import lombok.Getter;
  */
 @Getter
 public enum ResponsibleAgencyCode implements EdiCodeEnum {
+  /** Transportation Data Coordinating Committee (TDCC) — X12 code "T". */
   TDCC("T", "Transportation Data Coordinating Committee (TDCC)"),
+  /** Accredited Standards Committee X12 — X12 code "X". */
   ASC_X12("X", "Accredited Standards Committee X12");
 
   private final String code;

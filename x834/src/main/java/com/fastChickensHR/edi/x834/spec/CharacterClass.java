@@ -80,18 +80,30 @@ public enum CharacterClass {
     return builder.toString();
   }
 
-  /** Every character in this set, in a stable order: letters, digits, space, then punctuation. */
+  /**
+   * Every character in this set, in a stable order: letters, digits, space, then punctuation.
+   *
+   * @return the set's members as a string
+   */
   public String getCharacters() {
     return characters;
   }
 
-  /** Whether this set contains {@code candidate}. */
+  /**
+   * Whether this set contains {@code candidate}.
+   *
+   * @param candidate the character to test
+   * @return true when the character is a member of this set
+   */
   public boolean permits(char candidate) {
     return candidate < 128 && members.get(candidate);
   }
 
   /**
    * Whether every character of {@code value} is a member of this set. An empty value trivially is.
+   *
+   * @param value the text to test; null is treated as empty
+   * @return true when no character of the value falls outside this set
    */
   public boolean permitsAll(CharSequence value) {
     return firstViolation(value).isEmpty();
@@ -101,6 +113,9 @@ public enum CharacterClass {
    * The index of the first character of {@code value} that this set does not contain, or empty when
    * every character is a member. The index — not just the character — so a caller can report where
    * in a long value the offending character sits.
+   *
+   * @param value the text to test; null is treated as empty
+   * @return the index of the first non-member character, or empty when all are members
    */
   public OptionalInt firstViolation(CharSequence value) {
     if (value == null) {
@@ -117,6 +132,8 @@ public enum CharacterClass {
   /**
    * The characters {@link #EXTENDED} adds to {@link #BASIC}: lower-case letters and its
    * punctuation.
+   *
+   * @return the members of {@code EXTENDED} that are not members of {@code BASIC}
    */
   public static String extendedOnlyCharacters() {
     return lowerCase() + EXTENDED_ONLY_SPECIALS;

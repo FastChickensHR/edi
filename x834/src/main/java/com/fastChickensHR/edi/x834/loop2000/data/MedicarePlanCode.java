@@ -23,10 +23,15 @@ import lombok.Getter;
  */
 @Getter
 public enum MedicarePlanCode implements EdiCodeEnum {
+  /** Medicare Part A — X12 code "A". */
   PART_A("A", "Medicare Part A"),
+  /** Medicare Part B — X12 code "B". */
   PART_B("B", "Medicare Part B"),
+  /** Medicare Part A and B — X12 code "C". */
   PART_A_AND_B("C", "Medicare Part A and B"),
+  /** Medicare — X12 code "D". */
   MEDICARE("D", "Medicare"),
+  /** No Medicare — X12 code "E". */
   NO_MEDICARE("E", "No Medicare");
 
   private final String code;

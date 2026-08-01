@@ -41,12 +41,35 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BaseMember {
+
+  /** Creates a member with no fields initialized; used by concrete member subclasses. */
+  protected BaseMember() {}
+
+  /**
+   * The member's own identifier, emitted as a member-level {@code REF} whose qualifier is {@code
+   * memberIdQualifier}.
+   */
   protected String memberId;
+
+  /** REF01 for the {@code memberId} REF — states what kind of identifier it is. */
   protected String memberIdQualifier;
+
+  /**
+   * REF02 under {@code REF*0F} (zero-F, Subscriber Number) — the subscriber identifier this member
+   * enrolls under.
+   */
   protected String subscriberNumber;
+
+  /** REF02 under {@code REF*1L} — the group or policy number for this member's enrollment. */
   protected String policyNumber;
+
+  /** NM104 — the member's first name (Loop 2100A NM1). */
   protected String firstName;
+
+  /** NM103 — the member's last name (Loop 2100A NM1). */
   protected String lastName;
+
+  /** NM105 — the member's middle name (Loop 2100A NM1). Optional. */
   protected String middleName;
 
   /**
@@ -61,12 +84,16 @@ public abstract class BaseMember {
    */
   protected String nameId;
 
+  /** DMG02 — the member's birth date, emitted in {@code D8} (CCYYMMDD) format. */
   protected LocalDateTime birthDate;
 
   /** DMG03 — the member's gender, drawn from the element-1068 code list. */
   protected GenderCode gender;
 
+  /** INS01 — whether this member is the subscriber ({@code Y}) or a dependent ({@code N}). */
   protected MemberIndicator memberIndicator;
+
+  /** INS03 — what kind of maintenance this is (element 875), e.g. addition or termination. */
   protected MaintenanceTypeCode maintenanceTypeCode;
 
   /**
@@ -81,9 +108,16 @@ public abstract class BaseMember {
    */
   protected EmploymentStatusCode employmentStatusCode;
 
+  /** DTP*300 — the enrollment signature date for this member's maintenance. */
   protected LocalDateTime enrollmentDate;
+
+  /** DTP*356 — the member's eligibility begin date. */
   protected LocalDateTime coverageStartDate;
+
+  /** DTP*357 — the member's eligibility end date. */
   protected LocalDateTime coverageEndDate;
+
+  /** INS02 — how this member relates to the subscriber (element 1069), e.g. self or spouse. */
   protected IndividualRelationshipCode relationshipCode;
 
   /**
@@ -143,6 +177,8 @@ public abstract class BaseMember {
   }
 
   /**
+   * Looks up this member's address of the given kind.
+   *
    * @param type the address kind to look up
    * @return this member's address of that type, if any
    */
@@ -165,42 +201,92 @@ public abstract class BaseMember {
   // Retained so existing callers (setAddressLine1/setCity/...) keep working; each reads/writes
   // the member's RESIDENCE address within {@link #addresses}.
 
+  /**
+   * Returns the first address line of the member's residence address.
+   *
+   * @return residence line 1, or null when the member has no residence address
+   */
   public String getAddressLine1() {
     return getAddress(AddressType.RESIDENCE).map(Address::getLine1).orElse(null);
   }
 
+  /**
+   * Returns the second address line of the member's residence address.
+   *
+   * @return residence line 2, or null when the member has no residence address
+   */
   public String getAddressLine2() {
     return getAddress(AddressType.RESIDENCE).map(Address::getLine2).orElse(null);
   }
 
+  /**
+   * Returns the city of the member's residence address.
+   *
+   * @return residence city, or null when the member has no residence address
+   */
   public String getCity() {
     return getAddress(AddressType.RESIDENCE).map(Address::getCity).orElse(null);
   }
 
+  /**
+   * Returns the state of the member's residence address.
+   *
+   * @return residence state, or null when the member has no residence address
+   */
   public String getState() {
     return getAddress(AddressType.RESIDENCE).map(Address::getState).orElse(null);
   }
 
+  /**
+   * Returns the ZIP code of the member's residence address.
+   *
+   * @return residence ZIP code, or null when the member has no residence address
+   */
   public String getZipCode() {
     return getAddress(AddressType.RESIDENCE).map(Address::getZipCode).orElse(null);
   }
 
+  /**
+   * Sets the first address line of the member's residence address, creating one if absent.
+   *
+   * @param value residence line 1
+   */
   public void setAddressLine1(String value) {
     residenceOrCreate().setLine1(value);
   }
 
+  /**
+   * Sets the second address line of the member's residence address, creating one if absent.
+   *
+   * @param value residence line 2
+   */
   public void setAddressLine2(String value) {
     residenceOrCreate().setLine2(value);
   }
 
+  /**
+   * Sets the city of the member's residence address, creating one if absent.
+   *
+   * @param value residence city
+   */
   public void setCity(String value) {
     residenceOrCreate().setCity(value);
   }
 
+  /**
+   * Sets the state of the member's residence address, creating one if absent.
+   *
+   * @param value residence state
+   */
   public void setState(String value) {
     residenceOrCreate().setState(value);
   }
 
+  /**
+   * Sets the ZIP code of the member's residence address, creating one if absent.
+   *
+   * @param value residence ZIP code
+   */
   public void setZipCode(String value) {
     residenceOrCreate().setZipCode(value);
   }

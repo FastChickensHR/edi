@@ -42,9 +42,12 @@ public class MemberCommunication {
   /** The number itself (PER04/06/08) — required. */
   private String number;
 
+  /** Creates an empty communication; callers set the qualifier and number afterwards. */
   public MemberCommunication() {}
 
   /**
+   * Creates a communication from its qualifier/number pair.
+   *
    * @param qualifier what kind of number this is (PER03/05/07)
    * @param number the number itself (PER04/06/08)
    */

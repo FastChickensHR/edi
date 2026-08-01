@@ -23,7 +23,9 @@ import lombok.Getter;
  */
 @Getter
 public enum AcknowledgmentRequested implements EdiCodeEnum {
+  /** No Interchange Acknowledgment Requested — X12 code "0". */
   NO_ACKNOWLEDGMENT("0", "No Interchange Acknowledgment Requested"),
+  /** Interchange Acknowledgment Requested (TA1) — X12 code "1". */
   ACKNOWLEDGMENT_REQUESTED("1", "Interchange Acknowledgment Requested (TA1)");
 
   private final String code;

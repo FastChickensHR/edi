@@ -10,7 +10,6 @@ package com.fastChickensHR.edi.x834.loop2000;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * A single typed postal address for a member (residence, mailing, work, ...).
@@ -20,7 +19,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class Address {
   private AddressType type;
@@ -30,7 +28,12 @@ public class Address {
   private String state;
   private String zipCode;
 
+  /** Creates an empty address; callers set the {@link AddressType} and lines afterwards. */
+  public Address() {}
+
   /**
+   * Whether the address is complete enough for its street segment.
+   *
    * @return true when this address carries a street line (the minimum needed to emit an N3).
    */
   public boolean hasStreet() {
@@ -38,6 +41,8 @@ public class Address {
   }
 
   /**
+   * Whether the address is complete enough for its city/state/postal segment.
+   *
    * @return true when city, state and postal code are all present (the minimum to emit an N4).
    */
   public boolean hasCityStateZip() {

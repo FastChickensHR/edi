@@ -12,8 +12,12 @@ package com.fastChickensHR.edi.core;
  * (segment identifier, delimiters) and they are never overridable; {@code name} carries only the
  * <b>configurable</b> token(s) — an 834 REF qualifier, a CSV column — interpreted by the format's
  * own dialect below the kernel. {@code level} is the tree depth the address sits at.
+ *
+ * @param level the tree depth this address sits at
+ * @param name the configurable token(s) the format's dialect interprets at that depth
  */
 public record Location(RecordLevel level, String name) {
+  /** Rejects a null level and a null or blank name. */
   public Location {
     if (level == null) {
       throw new IllegalArgumentException("level is required");

@@ -25,28 +25,51 @@ import lombok.Getter;
  */
 @Getter
 public enum FrequencyCode implements EdiCodeEnum {
+  /** Annualized; 12-month equivalent — X12 code "0". */
   ANNUALIZED("0", "Annualized; 12-month equivalent"),
+  /** Weekly — X12 code "1". */
   WEEKLY("1", "Weekly"),
+  /** Biweekly — X12 code "2". */
   BIWEEKLY("2", "Biweekly"),
+  /** Semimonthly — X12 code "3". */
   SEMIMONTHLY("3", "Semimonthly"),
+  /** Monthly — X12 code "4". */
   MONTHLY("4", "Monthly"),
+  /** Other — X12 code "5". */
   OTHER("5", "Other"),
+  /** Daily — X12 code "6". */
   DAILY("6", "Daily"),
+  /** Annual — X12 code "7". */
   ANNUAL("7", "Annual"),
+  /** Two Calendar Months — X12 code "8". */
   TWO_CALENDAR_MONTHS("8", "Two Calendar Months"),
+  /** Lump-Sum Separation Allowance — X12 code "9". */
   LUMP_SUM_SEPARATION_ALLOWANCE("9", "Lump-Sum Separation Allowance"),
+  /** Quarter-to-Date — X12 code "A". */
   QUARTER_TO_DATE("A", "Quarter-to-Date"),
+  /** Year-to-Date — X12 code "B". */
   YEAR_TO_DATE("B", "Year-to-Date"),
+  /** Single — X12 code "C". */
   SINGLE("C", "Single"),
+  /** Policy Period — X12 code "D". */
   POLICY_PERIOD("D", "Policy Period"),
+  /** Claim Period — X12 code "E". */
   CLAIM_PERIOD("E", "Claim Period"),
+  /** Unit Report Identifier — X12 code "F". */
   UNIT_REPORT_IDENTIFIER("F", "Unit Report Identifier"),
+  /** Month-to-Date — X12 code "G". */
   MONTH_TO_DATE("G", "Month-to-Date"),
+  /** Hourly — X12 code "H". */
   HOURLY("H", "Hourly"),
+  /** Current Period — X12 code "J". */
   CURRENT_PERIOD("J", "Current Period"),
+  /** Quarterly — X12 code "Q". */
   QUARTERLY("Q", "Quarterly"),
+  /** Semiannual — X12 code "S". */
   SEMIANNUAL("S", "Semiannual"),
+  /** Unknown — X12 code "U". */
   UNKNOWN("U", "Unknown"),
+  /** Mutually Defined — X12 code "Z". */
   MUTUALLY_DEFINED("Z", "Mutually Defined");
 
   private final String code;

@@ -23,36 +23,66 @@ import lombok.Getter;
  */
 @Getter
 public enum TransactionTypeCode implements EdiCodeEnum {
+  /** Location Address Message — X12 code "01". */
   LOCATION_ADDRESS("01", "Location Address Message"),
+  /** Unique Item Tracking Control Report — X12 code "1A". */
   UNIQUE_TRACKING_CONTROL("1A", "Unique Item Tracking Control Report"),
+  /** Unique Item Tracking Report Reconciliation — X12 code "1B". */
   UNIQUE_TRACKING_RECONCILIATION("1B", "Unique Item Tracking Report Reconciliation"),
+  /** Location Relation Information — X12 code "02". */
   LOCATION_RELATION("02", "Location Relation Information"),
+  /** Report Message — X12 code "03". */
   REPORT_MESSAGE("03", "Report Message"),
+  /** Supporting Information — X12 code "3M". */
   SUPPORTING_INFORMATION("3M", "Supporting Information"),
+  /** Electronic Mail Message — X12 code "04". */
   ELECTRONIC_MAIL("04", "Electronic Mail Message"),
+  /** Request for Co-op — X12 code "05". */
   REQUEST_FOR_COOP("05", "Request for Co-op"),
+  /** Guidelines — X12 code "06". */
   GUIDELINES("06", "Guidelines"),
+  /** Accomplishment Based Renewal — X12 code "6A". */
   ACCOMPLISHMENT_RENEWAL("6A", "Accomplishment Based Renewal"),
+  /** Competitive Renewal — X12 code "6C". */
   COMPETITIVE_RENEWAL("6C", "Competitive Renewal"),
+  /** Non-competitive Renewal — X12 code "6N". */
   NON_COMPETITIVE_RENEWAL("6N", "Non-competitive Renewal"),
+  /** Resubmission — X12 code "6R". */
   RESUBMISSION("6R", "Resubmission"),
+  /** Supplemental — X12 code "6S". */
   SUPPLEMENTAL("6S", "Supplemental"),
+  /** Budget — X12 code "07". */
   BUDGET("07", "Budget"),
+  /** Commitment — X12 code "08". */
   COMMITMENT("08", "Commitment"),
+  /** Co-op Actual — X12 code "09". */
   COOP_ACTUAL("09", "Co-op Actual"),
+  /** Distribution — X12 code "10". */
   DISTRIBUTION("10", "Distribution"),
+  /** National Property Registry System Real Estate Property Transaction — X12 code "11". */
   PROPERTY_TRANSACTION("11", "National Property Registry System Real Estate Property Transaction"),
+  /** Physician's Report — X12 code "12". */
   PHYSICIAN_REPORT("12", "Physician's Report"),
+  /** Maintenance Request — X12 code "13". */
   MAINTENANCE_REQUEST("13", "Maintenance Request"),
+  /** Maintenance Response — X12 code "14". */
   MAINTENANCE_RESPONSE("14", "Maintenance Response"),
+  /** Request with Immediate Response Required (No Follow-up) — X12 code "15". */
   REQUEST_IMMEDIATE_NO_FOLLOWUP("15", "Request with Immediate Response Required (No Follow-up)"),
+  /** Request with Immediate Response Required (Follow-up Required) — X12 code "16". */
   REQUEST_IMMEDIATE_WITH_FOLLOWUP(
       "16", "Request with Immediate Response Required (Follow-up Required)"),
+  /** Request with Immediate Response to Mailbox — X12 code "17". */
   REQUEST_RESPONSE_TO_MAILBOX("17", "Request with Immediate Response to Mailbox"),
+  /** Response - No Further Updates to Follow — X12 code "18". */
   RESPONSE_NO_UPDATES("18", "Response - No Further Updates to Follow"),
+  /** Response - Further Updates to Follow — X12 code "19". */
   RESPONSE_UPDATES_FOLLOW("19", "Response - Further Updates to Follow"),
+  /** Air Export Waybill and Invoice — X12 code "20". */
   AIR_EXPORT_WAYBILL("20", "Air Export Waybill and Invoice"),
+  /** Report sent by National Center for Education Statistics (NCES) — X12 code "T1". */
   REPORT_SENT_BY_NCES("T1", "Report sent by National Center for Education Statistics (NCES)"),
+  /** Mutually Defined — X12 code "ZZ". */
   MUTUALLY_DEFINED("ZZ", "Mutually Defined");
 
   private final String code;

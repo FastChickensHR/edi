@@ -53,9 +53,12 @@ public class Income {
   /** The currency {@link #amount} is in (ICM06), e.g. {@code USD}. */
   private String currencyCode;
 
+  /** Creates an empty income; callers set the required frequency and amount afterwards. */
   public Income() {}
 
   /**
+   * Creates an income from the mandatory frequency/amount pair.
+   *
    * @param frequency the period the amount covers (ICM01)
    * @param amount what the member earns in that period (ICM02)
    */
