@@ -23,6 +23,12 @@
     <name>FastChickensHR EDI Core</name>
     <description>Format-neutral file kernel (FileContent / Record / Field / Location) and the generate/parse seam</description>
 
+    <properties>
+        <!-- Coverage regression floors (#244) - hand-ratchet only, never lower to admit a PR -->
+        <jacoco.line.floor>0.99</jacoco.line.floor>
+        <jacoco.branch.floor>0.90</jacoco.branch.floor>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

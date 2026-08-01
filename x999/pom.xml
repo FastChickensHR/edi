@@ -23,6 +23,12 @@
     <name>FastChickensHR EDI 999</name>
     <description>X12 999 / 997 acknowledgment support — parses into the core file kernel</description>
 
+    <properties>
+        <!-- Coverage regression floors (#244) - hand-ratchet only, never lower to admit a PR -->
+        <jacoco.line.floor>0.95</jacoco.line.floor>
+        <jacoco.branch.floor>0.80</jacoco.branch.floor>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.fastchickenshr</groupId>

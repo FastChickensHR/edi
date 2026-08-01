@@ -44,6 +44,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.36</lombok.version>
         <errorprone.version>2.50.0</errorprone.version>
+        <jacoco.version>0.8.13</jacoco.version>
+        <!--
+            Coverage regression floors (#244): each module declares its own
+            jacoco.line.floor / jacoco.branch.floor, set just under its measured
+            coverage. Hand-ratchet them upward when numbers durably improve;
+            never lower one to admit a PR. The 1.00 defaults here deliberately
+            fail any new module until it declares its floors.
+        -->
+        <jacoco.line.floor>1.00</jacoco.line.floor>
+        <jacoco.branch.floor>1.00</jacoco.branch.floor>
         <junit.version>5.10.2</junit.version>
     </properties>
 
@@ -125,6 +135,44 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check-floors</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.line.floor}</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco.branch.floor}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

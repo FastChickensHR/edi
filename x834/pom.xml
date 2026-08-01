@@ -23,6 +23,12 @@
     <name>FastChickensHR EDI 834</name>
     <description>X12 834 benefit enrollment EDI document generation toolkit</description>
 
+    <properties>
+        <!-- Coverage regression floors (#244) - hand-ratchet only, never lower to admit a PR -->
+        <jacoco.line.floor>0.95</jacoco.line.floor>
+        <jacoco.branch.floor>0.75</jacoco.branch.floor>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.fastchickenshr</groupId>

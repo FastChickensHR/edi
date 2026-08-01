@@ -23,6 +23,12 @@
     <name>FastChickensHR EDI Flat File</name>
     <description>Flat-file support (delimited today, fixed-width reserved) — parses into and generates from the core file kernel</description>
 
+    <properties>
+        <!-- Coverage regression floors (#244) - hand-ratchet only, never lower to admit a PR -->
+        <jacoco.line.floor>0.94</jacoco.line.floor>
+        <jacoco.branch.floor>0.82</jacoco.branch.floor>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.fastchickenshr</groupId>
