@@ -251,7 +251,16 @@
                             Breaking line, with a comment gisting that line. Reset to empty
                             at every release cut alongside the baseline bump.
                         -->
-                        <excludes/>
+                        <excludes>
+                            <!-- #262 idiom alignment (PR #266): Address dropped
+                                 @Data/@Builder/@AllArgsConstructor for the family's
+                                 @Getter/@Setter bean shape — builder()/AddressBuilder,
+                                 the all-args constructor and equals/hashCode/canEqual
+                                 are gone; construct via the no-arg ctor + setters.
+                                 CHANGELOG: Unreleased > Breaking. -->
+                            <exclude>com.fastChickensHR.edi.x834.loop2000.Address</exclude>
+                            <exclude>com.fastChickensHR.edi.x834.loop2000.Address$AddressBuilder</exclude>
+                        </excludes>
                     </parameter>
                 </configuration>
                 <executions>

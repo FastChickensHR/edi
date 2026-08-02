@@ -59,7 +59,10 @@ here so consumers can find it.
 
 ### Breaking
 
-- none
+- `x834`: `Address` dropped its Lombok-generated `builder()`/`AddressBuilder`,
+  all-args constructor and `equals`/`hashCode` in the idiom-guide alignment
+  (#262) — it is now a plain bean: construct with the no-arg constructor and
+  setters.
 
 ## [1.0.0-beta.1] - 2026-08-02
 
