@@ -7,9 +7,8 @@
  */
 package com.fastChickensHR.edi.x834.loop2000;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * A single typed postal address for a member (residence, mailing, work, ...).
@@ -17,9 +16,8 @@ import lombok.Data;
  * <p>This is a pure domain object; how (and whether) a given {@link AddressType} is serialized into
  * the X12 834 wire format is decided by the writer — see {@link AddressType} for the mapping.
  */
-@Data
-@Builder
-@AllArgsConstructor
+@Getter
+@Setter
 public class Address {
   private AddressType type;
   private String line1;

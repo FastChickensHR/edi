@@ -244,14 +244,13 @@ class X834MemberWriterTest {
     member.setState("IL");
     member.setZipCode("62704");
     // mailing (2100C) — a distinct PO box
-    member.addAddress(
-        Address.builder()
-            .type(AddressType.MAILING)
-            .line1("PO BOX 99")
-            .city("SPRINGFIELD")
-            .state("IL")
-            .zipCode("62705")
-            .build());
+    Address mailing = new Address();
+    mailing.setType(AddressType.MAILING);
+    mailing.setLine1("PO BOX 99");
+    mailing.setCity("SPRINGFIELD");
+    mailing.setState("IL");
+    mailing.setZipCode("62705");
+    member.addAddress(mailing);
 
     String out = render(writer.toSegments(member));
 

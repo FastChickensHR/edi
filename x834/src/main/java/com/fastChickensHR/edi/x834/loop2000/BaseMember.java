@@ -28,6 +28,7 @@ import com.fastChickensHR.edi.x834.loop2000.loop2700.ReportingCategory;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -182,7 +183,7 @@ public abstract class BaseMember {
    * @param type the address kind to look up
    * @return this member's address of that type, if any
    */
-  public java.util.Optional<Address> getAddress(AddressType type) {
+  public Optional<Address> getAddress(AddressType type) {
     return addresses.stream().filter(a -> a.getType() == type).findFirst();
   }
 
