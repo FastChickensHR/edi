@@ -95,10 +95,10 @@ heading.
 
 ## Idioms
 
-The code idiom guide (builders, Lombok charter, nullness, `X834*` naming,
-records vs beans) is being settled in
-[#243](https://github.com/FastChickensHR/edi/issues/243); its resolution will
-produce the guide that replaces this line.
+New code follows the idiom guide in [docs/STYLE.md](docs/STYLE.md) —
+builders, the Lombok charter, nullness, `X834*` naming, and records vs
+beans, as settled in
+[#243](https://github.com/FastChickensHR/edi/issues/243).
 
 ## Licensing
 
