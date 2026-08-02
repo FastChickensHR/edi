@@ -13,21 +13,39 @@ A Java toolkit for benefit-enrollment EDI: generate X12 834 files and delimited 
 
 ## Install
 
-Not yet published. Build and install to your local Maven repository:
-
-```bash
-mvn install
-```
-
-Then depend on the module you need:
+Tagged beta releases are published to GitHub Packages. Add the repository and
+depend on the module you need:
 
 ```xml
+<repositories>
+  <repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/FastChickensHR/edi</url>
+  </repository>
+</repositories>
+
 <dependency>
   <groupId>com.fastchickenshr</groupId>
   <artifactId>x834</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0-beta.1</version>
 </dependency>
 ```
+
+GitHub Packages requires authentication even for public downloads: put a
+personal access token with the `read:packages` scope in your
+`~/.m2/settings.xml` under a server whose id matches the repository id above:
+
+```xml
+<servers>
+  <server>
+    <id>github</id>
+    <username>YOUR_GITHUB_USERNAME</username>
+    <password>YOUR_READ_PACKAGES_PAT</password>
+  </server>
+</servers>
+```
+
+Alternatively, build from a clone with `mvn install`.
 
 ## Usage
 
