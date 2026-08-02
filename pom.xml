@@ -45,6 +45,17 @@
         <lombok.version>1.18.36</lombok.version>
         <errorprone.version>2.50.0</errorprone.version>
         <jacoco.version>0.8.13</jacoco.version>
+        <japicmp.version>0.23.1</japicmp.version>
+        <!--
+            Binary-compat gate baseline (#256): the last released version, resolved
+            from GitHub Packages. Bumped mechanically at each release cut; the
+            acknowledgment (exclude) block below resets to empty at the same time.
+            Lenient by default (missing baseline is skipped) so pre-release
+            bootstrap and PAT-less local builds stay green; CI's strict override
+            flips ignoreMissingOldVersion to false once the baseline exists.
+        -->
+        <edi.compat.baseline>1.0.0-beta.1</edi.compat.baseline>
+        <edi.compat.ignoreMissingOldVersion>true</edi.compat.ignoreMissingOldVersion>
         <!--
             Coverage regression floors (#244): each module declares its own
             jacoco.line.floor / jacoco.branch.floor, set just under its measured
@@ -154,6 +165,42 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${japicmp.version}</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${edi.compat.baseline}</version>
+                            <type>jar</type>
+                        </dependency>
+                    </oldVersion>
+                    <parameter>
+                        <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
+                        <ignoreMissingOldVersion>${edi.compat.ignoreMissingOldVersion}</ignoreMissingOldVersion>
+                        <accessModifier>protected</accessModifier>
+                        <!--
+                            Acknowledgment block (#256): every exclude is a fully-qualified
+                            element added in the SAME PR as the break and its CHANGELOG
+                            Breaking line, with a comment gisting that line. Reset to empty
+                            at every release cut alongside the baseline bump.
+                        -->
+                        <excludes/>
+                    </parameter>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>compat-gate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cmp</goal>
                         </goals>
                     </execution>
                 </executions>
