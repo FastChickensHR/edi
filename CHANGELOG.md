@@ -61,14 +61,27 @@ here so consumers can find it.
 
 - none
 
+## [1.0.0-beta.1] - 2026-08-02
+
+The first tagged release: the curated 1.0 candidate surface, published to
+GitHub Packages.
+
+### Breaking
+
+- none (first release)
+
 ### Added
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
+- `core` — the format-neutral file kernel: `FileContent`/`Record`/`Field`/
+  `Location` and the `FileGenerator`/`FileParser` seam.
+- `x834` — the X12 834 (005010X220A1) benefit-enrollment document model:
+  builder-based envelope and member loop, the accumulate-never-throw
+  `GenerationResult` contract, frozen `X834Location` render keys, the
+  `spec/` element dictionary and X12 code-set enums.
+- `x999` — X12 999 implementation-acknowledgment parsing (envelope and
+  AK1/IK5/AK9 verdict segments).
+- `flatfile` — delimited flat-file generate/parse round-trip with a pinned
+  CSV convention; `fixedwidth` ships as an empty placeholder package.
+- Build gates enforced at `verify`: Spotless (google-java-format), Error
+  Prone (errors-only), JaCoCo regression floors, doclint-clean javadoc
+  jars, and the japicmp binary-compatibility gate this release baselines.

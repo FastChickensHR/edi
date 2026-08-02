@@ -20,6 +20,15 @@
 
     <name>FastChickensHR EDI</name>
     <description>Open-source toolkit for generating X12 EDI benefit enrollment documents</description>
+    <url>https://github.com/FastChickensHR/edi</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/mit</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
@@ -29,6 +38,37 @@
             <organizationUrl>https://fastchickenshr.com</organizationUrl>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/FastChickensHR/edi.git</connection>
+        <developerConnection>scm:git:git@github.com:FastChickensHR/edi.git</developerConnection>
+        <url>https://github.com/FastChickensHR/edi</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/FastChickensHR/edi</url>
+        </repository>
+    </distributionManagement>
+
+    <!-- Where the japicmp baseline (our own released artifacts) resolves from.
+         GitHub Packages requires auth even for public reads; without a
+         credentialed settings.xml the compat gate's lenient default skips. -->
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/FastChickensHR/edi</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <modules>
         <module>core</module>
@@ -151,6 +191,19 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.12.0</version>
                 <configuration>
@@ -185,6 +238,12 @@
                     <parameter>
                         <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
                         <ignoreMissingOldVersion>${edi.compat.ignoreMissingOldVersion}</ignoreMissingOldVersion>
+                        <!-- Lombok's provided-scope jar packs its internals as .SCL.lombok
+                             (not loadable classes) and drags phantom refs (ant, eclipse, …),
+                             so missing-class loading cannot be strict here. Our own
+                             dependencies resolve normally, and the gate compares OUR
+                             classes — this does not soften the binary-compat verdict. -->
+                        <ignoreMissingClasses>true</ignoreMissingClasses>
                         <accessModifier>protected</accessModifier>
                         <!--
                             Acknowledgment block (#256): every exclude is a fully-qualified
