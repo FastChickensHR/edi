@@ -13,6 +13,7 @@ on:
 permissions:
   checks: write
   contents: read
+  packages: read
 
 # A newer commit on the same ref supersedes an in-flight run.
 concurrency:
@@ -35,8 +36,14 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # Strict compat gate: the japicmp baseline now exists on GitHub Packages
+      # (v1.0.0-beta.1), so a missing/unresolvable baseline is a failure here.
+      # setup-java's generated settings.xml (server id "github") authenticates
+      # the baseline download with the workflow's own token.
       - name: Build with Maven and run tests
-        run: mvn -B verify
+        run: mvn -B verify -Dedi.compat.ignoreMissingOldVersion=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
