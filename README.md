@@ -2,6 +2,10 @@
 
 A Java toolkit for benefit-enrollment EDI: generate X12 834 files and delimited flat files (CSV and friends), and parse inbound flat-file member feeds — over one format-neutral file kernel.
 
+**[Read the docs →](https://fastchickenshr.github.io/edi/)** — getting started, the
+834 generator, the flat-file and acknowledgment parsers, the core kernel, and the
+API reference.
+
 ## Modules
 
 | Module | Purpose |
