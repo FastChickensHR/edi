@@ -1,0 +1,132 @@
+# Dependabot configuration — implements mono's ADR-1373 (dependency-update posture).
+#
+# ⚠️ WHY THIS REPO MATTERS MOST. edi is a PUBLISHED ARTIFACT. mono consumes it from GitHub
+# Packages at a pinned <edi.version> (mono#849), so a vulnerable transitive dependency here ships
+# into mono — and mono's own scanning will not necessarily surface it, because mono sees
+# `com.fastchickenshr:edi` as a single opaque coordinate. Before this file, edi had alerts on but
+# automated security fixes OFF and no config, so it produced no pull request at all, including for
+# a critical CVE. It was the repo where a blind spot cost the most and had the least coverage.
+#
+# This file is a POLICY DOCUMENT. Every ignore cites its decision, names its un-defer trigger, and
+# states its SECURITY CONSEQUENCE — because `ignore:` reaches security updates, so an ignore is a
+# security decision, not a noise decision.
+#
+# TWO LANES. Security updates are never soaked: `cooldown` cannot apply to them, and it gates
+# version ELIGIBILITY AT PROPOSAL TIME rather than merging. Two qualifications, stated rather than
+# hidden: `ignore:` does reach security updates (above), and when Dependabot reports
+# `security_update_not_possible` there is NO security PR at all — the fix then arrives only via
+# the routine sweep, at worst cooldown + one sweep interval (≤14 days here).
+#
+# ⚠️ NO AUTO-MERGE IN THIS REPO, deliberately. mono auto-merges its patch tier gated on SIX
+# required checks including the container build. edi's gate is `Run Unit Tests` + `JUnit Test
+# Report` — a real gate, but a much thinner one, with no container-build or end-to-end equivalent.
+# Auto-merge is only ever as safe as the protection behind it, and this is a published artifact
+# that ships into another product. Un-defer trigger: edi's required-check set growing to cover
+# packaging and integration. See ADR-1373 §10.
+#
+# ⚠️ `reviewers:` has been REMOVED from the schema. Use CODEOWNERS for reviewer routing.
+# ⚠️ Adding `target-branch:` to a block SILENTLY EXCLUDES THAT WHOLE BLOCK from security updates.
+#
+# edi is a Maven library: no npm, Docker or Terraform ecosystems exist here. Versions are declared
+# in the ROOT pom and inherited by core/x834/flatfile/x999, so one maven entry at "/" covers the
+# whole reactor.
+
+version: 2
+
+updates:
+  # ---------------------------------------------------------------------------
+  # The library — Maven (multi-module: core, x834, flatfile, x999)
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Chicago
+    # Four groups plus headroom for anything `dependency-type` does not classify. A binding limit
+    # does not queue an update, it WITHHOLDS it silently — no notification, no record. Security
+    # PRs are exempt from this limit and never count toward it.
+    open-pull-requests-limit: 6
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      # The soak defends against a COMPROMISED RELEASE — a malicious version published and yanked
+      # within hours to days. It is not a defence against disclosed vulnerabilities, where delay is
+      # pure cost; that is what the security lane is for.
+      default-days: 7
+      semver-patch-days: 7
+      semver-minor-days: 14
+      # Documentation-of-intent: majors are ignored below, so this configures nothing today and
+      # goes live the moment that ignore lifts.
+      semver-major-days: 30
+    groups:
+      # Runtime vs build matters MORE here than in mono: a runtime dependency of edi is shipped to
+      # every consumer of the published artifact, while spotless, japicmp and jacoco are not. A
+      # dependency that reaches consumers should never hide inside a wall of plugin churn.
+      #
+      # Patch and minor are split to match mono's shape, so the two files read the same way even
+      # though nothing here auto-merges.
+      edi-runtime-patch:
+        applies-to: version-updates
+        dependency-type: production
+        update-types: [ patch ]
+      edi-runtime-minor:
+        applies-to: version-updates
+        dependency-type: production
+        update-types: [ minor ]
+      edi-build-patch:
+        applies-to: version-updates
+        dependency-type: development
+        update-types: [ patch ]
+      edi-build-minor:
+        applies-to: version-updates
+        dependency-type: development
+        update-types: [ minor ]
+    ignore:
+      # Majors are ignored, replaced by mono's quarterly majors review, which covers this repo.
+      # Ignoring majors IS drift; the review is the only thing separating it from the
+      # security-only posture ADR-1373 §3 rejects.
+      #
+      # ⚠️ SECURITY CONSEQUENCE: this may suppress a security fix reachable only by a major bump.
+      # The `version-update:` prefix hints it does not, but the documentation never says so and it
+      # is UNVERIFIED. The compensating control is that IGNORES SUPPRESS PRs, NOT ALERTS — an alert
+      # whose `first_patched_version` requires a major triggers an IMMEDIATE out-of-band review
+      # rather than waiting for the quarter (ADR-1373 §6).
+      #
+      # ⚠️ japicmp enforces this library's binary-compatibility promise. A major bump of it, or of
+      # anything in the public signature of core/x834/flatfile/x999, is a consumer-visible event
+      # and belongs in the quarterly review with a verdict, never in a routine sweep.
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
+
+  # ---------------------------------------------------------------------------
+  # CI — GitHub Actions (maven.yml, publish.yml)
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      # ⚠️ github-actions supports `default-days` ONLY — the per-semver keys are silently ignored
+      # here, so writing them would be a lie in a policy file.
+      default-days: 7
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns: [ "*" ]
+    ignore:
+      # Majors — see the maven block above for the reasoning and the security consequence.
+      # ⚠️ publish.yml releases this artifact to GitHub Packages. A major bump to an action in the
+      # publish path is a supply-chain change to how we SHIP, not just how we build.
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
