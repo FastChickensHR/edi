@@ -85,7 +85,7 @@
         <lombok.version>1.18.36</lombok.version>
         <errorprone.version>2.50.0</errorprone.version>
         <jacoco.version>0.8.13</jacoco.version>
-        <japicmp.version>0.23.1</japicmp.version>
+        <japicmp.version>0.26.1</japicmp.version>
         <!--
             Binary-compat gate baseline (#256): the last released version, resolved
             from GitHub Packages. Bumped mechanically at each release cut; the
@@ -105,7 +105,7 @@
         -->
         <jacoco.line.floor>1.00</jacoco.line.floor>
         <jacoco.branch.floor>1.00</jacoco.branch.floor>
-        <junit.version>5.10.2</junit.version>
+        <junit.version>5.14.4</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -131,7 +131,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.13.0</version>
+                    <version>3.15.0</version>
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
@@ -159,7 +159,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.5.6</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -167,7 +167,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.9.0</version>
                 <configuration>
                     <java>
                         <googleJavaFormat>
@@ -192,7 +192,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
