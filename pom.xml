@@ -84,8 +84,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.36</lombok.version>
         <errorprone.version>2.50.0</errorprone.version>
-        <jacoco.version>0.8.13</jacoco.version>
-        <japicmp.version>0.26.1</japicmp.version>
+        <jacoco.version>0.8.15</jacoco.version>
+        <japicmp.version>0.26.2</japicmp.version>
         <!--
             Binary-compat gate baseline (#256): the last released version, resolved
             from GitHub Packages. Bumped mechanically at each release cut; the
